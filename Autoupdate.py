@@ -15,6 +15,7 @@ def update(app_name):
     1 - The latest built exe  (App_name.exe)
     2 - The APPS.UPDATE.exe
     """
+    #Test
     AppPath = os.path.abspath(sys.argv[0])
     head, tail = os.path.split(AppPath)
     extension = tail.split(".")
