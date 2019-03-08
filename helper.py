@@ -10,7 +10,7 @@ from library import settings
 
 def get_correct_pse_path(number):
     """
-    Searches for the correct project folder based on the given number
+    Searches  for the correct project folder based on the given number
     :param number: <class int> pse number as int
     :return: <class str> path for project. path is empty if not found
     """
