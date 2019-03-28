@@ -28,7 +28,7 @@ key update: Check if an update is available for the application.
 """
 
 import ctypes
-from logging import debug
+from logging import debug, error
 import os
 import subprocess
 import sys
@@ -56,6 +56,10 @@ def _check_install_update(app_name):
 
     upd_path = os.path.join("N:\\Lager", app_name, "UPDATE")
     upd_file = os.path.join(upd_path, f"{app_name}.exe")
+
+    if not os.path.exists(upd_file):
+        error("Could not update app since path {upd_path} does not exist")
+
     if os.path.getmtime(upd_file) > os.path.getmtime(app_path):
         debug("An updated version of the software is available.")
         ctypes.windll.user32.MessageBoxW(
