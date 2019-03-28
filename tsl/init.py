@@ -60,7 +60,8 @@ def _check_install_update(app_name):
     upd_file = os.path.join(upd_path, f"{app_name}.exe")
 
     if not os.path.exists(upd_file):
-        error("Could not update app since path {upd_path} does not exist")
+        error(f"Could not update app since path {upd_path} does not exist")
+        return
 
     if os.path.getmtime(upd_file) > os.path.getmtime(app_path):
         debug("An updated version of the software is available.")
