@@ -28,7 +28,9 @@ key update: Check if an update is available for the application.
 """
 
 import ctypes
-from logging import debug, error
+import traceback
+from logging import debug, error, getLogger, Formatter, StreamHandler, \
+    FileHandler, DEBUG, warning, critical, info
 import os
 import subprocess
 import sys
@@ -108,9 +110,95 @@ def _edit_registry_keys(app_name):
         winreg.CloseKey(registry_key)
 
 
+def excepthook(cls, exception, trace):
+    """
+    Override the system except hook to catch PyQt exceptions.
+
+    :param cls: <class class> class of the exception
+    :param exception: <class str> exception string
+    :param trace: <class traceback> traceback of the exception
+    :return: <class NoneType> None
+    """
+    critical("Critical error occurred:")
+    traceback_text = ""
+    for line in traceback.format_tb(trace):
+        for line_splitted in line.split("\n"):
+            if line_splitted:
+                traceback_text = traceback_text + line_splitted + "\n"
+                critical(line_splitted)
+    critical(f"{cls} {exception}")
+    try:
+        _error_message_box("{}: {}".format(cls, exception), traceback_text)
+    except ImportError:
+        warning("Not showing error message since PyQt5 is not installed.")
+
+
+def _error_message_box(error_message, traceb):
+    """
+    Show an error message box containing the given traceback.
+
+    :param error_message: <class str> Error text
+    :param traceb: <class traceback> traceback as string
+    :return: <class NoneType> None
+    """
+    from PyQt5.QtWidgets import QMessageBox
+    info("Showing exception message")
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Critical)
+    msg.setText(error_message)
+    msg.setInformativeText(traceb)
+    msg.setWindowTitle("An error occurred")
+    msg.exec()
+
+
+def _set_excepthook(app_name):
+    """
+    Set the excepthook to catch PyQt5 exceptions in signals and slots.
+
+    :param app_name: <class str> name of the app
+    :return: <class NoneType> None
+    """
+    debug(f"Setting custom except hook for {app_name}")
+    sys.excepthook = excepthook
+
+
+def _create_logger(app_name):
+    """
+    Set up the logging environment.
+
+    :param app_name: <class str> name of the app
+    :return: <class NoneType> None
+    """
+    file_name = "logfile.log"
+    log = getLogger()  # root logger
+    log.setLevel(DEBUG)
+    format_str = '%(asctime)s.%(msecs)03d %(threadName)s  - ' \
+                 '%(levelname)-8s - %(message)s'
+    date_format = '%Y-%m-%d %H:%M:%S'
+    formatter = Formatter(format_str, date_format)
+    stream_handler = StreamHandler()
+    stream_handler.setFormatter(formatter)
+    log.addHandler(stream_handler)
+
+    try:
+        os.remove(file_name)
+    except PermissionError:
+        print(f"Could not get lock on {file_name}, exiting")
+        sys.exit(0)
+    except FileNotFoundError:
+        pass
+    file_handler = FileHandler(file_name)
+    file_handler.setFormatter(formatter)
+
+    log.addHandler(file_handler)
+    debug(f"Successfully initialized logging for {app_name}")
+
+
 ARGUMENTS = {
+    "logging": _create_logger,
+    "excepthook": _set_excepthook,
     "registry": _edit_registry_keys,
-    "update": _check_install_update
+    "update": _check_install_update,
 }
 
 
