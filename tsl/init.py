@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 r"""
 TSL Library - init: providing functions needed on application startup.
 
