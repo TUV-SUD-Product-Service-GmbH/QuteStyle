@@ -51,6 +51,7 @@ def _check_install_update(app_name):
     app_path = os.path.abspath(sys.argv[0])
 
     if _check_ide():
+        debug("Application is run from IDE, not running update check.")
         return
 
     upd_path = os.path.join("N:\\Lager", app_name, "UPDATE")
@@ -86,6 +87,7 @@ def _edit_registry_keys(app_name):
     :return: <class NoneType> None
     """
     if _check_ide():
+        debug("Application is run from IDE, not updating registry keys.")
         return
 
     data = {
