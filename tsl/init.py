@@ -129,6 +129,6 @@ def init(app_name, **kwargs):
     for key, parameter in kwargs.items():
         debug(f"Key '{key}': {parameter}")
 
-    for key, func in ARGUMENTS:
+    for key, func in ARGUMENTS.items():
         if key in kwargs and kwargs[key]:
             func(app_name)
