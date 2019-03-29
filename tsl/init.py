@@ -37,6 +37,11 @@ import sys
 import winreg
 
 
+SETTINGS = {
+    "log_level": DEBUG
+}
+
+
 def _check_install_update(app_name):
     """
     Check if an update is available and start the updater if so.
@@ -97,6 +102,7 @@ def _edit_registry_keys(app_name):
         debug("Application is run from IDE, not updating registry keys.")
         return
 
+    debug(f"Updating registry keys for {app_name}")
     data = {
         os.path.join("Software", app_name): os.path.abspath(sys.argv[0]),
         os.path.join("Software", "TÜV SÜD", app_name):
@@ -172,7 +178,7 @@ def _create_logger(app_name):
     """
     file_name = "logfile.log"
     log = getLogger()  # root logger
-    log.setLevel(DEBUG)
+    log.setLevel(SETTINGS["log_level"])
     format_str = '%(asctime)s.%(msecs)03d %(threadName)s  - ' \
                  '%(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
