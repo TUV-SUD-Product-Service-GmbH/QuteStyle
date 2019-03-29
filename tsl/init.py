@@ -29,8 +29,8 @@ key update: Check if an update is available for the application.
 
 import ctypes
 import traceback
-from logging import debug, error, getLogger, Formatter, StreamHandler, \
-    FileHandler, DEBUG, warning, critical, info
+from logging import error, getLogger, Formatter, StreamHandler, \
+    FileHandler, warning, critical, info, DEBUG
 import os
 import subprocess
 import sys
@@ -54,11 +54,11 @@ def _check_install_update(app_name):
     :param app_name: <class str> name of the application.
     :return: <class NoneType> None
     """
-    debug(f"Checking for _check_install_update of application \"{app_name}\"")
+    info(f"Checking for _check_install_update of application \"{app_name}\"")
     app_path = os.path.abspath(sys.argv[0])
 
     if _check_ide():
-        debug("Application is run from IDE, not running update check.")
+        info("Application is run from IDE, not running update check.")
         return
 
     upd_path = os.path.join("N:\\Lager", app_name, "UPDATE")
@@ -69,7 +69,7 @@ def _check_install_update(app_name):
         return
 
     if os.path.getmtime(upd_file) > os.path.getmtime(app_path):
-        debug("An updated version of the software is available.")
+        info("An updated version of the software is available.")
         ctypes.windll.user32.MessageBoxW(
             0, "Software update available. The Application will be closed, "
                "updated and relaunched automatically.", "Update", 0)
@@ -77,7 +77,7 @@ def _check_install_update(app_name):
             [os.path.join(upd_path, "APPS_UPDATE.exe"), r"/ROOT:" + app_path,
              r"/TEXTFILE:" + os.path.join(upd_path, app_name + ".txt")])
         sys.exit()
-    debug("No update is available, continuing startup.")
+    info("No update is available, continuing startup.")
 
 
 def _check_ide():
@@ -86,7 +86,7 @@ def _check_ide():
 
     :return: <class bool> True if run from IDE
     """
-    debug("Checking if running from IDE")
+    info("Checking if running from IDE")
     app_path = os.path.abspath(sys.argv[0])
     return not os.path.split(app_path)[1].endswith(".exe")
 
@@ -99,10 +99,10 @@ def _edit_registry_keys(app_name):
     :return: <class NoneType> None
     """
     if _check_ide():
-        debug("Application is run from IDE, not updating registry keys.")
+        info("Application is run from IDE, not updating registry keys.")
         return
 
-    debug(f"Updating registry keys for {app_name}")
+    info(f"Updating registry keys for {app_name}")
     data = {
         os.path.join("Software", app_name): os.path.abspath(sys.argv[0]),
         os.path.join("Software", "TÜV SÜD", app_name):
@@ -165,7 +165,7 @@ def _set_excepthook(app_name):
     :param app_name: <class str> name of the app
     :return: <class NoneType> None
     """
-    debug(f"Setting custom except hook for {app_name}")
+    info(f"Setting custom except hook for {app_name}")
     sys.excepthook = excepthook
 
 
@@ -178,6 +178,11 @@ def _create_logger(app_name):
     """
     file_name = "logfile.log"
     log = getLogger()  # root logger
+
+    # remove all handlers from logger if there are any:
+    for handler in log.handlers:
+        log.removeHandler(handler)
+
     log.setLevel(SETTINGS["log_level"])
     format_str = '%(asctime)s.%(msecs)03d %(threadName)s  - ' \
                  '%(levelname)-8s - %(message)s'
@@ -198,11 +203,10 @@ def _create_logger(app_name):
     file_handler.setFormatter(formatter)
 
     log.addHandler(file_handler)
-    debug(f"Successfully initialized logging for {app_name}")
+    info(f"Successfully initialized logging for {app_name}")
 
 
 ARGUMENTS = {
-    "logging": _create_logger,
     "excepthook": _set_excepthook,
     "registry": _edit_registry_keys,
     "update": _check_install_update,
@@ -227,9 +231,12 @@ def init(app_name, **kwargs):
     # normalize the app_name just in case.
     app_name = app_name.lower()
 
-    debug(f"Initializing application {app_name} with:")
+    if "logging" in kwargs and kwargs["logging"]:
+        _create_logger(app_name)
+
+    info(f"Initializing application {app_name} with:")
     for key, parameter in kwargs.items():
-        debug(f"Key '{key}': {parameter}")
+        info(f"Key '{key}': {parameter}")
 
     for key, func in ARGUMENTS.items():
         if key in kwargs and kwargs[key]:
