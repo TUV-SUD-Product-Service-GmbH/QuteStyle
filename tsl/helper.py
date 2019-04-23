@@ -1,37 +1,29 @@
+"""
+TSL Library - helper: useful functions for TSL tools.
+
+Public methods:
+- get_correct_pse_path: Search for the project folder based on a id.
+- encode_pixmap: Encode a QPixmap to a Base64 str.
+- decode_pixmap: Decode a QPixmap from a Base64 str.
+- get_project_path: Search for the project folder based on the given id.
+- get_process_path: Search for the process folder based on the given id.
+- create_path_map: Create a map of ians and paths.
+"""
+import re
 from datetime import date
-from logging import debug
+from logging import info
 import os
 
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
 
-from library import settings
-
-
-def get_correct_pse_path(number):
-    """
-    Searches  for the correct project folder based on the given number
-    :param number: <class int> pse number as int
-    :return: <class str> path for project. path is empty if not found
-    """
-    debug("Searching correct path for project number %s", number)
-    year = date.today().year
-
-    for i in range(0, year-2000):
-        # Todo: make a setting for this
-        path = os.path.join(settings.PATH, str(year-i))
-        if os.path.exists(path):
-            project_path = os.path.join(path, str(number))
-            if os.path.exists(project_path):
-                debug(f"Returning pse path: {project_path}")
-                return project_path
-
-    return ""
+PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS\PSEX"
 
 
 def encode_pixmap(pixmap):
     """
-    Encodes a QPixmap object so that it can be stored within a json file
+    Encode a QPixmap to a Base64 str.
+
     :param pixmap: <class QPixmap> pixmap to be stored
     :return: <class str> Base64 string
     """
@@ -42,13 +34,99 @@ def encode_pixmap(pixmap):
     return byte_array.toBase64().data().decode("utf-8")
 
 
-def decode_pixmap(string):
+def decode_pixmap(pixmap_string):
     """
-    Decodes a base64 string and extracts the QPixmap
-    :param pixmap: <class str> Base64 string
+    Decode a QPixmap from a Base64 str.
+
+    :param pixmap_string: <class str> Base64 string
     :return: <class QPixmap> extracted pixmap
     """
-    byte_array = QByteArray.fromBase64(string.encode("utf-8"))
+    byte_array = QByteArray.fromBase64(pixmap_string.encode("utf-8"))
     qpixmap = QPixmap()
     qpixmap.loadFromData(byte_array)
     return qpixmap
+
+
+def get_project_path(project_id):
+    """
+    Search for the project folder based on an id.
+
+    This is a convenience function for backwards compatibility of
+    get_path_for_id with id_type "project".
+
+    :param project_id: <class int> pse number as int
+    :raises ValueError: if no path was found for given id
+    :return: <class str> path for project
+    """
+    return get_path_for_id(project_id, "project")
+
+
+def get_process_path(process_id):
+    """
+    Search for the process folder based on an id.
+
+    This is a convenience function for backwards compatibility of
+    get_path_for_id with id_type "process".
+
+    :param process_id: <class int> pse number as int
+    :raises ValueError: if no path was found for given id
+    :return: <class str> path for process.
+    """
+    return get_path_for_id(process_id, "process")
+
+
+def get_path_for_id(ident, id_type):
+    """
+    Get the project path for the given id and type.
+
+    :param ident: <class int> process or project number
+    :param id_type: <class str> type of project ("process", "project")
+    :raises ValueError: if no path was found for given id
+    :return: <class tr> path for id
+    """
+    info(f"Searching correct path for {id_type} id %s", ident)
+    year = date.today().year
+
+    for i in range(0, year - 2000):
+        path_type = {"process": "Prozesse", "project": "Projects"}[id_type]
+        path = os.path.join(os.path.join(PATH, path_type), str(year - i))
+        if os.path.exists(path):
+            id_path = os.path.join(path, str(ident))
+            if os.path.exists(id_path):
+                info(f"Found {id_type} path {id_path}")
+                return id_path
+
+    raise ValueError(f"No path found for {id_type} id {ident}")
+
+
+def create_path_map():
+    """
+    Create a map of ians and paths.
+
+    :return: <class dict> ians with their respective paths
+    """
+    # there is not better way doing this, an extra function also makes no sense
+    # pylint: disable=too-many-nested-blocks
+    paths = {}
+    for i in range(2):
+        path = os.path.join(os.path.join(PATH, "Prozesse"),
+                            str(date.today().year - i))
+
+        # create a list of all folders sorted by their INODE number
+        folders = [(folder, os.stat(os.path.join(path, folder)).st_ino)
+                   for folder in os.listdir(path)]
+        folders.sort(key=lambda x: x[1])
+
+        for fold in folders:
+            try:
+                for file in os.listdir(os.path.join(path, fold[0], "SPEC")):
+                    if re.search("_PA_Stand", file) or \
+                            re.search("_Anlage EAN-Codes", file):
+                        try:
+                            paths[int(file[:6])] = fold[0]
+                            break
+                        except ValueError:
+                            continue
+            except FileNotFoundError:
+                continue
+    return paths
