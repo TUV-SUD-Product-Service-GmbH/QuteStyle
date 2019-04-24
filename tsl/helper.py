@@ -17,7 +17,7 @@ import os
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
 
-PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS\PSEX"
+PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
 
 
 def encode_pixmap(pixmap):
@@ -88,7 +88,8 @@ def get_path_for_id(ident, id_type):
     year = date.today().year
 
     for i in range(0, year - 2000):
-        path_type = {"process": "Prozesse", "project": "Projects"}[id_type]
+        path_type = {"process": "PSEX\\Prozesse",
+                     "project": "Projects"}[id_type]
         path = os.path.join(os.path.join(PATH, path_type), str(year - i))
         if os.path.exists(path):
             id_path = os.path.join(path, str(ident))
