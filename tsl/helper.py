@@ -110,7 +110,7 @@ def create_path_map():
     # pylint: disable=too-many-nested-blocks
     paths = {}
     for i in range(2):
-        path = os.path.join(os.path.join(PATH, "Prozesse"),
+        path = os.path.join(os.path.join(PATH, "PSEX\\Prozesse"),
                             str(date.today().year - i))
 
         # create a list of all folders sorted by their INODE number
