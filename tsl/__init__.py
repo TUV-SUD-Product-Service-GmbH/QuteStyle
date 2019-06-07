@@ -1,1 +1,1 @@
-from .init import init, SETTINGS
+from .init import init, SETTINGS, check_ide

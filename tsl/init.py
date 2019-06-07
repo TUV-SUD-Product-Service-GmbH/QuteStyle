@@ -57,7 +57,7 @@ def _check_install_update(app_name):
     info(f"Checking for _check_install_update of application \"{app_name}\"")
     app_path = os.path.abspath(sys.argv[0])
 
-    if _check_ide():
+    if check_ide():
         info("Application is run from IDE, not running update check.")
         return
 
@@ -80,7 +80,7 @@ def _check_install_update(app_name):
     info("No update is available, continuing startup.")
 
 
-def _check_ide():
+def check_ide():
     """
     Check if the application is run from the IDE.
 
@@ -98,7 +98,7 @@ def _edit_registry_keys(app_name):
     :param app_name: <class str> name of the app
     :return: <class NoneType> None
     """
-    if _check_ide():
+    if check_ide():
         info("Application is run from IDE, not updating registry keys.")
         return
 

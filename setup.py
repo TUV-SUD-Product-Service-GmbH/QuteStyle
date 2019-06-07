@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='tsl',
-      version='1.0',
+      version='1.0.1',
       description='Library for TSL shared functions',
       url='https://tfs.itgr.net/TPS/TSL/_dashboards',
       author='Walid Amokrane, Tilman Krummeck',
