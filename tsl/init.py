@@ -184,8 +184,8 @@ def _create_logger(app_name):
         log.removeHandler(handler)
 
     log.setLevel(SETTINGS["log_level"])
-    format_str = '%(asctime)s.%(msecs)03d %(threadName)s  - ' \
-                 '%(levelname)-8s - %(message)s'
+    format_str = '%(asctime)s.%(msecs)03d %(threadName)10s  - ' \
+                 '%(module)25s - %(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
     formatter = Formatter(format_str, date_format)
     stream_handler = StreamHandler()
