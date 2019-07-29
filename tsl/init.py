@@ -199,7 +199,7 @@ def _create_logger(app_name):
         sys.exit(0)
     except FileNotFoundError:
         pass
-    file_handler = FileHandler(file_name)
+    file_handler = FileHandler(file_name, "w", "utf-8")
     file_handler.setFormatter(formatter)
 
     log.addHandler(file_handler)
