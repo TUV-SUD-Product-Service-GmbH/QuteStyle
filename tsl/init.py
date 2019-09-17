@@ -36,6 +36,8 @@ import subprocess
 import sys
 import winreg
 
+from tsl.version import VERSION
+
 
 SETTINGS = {
     "log_level": DEBUG
@@ -204,6 +206,7 @@ def _create_logger(app_name):
 
     log.addHandler(file_handler)
     info(f"Successfully initialized logging for {app_name}")
+    info("TSL-Library version %s", VERSION)
 
 
 ARGUMENTS = {
