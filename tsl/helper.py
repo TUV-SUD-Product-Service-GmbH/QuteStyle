@@ -19,6 +19,8 @@ from PyQt5.QtGui import QPixmap
 
 PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
 
+MEMO = {"process": {}, "project": {}}
+
 
 def encode_pixmap(pixmap):
     """
@@ -87,15 +89,20 @@ def get_path_for_id(ident, id_type):
     info(f"Searching correct path for {id_type} id %s", ident)
     year = date.today().year
 
-    for i in range(0, year - 2000):
-        path_type = {"process": "PSEX\\Prozesse",
-                     "project": "Projects"}[id_type]
-        path = os.path.join(os.path.join(PATH, path_type), str(year - i))
-        if os.path.exists(path):
-            id_path = os.path.join(path, str(ident))
-            if os.path.exists(id_path):
-                info(f"Found {id_type} path {id_path}")
-                return id_path
+    try:
+        info("Trying to returned cached entry.")
+        return MEMO[id_type][ident]
+    except KeyError:
+        for i in range(0, year - 2000):
+            path_type = {"process": "PSEX\\Prozesse",
+                         "project": "Projects"}[id_type]
+            path = os.path.join(os.path.join(PATH, path_type), str(year - i))
+            if os.path.exists(path):
+                id_path = os.path.join(path, str(ident))
+                if os.path.exists(id_path):
+                    info(f"Found {id_type} path {id_path}")
+                    MEMO[id_type][ident] = id_path
+                    return id_path
 
     raise ValueError(f"No path found for {id_type} id {ident}")
 
