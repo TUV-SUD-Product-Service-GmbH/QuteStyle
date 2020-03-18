@@ -24,27 +24,34 @@ key update: Check if an update is available for the application.
             base_library.zip
             ...
             ___________________________________________
-
+key logging: Initialize logging to log output to the stdout stream and also
+             to a file "logfile.log" in the project folder. To configure
+             logging, import SETTINGS. The following values can be set:
+             - log_level: log level from logging module (default: DEBUG)
+             - full_log: log everything, also logs from 3rd-party modules
 """
 
 import ctypes
+import logging
 import traceback
-from logging import error, getLogger, Formatter, StreamHandler, \
-    FileHandler, warning, critical, info, DEBUG
 import os
 import subprocess
 import sys
 import winreg
+from typing import Callable, Dict
 
 from tsl.version import VERSION
 
 
+log = logging.getLogger("tsl")  # pylint: disable=invalid-name
+
 SETTINGS = {
-    "log_level": DEBUG
+    "log_level": logging.DEBUG,
+    "full_log": False
 }
 
 
-def _check_install_update(app_name):
+def _check_install_update(app_name: str) -> None:
     """
     Check if an update is available and start the updater if so.
 
@@ -56,22 +63,24 @@ def _check_install_update(app_name):
     :param app_name: <class str> name of the application.
     :return: <class NoneType> None
     """
-    info(f"Checking for _check_install_update of application \"{app_name}\"")
+    log.info("Checking for _check_install_update of application '%s'",
+             app_name)
     app_path = os.path.abspath(sys.argv[0])
 
     if check_ide():
-        info("Application is run from IDE, not running update check.")
+        log.info("Application is run from IDE, not running update check.")
         return
 
     upd_path = os.path.join("N:\\Lager", app_name, "UPDATE")
     upd_file = os.path.join(upd_path, f"{app_name}.exe")
 
     if not os.path.exists(upd_file):
-        error(f"Could not update app since path {upd_path} does not exist")
+        log.error("Could not update app since path %s does not exist",
+                  upd_path)
         return
 
     if os.path.getmtime(upd_file) > os.path.getmtime(app_path):
-        info("An updated version of the software is available.")
+        log.info("An updated version of the software is available.")
         ctypes.windll.user32.MessageBoxW(
             0, "Software update available. The Application will be closed, "
                "updated and relaunched automatically.", "Update", 0)
@@ -79,21 +88,21 @@ def _check_install_update(app_name):
             [os.path.join(upd_path, "APPS_UPDATE.exe"), r"/ROOT:" + app_path,
              r"/TEXTFILE:" + os.path.join(upd_path, app_name + ".txt")])
         sys.exit()
-    info("No update is available, continuing startup.")
+    log.info("No update is available, continuing startup.")
 
 
-def check_ide():
+def check_ide() -> bool:
     """
     Check if the application is run from the IDE.
 
     :return: <class bool> True if run from IDE
     """
-    info("Checking if running from IDE")
+    log.info("Checking if running from IDE")
     app_path = os.path.abspath(sys.argv[0])
     return not os.path.split(app_path)[1].endswith(".exe")
 
 
-def _edit_registry_keys(app_name):
+def _edit_registry_keys(app_name: str) -> None:
     """
     Add or update the registry keys for the application.
 
@@ -101,10 +110,10 @@ def _edit_registry_keys(app_name):
     :return: <class NoneType> None
     """
     if check_ide():
-        info("Application is run from IDE, not updating registry keys.")
+        log.info("Application is run from IDE, not updating registry keys.")
         return
 
-    info(f"Updating registry keys for {app_name}")
+    log.info("Updating registry keys for %s", app_name)
     data = {
         os.path.join("Software", app_name): os.path.abspath(sys.argv[0]),
         os.path.join("Software", "TÜV SÜD", app_name):
@@ -119,7 +128,9 @@ def _edit_registry_keys(app_name):
         winreg.CloseKey(registry_key)
 
 
-def excepthook(cls, exception, trace):
+def excepthook(cls: Callable, exception: Exception,
+               trace: traceback  # type: ignore
+               ) -> None:
     """
     Override the system except hook to catch PyQt exceptions.
 
@@ -128,21 +139,21 @@ def excepthook(cls, exception, trace):
     :param trace: <class traceback> traceback of the exception
     :return: <class NoneType> None
     """
-    critical("Critical error occurred:")
+    log.critical("Critical error occurred:")
     traceback_text = ""
     for line in traceback.format_tb(trace):
         for line_splitted in line.split("\n"):
             if line_splitted:
                 traceback_text = traceback_text + line_splitted + "\n"
-                critical(line_splitted)
-    critical(f"{cls} {exception}")
+                log.critical(line_splitted)
+    log.critical("%s %s", cls, exception)
     try:
         _error_message_box("{}: {}".format(cls, exception), traceback_text)
     except ImportError:
-        warning("Not showing error message since PyQt5 is not installed.")
+        log.warning("Not showing error message since PyQt5 is not installed.")
 
 
-def _error_message_box(error_message, traceb):
+def _error_message_box(error_message: str, traceb: str) -> None:
     """
     Show an error message box containing the given traceback.
 
@@ -150,50 +161,48 @@ def _error_message_box(error_message, traceb):
     :param traceb: <class traceback> traceback as string
     :return: <class NoneType> None
     """
-    from PyQt5.QtWidgets import QMessageBox
-    info("Showing exception message")
-    msg = QMessageBox()
-    msg.setIcon(QMessageBox.Critical)
-    msg.setText(error_message)
-    msg.setInformativeText(traceb)
-    msg.setWindowTitle("An error occurred")
-    msg.exec()
+    try:
+        # pylint: disable=import-outside-toplevel
+        from PyQt5.QtWidgets import QMessageBox
+        log.info("Showing exception message")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText(error_message)
+        msg.setInformativeText(traceb)
+        msg.setWindowTitle("An error occurred")
+        msg.exec()
+    except ModuleNotFoundError:
+        log.info("PyQt5 is not installed, not showing exception message")
 
 
-def _set_excepthook(app_name):
+def _set_excepthook(app_name: str) -> None:
     """
     Set the excepthook to catch PyQt5 exceptions in signals and slots.
 
     :param app_name: <class str> name of the app
     :return: <class NoneType> None
     """
-    info(f"Setting custom except hook for {app_name}")
-    sys.excepthook = excepthook
+    log.info("Setting custom except hook for %s", app_name)
+    sys.excepthook = excepthook  # type: ignore
 
 
-def _create_logger(app_name):
+def _create_logger(app_name: str) -> None:
     """
     Set up the logging environment.
 
-    :param app_name: <class str> name of the app
-    :return: <class NoneType> None
+    If SETTINGS["full_log"] is set to True, the function will configure the
+    root logger to send its log to our logfile and to the stdout. Otherwise,
+    only the application logs are send.
+
+    The function will configure the log level according to SETTINGS["level"].
     """
-    file_name = "logfile.log"
-    log = getLogger()  # root logger
-
-    # remove all handlers from logger if there are any:
-    for handler in log.handlers:
-        log.removeHandler(handler)
-
-    log.setLevel(SETTINGS["log_level"])
     format_str = '%(asctime)s.%(msecs)03d %(threadName)10s  - ' \
-                 '%(module)25s - %(levelname)-8s - %(message)s'
+                 '%(name)-50s - %(funcName)-25s:%(lineno)-4s - ' \
+                 '%(levelname)-8s - %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
-    formatter = Formatter(format_str, date_format)
-    stream_handler = StreamHandler()
-    stream_handler.setFormatter(formatter)
-    log.addHandler(stream_handler)
+    formatter = logging.Formatter(format_str, date_format)
 
+    file_name = "logfile.log"
     try:
         os.remove(file_name)
     except PermissionError:
@@ -201,12 +210,24 @@ def _create_logger(app_name):
         sys.exit(0)
     except FileNotFoundError:
         pass
-    file_handler = FileHandler(file_name, "w", "utf-8")
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    file_handler = logging.FileHandler(file_name, "w", "utf-8")
     file_handler.setFormatter(formatter)
 
-    log.addHandler(file_handler)
-    info(f"Successfully initialized logging for {app_name}")
-    info("TSL-Library version %s", VERSION)
+    if SETTINGS["full_log"]:
+        loggers = [logging.getLogger(), log]  # root logger
+    else:
+        loggers = [logging.getLogger(app_name), log]  # app specific logger
+
+    for logger in loggers:
+        logger.addHandler(file_handler)
+        logger.addHandler(stream_handler)
+        logger.setLevel(SETTINGS["log_level"])
+
+    log.info("Successfully initialized logging for '%s'", app_name)
+    log.info("TSL-Library version %s", VERSION)
 
 
 ARGUMENTS = {
@@ -216,7 +237,7 @@ ARGUMENTS = {
 }
 
 
-def init(app_name, **kwargs):
+def init(app_name: str, **kwargs: Dict[str, bool]) -> None:
     """
     Init the application and setup different TSL specific functions.
 
@@ -231,15 +252,12 @@ def init(app_name, **kwargs):
     # check that an app_name is given (i.e. not "") and that it is a str
     assert app_name and isinstance(app_name, str)
 
-    # normalize the app_name just in case.
-    app_name = app_name.lower()
-
     if "logging" in kwargs and kwargs["logging"]:
         _create_logger(app_name)
 
-    info(f"Initializing application {app_name} with:")
+    log.info("Initializing application %s with:", app_name)
     for key, parameter in kwargs.items():
-        info(f"Key '{key}': {parameter}")
+        log.info("Key '%s': %s", key, parameter)
 
     for key, func in ARGUMENTS.items():
         if key in kwargs and kwargs[key]:
