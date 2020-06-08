@@ -45,7 +45,8 @@ log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
 SETTINGS = {
     "log_level": logging.DEBUG,
-    "full_log": False
+    "full_log": False,
+    "name_log": "logfile.log"
 }
 
 
@@ -160,18 +161,17 @@ def _create_logger(app_name: str) -> None:
     date_format = '%Y-%m-%d %H:%M:%S'
     formatter = logging.Formatter(format_str, date_format)
 
-    file_name = "logfile.log"
     try:
-        os.remove(file_name)
+        os.remove(SETTINGS["name_log"])
     except PermissionError:
-        print(f"Could not get lock on {file_name}, exiting")
+        print(f"Could not get lock on {SETTINGS['name_log']}, exiting")
         sys.exit(0)
     except FileNotFoundError:
         pass
 
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
-    file_handler = logging.FileHandler(file_name, "w", "utf-8")
+    file_handler = logging.FileHandler(SETTINGS["name_log"], "w", "utf-8")
     file_handler.setFormatter(formatter)
 
     if SETTINGS["full_log"]:
