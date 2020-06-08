@@ -31,11 +31,9 @@ key logging: Initialize logging to log output to the stdout stream and also
              - full_log: log everything, also logs from 3rd-party modules
 """
 
-import ctypes
 import logging
 import traceback
 import os
-import subprocess
 import sys
 import winreg
 from typing import Callable, Dict
@@ -49,46 +47,6 @@ SETTINGS = {
     "log_level": logging.DEBUG,
     "full_log": False
 }
-
-
-def _check_install_update(app_name: str) -> None:
-    """
-    Check if an update is available and start the updater if so.
-
-    The function will terminate the application if an _check_install_update is
-    available.
-
-    See documentation of ´init´ on how to configure the update folder itself.
-
-    :param app_name: <class str> name of the application.
-    :return: <class NoneType> None
-    """
-    log.info("Checking for _check_install_update of application '%s'",
-             app_name)
-    app_path = os.path.abspath(sys.argv[0])
-
-    if check_ide():
-        log.info("Application is run from IDE, not running update check.")
-        return
-
-    upd_path = os.path.join("N:\\Lager", app_name, "UPDATE")
-    upd_file = os.path.join(upd_path, f"{app_name}.exe")
-
-    if not os.path.exists(upd_file):
-        log.error("Could not update app since path %s does not exist",
-                  upd_path)
-        return
-
-    if os.path.getmtime(upd_file) > os.path.getmtime(app_path):
-        log.info("An updated version of the software is available.")
-        ctypes.windll.user32.MessageBoxW(
-            0, "Software update available. The Application will be closed, "
-               "updated and relaunched automatically.", "Update", 0)
-        subprocess.Popen(
-            [os.path.join(upd_path, "APPS_UPDATE.exe"), r"/ROOT:" + app_path,
-             r"/TEXTFILE:" + os.path.join(upd_path, app_name + ".txt")])
-        sys.exit()
-    log.info("No update is available, continuing startup.")
 
 
 def check_ide() -> bool:
@@ -233,7 +191,6 @@ def _create_logger(app_name: str) -> None:
 ARGUMENTS = {
     "excepthook": _set_excepthook,
     "registry": _edit_registry_keys,
-    "update": _check_install_update,
 }
 
 
