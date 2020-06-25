@@ -10,4 +10,7 @@ setup(name='tsl',
       author_email='PS-TF-Entwicklung@tuev-sued.de',
       license='MIT',
       packages=['tsl'],
+      package_data={
+            'tsl': ['py.typed'],
+      },
       zip_safe=False)

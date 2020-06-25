@@ -1,14 +1,4 @@
-"""
-TSL Library - helper: useful functions for TSL tools.
-
-Public methods:
-- get_correct_pse_path: Search for the project folder based on a id.
-- encode_pixmap: Encode a QPixmap to a Base64 str.
-- decode_pixmap: Decode a QPixmap from a Base64 str.
-- get_project_path: Search for the project folder based on the given id.
-- get_process_path: Search for the process folder based on the given id.
-- create_path_map: Create a map of ians and paths.
-"""
+"""TSL Library - helper: useful functions for TSL tools."""
 from datetime import date
 import logging
 import os
@@ -25,12 +15,7 @@ log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
 
 def encode_pixmap(pixmap: QPixmap) -> str:
-    """
-    Encode a QPixmap to a Base64 str.
-
-    :param pixmap: <class QPixmap> pixmap to be stored
-    :return: <class str> Base64 string
-    """
+    """Encode a QPixmap to a Base64 str."""
     byte_array = QByteArray()
     buffer = QBuffer(byte_array)
     buffer.open(QIODevice.WriteOnly)
@@ -39,12 +24,7 @@ def encode_pixmap(pixmap: QPixmap) -> str:
 
 
 def decode_pixmap(pixmap_string: str) -> QPixmap:
-    """
-    Decode a QPixmap from a Base64 str.
-
-    :param pixmap_string: <class str> Base64 string
-    :return: <class QPixmap> extracted pixmap
-    """
+    """Decode a QPixmap from a Base64 str."""
     byte_array = QByteArray.fromBase64(pixmap_string.encode("utf-8"))
     qpixmap = QPixmap()
     qpixmap.loadFromData(byte_array)
@@ -57,10 +37,6 @@ def get_project_path(project_id: int) -> str:
 
     This is a convenience function for backwards compatibility of
     get_path_for_id with id_type "project".
-
-    :param project_id: <class int> pse number as int
-    :raises ValueError: if no path was found for given id
-    :return: <class str> path for project
     """
     return get_path_for_id(project_id, "project")
 
@@ -71,23 +47,12 @@ def get_process_path(process_id: int) -> str:
 
     This is a convenience function for backwards compatibility of
     get_path_for_id with id_type "process".
-
-    :param process_id: <class int> pse number as int
-    :raises ValueError: if no path was found for given id
-    :return: <class str> path for process.
     """
     return get_path_for_id(process_id, "process")
 
 
 def get_path_for_id(ident: int, id_type: str) -> str:
-    """
-    Get the project path for the given id and type.
-
-    :param ident: <class int> process or project number
-    :param id_type: <class str> type of project ("process", "project")
-    :raises ValueError: if no path was found for given id
-    :return: <class tr> path for id
-    """
+    """Get the project path for the given id and type."""
     log.info("Searching correct path for %s id %s", id_type, ident)
     year = date.today().year
 

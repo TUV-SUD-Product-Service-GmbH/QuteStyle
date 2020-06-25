@@ -12,18 +12,6 @@ To used any of the following sub-functions define the documented keyword as a
 bool value with value ´True´:
 
 key registry: Update the application's registry keys for use in PSE-Assistant.
-key update: Check if an update is available for the application.
-            If an update is available, the function will open the updater and
-            exit the application.  An update will be detected, if a newer
-            version of the application's executable is available in folder
-            "N:\Lager\{app_name}\UPDATE". If more than the executable needs
-            to be copied, one must provide a "{app_name}.txt" file that
-            contains the paths to the additional files like this:
-            ___________________________________________
-            [FILES TO BE UPDATED IN THE UPDATE FOLDER]
-            base_library.zip
-            ...
-            ___________________________________________
 key logging: Initialize logging to log output to the stdout stream and also
              to a file "logfile.log" in the project folder. To configure
              logging, import SETTINGS. The following values can be set:
@@ -35,19 +23,28 @@ import logging
 import traceback
 import os
 import sys
-import winreg
-from typing import Callable, Dict
+import winreg  # type: ignore
+from typing import Callable, TypedDict
 
 from tsl.version import VERSION
 
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
-SETTINGS = {
-    "log_level": logging.DEBUG,
-    "full_log": False,
-    "name_log": "logfile.log"
-}
+
+class SettingsDict(TypedDict):
+    """Type definition for settings dictionary."""
+
+    log_level: int
+    full_log: bool
+    name_log: str
+
+
+SETTINGS = SettingsDict(
+    log_level=logging.DEBUG,
+    full_log=False,
+    name_log="logfile.log"
+)
 
 
 def check_ide() -> bool:
@@ -61,7 +58,7 @@ def check_ide() -> bool:
     return not os.path.split(app_path)[1].endswith(".exe")
 
 
-def _edit_registry_keys(app_name: str) -> None:
+def edit_registry_keys(app_name: str) -> None:
     """
     Add or update the registry keys for the application.
 
@@ -107,12 +104,12 @@ def excepthook(cls: Callable, exception: Exception,
                 log.critical(line_splitted)
     log.critical("%s %s", cls, exception)
     try:
-        _error_message_box("{}: {}".format(cls, exception), traceback_text)
+        error_message_box("{}: {}".format(cls, exception), traceback_text)
     except ImportError:
         log.warning("Not showing error message since PyQt5 is not installed.")
 
 
-def _error_message_box(error_message: str, traceb: str) -> None:
+def error_message_box(error_message: str, traceb: str) -> None:
     """
     Show an error message box containing the given traceback.
 
@@ -134,7 +131,7 @@ def _error_message_box(error_message: str, traceb: str) -> None:
         log.info("PyQt5 is not installed, not showing exception message")
 
 
-def _set_excepthook(app_name: str) -> None:
+def set_excepthook(app_name: str) -> None:
     """
     Set the excepthook to catch PyQt5 exceptions in signals and slots.
 
@@ -145,7 +142,7 @@ def _set_excepthook(app_name: str) -> None:
     sys.excepthook = excepthook  # type: ignore
 
 
-def _create_logger(app_name: str) -> None:
+def create_logger(app_name: str) -> None:
     """
     Set up the logging environment.
 
@@ -188,34 +185,25 @@ def _create_logger(app_name: str) -> None:
     log.info("TSL-Library version %s", VERSION)
 
 
-ARGUMENTS = {
-    "excepthook": _set_excepthook,
-    "registry": _edit_registry_keys,
-}
-
-
-def init(app_name: str, **kwargs: Dict[str, bool]) -> None:
+def init(app_name: str, logging: bool = False, registry: bool = False,
+         excepthook: bool = False) -> None:
     """
     Init the application and setup different TSL specific functions.
 
     The following keywords are evaluated for execution of different functions:
+    - logging: Configure logging
     - registry: Update the registry keys of the app
-    - update: Check of an application update
-
-    :param app_name: <class str> name of the application.
-    :param kwargs: <class dict> keyword arguments.
-    :return: <class NoneType> None
+    - excepthook: Install a custom excepthook for catching Qt exceptions
     """
     # check that an app_name is given (i.e. not "") and that it is a str
     assert app_name and isinstance(app_name, str)
 
-    if "logging" in kwargs and kwargs["logging"]:
-        _create_logger(app_name)
+    if logging:
+        create_logger(app_name)
+        log.info("Initializing application %s:", app_name)
 
-    log.info("Initializing application %s with:", app_name)
-    for key, parameter in kwargs.items():
-        log.info("Key '%s': %s", key, parameter)
+    if registry:
+        edit_registry_keys(app_name)
 
-    for key, func in ARGUMENTS.items():
-        if key in kwargs and kwargs[key]:
-            func(app_name)
+    if excepthook:
+        set_excepthook(app_name)
