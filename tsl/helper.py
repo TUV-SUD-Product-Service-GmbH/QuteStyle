@@ -1,11 +1,13 @@
 """TSL Library - helper: useful functions for TSL tools."""
-from datetime import date
 import logging
 import os
 from typing import Dict
 
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
+from sqlalchemy.orm.exc import NoResultFound
+
+from tsl.pse_database import AdminSession, Project, Process
 
 PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
 
@@ -32,43 +34,26 @@ def decode_pixmap(pixmap_string: str) -> QPixmap:
 
 
 def get_project_path(project_id: int) -> str:
-    """
-    Search for the project folder based on an id.
-
-    This is a convenience function for backwards compatibility of
-    get_path_for_id with id_type "project".
-    """
-    return get_path_for_id(project_id, "project")
+    """Search for the project folder based on an id."""
+    log.info("Searching correct path for project id %s", project_id)
+    session = AdminSession()
+    try:
+        project = session.query(Project).filter(Project.P_ID == project_id)\
+            .filter(Project.DELR_ID == 2).one()
+        log.debug("Got project: %s", project)
+        return os.path.join(PATH, project.P_FOLDER)
+    except NoResultFound:
+        raise ValueError(f"No path found for project id {project_id}")
 
 
 def get_process_path(process_id: int) -> str:
-    """
-    Search for the process folder based on an id.
-
-    This is a convenience function for backwards compatibility of
-    get_path_for_id with id_type "process".
-    """
-    return get_path_for_id(process_id, "process")
-
-
-def get_path_for_id(ident: int, id_type: str) -> str:
-    """Get the project path for the given id and type."""
-    log.info("Searching correct path for %s id %s", id_type, ident)
-    year = date.today().year
-
+    """Search for the process folder based on an id."""
+    log.info("Searching correct path for process id %s", process_id)
+    session = AdminSession()
     try:
-        log.info("Trying to returned cached entry.")
-        return MEMO[id_type][ident]
-    except KeyError:
-        for i in range(0, year - 2000):
-            path_type = {"process": "PSEX\\Prozesse",
-                         "project": "Projects"}[id_type]
-            path = os.path.join(os.path.join(PATH, path_type), str(year - i))
-            if os.path.exists(path):
-                id_path = os.path.join(path, str(ident))
-                if os.path.exists(id_path):
-                    log.info("Found %s path %s", id_type, id_path)
-                    MEMO[id_type][ident] = id_path
-                    return id_path
-
-    raise ValueError(f"No path found for {id_type} id {ident}")
+        process = session.query(Process) \
+            .filter(Process.PC_ID == process_id).one()
+        log.debug("Got process: %s", process)
+        return os.path.join(PATH, "PSEX", process.PC_PATH)
+    except NoResultFound:
+        raise ValueError(f"No path found for process id {process_id}")

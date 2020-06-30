@@ -13,4 +13,8 @@ setup(name='tsl',
       package_data={
             'tsl': ['py.typed'],
       },
+      install_requires=[
+            'sqlalchemy',
+            'pyodbc',
+      ],
       zip_safe=False)
