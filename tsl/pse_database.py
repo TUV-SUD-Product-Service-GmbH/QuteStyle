@@ -1,5 +1,6 @@
 """Database connection and models for the PSE database."""
 from sqlalchemy import create_engine, Column, Integer, Unicode, Float
+from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -38,3 +39,4 @@ class Project(Base):
     P_ZARA_NUMBER = Column(Unicode(length=11))
     P_FOLDER = Column(Unicode(length=256))
     DELR_ID = Column(Integer)
+    P_WC_ID = Column(UNIQUEIDENTIFIER())

@@ -5,6 +5,7 @@ from typing import Dict
 
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
+from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 
 from tsl.pse_database import AdminSession, Project, Process
@@ -39,7 +40,8 @@ def get_project_path(project_id: int) -> str:
     session = AdminSession()
     try:
         project = session.query(Project).filter(Project.P_ID == project_id)\
-            .filter(Project.DELR_ID == 2).one()
+            .filter(Project.P_WC_ID ==
+                    "BB8E7738-0ACB-423C-8626-18AA3355B8FF").one()
         log.debug("Got project: %s", project)
         return os.path.join(PATH, project.P_FOLDER)
     except NoResultFound:

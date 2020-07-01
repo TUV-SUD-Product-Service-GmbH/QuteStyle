@@ -9,6 +9,9 @@ def test_check_project_path() -> None:
     assert get_project_path(1234575) == \
         r'\\de001.itgr.net\PS\RF-UnitCentralPS_' \
         r'PSE\CPS\Projects\2018\1234575'
+    assert get_project_path(1504436) == \
+        r'\\de001.itgr.net\PS\RF-UnitCentralPS_' \
+        r'PSE\CPS\Projects\2020\1504436'
 
 
 def test_check_project_path_fail() -> None:
