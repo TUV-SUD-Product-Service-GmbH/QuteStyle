@@ -8,8 +8,7 @@ import os
 import shutil
 from typing import Dict, List, Tuple
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
-
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QEventLoop, QTimer
 
 log = logging.getLogger("tsl.copy_worker")  # pylint: disable=invalid-name
 
@@ -78,11 +77,28 @@ class CopyWorker(QObject):
                 os.makedirs(folder)
             except FileExistsError:
                 log.debug("Folder does already exist")
-            shutil.copy(src, dst)
+            self.copy_file(dst, src)
             self.files_copied.emit(idx + 1, len(self._file_list))
         self.files_copied.emit(100, 100)
         self.copy_finished.emit()
         self.status_changed.emit("Update complete.")
+
+    @staticmethod
+    def copy_file(dst: str, src: str) -> None:
+        """Copy a file from dst to src."""
+        count = 30
+        while count > 0:
+            try:
+                shutil.copy(src, dst)
+                count = 0
+            except PermissionError:
+                log.warning("Could not copy to  %s due to PermissionError",
+                            dst)
+                # sleep 1 second in an event loop
+                loop = QEventLoop()
+                QTimer.singleShot(1000, loop.quit)
+                loop.exec()
+                count -= 1
 
     def _remove_files(self) -> None:
         """Remove files from the path that aren't needed anymore."""
