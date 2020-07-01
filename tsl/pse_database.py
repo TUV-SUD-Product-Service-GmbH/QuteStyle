@@ -4,7 +4,7 @@ from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
+STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@10.250.10.44" \
               "/PSExplorer?driver=SQL+Server"
 
 ENGINE = create_engine(STD_DB_PATH, connect_args={'timeout': 25})
