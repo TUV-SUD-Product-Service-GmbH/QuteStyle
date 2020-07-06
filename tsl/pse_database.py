@@ -4,8 +4,9 @@ from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@10.250.10.44" \
-              "/PSExplorer?driver=SQL+Server"
+STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
+              "/PSExplorer?driver=" \
+              "SQL+Server+Native+Client+11.0;MultiSubnetFailover=Yes"
 
 ENGINE = create_engine(STD_DB_PATH, connect_args={'timeout': 25})
 
@@ -39,4 +40,4 @@ class Project(Base):
     P_ZARA_NUMBER = Column(Unicode(length=11))
     P_FOLDER = Column(Unicode(length=256))
     DELR_ID = Column(Integer)
-    P_WC_ID = Column(UNIQUEIDENTIFIER())
+    P_WC_ID = Column(UNIQUEIDENTIFIER)

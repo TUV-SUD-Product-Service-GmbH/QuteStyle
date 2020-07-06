@@ -5,7 +5,6 @@ from typing import Dict
 
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
-from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 
 from tsl.pse_database import AdminSession, Project, Process
