@@ -41,3 +41,4 @@ class Project(Base):
     P_FOLDER = Column(Unicode(length=256))
     DELR_ID = Column(Integer)
     P_WC_ID = Column(UNIQUEIDENTIFIER)
+    P_NAME = Column(Unicode(length=31))
