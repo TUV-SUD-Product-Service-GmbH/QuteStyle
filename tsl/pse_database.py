@@ -42,3 +42,4 @@ class Project(Base):
     DELR_ID = Column(Integer)
     P_WC_ID = Column(UNIQUEIDENTIFIER)
     P_NAME = Column(Unicode(length=31))
+    BATCH_NUMBER = Column(Unicode(length=16))
