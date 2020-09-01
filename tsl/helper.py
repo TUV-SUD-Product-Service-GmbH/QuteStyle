@@ -45,6 +45,8 @@ def get_project_path(project_id: int) -> str:
         return os.path.join(PATH, project.P_FOLDER)
     except NoResultFound:
         raise ValueError(f"No path found for project id {project_id}")
+    finally:
+        session.close()
 
 
 def get_process_path(process_id: int) -> str:
@@ -58,3 +60,5 @@ def get_process_path(process_id: int) -> str:
         return os.path.join(PATH, "PSEX", process.PC_PATH)
     except NoResultFound:
         raise ValueError(f"No path found for process id {process_id}")
+    finally:
+        session.close()
