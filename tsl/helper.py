@@ -1,7 +1,6 @@
 """TSL Library - helper: useful functions for TSL tools."""
 import logging
 import os
-from typing import Dict
 
 from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
 from PyQt5.QtGui import QPixmap
@@ -10,8 +9,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from tsl.pse_database import AdminSession, Project, Process
 
 PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
-
-MEMO: Dict[str, Dict[int, str]] = {"process": {}, "project": {}}
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
