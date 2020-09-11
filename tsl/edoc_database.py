@@ -6,11 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.sql.schema import ForeignKey
 
-STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
-              "/EDOC?driver=" \
-              "SQL+Server+Native+Client+11.0;MultiSubnetFailover=Yes"
+from tsl.variables import STD_DB_PATH
 
-ENGINE = create_engine(STD_DB_PATH, connect_args={'timeout': 25})
+ENGINE = create_engine(STD_DB_PATH.format("EDOC"))
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE
