@@ -124,3 +124,27 @@ class Navigation(Base):
     N_UPDATEBY = Column(Integer)
 
     packages = relationship("Package")
+
+
+class Module(Base):
+    """Module table model."""
+
+    __tablename__ = "EDOC_MODUL"
+
+    EM_ID = Column(Integer, primary_key=True, nullable=False)
+    E_ID = Column(Integer)
+    DM_ID = Column(Integer)
+    DM_VERSION = Column(Integer)
+    EM_NAME = Column(Unicode(length=255))
+    EM_LETTER = Column(Unicode(length=10))
+    EM_NUMBER = Column(Integer)
+    SO_NUMBER = Column(Integer)
+    EM_OFFLINE_BY = Column(Integer)
+    EM_OFFLINE_SINCE = Column(DateTime)
+    EM_REG = Column(DateTime)
+    EM_REGBY = Column(Integer)
+    EM_UPDATE = Column(DateTime)
+    EM_UPDATEBY = Column(Integer)
+    EM_FILTER_LEVEL = Column(Unicode(length=100))
+    EM_FILTER_PARAM = Column(Unicode(length=512))
+    EM_FILTER_ITEMS = Column(Unicode(length=2048))
