@@ -14,7 +14,7 @@ log = logging.getLogger("tsl.copy_worker")  # pylint: disable=invalid-name
 
 
 class CopyWorker(QObject):
-    """Worker object processing a update."""
+    """Worker object processing an update."""
 
     current_file = pyqtSignal(str, name="current_file")
     files_copied = pyqtSignal(int, int, name="files_copied")
