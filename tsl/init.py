@@ -26,6 +26,14 @@ import sys
 import winreg  # type: ignore
 from typing import Callable, TypedDict
 
+try:
+    from PyQt5.QtWidgets import QMessageBox
+    from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtFatalMsg, \
+        QtCriticalMsg, QtWarningMsg, QtInfoMsg, qInstallMessageHandler
+except ModuleNotFoundError:
+    # if PyQt5 is not installed, we skip the imports
+    pass
+
 from tsl.version import VERSION
 
 
@@ -48,23 +56,14 @@ SETTINGS = SettingsDict(
 
 
 def check_ide() -> bool:
-    """
-    Check if the application is run from the IDE.
-
-    :return: <class bool> True if run from IDE
-    """
+    """Check if the application is run from the IDE."""
     log.info("Checking if running from IDE")
     app_path = os.path.abspath(sys.argv[0])
     return not os.path.split(app_path)[1].endswith(".exe")
 
 
 def edit_registry_keys(app_name: str) -> None:
-    """
-    Add or update the registry keys for the application.
-
-    :param app_name: <class str> name of the app
-    :return: <class NoneType> None
-    """
+    """Add or update the registry keys for the application."""
     if check_ide():
         log.info("Application is run from IDE, not updating registry keys.")
         return
@@ -87,14 +86,7 @@ def edit_registry_keys(app_name: str) -> None:
 def excepthook(cls: Callable, exception: Exception,
                trace: traceback  # type: ignore
                ) -> None:
-    """
-    Override the system except hook to catch PyQt exceptions.
-
-    :param cls: <class class> class of the exception
-    :param exception: <class str> exception string
-    :param trace: <class traceback> traceback of the exception
-    :return: <class NoneType> None
-    """
+    """Override the system except hook to catch PyQt exceptions."""
     log.critical("Critical error occurred:")
     traceback_text = ""
     for line in traceback.format_tb(trace):
@@ -110,16 +102,8 @@ def excepthook(cls: Callable, exception: Exception,
 
 
 def error_message_box(error_message: str, traceb: str) -> None:
-    """
-    Show an error message box containing the given traceback.
-
-    :param error_message: <class str> Error text
-    :param traceb: <class traceback> traceback as string
-    :return: <class NoneType> None
-    """
+    """Show an error message box containing the given traceback."""
     try:
-        # pylint: disable=import-outside-toplevel
-        from PyQt5.QtWidgets import QMessageBox
         log.info("Showing exception message")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
@@ -127,17 +111,12 @@ def error_message_box(error_message: str, traceb: str) -> None:
         msg.setInformativeText(traceb)
         msg.setWindowTitle("An error occurred")
         msg.exec()
-    except ModuleNotFoundError:
+    except NameError:
         log.info("PyQt5 is not installed, not showing exception message")
 
 
 def set_excepthook(app_name: str) -> None:
-    """
-    Set the excepthook to catch PyQt5 exceptions in signals and slots.
-
-    :param app_name: <class str> name of the app
-    :return: <class NoneType> None
-    """
+    """Set the excepthook to catch PyQt5 exceptions in signals and slots."""
     log.info("Setting custom except hook for %s", app_name)
     sys.excepthook = excepthook  # type: ignore
 
@@ -181,29 +160,51 @@ def create_logger(app_name: str) -> None:
         logger.addHandler(stream_handler)
         logger.setLevel(SETTINGS["log_level"])
 
+    log.info("Configuring Qt message handler")
+    try:
+        qInstallMessageHandler(qt_message_handler)
+    except NameError:
+        log.info("PyQt5 is not installed, not configuring Qt message handler")
     log.info("Successfully initialized logging for '%s'", app_name)
     log.info("TSL-Library version %s", VERSION)
 
 
-def init(app_name: str, logging: bool = False, registry: bool = False,
-         excepthook: bool = False) -> None:
+def qt_message_handler(mode: QtMsgType, context: QMessageLogContext,
+                       message: str) -> None:
+    """Handle a Qt log message and write it to python logging."""
+    if mode == QtInfoMsg:
+        level = logging.INFO
+    elif mode == QtWarningMsg:
+        level = logging.WARNING
+    elif mode == QtCriticalMsg:
+        level = logging.CRITICAL
+    elif mode == QtFatalMsg:
+        level = logging.FATAL
+    else:
+        level = logging.DEBUG
+    msg = f"{context.file}:{context.line}:{context.function} - {message}"
+    log.log(level, msg)
+
+
+def init(app_name: str, logs: bool = False, registry: bool = False,
+         hook: bool = False) -> None:
     """
     Init the application and setup different TSL specific functions.
 
     The following keywords are evaluated for execution of different functions:
-    - logging: Configure logging
+    - logs: Configure logging
     - registry: Update the registry keys of the app
-    - excepthook: Install a custom excepthook for catching Qt exceptions
+    - hook: Install a custom excepthook for catching Qt exceptions
     """
     # check that an app_name is given (i.e. not "") and that it is a str
     assert app_name and isinstance(app_name, str)
 
-    if logging:
+    if logs:
         create_logger(app_name)
         log.info("Initializing application %s:", app_name)
 
     if registry:
         edit_registry_keys(app_name)
 
-    if excepthook:
+    if hook:
         set_excepthook(app_name)
