@@ -1,4 +1,10 @@
-"""Database connection and models for the PSE database."""
+"""
+Database connection and models for the PSE database.
+
+WARNING! Delete cascades do not work properly, when delete is executed on a
+query. Always use session.delete()!
+
+"""
 import logging
 import os
 from contextlib import contextmanager
@@ -96,7 +102,7 @@ class PackageElement(Base):
     __tablename__ = "NAV_PACK_ELEMENT"
 
     NPE_ID = Column(Integer, primary_key=True, nullable=False)
-    NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID'))
+    NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID', ondelete="CASCADE"))
     DM_ID = Column(Integer)
     NL_ID = Column(Integer)
     ZM_LOCATION = Column(Unicode(length=5))
@@ -123,7 +129,7 @@ class Package(Base):
     __tablename__ = "NAV_PACK"
 
     NP_ID = Column(Integer, primary_key=True, nullable=False)
-    N_ID = Column(Integer, ForeignKey('NAV.N_ID'))
+    N_ID = Column(Integer, ForeignKey('NAV.N_ID', ondelete="CASCADE"))
     NP_NAME_DE = Column(Unicode(length=150))
     NP_NAME_EN = Column(Unicode(length=150))
     NP_COMMENT_DE = Column(Unicode(length=800))
@@ -145,12 +151,14 @@ class Package(Base):
     clearing_state = relationship("Clearing")
 
     package_elements: List[PackageElement] = \
-        relationship("PackageElement", back_populates="package")
+        relationship("PackageElement", back_populates="package",
+                     cascade="all, delete")
 
     navigation = relationship("Navigation", back_populates="packages")
 
     service_classes: List['ServiceClass'] = \
-        relationship("ServiceClass", back_populates="package")
+        relationship("ServiceClass", back_populates="package",
+                     cascade="all, delete")
 
     package_type = relationship("PackageType")
 
@@ -221,7 +229,8 @@ class PackageCalculation(Base):
     __tablename__ = "NAV_PACK_ELEMENT_CALC"
 
     NPEC_ID = Column(Integer, primary_key=True, nullable=False)
-    NPE_ID = Column(Integer, ForeignKey('NAV_PACK_ELEMENT.NPE_ID'))
+    NPE_ID = Column(Integer, ForeignKey('NAV_PACK_ELEMENT.NPE_ID',
+                                        ondelete="CASCADE"))
     ST_ID = Column(Integer, nullable=False)
     NPEC_DELTA_START = Column(Float)
     NPEC_TIME_DAYS = Column(Integer)
@@ -316,7 +325,7 @@ class ServiceClass(Base):
     __tablename__ = "NAV_PACK_SERVICECLASS"
 
     NPS_ID = Column(Integer, primary_key=True, nullable=False)
-    NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID'))
+    NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID', ondelete="CASCADE"))
     SCL_ID = Column(Integer)
 
     package = relationship("Package", back_populates="service_classes")
@@ -328,7 +337,8 @@ class ProofElement(Base):
     __tablename__ = "NAV_PACK_ELEMENT_PROOF"
 
     NPEP_ID = Column(Integer, primary_key=True, nullable=False)
-    NPE_ID = Column(Integer, ForeignKey('NAV_PACK_ELEMENT.NPE_ID'))
+    NPE_ID = Column(Integer, ForeignKey('NAV_PACK_ELEMENT.NPE_ID',
+                                        ondelete="CASCADE"))
     NPEP_TYPE = Column(Integer)
     NPR_ID = Column(Integer)
     NPEP_TEXT_DE = Column(Unicode(length=255))
@@ -457,7 +467,6 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
                 NPEP_TEXT_EN=proof_element.NPEP_TEXT_EN,
                 NPEP_REG=now,
                 NPEP_REGBY=user_id
-
             )
             session.add(new_proof)
     session.flush()
