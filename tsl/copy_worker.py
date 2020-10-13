@@ -6,6 +6,7 @@ import logging
 import ntpath
 import os
 import shutil
+import time
 from typing import Dict, List, Tuple
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QEventLoop, QTimer
@@ -77,7 +78,15 @@ class CopyWorker(QObject):
                 os.makedirs(folder)
             except FileExistsError:
                 log.debug("Folder does already exist")
-            self.copy_file(dst, src)
+            try_count = 30
+            while try_count:
+                try:
+                    self.copy_file(dst, src)
+                except PermissionError:
+                    log.warning("Received permission error copying file to %s",
+                                dst)
+                    try_count -= 1
+                    time.sleep(5)
             self.files_copied.emit(idx + 1, len(self._file_list))
         self.files_copied.emit(100, 100)
         self.copy_finished.emit()

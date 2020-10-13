@@ -103,11 +103,11 @@ class PackageElement(Base):
 
     NPE_ID = Column(Integer, primary_key=True, nullable=False)
     NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID', ondelete="CASCADE"))
-    DM_ID = Column(Integer)
-    NL_ID = Column(Integer)
+    DM_ID = Column(Integer, ForeignKey('DEFAULT_MODUL.DM_ID'))
+    NL_ID = Column(Integer, ForeignKey('NAVLEVEL.NL_ID'))
     ZM_LOCATION = Column(Unicode(length=5))
     NPE_CREATE = Column(Boolean)
-    CT_ID = Column(Integer)
+    CT_ID = Column(Integer, ForeignKey('CALC_TYPE.CT_ID'))
     NPE_REG = Column(DateTime)
     NPE_REGBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
     NPE_UPDATE = Column(DateTime)
@@ -115,12 +115,106 @@ class PackageElement(Base):
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
     package = relationship("Package", back_populates="package_elements")
-    package_calculations: List['PackageCalculation'] = \
-        relationship('PackageCalculation', back_populates="package_element",
-                     cascade="all, delete")
+    package_calculations: List['PackageElementCalculation'] = \
+        relationship('PackageElementCalculation',
+                     back_populates="package_element", cascade="all, delete")
     proof_elements: List['ProofElement'] = \
         relationship("ProofElement", back_populates="package_element",
                      cascade="all, delete")
+
+    default_module = relationship("DefaultModule")
+
+
+class NavLevel(Base):
+    """Level of a PackageElement."""
+
+    __tablename__ = "NAVLEVEL"
+
+    NL_ID = Column(Integer, primary_key=True)
+    NL_LEVEL = Column(Integer, unique=True)
+    NL_NAME_DE = Column(Unicode(length=30))
+    NL_NAME_EN = Column(Unicode(length=30))
+
+
+class CalculationType(Base):
+    """Type of a calculation."""
+
+    __tablename__ = "CALC_TYPE"
+
+    CT_ID = Column(Integer, primary_key=True)
+    CT_NAME = Column(Unicode(length=50))
+    CT_ORDER = Column(Integer)
+    CA_ID = Column(Integer)
+
+
+class DefaultModule(Base):
+    """Default module table model."""
+
+    __tablename__ = "DEFAULT_MODUL"
+
+    DM_ID = Column(Integer, primary_key=True)
+    DM_VERSION = Column(Integer)
+    DM_ACTIVE = Column(Boolean)
+    DM_NAME = Column(Unicode(length=255))
+    DM_LETTER = Column(Unicode(length=10))
+    HEAD_ID = Column(Integer)
+    TPT_ID = Column(Integer)
+    TPSC_ID = Column(Integer)
+    DM_IS_MASTER = Column(Boolean)
+    DM_COMMENT = Column(Unicode(length=500))
+    CL_ID = Column(Integer, ForeignKey('CLEARING.CL_ID'))
+    DM_CLEAR_BY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    DM_CLEAR_DATE = Column(DateTime)
+    DM_REGBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    DM_REG = Column(DateTime)
+    DM_UPDATEBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    DM_UPDATE = Column(DateTime)
+    DM_TESTBASE_DE = Column(Unicode(length=500))
+    DM_TESTBASE_EN = Column(Unicode(length=500))
+    DM_TESTBASE_FR = Column(Unicode(length=500))
+    DM_IS_CUSTOMER = Column(Boolean)
+    DM_IS_MARKETABILITY = Column(Boolean)
+    DM_IS_USABILITY = Column(Boolean)
+    CT_ID = Column(Integer, ForeignKey('CALC_TYPE.CT_ID'))
+    DM_SCOPE_DE = Column(Unicode(length=500))
+    DM_SCOPE_EN = Column(Unicode(length=500))
+    DM_SCOPE_FR = Column(Unicode(length=500))
+    DM_CLEAR_BY_VT = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    DM_CLEAR_DATE_VT = Column(DateTime)
+    DM_CREATED_FOR = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    DM_CREATED_FOR_DATE = Column(DateTime)
+    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
+    HRP_ID = Column(Integer, ForeignKey("HR_PRODUCT.HRP_ID"), nullable=False)
+    DM_IS_INFO = Column(Boolean)
+    DM_SOURCE = Column(Integer)
+    DM_PROCEDURE = Column(Integer)
+    DM_COMMENT_DE = Column(Unicode(length=1024))
+    DM_COMMENT_EN = Column(Unicode(length=1024))
+    DM_COMMENT_FR = Column(Unicode(length=1024))
+    DM_NAME_EN = Column(Unicode(length=255))
+    ND_ID = Column(Integer, ForeignKey("NAVDOMAIN.ND_ID"))
+    DM_ALIAS_DE = Column(Unicode(length=255))
+    DM_ALIAS_EN = Column(Unicode(length=255))
+    DM_PARENT = Column(Integer)
+    DM_REVISION = Column(Unicode(length=60))
+
+    nav_domain = relationship("NavDomain")
+
+
+class NavDomain(Base):
+    """Domain of a Navigation/Module."""
+
+    __tablename__ = "NAVDOMAIN"
+
+    ND_ID = Column(Integer, primary_key=True)
+    ND_SHORT = Column(Unicode(length=10))
+    ND_NAME_DE = Column(Unicode(length=100))
+    ND_NAME_EN = Column(Unicode(length=100))
+    ND_REG = Column(DateTime)
+    ND_REGBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    ND_ORDER = Column(Integer)
+    ND_ORDER_EXPORT = Column(Integer, nullable=False)
+    ND_ORDER_PLAN_DEFAULT = Column(Integer, nullable=False)
 
 
 class Package(Base):
@@ -223,7 +317,7 @@ class Clearing(Base):
     TPST_ID = Column(Integer)  # not clear what this is
 
 
-class PackageCalculation(Base):
+class PackageElementCalculation(Base):
     """Calculation data for a PackageElement."""
 
     __tablename__ = "NAV_PACK_ELEMENT_CALC"
@@ -285,6 +379,14 @@ class Navigation(Base):
 
     country = relationship("Country")
     product = relationship("Product")
+
+    @property
+    def lidl_phasen(self) -> List[Package]:
+        """Return the LIDL phasen services."""
+        # convert the name to a str since it could be None
+        return [pack for pack in self.packages
+                if "lidl" in str(pack.NP_NAME_DE).lower()
+                and "phasen" in str(pack.NP_NAME_DE).lower()]
 
 
 class Country(Base):
@@ -378,7 +480,7 @@ class Module(Base):
 
 # SCRIPTS
 def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
-                            session: AdminSession) -> int:
+                            session: Session) -> int:
     """
     Insert a copy of the given package into the given navigation.
 
@@ -438,7 +540,7 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
         session.flush()
 
         for calculaton in package_element.package_calculations:
-            new_calc = PackageCalculation(
+            new_calc = PackageElementCalculation(
                 NPE_ID=new_element.NPE_ID,
                 ST_ID=calculaton.ST_ID,
                 NPEC_DELTA_START=calculaton.NPEC_DELTA_START,
