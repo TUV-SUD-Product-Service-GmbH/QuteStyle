@@ -82,11 +82,15 @@ class CopyWorker(QObject):
             while try_count:
                 try:
                     self.copy_file(dst, src)
+                    break
                 except PermissionError:
                     log.warning("Received permission error copying file to %s",
                                 dst)
                     try_count -= 1
                     time.sleep(5)
+            else:
+                log.debug("The updated failed")
+                self.status_changed.emit("Update failed.")
             self.files_copied.emit(idx + 1, len(self._file_list))
         self.files_copied.emit(100, 100)
         self.copy_finished.emit()
