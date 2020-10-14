@@ -14,7 +14,7 @@ from typing import List, Iterator
 from sqlalchemy import create_engine, Column, Integer, Unicode, DateTime, \
     Boolean, Float, Numeric
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, Session
+from sqlalchemy.orm import sessionmaker, relationship, Session, Query
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.variables import STD_DB_PATH
@@ -124,13 +124,15 @@ class PackageElement(Base):
 
     default_module = relationship("DefaultModule")
 
+    level = relationship("NavLevel")
+
 
 class NavLevel(Base):
     """Level of a PackageElement."""
 
     __tablename__ = "NAVLEVEL"
 
-    NL_ID = Column(Integer, primary_key=True)
+    NL_ID = Column(Integer, primary_key=True, nullable=False)
     NL_LEVEL = Column(Integer, unique=True)
     NL_NAME_DE = Column(Unicode(length=30))
     NL_NAME_EN = Column(Unicode(length=30))
@@ -141,7 +143,7 @@ class CalculationType(Base):
 
     __tablename__ = "CALC_TYPE"
 
-    CT_ID = Column(Integer, primary_key=True)
+    CT_ID = Column(Integer, primary_key=True, nullable=False)
     CT_NAME = Column(Unicode(length=50))
     CT_ORDER = Column(Integer)
     CA_ID = Column(Integer)
@@ -152,7 +154,7 @@ class DefaultModule(Base):
 
     __tablename__ = "DEFAULT_MODUL"
 
-    DM_ID = Column(Integer, primary_key=True)
+    DM_ID = Column(Integer, primary_key=True, nullable=False)
     DM_VERSION = Column(Integer)
     DM_ACTIVE = Column(Boolean)
     DM_NAME = Column(Unicode(length=255))
@@ -206,7 +208,7 @@ class NavDomain(Base):
 
     __tablename__ = "NAVDOMAIN"
 
-    ND_ID = Column(Integer, primary_key=True)
+    ND_ID = Column(Integer, primary_key=True, nullable=False)
     ND_SHORT = Column(Unicode(length=10))
     ND_NAME_DE = Column(Unicode(length=100))
     ND_NAME_EN = Column(Unicode(length=100))
@@ -248,6 +250,8 @@ class Package(Base):
         relationship("PackageElement", back_populates="package",
                      cascade="all, delete")
 
+    pe_quer: Query = relationship("PackageElement", lazy='dynamic')
+
     navigation = relationship("Navigation", back_populates="packages")
 
     service_classes: List['ServiceClass'] = \
@@ -264,7 +268,7 @@ class PackageCategory(Base):
 
     __tablename__ = 'PACKAGE_CAT'
 
-    PC_ID = Column(Integer, primary_key=True)
+    PC_ID = Column(Integer, primary_key=True, nullable=False)
     PC_NAME_DE = Column(Unicode(length=50))
     PC_NAME_EN = Column(Unicode(length=50))
     PC_REG = Column(DateTime)
@@ -276,7 +280,7 @@ class PackageType(Base):
 
     __tablename__ = 'PACKAGE_TYPE'
 
-    PT_ID = Column(Integer, primary_key=True)
+    PT_ID = Column(Integer, primary_key=True, nullable=False)
     PT_NAME_DE = Column(Unicode(length=255))
     PT_NAME_EN = Column(Unicode(length=255))
     PT_REG = Column(DateTime)
@@ -291,7 +295,7 @@ class PackageName(Base):
 
     __tablename__ = "PACKAGE_NAME"
 
-    PN_ID = Column(Integer, primary_key=True)
+    PN_ID = Column(Integer, primary_key=True, nullable=False)
     PN_NAME_DE = Column(Unicode(length=255))
     PN_NAME_EN = Column(Unicode(length=255))
     PN_REG = Column(DateTime)
@@ -305,7 +309,7 @@ class Clearing(Base):
 
     __tablename__ = "CLEARING"
 
-    CL_ID = Column(Integer, primary_key=True)
+    CL_ID = Column(Integer, primary_key=True, nullable=False)
     CL_NAME_DE = Column(Unicode(length=100))
     CL_NAME_EN = Column(Unicode(length=100))
     CL_DESCRIPTION_DE = Column(Unicode(length=255))  # always NULL
@@ -375,7 +379,7 @@ class Navigation(Base):
     N_UPDATE = Column(DateTime)
     N_UPDATEBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
 
-    packages: List[Package] = relationship("Package", lazy='dynamic')
+    packages: Query = relationship("Package", lazy='dynamic')
 
     country = relationship("Country")
     product = relationship("Product")
@@ -394,7 +398,7 @@ class Country(Base):
 
     __tablename__ = "HR_COUNTRY"
 
-    HRC_ID = Column(Integer, primary_key=True)
+    HRC_ID = Column(Integer, primary_key=True, nullable=False)
     HRC_LEFT = Column(Integer)
     HRC_RIGHT = Column(Integer)
     HRC_INDENT = Column(Integer)
@@ -410,7 +414,7 @@ class Product(Base):
 
     __tablename__ = "HR_PRODUCT"
 
-    HRP_ID = Column(Integer, primary_key=True)
+    HRP_ID = Column(Integer, primary_key=True, nullable=False)
     HRP_LEFT = Column(Integer)
     HRP_RIGHT = Column(Integer)
     HRP_INDENT = Column(Integer)
@@ -428,9 +432,25 @@ class ServiceClass(Base):
 
     NPS_ID = Column(Integer, primary_key=True, nullable=False)
     NP_ID = Column(Integer, ForeignKey('NAV_PACK.NP_ID', ondelete="CASCADE"))
-    SCL_ID = Column(Integer)
+    SCL_ID = Column(Integer, ForeignKey('SERVICECLASS.SCL_ID'))
 
     package = relationship("Package", back_populates="service_classes")
+    definition = relationship("ServiceClassDefinition")
+
+
+class ServiceClassDefinition(Base):
+    """Definitions for the service class."""
+
+    __tablename__ = "SERVICECLASS"
+
+    SCL_ID = Column(Integer, primary_key=True, nullable=False)
+    SCL_LEVEL = Column(Integer)
+    SCL_REMARK_DE = Column(Unicode(length=500))
+    SCL_REMARK_EN = Column(Unicode(length=500))
+    SCL_REG = Column(DateTime)
+    SCL_REGBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
+    SCL_UPDATE = Column(DateTime)
+    SCL_UPDATEBY = Column(Integer, ForeignKey('V_PSEX_STAFF.ST_ID'))
 
 
 class ProofElement(Base):
