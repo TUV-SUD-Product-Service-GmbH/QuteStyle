@@ -6,10 +6,12 @@ query. Always use session.delete()!
 
 """
 import logging
+import operator
 import os
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime
-from typing import List, Iterator
+from typing import List, Iterator, Optional, Dict, cast
 
 from sqlalchemy import create_engine, Column, Integer, Unicode, DateTime, \
     Boolean, Float, Numeric
@@ -94,6 +96,24 @@ class Team(Base):
 
     HR_ID = Column(Integer, primary_key=True, nullable=False)
     HR_SHORT = Column(Unicode(length=21))
+    HR_NEW_ID = Column(Integer, nullable=False)
+    ST_ID = Column(Integer)
+
+
+class TeamSublocation(Base):
+    """Sublocation of a team."""
+
+    __tablename__ = "V_TEAM_SUBLOCATION"
+
+    ST_ID = Column(Integer, primary_key=True)
+    ST_SURNAME = Column(Unicode(length=60), nullable=False)
+    ST_TEAM = Column(Unicode(length=36))
+    Sublocation = Column(Unicode(length=6))  # is always NULL as of 16.10.2020
+
+    @property
+    def name(self) -> Optional[str]:
+        """Return the name of the team."""
+        return self.ST_SURNAME
 
 
 class PackageElement(Base):
@@ -354,6 +374,13 @@ class PackageElementCalculation(Base):
     package_element = relationship(PackageElement,
                                    back_populates="package_calculations")
 
+    @property
+    def team(self) -> TeamSublocation:
+        """Return the team by ST_ID."""
+        session = AdminSession.object_session(self)
+        team = session.query(TeamSublocation).get(self.ST_ID)
+        return cast(TeamSublocation, team)
+
 
 class Navigation(Base):
     """Navigation table model."""
@@ -391,6 +418,70 @@ class Navigation(Base):
         return [pack for pack in self.packages
                 if "lidl" in str(pack.NP_NAME_DE).lower()
                 and "phasen" in str(pack.NP_NAME_DE).lower()]
+
+    def default_teams(self) -> Dict[str, int]:
+        """
+        Get the default teams used in the Navigation.
+
+        Will return a dictionary with the DomainName as key and the team id
+        as value.
+        """
+        team_counts: Dict[str, Dict[int, int]] = {
+            "SAFE": defaultdict(int),
+            "PERF": defaultdict(int),
+            "PM": defaultdict(int)
+        }
+
+        for package in self.packages:
+            for package_element in package.package_elements:
+                package_element = cast(PackageElement, package_element)
+                domain = package_element.default_module.nav_domain.ND_SHORT
+                if domain not in team_counts:
+                    continue
+                for calc in package_element.package_calculations:
+                    log.debug("Adding team id to dict: %s", calc.ST_ID)
+                    team_counts[domain][calc.ST_ID] += 1
+        teams = {
+            "SAFE": -1,
+            "PERF": -1,
+            "PM": -1
+        }
+        for domain_name, counts in team_counts.items():
+            team = max(counts.items(), key=operator.itemgetter(1))[0]
+            log.debug("Returning team %s for domain %s", team, domain_name)
+            teams[domain_name] = team
+        return teams
+
+    def safe_team(self) -> int:
+        """Return the team which is used mostly in SAFE."""
+        return self._team_by_domain_name("SAFE")
+
+    def perf_team(self) -> int:
+        """Return the team which is used mostly in PERF."""
+        return self._team_by_domain_name("PERF")
+
+    def tpl_team(self) -> int:
+        """Return the team which is used mostly in PM."""
+        return self._team_by_domain_name("PM")
+
+    def _team_by_domain_name(self, domain_name: str) -> int:
+        """Return the team which is used mostly in the given domain."""
+        team_counts: Dict[int, int] = defaultdict(int)
+        for package in self.packages:
+            if "LIDL_PP" in package.NP_NAME_DE:
+                log.debug("Not checking %s", package.NP_NAME_DE)
+                continue
+            for package_element in package.package_elements:
+                package_element = cast(PackageElement, package_element)
+                if domain_name != package_element.default_module\
+                        .nav_domain.ND_SHORT:
+                    continue
+                for calc in package_element.package_calculations:
+                    log.debug("Adding team id to dict: %s", calc.ST_ID)
+                    team_counts[calc.ST_ID] += 1
+        team = max(team_counts.items(), key=operator.itemgetter(1))[0]
+        log.debug("Returning team to be the most used team")
+        return team
 
 
 class Country(Base):
