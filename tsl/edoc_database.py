@@ -441,9 +441,9 @@ class Navigation(Base):
                               for pack_ele in pack_elements}
         default_modules = session.query(DefaultModule) \
             .filter(DefaultModule.DM_ID.in_(default_module_ids.values())).all()
-        domain_ids = [mod.ND_ID for mod in default_modules]
+        domain_ids = {mod.DM_ID: mod.ND_ID for mod in default_modules}
         domains = session.query(NavDomain) \
-            .filter(NavDomain.ND_ID.in_(domain_ids)).all()
+            .filter(NavDomain.ND_ID.in_(list(domain_ids.values()))).all()
         domain_names = {domain.ND_ID: domain.ND_SHORT for domain in domains}
 
         pack_ele_ids = [pack_ele.NPE_ID for pack_ele in pack_elements]
