@@ -419,6 +419,7 @@ class Navigation(Base):
                 if "lidl" in str(pack.NP_NAME_DE).lower()
                 and "phasen" in str(pack.NP_NAME_DE).lower()]
 
+    # pylint: disable=too-many-locals
     def default_teams(self) -> Dict[str, int]:
         """
         Get the default teams used in the Navigation.
@@ -432,15 +433,36 @@ class Navigation(Base):
             "PM": defaultdict(int)
         }
 
-        for package in self.packages:
-            for package_element in package.package_elements:
-                package_element = cast(PackageElement, package_element)
-                domain = package_element.default_module.nav_domain.ND_SHORT
-                if domain not in team_counts:
-                    continue
-                for calc in package_element.package_calculations:
-                    log.debug("Adding team id to dict: %s", calc.ST_ID)
-                    team_counts[domain][calc.ST_ID] += 1
+        session = Session.object_session(self)
+        package_ids = [pack.NP_ID for pack in self.packages]
+        pack_elements = session.query(PackageElement) \
+            .filter(PackageElement.NP_ID.in_(package_ids)).all()
+        default_module_ids = {pack_ele.NPE_ID: pack_ele.DM_ID
+                              for pack_ele in pack_elements}
+        default_modules = session.query(DefaultModule) \
+            .filter(DefaultModule.DM_ID.in_(default_module_ids.values())).all()
+        domain_ids = [mod.ND_ID for mod in default_modules]
+        domains = session.query(NavDomain) \
+            .filter(NavDomain.ND_ID.in_(domain_ids)).all()
+        domain_names = {domain.ND_ID: domain.ND_SHORT for domain in domains}
+
+        pack_ele_ids = [pack_ele.NPE_ID for pack_ele in pack_elements]
+        calcs = session.query(PackageElementCalculation) \
+            .filter(PackageElementCalculation.NPE_ID.in_(pack_ele_ids)).all()
+
+        for calc in calcs:
+            log.debug("Adding team id to dict: %s (calc: %s)", calc.ST_ID,
+                      calc.NPEC_ID)
+            mod_id = default_module_ids[calc.NPE_ID]
+            if mod_id is None:
+                log.warning("No module stored for PackageElement %s",
+                            calc.NPE_ID)
+                continue
+            domain_id = domain_ids[mod_id]
+            domain = domain_names[domain_id]
+            if domain not in team_counts:
+                continue
+            team_counts[domain][calc.ST_ID] += 1
         teams = {
             "SAFE": -1,
             "PERF": -1,
@@ -451,37 +473,31 @@ class Navigation(Base):
             log.debug("Returning team %s for domain %s", team, domain_name)
             teams[domain_name] = team
         return teams
+        # pylint: enable=too-many-locals
 
-    def safe_team(self) -> int:
-        """Return the team which is used mostly in SAFE."""
-        return self._team_by_domain_name("SAFE")
-
-    def perf_team(self) -> int:
-        """Return the team which is used mostly in PERF."""
-        return self._team_by_domain_name("PERF")
-
-    def tpl_team(self) -> int:
-        """Return the team which is used mostly in PM."""
-        return self._team_by_domain_name("PM")
-
-    def _team_by_domain_name(self, domain_name: str) -> int:
-        """Return the team which is used mostly in the given domain."""
-        team_counts: Dict[int, int] = defaultdict(int)
+    def default_zara_product(self) -> str:
+        """Calculate the default ZaraProduct."""
+        log.debug("Calculation ZaraProduct for Navigation %s", self.N_ID)
+        products: Dict[str, int] = defaultdict(int)
         for package in self.packages:
-            if "LIDL_PP" in package.NP_NAME_DE:
-                log.debug("Not checking %s", package.NP_NAME_DE)
-                continue
-            for package_element in package.package_elements:
-                package_element = cast(PackageElement, package_element)
-                if domain_name != package_element.default_module\
-                        .nav_domain.ND_SHORT:
-                    continue
-                for calc in package_element.package_calculations:
-                    log.debug("Adding team id to dict: %s", calc.ST_ID)
-                    team_counts[calc.ST_ID] += 1
-        team = max(team_counts.items(), key=operator.itemgetter(1))[0]
-        log.debug("Returning team to be the most used team")
-        return team
+            products[package.ZM_PRODUCT] += 1
+
+        if products["T10"] > products["T20"]:
+            log.debug("ZaraProduct is T10")
+            return "T10"
+        log.debug("ZaraProduct is T20")
+        return "T20"
+
+    def calculations(self) -> List[PackageElementCalculation]:
+        """Return all PackageElementCalculation."""
+        session = Session.object_session(self)
+        package_ids = [pack.NP_ID for pack in self.packages]
+        pack_elements = session.query(PackageElement) \
+            .filter(PackageElement.NP_ID.in_(package_ids)).all()
+        pack_ele_ids = [pack_ele.NPE_ID for pack_ele in pack_elements]
+        calcs = session.query(PackageElementCalculation) \
+            .filter(PackageElementCalculation.NPE_ID.in_(pack_ele_ids)).all()
+        return cast(List[PackageElementCalculation], calcs)
 
 
 class Country(Base):
@@ -587,6 +603,28 @@ class Module(Base):
     EM_FILTER_LEVEL = Column(Unicode(length=100))
     EM_FILTER_PARAM = Column(Unicode(length=512))
     EM_FILTER_ITEMS = Column(Unicode(length=2048))
+
+
+class ZaraObject(Base):
+    """Zara Object table model."""
+
+    __tablename__ = "V_PSEX_ZOBJECT"
+
+    ZM_PRIMARY_FAKE = Column(Integer, primary_key=True)
+    ZM_OBJECT = Column(Unicode(length=5))
+    ZM_OBJECT_NAME = Column(Unicode(length=255))
+    ZM_OBJECT_LANGUAGE = Column(Unicode(length=2))
+
+
+class ZaraProduct(Base):
+    """Zara Product table model."""
+
+    __tablename__ = "V_PSEX_ZPRODUCT"
+
+    ZM_PRIMARY_FAKE = Column(Integer, primary_key=True)
+    ZM_PRODUCT = Column(Unicode(length=5))
+    ZM_PROUDCT_NAME = Column(Unicode(length=255))
+    ZM_PRODUCT_LANGUAGE = Column(Unicode(length=2))
 
 
 # SCRIPTS
