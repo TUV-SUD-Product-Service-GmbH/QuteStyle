@@ -51,7 +51,7 @@ class TSLMainWindow(QMainWindow):
             self.update_status(False)
         super(TSLMainWindow, self).show()
 
-    def handle_update_window(self) -> None:
+    def _handle_update_window(self) -> None:
         """Handle the update window."""
         log.debug("Handling for update status: %s", self._update_status)
 
@@ -110,7 +110,7 @@ class TSLMainWindow(QMainWindow):
         """Handle the update status of the Updater."""
         log.debug("Update status from Updater: %s", update_available)
         self._update_status = update_available
-        self.handle_update_window()
+        self._handle_update_window()
 
     @pyqtSlot(name="updater_finished")
     def updater_finished(self) -> None:
@@ -132,3 +132,8 @@ class TSLMainWindow(QMainWindow):
             sys.exit()
         else:
             log.debug("No update is available.")
+
+    def _close_progress_window(self) -> None:
+        """Uninstall the eventfilter and then close the progress window."""
+        self._progress.removeEventFilter(self)
+        self._progress.close()
