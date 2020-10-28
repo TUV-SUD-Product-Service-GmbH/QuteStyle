@@ -99,9 +99,10 @@ class TSLMainWindow(QMainWindow):
 
     @pyqtSlot(name="on_about")
     def on_about(self) -> None:
-        """Show a message box about the used PS ChemUp version."""
-        log.debug("User pressed button to show dialog about PS ChemUp")
-        title = self.tr("Über PS ChemUp")
+        """Show a message box about the used app version."""
+        log.debug("User pressed button to show dialog about %s",
+                  self._app_name)
+        title = self.tr(f"Über {self._app_name}")
         QMessageBox.about(self, title, self._help_text)
 
     @pyqtSlot(bool, name="update_status")
