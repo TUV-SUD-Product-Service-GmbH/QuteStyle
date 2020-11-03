@@ -469,8 +469,12 @@ class Navigation(Base):
             "PM": -1
         }
         for domain_name, counts in team_counts.items():
-            team = max(counts.items(), key=operator.itemgetter(1))[0]
-            log.debug("Returning team %s for domain %s", team, domain_name)
+            try:
+                team = max(counts.items(), key=operator.itemgetter(1))[0]
+                log.debug("Returning team %s for domain %s", team, domain_name)
+            except ValueError:
+                log.debug("No teams were found for domain %s", domain_name)
+                team = -1
             teams[domain_name] = team
         return teams
         # pylint: enable=too-many-locals
@@ -642,7 +646,6 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
     pack: Package = session.query(Package).get(package_id)
     assert pack
 
-    now = datetime.now()
     new_pack = Package(
         N_ID=nav_id,
         NP_NAME_DE=pack.NP_NAME_DE,
@@ -658,7 +661,7 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
         NP_IS_TEMPLATE=False,
         NP_TEMPLATE_ID=pack.NP_ID,
         PN_ID=pack.PN_ID,
-        NP_REG=now,
+        NP_REG=datetime.now(),
         NP_REGBY=user_id
     )
     session.add(new_pack)
@@ -674,51 +677,56 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
         session.add(new_class)
 
     for package_element in pack.package_elements:
-        new_element = PackageElement(
-            NP_ID=new_pack.NP_ID,
-            DM_ID=package_element.DM_ID,
-            NL_ID=package_element.NL_ID,
-            ZM_LOCATION=package_element.ZM_LOCATION,
-            CT_ID=package_element.CT_ID,
-            NPE_CREATE=package_element.NPE_CREATE,
-            NPE_CREATE_SO=package_element.NPE_CREATE_SO,
-            NPE_REG=now,
-            NPE_REGBY=user_id
-        )
-        session.add(new_element)
-        session.flush()
-
-        for calculaton in package_element.package_calculations:
-            new_calc = PackageElementCalculation(
-                NPE_ID=new_element.NPE_ID,
-                ST_ID=calculaton.ST_ID,
-                NPEC_DELTA_START=calculaton.NPEC_DELTA_START,
-                NPEC_TIME_DAYS=calculaton.NPEC_TIME_DAYS,
-                NPEC_TIME_HOURS=calculaton.NPEC_TIME_HOURS,
-                NPEC_RATE=calculaton.NPEC_RATE,
-                NPEC_COSTS=calculaton.NPEC_COSTS,
-                NPEC_TRAVEL=calculaton.NPEC_TRAVEL,
-                NPEC_FACTOR=calculaton.NPEC_FACTOR,
-                NPEC_PRICE=calculaton.NPEC_PRICE,
-                NPEC_COMMENT=calculaton.NPEC_COMMENT,
-                NPEC_TASK=calculaton.NPEC_TASK,
-                ZM_ID=calculaton.ZM_ID,
-                NPOS_ID=calculaton.NPOS_ID,
-                NPEC_REG=now,
-                NPEC_REGBY=user_id
-            )
-            session.add(new_calc)
-
-        for proof_element in package_element.proof_elements:
-            new_proof = ProofElement(
-                NPE_ID=new_element.NPE_ID,
-                NPEP_TYPE=proof_element.NPEP_TYPE,
-                NPR_ID=proof_element.NPR_ID,
-                NPEP_TEXT_DE=proof_element.NPEP_TEXT_DE,
-                NPEP_TEXT_EN=proof_element.NPEP_TEXT_EN,
-                NPEP_REG=now,
-                NPEP_REGBY=user_id
-            )
-            session.add(new_proof)
+        copy_package_element(new_pack.NP_ID, package_element, session, user_id)
     session.flush()
     return new_pack_id
+
+
+def copy_package_element(new_pack_id: int, package_element: PackageElement,
+                         session: Session, user_id: int) -> int:
+    """Copy the PackageElement to the Package with the given id."""
+    new_element = PackageElement(
+        NP_ID=new_pack_id,
+        DM_ID=package_element.DM_ID,
+        NL_ID=package_element.NL_ID,
+        ZM_LOCATION=package_element.ZM_LOCATION,
+        CT_ID=package_element.CT_ID,
+        NPE_CREATE=package_element.NPE_CREATE,
+        NPE_CREATE_SO=package_element.NPE_CREATE_SO,
+        NPE_REG=datetime.now(),
+        NPE_REGBY=user_id
+    )
+    session.add(new_element)
+    session.flush()
+    for calculation in package_element.package_calculations:
+        new_calc = PackageElementCalculation(
+            NPE_ID=new_element.NPE_ID,
+            ST_ID=calculation.ST_ID,
+            NPEC_DELTA_START=calculation.NPEC_DELTA_START,
+            NPEC_TIME_DAYS=calculation.NPEC_TIME_DAYS,
+            NPEC_TIME_HOURS=calculation.NPEC_TIME_HOURS,
+            NPEC_RATE=calculation.NPEC_RATE,
+            NPEC_COSTS=calculation.NPEC_COSTS,
+            NPEC_TRAVEL=calculation.NPEC_TRAVEL,
+            NPEC_FACTOR=calculation.NPEC_FACTOR,
+            NPEC_PRICE=calculation.NPEC_PRICE,
+            NPEC_COMMENT=calculation.NPEC_COMMENT,
+            NPEC_TASK=calculation.NPEC_TASK,
+            ZM_ID=calculation.ZM_ID,
+            NPOS_ID=calculation.NPOS_ID,
+            NPEC_REG=datetime.now(),
+            NPEC_REGBY=user_id
+        )
+        session.add(new_calc)
+    for proof_element in package_element.proof_elements:
+        new_proof = ProofElement(
+            NPE_ID=new_element.NPE_ID,
+            NPEP_TYPE=proof_element.NPEP_TYPE,
+            NPR_ID=proof_element.NPR_ID,
+            NPEP_TEXT_DE=proof_element.NPEP_TEXT_DE,
+            NPEP_TEXT_EN=proof_element.NPEP_TEXT_EN,
+            NPEP_REG=datetime.now(),
+            NPEP_REGBY=user_id
+        )
+        session.add(new_proof)
+    return new_element.NPE_ID
