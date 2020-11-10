@@ -633,11 +633,15 @@ class ZaraProduct(Base):
 
 # SCRIPTS
 def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
-                            session: Session) -> int:
+                            session: Session, copy_pe: bool = True) -> int:
     """
     Insert a copy of the given package into the given navigation.
 
     Returns the id of the new package.
+
+    If copy_pe is false, the PackageElements won't be copied along with the
+    Package. This should be used if the PackageElements will be created
+    otherwise (i.e. copied from the LIDL Phasen Service).
 
     Based on dbo.SP_NAV_INSERT_PACKAGE in dbo.EDOC.
     """
@@ -676,8 +680,10 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
         )
         session.add(new_class)
 
-    for package_element in pack.package_elements:
-        copy_package_element(new_pack.NP_ID, package_element, session, user_id)
+    if copy_pe:
+        for package_element in pack.package_elements:
+            copy_package_element(new_pack.NP_ID, package_element, session,
+                                 user_id)
     session.flush()
     return new_pack_id
 
