@@ -33,13 +33,14 @@ AdminSession = sessionmaker(bind=ENGINE)  # pylint: disable=invalid-name
 
 # session fixture for use in with statement
 @contextmanager
-def session_scope() -> Iterator[Session]:
+def session_scope(commit: bool = True) -> Iterator[Session]:
     """Provide a transactional scope around a series of operations."""
     session = AdminSession()
     try:
         session.expire_on_commit = False
         yield session
-        session.commit()
+        if commit:
+            session.commit()
     except:  # nopep8
         session.rollback()
         raise
@@ -736,3 +737,13 @@ def copy_package_element(new_pack_id: int, package_element: PackageElement,
         )
         session.add(new_proof)
     return new_element.NPE_ID
+
+
+def get_user_id() -> int:
+    """Get the database id for the current user."""
+    with session_scope() as session:
+        username = os.getlogin()
+        log.debug("Getting database id for user %s", username)
+        user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
+        log.debug("Returning user id: %s", user.ST_ID)
+        return cast(int, user.ST_ID)
