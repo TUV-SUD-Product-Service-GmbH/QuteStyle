@@ -2,22 +2,23 @@
 import errno
 import logging
 import os
-import winreg
+from winreg import OpenKey, HKEY_CURRENT_USER, KEY_READ, QueryValueEx
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
 from sqlalchemy import create_engine, Column, Integer, Unicode, Float, \
     ForeignKey, DateTime
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
+from sqlalchemy.pool import StaticPool
 
 from tsl.variables import STD_DB_PATH
 
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
-ENGINE = create_engine(os.getenv("PSE_DB_PATH",
-                                 STD_DB_PATH.format("PSExplorer")))
+ENGINE = create_engine(
+    os.getenv("PSE_DB_PATH", STD_DB_PATH.format("PSExplorer")),
+    connect_args={'check_same_thread': False}, poolclass=StaticPool)
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE
@@ -69,7 +70,7 @@ class Project(Base):
     P_ZARA_NUMBER = Column(Unicode(length=11))
     P_FOLDER = Column(Unicode(length=256))
     DELR_ID = Column(Integer)
-    P_WC_ID = Column(UNIQUEIDENTIFIER)
+    P_WC_ID = Column(Unicode(length=36))
     P_NAME = Column(Unicode(length=31))
     P_CUSTOMER_A = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
     P_CUSTOMER_B = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
@@ -105,7 +106,8 @@ class CustomerAddress(Base):
 
     __tablename__ = 'CUSTOMER_ADDRESS'
 
-    CU_ID = Column(Integer, primary_key=True, nullable=False)
+    CA_ID = Column(Integer, primary_key=True, nullable=False)
+    CU_ID = Column(Integer, nullable=False)
     CA_NAME = Column(Unicode(length=166), nullable=False)
     CA_STREET = Column(Unicode(length=101))
     CA_ZIPCODE = Column(Unicode(length=11))
@@ -127,10 +129,9 @@ class Staff(Base):
 
 def get_selected_psex_id() -> Optional[int]:
     """Get the id of the currently selected project in PSExplorer."""
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\TUV\PSExplorer",
-                         0, winreg.KEY_READ)
+    key = OpenKey(HKEY_CURRENT_USER, r"Software\TUV\PSExplorer", 0, KEY_READ)
     try:
-        project_id = winreg.QueryValueEx(key, 'SelectedProjectId')[0]
+        project_id = QueryValueEx(key, 'SelectedProjectId')[0]
         log.debug("Selected PSEX-ID is %s", project_id)
         return project_id
     except OSError as error:
