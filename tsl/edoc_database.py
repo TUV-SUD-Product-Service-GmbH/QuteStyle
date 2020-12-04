@@ -331,6 +331,31 @@ class DefaultModule(Base):
     header = relationship("Header")
     items = relationship("DefaultModuleItem", back_populates="default_module")
 
+    calculations = relationship("DefaultModuleCalc",
+                                back_populates="default_module")
+
+
+class DefaultModuleCalc(Base):
+    """Calculation for a DefaultModule."""
+
+    __tablename__ = "DEFAULT_MODUL_CALC"
+
+    DMC_ID = Column(Integer, primary_key=True)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
+    WST_ID = Column(Integer)  # todo: add foreign key
+    DMC_TASK = Column(Unicode(length=500))
+    DMC_TIME_HOURS = Column(Float)
+    DMC_TIME_DAYS = Column(Float)
+    DMC_COSTS = Column(Numeric(precision=18, scale=2))
+    DMC_TRAVEL = Column(Numeric(precision=18, scale=2))
+    DMC_COMMENT = Column(Unicode(length=500))
+    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    DMC_COSTS_EXTERNAL = Column(Numeric(precision=18, scale=2))
+
+    default_module = relationship("DefaultModule",
+                                  back_populates="calculations")
+    team = relationship("Staff")
+
 
 class DefaultModuleAttribute(Base):
     """Attribute links for a DefaultModule."""
@@ -393,6 +418,7 @@ class Edoc(Base):
     upd_user = relationship("Staff", foreign_keys=[E_UPDATEBY])
     package = relationship("Package")
     header = relationship("Header")
+    phases = relationship("EdocPhase", back_populates="edoc")
 
 
 class EdocModuleItem(Base):
@@ -605,7 +631,7 @@ class EdocPhase(Base):
     EP_USABILITY_COMMENT_FR = Column(Unicode)
     EP_PHASEALIAS = Column(Unicode(length=100))
 
-    edoc = relationship("Edoc")
+    edoc = relationship("Edoc", back_populates="phases")
     project = relationship("Project")
     result = relationship("EdocResult")
     process_phase = relationship("ProcessPhase")
@@ -746,7 +772,7 @@ class Navigation(Base):
     N_UPDATE = Column(DateTime)
     N_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
 
-    packages = relationship("Package", lazy="dynamic")
+    packages: List["Package"] = relationship("Package", lazy="dynamic")
 
     country = relationship("Country")
     product = relationship("Product")
@@ -929,13 +955,15 @@ class Package(Base):
 
     clearing_state = relationship("Clearing")
 
-    package_elements = relationship("PackageElement", back_populates="package",
-                                    cascade="all, delete")
+    package_elements: List["PackageElement"] = \
+        relationship("PackageElement", back_populates="package",
+                     cascade="all, delete")
 
     navigation = relationship("Navigation", back_populates="packages")
 
-    service_classes = relationship("ServiceClass", back_populates="package",
-                                   cascade="all, delete")
+    service_classes: List["ServiceClass"] = \
+        relationship("ServiceClass", back_populates="package",
+                     cascade="all, delete")
 
     package_type = relationship("PackageType")
 
@@ -973,9 +1001,10 @@ class PackageElement(Base):
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
     package = relationship("Package", back_populates="package_elements")
-    package_calculations = relationship("PackageElementCalculation",
-                                        back_populates="package_element",
-                                        cascade="all, delete")
+    package_calculations: List["PackageElementCalculation"]\
+        = relationship("PackageElementCalculation",
+                       back_populates="package_element",
+                       cascade="all, delete")
     proof_elements = relationship("ProofElement", cascade="all, delete",
                                   back_populates="package_element")
 
