@@ -54,6 +54,17 @@ class Process(Base):
     PC_PATH = Column(Unicode(length=50))
 
 
+class ProcessPhase(Base):
+    """ProcessPhase table model."""
+
+    __tablename__ = 'PROCESSPHASE'
+
+    PRP_ID = Column(Integer, primary_key=True, nullable=False)
+    PRP_SHORT_DE = Column(Unicode(length=256))
+    PRP_SHORT_EN = Column(Unicode(length=256))
+    PRP_SHORT_FR = Column(Unicode(length=256))
+
+
 class Project(Base):
     """Project table model."""
 
@@ -65,7 +76,9 @@ class Project(Base):
     P_PRODUCT = Column(Unicode(length=256))
     P_CONTACT = Column(Unicode(length=256))
     P_CONTACT_CUC_ID = Column(Integer, ForeignKey('CUSTOMER_CONTACT.CUC_ID'))
+    P_DEADLINE = Column(DateTime)
     P_ORDERSIZE = Column(Float)
+    P_PROCESSPHASE = Column(Integer, ForeignKey('PROCESSPHASE.PRP_ID'))
     P_MODEL = Column(Unicode(length=256))
     P_ZARA_NUMBER = Column(Unicode(length=11))
     P_FOLDER = Column(Unicode(length=256))
@@ -86,6 +99,7 @@ class Project(Base):
     manufacturer_address = relationship('CustomerAddress',
                                         foreign_keys=[P_CUSTOMER_B])
     process = relationship('Process')
+    phase = relationship('ProcessPhase')
     staff = relationship('Staff')
 
 
