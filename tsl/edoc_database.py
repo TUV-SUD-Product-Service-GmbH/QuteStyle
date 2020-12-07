@@ -173,7 +173,7 @@ class DefaultItem(Base):
     DI_ID = Column(Integer, primary_key=True)
     DI_VERSION = Column(Integer)
     DI_NAME = Column(Unicode(length=100))
-    TPT_ID = Column(Integer)  # todo: link ForeignKey
+    TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
     TPSC_ID = Column(Integer)  # todo: link ForeignKey
     DI_REQUIREMENT_DE = Column(Unicode(length=1500))
     DI_REQUIREMENT_EN = Column(Unicode(length=1500))
@@ -228,10 +228,10 @@ class DefaultItem(Base):
     DI_PROTECTED = Column(Boolean)
 
     clearing = relationship("Clearing")
-    annexes = relationship("DefaultItemAnnex", back_populates="default_item",
-                           lazy="joined")
+    annexes = relationship("DefaultItemAnnex", back_populates="default_item")
     pictures = relationship("DefaultItemPicture",
-                            back_populates="default_item", lazy="joined")
+                            back_populates="default_item")
+    template_type = relationship("TemplateType")
 
 
 class DefaultItemAnnex(Base):
@@ -285,7 +285,7 @@ class DefaultModule(Base):
     DM_NAME = Column(Unicode(length=255))
     DM_LETTER = Column(Unicode(length=10))
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"))
-    TPT_ID = Column(Integer)
+    TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
     TPSC_ID = Column(Integer)
     DM_IS_MASTER = Column(Boolean)
     DM_COMMENT = Column(Unicode(length=500))
@@ -333,6 +333,24 @@ class DefaultModule(Base):
 
     calculations = relationship("DefaultModuleCalc",
                                 back_populates="default_module")
+    template_type = relationship("TemplateType")
+    links = relationship("DefaultModuleLink", back_populates="default_module")
+    test_bases = relationship("DefaultModuleTestBase")
+
+
+class DefaultModuleTestBase(Base):
+    """TestBase for a DefaultModule."""
+
+    __tablename__ = "DEFAULT_MODUL_BASE"
+
+    DMB_ID = Column(Integer, primary_key=True)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
+    B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
+    DMB_TYPE = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"), nullable=False)
+
+    test_base_type = relationship("TestBaseType")
+    test_base = relationship("TestBase")
+    default_module = relationship("DefaultModule", back_populates="test_bases")
 
 
 class DefaultModuleCalc(Base):
@@ -392,9 +410,27 @@ class DefaultModuleItem(Base):
     DMI_FACTOR = Column(Numeric(precision=18, scale=2))
     DMI_PRICE = Column(Numeric(precision=18, scale=2))
 
-    default_module = relationship("DefaultModule", back_populates="items",
-                                  lazy="joined")
-    default_item = relationship("DefaultItem", lazy="joined")
+    default_module = relationship("DefaultModule", back_populates="items")
+    default_item = relationship("DefaultItem")
+
+
+class DefaultModuleLink(Base):
+    """Link of a DefaultModule."""
+
+    __tablename__ = "DEFAULT_MODUL_LINK"
+
+    DML_ID = Column(Integer, primary_key=True)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
+    # the next four columns can never be NULL from eDOC
+    DML_TEXT_DE = Column(Unicode(length=1024), nullable=False)
+    DML_TEXT_EN = Column(Unicode(length=1024), nullable=False)
+    DML_TEXT_FR = Column(Unicode(length=1024), nullable=False)
+    DML_URL = Column(Unicode(length=512), nullable=False)
+    DML_UPDATE = Column(DateTime)
+    DML_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+
+    default_module = relationship("DefaultModule", back_populates="links")
+    update_by = relationship("Staff")
 
 
 class Edoc(Base):
@@ -404,7 +440,8 @@ class Edoc(Base):
 
     E_ID = Column(Integer, primary_key=True)
     E_VERSION = Column(Integer, default=1)
-    E_NAME = Column(Unicode(length=255))
+    # E_NAME is nullable in database, but never actually NULL
+    E_NAME = Column(Unicode(length=255), nullable=False)
     # default header is "Modulvorlage Standard" from HEADER table
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"), default=1)
     E_YN_SYMBOL = Column(Boolean, default=True)
@@ -418,7 +455,11 @@ class Edoc(Base):
     upd_user = relationship("Staff", foreign_keys=[E_UPDATEBY])
     package = relationship("Package")
     header = relationship("Header")
-    phases = relationship("EdocPhase", back_populates="edoc")
+    phases: List["EdocPhase"] = relationship("EdocPhase",
+                                             back_populates="edoc")
+    modules: List["EdocModule"] = relationship("EdocModule",
+                                               back_populates="edoc",
+                                               order_by="EdocModule.EM_NUMBER")
 
 
 class EdocModuleItem(Base):
@@ -459,13 +500,15 @@ class EdocModuleItem(Base):
     NL_ID = Column(Integer, ForeignKey("NAVLEVEL.NL_ID"))
 
     edoc = relationship("Edoc")
-    edoc_module = relationship("EdocModule")
+    edoc_module = relationship("EdocModule", back_populates="items")
     default_module = relationship("DefaultModule")
     default_item = relationship("DefaultItem")
     nav_level = relationship("NavLevel")
+    phase_results = relationship("EdocModuleItemPhase",
+                                 back_populates="edoc_item")
 
 
-class EdocModuleItemComparision(Base):
+class EdocModuleItemComparison(Base):
     """Comparison table for EdocModuleItems."""
 
     __tablename__ = "EDOC_MODUL_ITEM_COMPARISON"
@@ -483,7 +526,7 @@ class EdocModuleItemComparision(Base):
     EMIC_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
 
 
-class EdocModuleItemComparisionPhase(Base):
+class EdocModuleItemComparisonPhase(Base):
     """Comparison table for EdocModuleItems."""
 
     __tablename__ = "EDOC_MODUL_ITEM_COMPARISON_PHASE"
@@ -530,7 +573,8 @@ class EdocModuleItemPhase(Base):
     EMIP_IS_COPY = Column(Boolean, nullable=False)
 
     edoc_module = relationship("EdocModule")
-    edoc_item = relationship("EdocModuleItem")
+    edoc_item = relationship("EdocModuleItem", back_populates="phase_results")
+    phase = relationship("ProcessPhase")
     handleby = relationship("Staff", foreign_keys=[EMIP_HANDLEDBY])
 
 
@@ -570,6 +614,29 @@ class EdocModuleItemPicture(Base):
     EMIPC_DATA = deferred(Column(LargeBinary))
 
 
+class EdocModulePhase(Base):
+    """Phase for an EdocModule."""
+
+    __tablename__ = "EDOC_MODUL_PHASE"
+
+    EMP_ID = Column(Integer, primary_key=True)
+    E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
+    EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
+    PRP_ID = Column(Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"))
+    EMP_SUMMARY_DE = Column(Unicode)
+    EMP_SUMMARY_EN = Column(Unicode)
+    EMP_SUMMARY_FR = Column(Unicode)
+    EMP_COMMENT_DE = Column(Unicode(length=4000))
+    EMP_COMMENT_EN = Column(Unicode(length=4000))
+    EMP_COMMENT_FR = Column(Unicode(length=4000))
+    ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"))
+    EMP_VALUE = Column(Numeric(precision=18, scale=3))
+    SO_NUMBER = Column(Integer)
+    EMP_WITH_ADD = Column(Boolean)
+
+    edoc_module = relationship("EdocModule", back_populates="phases")
+
+
 class EdocModule(Base):
     """Module table model."""
 
@@ -583,7 +650,7 @@ class EdocModule(Base):
     EM_LETTER = Column(Unicode(length=10))
     EM_NUMBER = Column(Integer)
     SO_NUMBER = Column(Integer)
-    EM_OFFLINE_BY = Column(Integer)
+    EM_OFFLINE_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     EM_OFFLINE_SINCE = Column(DateTime)
     EM_REG = Column(DateTime)
     EM_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
@@ -593,8 +660,11 @@ class EdocModule(Base):
     EM_FILTER_PARAM = Column(Unicode(length=512))
     EM_FILTER_ITEMS = Column(Unicode(length=2048))
 
-    edoc = relationship("Edoc")
+    edoc = relationship("Edoc", back_populates="modules")
     default_module = relationship("DefaultModule")
+    offline_by = relationship("Staff", foreign_keys=[EM_OFFLINE_BY])
+    phases = relationship("EdocModulePhase", back_populates="edoc_module")
+    items = relationship("EdocModuleItem", back_populates="edoc_module")
 
 
 class EdocPhase(Base):
@@ -619,12 +689,12 @@ class EdocPhase(Base):
     EP_CUSTOMER_COMMENT_DE = Column(Unicode)
     EP_CUSTOMER_COMMENT_EN = Column(Unicode)
     EP_CUSTOMER_COMMENT_FR = Column(Unicode)
-    EP_MARKETABILITY_RESULT = Column(Integer)
+    EP_MARKETABILITY_RESULT = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"))
     EP_MARKETABILITY_VALUE = Column(Numeric(precision=18, scale=3))
     EP_MARKETABILITY_COMMENT_DE = Column(Unicode)
     EP_MARKETABILITY_COMMENT_EN = Column(Unicode)
     EP_MARKETABILITY_COMMENT_FR = Column(Unicode)
-    EP_USABILITY_RESULT = Column(Integer)
+    EP_USABILITY_RESULT = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"))
     EP_USABILITY_VALUE = Column(Numeric(precision=18, scale=3))
     EP_USABILITY_COMMENT_DE = Column(Unicode)
     EP_USABILITY_COMMENT_EN = Column(Unicode)
@@ -633,7 +703,11 @@ class EdocPhase(Base):
 
     edoc = relationship("Edoc", back_populates="phases")
     project = relationship("Project")
-    result = relationship("EdocResult")
+    result = relationship("EdocResult", foreign_keys=[ER_ID])
+    usability_result = relationship("EdocResult",
+                                    foreign_keys=[EP_USABILITY_RESULT])
+    marketability_result = relationship("EdocResult",
+                                        foreign_keys=[EP_MARKETABILITY_RESULT])
     process_phase = relationship("ProcessPhase")
 
 
@@ -1021,7 +1095,7 @@ class PackageElementCalculation(Base):
     NPEC_ID = Column(Integer, primary_key=True)
     NPE_ID = Column(Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID",
                                         ondelete="CASCADE"))
-    ST_ID = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"),
+    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
                    nullable=False)
     NPEC_DELTA_START = Column(Float)
     NPEC_TIME_DAYS = Column(Integer)
@@ -1049,7 +1123,7 @@ class PackageElementCalculation(Base):
 
     nav_position = relationship("NavPosition")
 
-    team = relationship("TeamSublocation")
+    team = relationship("Staff", foreign_keys=[ST_ID])
 
 
 class PackageElementFilter(Base):
@@ -1323,7 +1397,8 @@ class Staff(Base):
 
     ST_ID = Column(Integer, primary_key=True)
     ST_SURNAME = Column(Unicode(length=60), nullable=False)
-    ST_FORENAME = Column(Unicode(length=50))
+    # ST_FORENAME is nullable in database, but never actually NULL
+    ST_FORENAME = Column(Unicode(length=50), nullable=False)
     ST_COSTID = Column(Unicode(length=10))
     ST_ACTIVE = Column(Boolean, nullable=False)
     ST_NUMBER = Column(Unicode(length=8))
@@ -1402,12 +1477,12 @@ class SubOrder(Base):
     SO_DISABLED = Column(Boolean)
     SO_FORECAST = Column(Numeric(precision=18, scale=2))
     SO_INTERN = Column(Boolean)
-    ST_ID_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
-    SO_UPDATEBY_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
-    SO_REGBY_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
-    SO_READYBY_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
-    SO_DISPOBY_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
-    SO_CHECKBY_TEAM = Column(Integer, ForeignKey("V_TEAM_SUBLOCATION.ST_ID"))
+    ST_ID_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    SO_UPDATEBY_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    SO_REGBY_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    SO_READYBY_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    SO_DISPOBY_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    SO_CHECKBY_TEAM = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     ORDER_POSITION = Column(Unicode(length=6))
     ORDER_DATE = Column(DateTime)
     ORDER_SIGN = Column(Unicode(length=35))
@@ -1428,15 +1503,15 @@ class SubOrder(Base):
     project = relationship("Project")
     dispo_user = relationship("Staff", foreign_keys=[SO_DISPOBY])
     user = relationship("Staff", foreign_keys=[ST_ID])
-    team = relationship("TeamSublocation", foreign_keys=[ST_ID_TEAM])
-    update_team = relationship("TeamSublocation",
+    team = relationship("Staff", foreign_keys=[ST_ID_TEAM])
+    update_team = relationship("Staff",
                                foreign_keys=[SO_UPDATEBY_TEAM])
-    reg_team = relationship("TeamSublocation", foreign_keys=[SO_REGBY_TEAM])
-    ready_team = relationship("TeamSublocation",
+    reg_team = relationship("Staff", foreign_keys=[SO_REGBY_TEAM])
+    ready_team = relationship("Staff",
                               foreign_keys=[SO_READYBY_TEAM])
-    dispo_team = relationship("TeamSublocation",
+    dispo_team = relationship("Staff",
                               foreign_keys=[SO_DISPOBY_TEAM])
-    check_team = relationship("TeamSublocation",
+    check_team = relationship("Staff",
                               foreign_keys=[SO_CHECKBY_TEAM])
 
 
@@ -1465,6 +1540,69 @@ class TeamSublocation(Base):
     def name(self) -> Optional[str]:
         """Return the name of the team."""
         return self.ST_SURNAME
+
+
+class TemplateType(Base):
+    """TemplateType."""
+
+    __tablename__ = "V_PSEX_TEMPLATE_TYPE"
+
+    TPT_ID = Column(Integer, primary_key=True)
+    TPT_NAME_DE = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_EN = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_FR = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_DE = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_EN = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_FR = Column(Unicode(length=256), nullable=False)
+    TPT_PATH = Column(Unicode(length=256), nullable=False)
+    TPT_PREFIX = Column(Unicode(length=256), nullable=False)
+    TPT_MODULETYPE = Column(Unicode(length=256))
+    TPT_SHOWINPROZESSFOLDER = Column(Boolean, nullable=False)
+    TPT_SHOWINTEMPLATEMANAGER = Column(Boolean, nullable=False)
+
+
+class TestBase(Base):
+    """TestBase model."""
+
+    __tablename__ = "BASE"
+
+    B_ID = Column(Integer, primary_key=True)
+    B_NAME_DE = Column(Unicode(length=512))
+    B_NAME_EN = Column(Unicode(length=512))
+    B_NAME_FR = Column(Unicode(length=512))
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
+    BT_ID = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"))
+    PLK_SHORT = Column(Unicode(length=10))
+    B_REG = Column(DateTime)
+    B_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    B_UPDATE = Column(DateTime)
+    B_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
+    B_PARENT = Column(Integer, ForeignKey("BASE.B_ID"))
+    B_SHORT_DE = Column(Unicode(length=512))
+    B_SHORT_EN = Column(Unicode(length=512))
+    B_SHORT_FR = Column(Unicode(length=512))
+    B_DOW = Column(DateTime)
+    B_COMMENT_DE = Column(Unicode(length=512))
+    B_COMMENT_EN = Column(Unicode(length=512))
+    B_COMMENT_FR = Column(Unicode(length=512))
+    B_DOA = Column(Integer, nullable=False)
+
+    test_base_type = relationship("TestBaseType")
+    default_item = relationship("DefaultItem")
+
+
+class TestBaseType(Base):
+    """Type of a TestBase."""
+
+    __tablename__ = "BASE_TYPE"
+
+    BT_ID = Column(Integer, primary_key=True)
+    BT_SHORT = Column(Unicode(length=6))
+    BT_NAME_DE = Column(Unicode(length=50))
+    BT_NAME_EN = Column(Unicode(length=50))
+    BT_NAME_FR = Column(Unicode(length=50))
+    GT_ID = Column(Integer)  # todo: Add ForeignKey
 
 
 class ZaraObject(Base):
