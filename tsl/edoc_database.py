@@ -4,8 +4,13 @@ Database connection and models for the PSE database.
 WARNING! Delete cascades do not work properly, when delete is executed on a
 query. Always use session.delete()!
 
+INFORMATION! We are using datetime.now as default/onupdate for reg and update
+columns even if datetime.utcnow would be the correct choice to mimik Navigator
+behaviour.
+
 """
 # pylint: disable=too-many-lines
+from __future__ import annotations
 import logging
 import os
 from collections import defaultdict
@@ -30,6 +35,20 @@ Base = declarative_base()
 Base.metadata.bind = ENGINE
 
 AdminSession = sessionmaker(bind=ENGINE)  # pylint: disable=invalid-name
+
+USER_ID: Optional[int] = None
+
+
+def get_user_id() -> int:
+    """Get the database id for the current user."""
+    global USER_ID  # pylint: disable=global-statement
+    if USER_ID is None:
+        with session_scope() as session:
+            username = os.getlogin()
+            log.debug("Getting database id for user %s", username)
+            user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
+            USER_ID = user.ST_ID
+    return USER_ID
 
 
 # session fixture for use in with statement
@@ -70,14 +89,23 @@ class Attribute(Base):
     ATT_SHORT = Column(Unicode(length=10))
     ATT_NAME_DE = Column(Unicode(length=60))
     ATT_NAME_EN = Column(Unicode(length=60))
-    ATT_REG = Column(DateTime)
-    ATT_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    ATT_UPDATE = Column(DateTime)
-    ATT_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("ATT_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "ATT_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("ATT_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "ATT_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     ATT_TYPE = Column(Integer, ForeignKey("ATTRIBUTES_TYPE.ATT_TYPE"))
     ATT_IS_FILTER = Column(Boolean, nullable=False)
 
     attribute_type = relationship("AttributeType")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class AttributeType(Base):
@@ -114,11 +142,20 @@ class Clearing(Base):
     CL_NAME_EN = Column(Unicode(length=100))
     CL_DESCRIPTION_DE = Column(Unicode(length=255))  # always NULL
     CL_DESCRIPTION_EN = Column(Unicode(length=255))  # always NULL
-    CL_REG = Column(DateTime)
-    CL_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    CL_UPDATE = Column(DateTime)
-    CL_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("CL_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "CL_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("CL_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "CL_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     TPST_ID = Column(Integer)  # not clear what this is
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Country(Base):
@@ -133,8 +170,13 @@ class Country(Base):
     HRC_NAME_DE = Column(Unicode(length=255))
     HRC_NAME_EN = Column(Unicode(length=255))
     HRC_NAME_FR = Column(Unicode(length=255))
-    HRC_UPDATE = Column(DateTime)
-    HRC_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    update = Column("HRC_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "HRC_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class CustomerAddress(Base):
@@ -194,10 +236,16 @@ class DefaultItem(Base):
     CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
     DI_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     DI_CLEAR_DATE = Column(DateTime)
-    DI_REG = Column(DateTime)
-    DI_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DI_UPDATE = Column(DateTime)
-    DI_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("DI_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "DI_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("DI_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DI_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     DI_MAINFEATURE = Column(Boolean)
     DI_ADD = Column(Boolean)
     WST_ID = Column(Integer)
@@ -232,6 +280,9 @@ class DefaultItem(Base):
     pictures = relationship("DefaultItemPicture",
                             back_populates="default_item")
     template_type = relationship("TemplateType")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class DefaultItemAnnex(Base):
@@ -292,10 +343,16 @@ class DefaultModule(Base):
     CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
     DM_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     DM_CLEAR_DATE = Column(DateTime)
-    DM_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_REG = Column(DateTime)
-    DM_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_UPDATE = Column(DateTime)
+    reg = Column("DM_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "DM_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("DM_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DM_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     DM_TESTBASE_DE = Column(Unicode(length=500))
     DM_TESTBASE_EN = Column(Unicode(length=500))
     DM_TESTBASE_FR = Column(Unicode(length=500))
@@ -336,6 +393,9 @@ class DefaultModule(Base):
     template_type = relationship("TemplateType")
     links = relationship("DefaultModuleLink", back_populates="default_module")
     test_bases = relationship("DefaultModuleTestBase")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class DefaultModuleTestBase(Base):
@@ -401,10 +461,16 @@ class DefaultModuleItem(Base):
     DMI_KENNWERT = Column(Unicode(length=255))
     DMI_PRUEFLEVEL = Column(Unicode(length=100))
     DMI_TITLE = Column(Boolean)
-    DMI_REG = Column(DateTime)
-    DMI_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DMI_UPDATE = Column(DateTime)
-    DMI_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("DMI_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "DMI_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("DMI_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DMI_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     WST_ID = Column(Integer)  # todo: Check if ForeignKey
     ST_ID = Column(Integer)  # todo: Check if Team of User
     DMI_FACTOR = Column(Numeric(precision=18, scale=2))
@@ -412,6 +478,9 @@ class DefaultModuleItem(Base):
 
     default_module = relationship("DefaultModule", back_populates="items")
     default_item = relationship("DefaultItem")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class DefaultModuleLink(Base):
@@ -426,11 +495,15 @@ class DefaultModuleLink(Base):
     DML_TEXT_EN = Column(Unicode(length=1024), nullable=False)
     DML_TEXT_FR = Column(Unicode(length=1024), nullable=False)
     DML_URL = Column(Unicode(length=512), nullable=False)
-    DML_UPDATE = Column(DateTime)
-    DML_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    update = Column("DML_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DML_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
 
     default_module = relationship("DefaultModule", back_populates="links")
-    update_by = relationship("Staff")
+
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Edoc(Base):
@@ -445,14 +518,18 @@ class Edoc(Base):
     # default header is "Modulvorlage Standard" from HEADER table
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"), default=1)
     E_YN_SYMBOL = Column(Boolean, default=True)
-    E_REG = Column(DateTime)
-    E_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    E_UPDATE = Column(DateTime)
-    E_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("E_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "E_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("E_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "E_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
 
-    reg_user = relationship("Staff", foreign_keys=[E_REGBY])
-    upd_user = relationship("Staff", foreign_keys=[E_UPDATEBY])
     package = relationship("Package")
     header = relationship("Header")
     phases: List["EdocPhase"] = relationship("EdocPhase",
@@ -460,6 +537,9 @@ class Edoc(Base):
     modules: List["EdocModule"] = relationship("EdocModule",
                                                back_populates="edoc",
                                                order_by="EdocModule.EM_NUMBER")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class EdocModuleItem(Base):
@@ -491,10 +571,16 @@ class EdocModuleItem(Base):
     EMI_KEYNOTE = Column(Boolean)
     EMI_MEASURE = Column(Boolean)
     EMI_ADD = Column(Boolean)
-    EMI_REG = Column(DateTime)
-    EMI_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    EMI_UPDATE = Column(DateTime)
-    EMI_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EMI_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "EMI_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("EMI_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "EMI_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     EMI_MAINFEATURE = Column(Boolean)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     NL_ID = Column(Integer, ForeignKey("NAVLEVEL.NL_ID"))
@@ -506,6 +592,9 @@ class EdocModuleItem(Base):
     nav_level = relationship("NavLevel")
     phase_results = relationship("EdocModuleItemPhase",
                                  back_populates="edoc_item")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class EdocModuleItemComparison(Base):
@@ -520,11 +609,19 @@ class EdocModuleItemComparison(Base):
     EMIC_TEXT_DE = Column(Unicode(length=500))
     EMIC_TEXT_EN = Column(Unicode(length=500))
     EMIC_TEXT_FR = Column(Unicode(length=500))
-    EMIC_REG = Column(DateTime)
-    EMIC_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    EMIC_UPDATE = Column(DateTime)
-    EMIC_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EMIC_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "EMIC_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("EMIC_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "EMIC_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
 
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 class EdocModuleItemComparisonPhase(Base):
     """Comparison table for EdocModuleItems."""
@@ -541,8 +638,13 @@ class EdocModuleItemComparisonPhase(Base):
     EMICP_TEXT_EN = Column(Unicode(length=500))
     EMICP_TEXT_FR = Column(Unicode(length=500))
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
-    ER_UPDATE = Column(DateTime)
-    ER_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    update = Column("ER_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "ER_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class EdocModuleItemPhase(Base):
@@ -563,10 +665,16 @@ class EdocModuleItemPhase(Base):
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
     EMIP_HANDLEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     EMIP_HINT = Column(Boolean, default=False)
-    EMIP_REG = Column(DateTime)
-    EMIP_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    EMIP_UPDATE = Column(DateTime)
-    EMIP_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EMIP_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "EMIP_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("EMIP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "EMIP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     WST_ID = Column(Integer)  # todo: add ForeignKey
     SO_NUMBER = Column(Integer)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
@@ -576,6 +684,9 @@ class EdocModuleItemPhase(Base):
     edoc_item = relationship("EdocModuleItem", back_populates="phase_results")
     phase = relationship("ProcessPhase")
     handleby = relationship("Staff", foreign_keys=[EMIP_HANDLEDBY])
+    result = relationship("EdocResult")
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class EdocModuleItemPhaseAnnex(Base):
@@ -591,8 +702,13 @@ class EdocModuleItemPhaseAnnex(Base):
     EMIPA_FILENAME = Column(Unicode(length=255))
     EMIPA_CHECKSUM = Column(Unicode(length=32))
     EMIPA_DATA = Column(LargeBinary)
-    EMIPA_UPLOAD = Column(DateTime)
-    EMIPA_UPLOAD_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EMIPA_UPLOAD", DateTime, onupdate=datetime.now)
+    reg_by = Column(
+        "EMIPA_UPLOAD_BY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class EdocModuleItemPicture(Base):
@@ -652,10 +768,16 @@ class EdocModule(Base):
     SO_NUMBER = Column(Integer)
     EM_OFFLINE_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     EM_OFFLINE_SINCE = Column(DateTime)
-    EM_REG = Column(DateTime)
-    EM_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    EM_UPDATE = Column(DateTime)
-    EM_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EM_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "EM_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("EM_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "EM_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     EM_FILTER_LEVEL = Column(Unicode(length=100))
     EM_FILTER_PARAM = Column(Unicode(length=512))
     EM_FILTER_ITEMS = Column(Unicode(length=2048))
@@ -665,6 +787,9 @@ class EdocModule(Base):
     offline_by = relationship("Staff", foreign_keys=[EM_OFFLINE_BY])
     phases = relationship("EdocModulePhase", back_populates="edoc_module")
     items = relationship("EdocModuleItem", back_populates="edoc_module")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class EdocPhase(Base):
@@ -731,14 +856,20 @@ class EdocResult(Base):
     ER_DESCRIPTION_EN = Column(Unicode(length=255))
     ER_DESCRIPTION_FR = Column(Unicode(length=255))
     ER_IS_MODULRESULT = Column(Integer)
-    ER_REG = Column(DateTime)
-    ER_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    ER_UPDATE = Column(DateTime)
-    ER_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("ER_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "ER_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("ER_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "ER_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     ER_SHOW_IN_PROOF = Column(Boolean)
 
-    reg_user = relationship("Staff", foreign_keys=[ER_REGBY])
-    upd_user = relationship("Staff", foreign_keys=[ER_UPDATEBY])
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Header(Base):
@@ -751,16 +882,22 @@ class Header(Base):
     HEAD_FILENAME = Column(Unicode(length=255))
     HEAD_NAME = Column(Unicode(length=120))
     HEAD_DATA = deferred(Column(LargeBinary))
-    HEAD_REG = Column(DateTime)
-    HEAD_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    HEAD_UPDATE = Column(DateTime)
-    HEAD_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("HEAD_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "HEAD_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("HEAD_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "HEAD_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     HEAD_DEFAULT_PROTOCOL = Column(Boolean)
     HEAD_DEFAULT_REPORT = Column(Boolean)
     HEAD_NAME_EN = Column(Unicode(length=120))
 
-    reg_user = relationship("Staff", foreign_keys=[HEAD_REGBY])
-    upd_user = relationship("Staff", foreign_keys=[HEAD_UPDATEBY])
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class KindOfTest(Base):
@@ -785,10 +922,19 @@ class ModulParameter(Base):
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     MP_PARAMETER_DE = Column(Unicode(length=256))
     MP_PARAMETER_EN = Column(Unicode(length=256))
-    MP_REG = Column(DateTime)
-    MP_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    MP_UPDATE = Column(DateTime)
-    MP_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("MP_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "MP_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("MP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "MP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class NavCountModuleExport(Base):
@@ -799,10 +945,15 @@ class NavCountModuleExport(Base):
     NCM_ID = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     NCM_TYPE = Column(Integer)
-    NCM_REG = Column(DateTime)
-    NCM_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NCM_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NCM_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
 
     default_module = relationship("DefaultModule")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class NavDomain(Base):
@@ -814,11 +965,16 @@ class NavDomain(Base):
     ND_SHORT = Column(Unicode(length=10))
     ND_NAME_DE = Column(Unicode(length=100))
     ND_NAME_EN = Column(Unicode(length=100))
-    ND_REG = Column(DateTime)
-    ND_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("ND_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "ND_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
     ND_ORDER = Column(Integer)
     ND_ORDER_EXPORT = Column(Integer, nullable=False)
     ND_ORDER_PLAN_DEFAULT = Column(Integer, nullable=False)
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class Navigation(Base):
@@ -841,10 +997,16 @@ class Navigation(Base):
     ZM_OBJECT = Column(Unicode(length=5))
     KOT_ID = Column(Integer, ForeignKey("V_PSEX_KIND_OF_TEST.KOT_ID"),
                     nullable=False)
-    N_REG = Column(DateTime)
-    N_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    N_UPDATE = Column(DateTime)
-    N_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("N_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "N_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("N_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "N_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
 
     packages: List["Package"] = relationship("Package", lazy="dynamic")
 
@@ -853,6 +1015,9 @@ class Navigation(Base):
     kind_of_test = relationship("KindOfTest")
 
     nav_saves = relationship("NavSave", back_populates="navigation")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
     @property
     def lidl_phasen(self) -> List['Package']:
@@ -878,14 +1043,15 @@ class Navigation(Base):
 
     def calculations(self) -> List['PackageElementCalculation']:
         """Return all PackageElementCalculation."""
-        session = Session.object_session(self)
-        package_ids = [pack.NP_ID for pack in
-                       cast(List[Package], self.packages)]
-        pack_elements = session.query(PackageElement) \
-            .filter(PackageElement.NP_ID.in_(package_ids)).all()
-        pack_ele_ids = [pack_ele.NPE_ID for pack_ele in pack_elements]
-        calcs = session.query(PackageElementCalculation) \
-            .filter(PackageElementCalculation.NPE_ID.in_(pack_ele_ids)).all()
+        calcs = Session.object_session(self).query(
+            PackageElementCalculation
+        ).join(
+            PackageElement
+        ).join(
+            Package
+        ).filter(
+            Package.N_ID == self.N_ID
+        ).all()
         return cast(List[PackageElementCalculation], calcs)
 
 
@@ -909,10 +1075,19 @@ class NavPosition(Base):
     NPOS_POSITION = Column(Integer)
     NPOS_TEXT_DE = Column(Unicode(length=2048))
     NPOS_TEXT_EN = Column(Unicode(length=2048))
-    NPOS_REG = Column(DateTime)
-    NPOS_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NPOS_UPDATE = Column(DateTime)
-    NPOS_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("EMIPAOS_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "EMIPAOS_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("EMIPAOS_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "EMIPAOS_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class NavSave(Base):
@@ -929,11 +1104,14 @@ class NavSave(Base):
     NS_NAME_EN = Column(Unicode(length=256))
     NS_CRM = Column(Unicode(length=256))
     NS_TYPE = Column(Integer, nullable=False)
-    NS_REG = Column(DateTime)
-    NS_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NS_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NS_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
 
     navigation = relationship("Navigation", back_populates="nav_saves")
-    reg_user = relationship("Staff")
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
     project = relationship("Project")
 
     save_calculations = relationship("NavSaveCalculation",
@@ -1021,10 +1199,16 @@ class Package(Base):
     NP_TESTSAMPLES = Column(Integer, nullable=False)
     NP_IS_TEMPLATE = Column(Boolean, nullable=False)
     NP_TEMPLATE_ID = Column(Integer)
-    NP_REG = Column(DateTime)
-    NP_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NP_UPDATE = Column(DateTime)
-    NP_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NP_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NP_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("NP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "NP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     PN_ID = Column(Integer, ForeignKey("PACKAGE_NAME.PN_ID"), nullable=False)
 
     clearing_state = relationship("Clearing")
@@ -1043,6 +1227,9 @@ class Package(Base):
 
     package_name = relationship("PackageName")
 
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
+
 
 class PackageCategory(Base):
     """Category of a Package (linked to the type)."""
@@ -1052,8 +1239,13 @@ class PackageCategory(Base):
     PC_ID = Column(Integer, primary_key=True)
     PC_NAME_DE = Column(Unicode(length=50))
     PC_NAME_EN = Column(Unicode(length=50))
-    PC_REG = Column(DateTime)
-    PC_REG_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("PC_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "PC_REG_BY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class PackageElement(Base):
@@ -1068,10 +1260,16 @@ class PackageElement(Base):
     ZM_LOCATION = Column(Unicode(length=5))
     NPE_CREATE = Column(Boolean)
     CT_ID = Column(Integer, ForeignKey("CALC_TYPE.CT_ID"))
-    NPE_REG = Column(DateTime)
-    NPE_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NPE_UPDATE = Column(DateTime)
-    NPE_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NPE_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NPE_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("NPE_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "NPE_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
     package = relationship("Package", back_populates="package_elements")
@@ -1085,6 +1283,8 @@ class PackageElement(Base):
     default_module = relationship("DefaultModule")
 
     level = relationship("NavLevel")
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class PackageElementCalculation(Base):
@@ -1109,10 +1309,16 @@ class PackageElementCalculation(Base):
     NPEC_TASK = Column(Unicode(length=500))
     ZM_ID = Column(Unicode(length=50))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
-    NPEC_REG = Column(DateTime)
-    NPEC_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NPEC_UPDATE = Column(DateTime)
-    NPEC_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NPEC_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NPEC_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("NPEC_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "NPEC_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     CBC_ID = Column(Integer)
     NPEC_COSTS_EXTERNAL = Column(Numeric(precision=18, scale=2))
     NPEC_COSTS_OLD = Column(Numeric(precision=18, scale=2))
@@ -1124,6 +1330,8 @@ class PackageElementCalculation(Base):
     nav_position = relationship("NavPosition")
 
     team = relationship("Staff", foreign_keys=[ST_ID])
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class PackageElementFilter(Base):
@@ -1133,9 +1341,14 @@ class PackageElementFilter(Base):
 
     NPEF_ID = Column(Integer, primary_key=True)
     NPE_ID = Column(Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID"))
-    DMI_ID = Column(Integer)  # todo: add ForeignKey
-    NPEF_REG = Column(DateTime)
-    NPEF_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    DMI_ID = Column(Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"))
+    reg = Column("NPEF_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NPEF_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class PackageName(Base):
@@ -1146,10 +1359,19 @@ class PackageName(Base):
     PN_ID = Column(Integer, primary_key=True)
     PN_NAME_DE = Column(Unicode(length=255))
     PN_NAME_EN = Column(Unicode(length=255))
-    PN_REG = Column(DateTime)
-    PN_REG_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    PN_UPDATE = Column(DateTime)
-    PN_UPDATE_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("PN_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "PN_REG_BY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("PN_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "PN_UPDATE_BY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class PackageType(Base):
@@ -1160,11 +1382,16 @@ class PackageType(Base):
     PT_ID = Column(Integer, primary_key=True)
     PT_NAME_DE = Column(Unicode(length=255))
     PT_NAME_EN = Column(Unicode(length=255))
-    PT_REG = Column(DateTime)
-    PT_REG_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("PT_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "PT_REG_BY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
     PC_ID = Column(Integer, ForeignKey("PACKAGE_CAT.PC_ID"))
 
     package_category = relationship("PackageCategory")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
 
 
 class PriceList(Base):
@@ -1178,13 +1405,22 @@ class PriceList(Base):
     PL_NAME_EN = Column(Unicode(length=100))
     CUR_ID = Column(Unicode(length=3))
     PL_ORDER = Column(Integer)
-    PL_REG = Column(DateTime)
-    PL_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("PL_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "PL_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("PL_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "PL_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     PL_TYPE = Column(Integer)
     PL_FACTOR_CC = Column(Numeric(precision=18, scale=5))
     PL_FACTOR_PROFIT = Column(Numeric(precision=18, scale=5))
-    PL_UPDATE = Column(DateTime)
-    PL_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Process(Base):
@@ -1250,8 +1486,13 @@ class Product(Base):
     HRP_NAME_DE = Column(Unicode(length=255))
     HRP_NAME_EN = Column(Unicode(length=255))
     HRP_NAME_FR = Column(Unicode(length=255))
-    HRP_UPDATE = Column(DateTime)
-    HRP_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    update = Column("HRP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "HRP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Project(Base):
@@ -1353,13 +1594,22 @@ class ProofElement(Base):
     NPR_ID = Column(Integer)
     NPEP_TEXT_DE = Column(Unicode(length=255))
     NPEP_TEXT_EN = Column(Unicode(length=255))
-    NPEP_REG = Column(DateTime)
-    NPEP_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NPEP_UPDATE = Column(DateTime)
-    NPEP_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("NPEP_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "NPEP_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("NPEP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "NPEP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
 
     package_element = relationship("PackageElement",
                                    back_populates="proof_elements")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class ServiceClass(Base):
@@ -1384,10 +1634,19 @@ class ServiceClassDefinition(Base):
     SCL_LEVEL = Column(Integer)
     SCL_REMARK_DE = Column(Unicode(length=500))
     SCL_REMARK_EN = Column(Unicode(length=500))
-    SCL_REG = Column(DateTime)
-    SCL_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    SCL_UPDATE = Column(DateTime)
-    SCL_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("SCL_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "SCL_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("SCL_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "SCL_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class Staff(Base):
@@ -1573,10 +1832,16 @@ class TestBase(Base):
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
     BT_ID = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"))
     PLK_SHORT = Column(Unicode(length=10))
-    B_REG = Column(DateTime)
-    B_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    B_UPDATE = Column(DateTime)
-    B_UPDATEBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    reg = Column("B_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "B_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("B_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "B_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
     HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
     B_PARENT = Column(Integer, ForeignKey("BASE.B_ID"))
     B_SHORT_DE = Column(Unicode(length=512))
@@ -1590,6 +1855,9 @@ class TestBase(Base):
 
     test_base_type = relationship("TestBaseType")
     default_item = relationship("DefaultItem")
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
 
 
 class TestBaseType(Base):
@@ -1628,7 +1896,7 @@ class ZaraProduct(Base):
 
 
 # SCRIPTS
-def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
+def insert_package_into_nav(nav_id: int, package_id: int,
                             session: Session, copy_pe: bool = True) -> int:
     """
     Insert a copy of the given package into the given navigation.
@@ -1661,8 +1929,6 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
         NP_IS_TEMPLATE=False,
         NP_TEMPLATE_ID=pack.NP_ID,
         PN_ID=pack.PN_ID,
-        NP_REG=datetime.now(),
-        NP_REGBY=user_id
     )
     session.add(new_pack)
     session.flush()
@@ -1679,14 +1945,13 @@ def insert_package_into_nav(nav_id: int, package_id: int, user_id: int,
     if copy_pe:
         for package_element in cast(List[PackageElement],
                                     pack.package_elements):
-            copy_package_element(new_pack.NP_ID, package_element, session,
-                                 user_id)
+            copy_package_element(new_pack.NP_ID, package_element, session)
     session.flush()
     return new_pack_id
 
 
 def copy_package_element(new_pack_id: int, package_element: PackageElement,
-                         session: Session, user_id: int) -> int:
+                         session: Session) -> int:
     """Copy the PackageElement to the Package with the given id."""
     new_element = PackageElement(
         NP_ID=new_pack_id,
@@ -1695,9 +1960,7 @@ def copy_package_element(new_pack_id: int, package_element: PackageElement,
         ZM_LOCATION=package_element.ZM_LOCATION,
         CT_ID=package_element.CT_ID,
         NPE_CREATE=package_element.NPE_CREATE,
-        NPE_CREATE_SO=package_element.NPE_CREATE_SO,
-        NPE_REG=datetime.now(),
-        NPE_REGBY=user_id
+        NPE_CREATE_SO=package_element.NPE_CREATE_SO
     )
     session.add(new_element)
     session.flush()
@@ -1718,8 +1981,6 @@ def copy_package_element(new_pack_id: int, package_element: PackageElement,
             NPEC_TASK=calculation.NPEC_TASK,
             ZM_ID=calculation.ZM_ID,
             NPOS_ID=calculation.NPOS_ID,
-            NPEC_REG=datetime.now(),
-            NPEC_REGBY=user_id
         )
         session.add(new_calc)
     for proof_element in cast(List[ProofElement],
@@ -1730,18 +1991,6 @@ def copy_package_element(new_pack_id: int, package_element: PackageElement,
             NPR_ID=proof_element.NPR_ID,
             NPEP_TEXT_DE=proof_element.NPEP_TEXT_DE,
             NPEP_TEXT_EN=proof_element.NPEP_TEXT_EN,
-            NPEP_REG=datetime.now(),
-            NPEP_REGBY=user_id
         )
         session.add(new_proof)
     return new_element.NPE_ID
-
-
-def get_user_id() -> int:
-    """Get the database id for the current user."""
-    with session_scope() as session:
-        username = os.getlogin()
-        log.debug("Getting database id for user %s", username)
-        user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
-        log.debug("Returning user id: %s", user.ST_ID)
-        return cast(int, user.ST_ID)
