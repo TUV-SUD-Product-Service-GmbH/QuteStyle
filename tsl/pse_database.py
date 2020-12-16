@@ -16,9 +16,11 @@ from tsl.variables import STD_DB_PATH
 
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
+# pre pool ping will ensure, that connection is reestablished if not alive
 ENGINE = create_engine(
     os.getenv("PSE_DB_PATH", STD_DB_PATH.format("PSExplorer")),
-    connect_args={'check_same_thread': False}, poolclass=StaticPool)
+    connect_args={'check_same_thread': False}, poolclass=StaticPool,
+    pool_pre_ping=True)
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE
@@ -147,7 +149,7 @@ def get_selected_psex_id() -> Optional[int]:
     try:
         project_id = QueryValueEx(key, 'SelectedProjectId')[0]
         log.debug("Selected PSEX-ID is %s", project_id)
-        return project_id
+        return int(project_id) if project_id else None
     except OSError as error:
         if error.errno == errno.ENOENT:
             log.debug("Key does not exist.")
