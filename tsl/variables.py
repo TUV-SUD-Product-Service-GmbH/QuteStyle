@@ -3,6 +3,9 @@ STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
               "/{}?driver=ODBC Driver 17 for SQL Server;" \
               "MultiSubnetFailover=Yes"
 
+PSE_TEMPLATE_PATH = "\\\\DE001.itgr.net\\PS\\" \
+                    "RF-UnitCentralPS_PSE\\CPS\\PSEX\\TEMPLATES\\"
+
 QEVENT_LOOKUP = {
     # Lookup table to pretty print QEvent types in logging.
     0: "QEvent.None",

@@ -7,11 +7,12 @@ from contextlib import contextmanager
 from typing import Iterator, Optional
 
 from sqlalchemy import create_engine, Column, Integer, Unicode, Float, \
-    ForeignKey, DateTime
+    ForeignKey, DateTime, BLOB, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 from sqlalchemy.pool import StaticPool
 
+from tsl.common_db import NullUnicode
 from tsl.variables import STD_DB_PATH
 
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
@@ -51,9 +52,9 @@ class Process(Base):
     __tablename__ = 'PROCESS'
 
     PC_ID = Column(Integer, primary_key=True, nullable=False)
-    PC_NAME = Column(Unicode(length=256))
-    PC_IAN = Column(Unicode(length=256))
-    PC_PATH = Column(Unicode(length=50))
+    PC_NAME = Column(NullUnicode(length=256))
+    PC_IAN = Column(NullUnicode(length=256))
+    PC_PATH = Column(NullUnicode(length=50))
 
 
 class ProcessPhase(Base):
@@ -62,9 +63,9 @@ class ProcessPhase(Base):
     __tablename__ = 'PROCESSPHASE'
 
     PRP_ID = Column(Integer, primary_key=True, nullable=False)
-    PRP_SHORT_DE = Column(Unicode(length=256))
-    PRP_SHORT_EN = Column(Unicode(length=256))
-    PRP_SHORT_FR = Column(Unicode(length=256))
+    PRP_SHORT_DE = Column(NullUnicode(length=256))
+    PRP_SHORT_EN = Column(NullUnicode(length=256))
+    PRP_SHORT_FR = Column(NullUnicode(length=256))
 
 
 class Project(Base):
@@ -74,23 +75,23 @@ class Project(Base):
 
     P_ID = Column(Integer, primary_key=True, nullable=False)
     PC_ID = Column(Integer, ForeignKey('PROCESS.PC_ID'))
-    P_IAN = Column(Unicode(length=256))
-    P_PRODUCT = Column(Unicode(length=256))
-    P_CONTACT = Column(Unicode(length=256))
+    P_IAN = Column(NullUnicode(length=256))
+    P_PRODUCT = Column(NullUnicode(length=256))
+    P_CONTACT = Column(NullUnicode(length=256))
     P_CONTACT_CUC_ID = Column(Integer, ForeignKey('CUSTOMER_CONTACT.CUC_ID'))
     P_DEADLINE = Column(DateTime)
     P_ORDERSIZE = Column(Float)
     P_PROCESSPHASE = Column(Integer, ForeignKey('PROCESSPHASE.PRP_ID'))
-    P_MODEL = Column(Unicode(length=256))
-    P_ZARA_NUMBER = Column(Unicode(length=11))
-    P_FOLDER = Column(Unicode(length=256))
+    P_MODEL = Column(NullUnicode(length=256))
+    P_ZARA_NUMBER = Column(NullUnicode(length=11))
+    P_FOLDER = Column(NullUnicode(length=256))
     DELR_ID = Column(Integer)
     P_WC_ID = Column(Unicode(length=36))
-    P_NAME = Column(Unicode(length=31))
+    P_NAME = Column(NullUnicode(length=31))
     P_CUSTOMER_A = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
     P_CUSTOMER_B = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
     P_PROJECTMANAGER = Column(Integer, ForeignKey('STAFF.ST_ID'))
-    P_TOKEN = Column(Unicode(length=61))
+    P_TOKEN = Column(NullUnicode(length=61))
     P_DATE_APPOINTMENT = Column(DateTime)
     P_EXPECTED_TS_RECEIPT = Column(DateTime)
     BATCH_NUMBER = Column(Unicode(length=16))
@@ -111,10 +112,10 @@ class CustomerContact(Base):
     __tablename__ = 'CUSTOMER_CONTACT'
 
     CUC_ID = Column(Integer, primary_key=True, nullable=False)
-    CUC_FORENAME = Column(Unicode(length=51))
-    CUC_SURNAME = Column(Unicode(length=36))
-    ANRED = Column(Unicode(length=31))
-    CUC_MAIL = Column(Unicode(length=256))
+    CUC_FORENAME = Column(NullUnicode(length=51))
+    CUC_SURNAME = Column(NullUnicode(length=36))
+    ANRED = Column(NullUnicode(length=31))
+    CUC_MAIL = Column(NullUnicode(length=256))
 
 
 class CustomerAddress(Base):
@@ -124,10 +125,10 @@ class CustomerAddress(Base):
 
     CA_ID = Column(Integer, primary_key=True, nullable=False)
     CU_ID = Column(Integer, nullable=False)
-    CA_NAME = Column(Unicode(length=166), nullable=False)
-    CA_STREET = Column(Unicode(length=101))
-    CA_ZIPCODE = Column(Unicode(length=11))
-    CA_CITY = Column(Unicode(length=41))
+    CA_NAME = Column(NullUnicode(length=166), nullable=False)
+    CA_STREET = Column(NullUnicode(length=101))
+    CA_ZIPCODE = Column(NullUnicode(length=11))
+    CA_CITY = Column(NullUnicode(length=41))
 
 
 class Staff(Base):
@@ -136,11 +137,123 @@ class Staff(Base):
     __tablename__ = 'STAFF'
 
     ST_ID = Column(Integer, primary_key=True, nullable=False)
-    ST_SURNAME = Column(Unicode(length=61))
-    ST_FORENAME = Column(Unicode(length=51))
-    ST_PHONE = Column(Unicode(length=81))
-    ST_FAX = Column(Unicode(length=81))
-    ST_EMAIL = Column(Unicode(length=81))
+    ST_SURNAME = Column(NullUnicode(length=61))
+    ST_FORENAME = Column(NullUnicode(length=51))
+    ST_PHONE = Column(NullUnicode(length=81))
+    ST_FAX = Column(NullUnicode(length=81))
+    ST_EMAIL = Column(NullUnicode(length=81))
+
+
+class TemplateData(Base):
+    """TemplateData table model."""
+
+    __tablename__ = 'TEMPLATE_DATA'
+
+    TPD_ID = Column(Integer, primary_key=True, nullable=False)
+    TP_ID = Column(Integer, nullable=False)
+    TPD_DATA = Column(BLOB)
+
+
+class Template(Base):
+    """TemplateData table model."""
+
+    __tablename__ = 'TEMPLATE'
+
+    TP_ID = Column(Integer, primary_key=True, nullable=False)
+    MD_ID = Column(Integer, nullable=False)
+    TPST_ID = Column(Integer, nullable=False)
+    TPT_ID = Column(Integer, ForeignKey('TEMPLATE_TYPE.TPT_ID'),
+                    nullable=False)
+    TPSC_ID = Column(Integer, ForeignKey('TEMPLATE_SCOPE.TPSC_ID'),
+                     nullable=False)
+    TPF_ID = Column(Integer, nullable=False)
+    TP_NAME_D = Column(Unicode(length=256))
+    TP_NAME_E = Column(Unicode(length=256))
+    TP_TIME_HOURS = Column(Float)
+    TP_TIME_DAYS = Column(Float)
+    TP_TESTPERSON_REQUIRED = Column(Boolean)
+    TP_COMMENT = Column(Unicode(length=256))
+    TP_VERSION = Column(Integer)
+    TP_LANGUAGE = Column(Unicode(length=256))
+    TP_CLEARINGDATE = Column(DateTime)
+    TP_CLEARINGBY = Column(Integer)
+    TP_FILENAME = Column(Unicode(length=256))
+    TP_REGDATE = Column(DateTime)
+    TP_REGBY = Column(Integer)
+    TP_UPDATE = Column(DateTime)
+    TP_UPDATEBY = Column(Integer)
+    TP_ISGLOBAL = Column(Boolean)
+    TP_DISABLED = Column(Boolean, nullable=False)
+    TP_TRANSFER_STATUS = Column(Unicode(length=51))
+    TP_ORIGINATING_SERVERID = Column(Integer)
+    TP_ROOT_TEMPLATE_ID = Column(Integer)
+    TP_UTC = Column(DateTime)
+    TP_WORKINGCLUSTER = Column(Unicode(length=36))
+    DM_ID = Column(Integer)
+    TP_OLD_TP = Column(Integer)
+
+    temp_scope = relationship('TemplateScope')
+    temp_type = relationship('TemplateType')
+
+
+class TemplateScope(Base):
+    """TemplateScope table model."""
+
+    __tablename__ = 'TEMPLATE_SCOPE'
+
+    TPSC_ID = Column(Integer, primary_key=True, nullable=False)
+    TPSC_NAME_DE = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_EN = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_FR = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_DE = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_EN = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_FR = Column(Unicode(length=256), nullable=False)
+    TPSC_PATH = Column(Unicode(length=256), nullable=False)
+    CREATED = Column(DateTime, nullable=False)
+    CREATED_BY = Column(Integer, nullable=False)
+    UPDATED = Column(DateTime)
+    UPDATED_BY = Column(Integer)
+
+
+class TemplateStatus(Base):
+    """TemplateStatus table model."""
+
+    __tablename__ = 'TEMPLATE_STATUS'
+
+    TPST_ID = Column(Integer, primary_key=True, nullable=False)
+    TPST_NAME_DE = Column(Unicode(length=256), nullable=False)
+    TPST_NAME_EN = Column(Unicode(length=256), nullable=False)
+    TPST_NAME_FR = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_DE = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_EN = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_FR = Column(Unicode(length=256), nullable=False)
+    CREATED = Column(DateTime, nullable=False)
+    UPDATED = Column(DateTime)
+    UPDATED_BY = Column(Integer)
+
+
+class TemplateType(Base):
+    """TemplateType table model."""
+
+    __tablename__ = 'TEMPLATE_TYPE'
+
+    TPT_ID = Column(Integer, primary_key=True, nullable=False)
+    TPT_NAME_DE = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_EN = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_FR = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_DE = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_EN = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_FR = Column(Unicode(length=256), nullable=False)
+    TPT_PATH = Column(Unicode(length=256), nullable=False)
+    TPT_PREFIX = Column(Unicode(length=256), nullable=False)
+    TPT_MODULETYPE = Column(Unicode(length=256), nullable=False)
+    TPT_SHOWINPROZESSFOLDER = Column(Boolean, nullable=False)
+    TPT_SHOWINTEMPLATEMANAGER = Column(Boolean, nullable=False)
+    CREATED = Column(DateTime, nullable=False)
+    CREATED_BY = Column(Integer, nullable=False)
+    UPDATED = Column(DateTime)
+    UPDATED_BY = Column(Integer)
+    TPT_INCLUDE_IN_TRADE_REPORT = Column(Boolean, nullable=False)
 
 
 def get_selected_psex_id() -> Optional[int]:
