@@ -3,18 +3,27 @@ import cProfile
 import contextlib
 import io
 import pstats
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import TypeDecorator, Unicode
 from sqlalchemy.engine import Dialect
 
 
+# add typing that is used only when running type check
+# this does not work during normal execution
+if TYPE_CHECKING:
+    StrEngine = TypeDecorator[str]  # noqa
+else:
+    StrEngine = TypeDecorator
+
+
 # pylint: disable=abstract-method
-class NullUnicode(TypeDecorator):
+class NullUnicode(StrEngine):
     """Handles NULL values for strings like empty strings."""
 
     impl = Unicode
 
+    # pylint: disable=no-self-use
     def process_bind_param(self, value: Optional[str], _: Dialect)\
             -> Optional[str]:
         """Write always NULL to the db if the string is empty."""

@@ -337,7 +337,7 @@ class DefaultModule(Base):
     DM_ID = Column(Integer, primary_key=True)
     DM_VERSION = Column(Integer)
     DM_ACTIVE = Column(Boolean)
-    DM_NAME = Column(Unicode(length=255))
+    DM_NAME = Column(Unicode(length=255), nullable=False)
     DM_LETTER = Column(Unicode(length=10))
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"))
     TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
@@ -393,8 +393,8 @@ class DefaultModule(Base):
     items: List[DefaultModuleItem]\
         = relationship("DefaultModuleItem", back_populates="default_module")
 
-    calculations = relationship("DefaultModuleCalc",
-                                back_populates="default_module")
+    calculations: List[DefaultModuleCalc] = \
+        relationship("DefaultModuleCalc", back_populates="default_module")
     template_type = relationship("TemplateType")
     links = relationship("DefaultModuleLink", back_populates="default_module")
     test_bases = relationship("DefaultModuleTestBase")
@@ -427,7 +427,7 @@ class DefaultModuleCalc(Base):
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     WST_ID = Column(Integer)  # todo: add foreign key
     DMC_TASK = Column(Unicode(length=500))
-    DMC_TIME_HOURS = Column(Float)
+    DMC_TIME_HOURS = Column(Float, nullable=False)
     DMC_TIME_DAYS = Column(Float)
     DMC_COSTS = Column(Numeric(precision=18, scale=2))
     DMC_TRAVEL = Column(Numeric(precision=18, scale=2))
@@ -1030,7 +1030,8 @@ class Navigation(Base):
         onupdate=get_user_id
     )
 
-    packages: List["Package"] = relationship("Package", lazy="dynamic")
+    packages: List["Package"] = relationship("Package",
+                                             back_populates="navigation")
 
     country = relationship("Country")
     product = relationship("Product")
@@ -1098,7 +1099,7 @@ class NavEdocModule(Base):
 
     NEM_ID = Column(Integer, primary_key=True)
     NE_RANDOM = Column(Integer, nullable=False)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"),  nullable=False)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False,
                    default=1)
     NE_NUMBER = Column(Integer)
@@ -1251,7 +1252,7 @@ class Package(Base):
 
     NP_ID = Column(Integer, primary_key=True)
     N_ID = Column(Integer, ForeignKey("NAV.N_ID", ondelete="CASCADE"))
-    NP_NAME_DE = Column(Unicode(length=150))
+    NP_NAME_DE = Column(NullUnicode(length=150), nullable=False)
     NP_NAME_EN = Column(Unicode(length=150))
     NP_COMMENT_DE = Column(Unicode(length=800))
     NP_COMMENT_EN = Column(Unicode(length=800))
@@ -1363,14 +1364,14 @@ class PackageElementCalculation(Base):
                    nullable=False)
     NPEC_DELTA_START = Column(Float)
     NPEC_TIME_DAYS = Column(Integer)
-    NPEC_TIME_HOURS = Column(Float)
+    NPEC_TIME_HOURS = Column(Float, nullable=False, default=0.0)
     NPEC_RATE = Column(Numeric(precision=18, scale=2))
     NPEC_COSTS = Column(Numeric(precision=18, scale=2))
-    NPEC_TRAVEL = Column(Numeric(precision=18, scale=2))
+    NPEC_TRAVEL = Column(Numeric(precision=18, scale=2),)
     NPEC_FACTOR = Column(Float)
     NPEC_PRICE = Column(Numeric(precision=18, scale=2))
     NPEC_COMMENT = Column(Unicode(length=500))
-    NPEC_TASK = Column(Unicode(length=500))
+    NPEC_TASK = Column(NullUnicode(length=500))
     ZM_ID = Column(Unicode(length=50))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
     reg = Column("NPEC_REG", DateTime, default=datetime.now)
