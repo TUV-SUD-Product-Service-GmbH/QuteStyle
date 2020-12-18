@@ -22,7 +22,8 @@ from typing import List, Iterator, Optional, Dict, cast
 from sqlalchemy import create_engine, Column, Integer, Unicode, DateTime, \
     Boolean, Float, Numeric, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, Session, deferred
+from sqlalchemy.orm import sessionmaker, relationship, Session, deferred, \
+    validates
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode
@@ -287,6 +288,8 @@ class DefaultItem(Base):
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
     level = relationship("NavLevel")
+    attributes: List[DefaultItemAttribute] = \
+        relationship("DefaultItemAttribute", back_populates="default_item")
 
 
 class DefaultItemAnnex(Base):
@@ -306,6 +309,19 @@ class DefaultItemAnnex(Base):
 
     default_item = relationship("DefaultItem", back_populates="annexes",
                                 lazy="joined")
+
+
+class DefaultItemAttribute(Base):
+    """Attribute of a DefaultItem."""
+
+    __tablename__ = "DEFAULT_ITEM_ATTRIBUTES"
+
+    DIA_ID = Column(Integer, primary_key=True)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
+    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+
+    default_item = relationship("DefaultItem", back_populates="attributes")
+    attribute = relationship("Attribute")
 
 
 class DefaultItemPicture(Base):
@@ -403,6 +419,19 @@ class DefaultModule(Base):
     update_user = relationship("Staff", foreign_keys=[update_by])
 
 
+class DefaultModuleAttribute(Base):
+    """Attribute of a DefaultModule."""
+
+    __tablename__ = "DEFAULT_MODUL_ATTRIBUTES"
+
+    DMA_ID = Column(Integer, primary_key=True)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
+    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+
+    default_module = relationship("DefaultModule", back_populates="attributes")
+    attribute = relationship("Attribute")
+
+
 class DefaultModuleTestBase(Base):
     """TestBase for a DefaultModule."""
 
@@ -438,19 +467,6 @@ class DefaultModuleCalc(Base):
     default_module = relationship("DefaultModule",
                                   back_populates="calculations")
     team = relationship("Staff")
-
-
-class DefaultModuleAttribute(Base):
-    """Attribute links for a DefaultModule."""
-
-    __tablename__ = "DEFAULT_MODUL_ATTRIBUTES"
-
-    DMA_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
-    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"))
-
-    default_module = relationship("DefaultModule", back_populates="attributes")
-    attribute = relationship("Attribute")
 
 
 class DefaultModuleItem(Base):
@@ -813,6 +829,17 @@ class EdocModule(Base):
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
 
+    @validates('EM_NAME', 'EM_LETTER', "EM_FILTER_LEVEL",  # type: ignore
+               "EM_FILTER_PARAM", "EM_FILTER_ITEMS")
+    def validate_str(self, key: str, value: str) -> str:
+        """Validate and if necessary truncate a str value."""
+        max_len = getattr(self.__class__, key).prop.columns[0].type.length
+        if value and len(value) > max_len:
+            log.warning("Truncating string by %s characters: %s",
+                        len(value) - max_len, value)
+            return value[:max_len]
+        return value
+
 
 class EdocPhase(Base):
     """eDOC phase model."""
@@ -1126,9 +1153,9 @@ class NavLevel(Base):
     __tablename__ = "NAVLEVEL"
 
     NL_ID = Column(Integer, primary_key=True)
-    NL_LEVEL = Column(Integer, unique=True)
-    NL_NAME_DE = Column(Unicode(length=30))
-    NL_NAME_EN = Column(Unicode(length=30))
+    NL_LEVEL = Column(Integer, unique=True, nullable=False)
+    NL_NAME_DE = Column(Unicode(length=30), nullable=False)
+    NL_NAME_EN = Column(Unicode(length=30), nullable=False)
 
 
 class NavPosition(Base):
@@ -1350,6 +1377,8 @@ class PackageElement(Base):
     level = relationship("NavLevel")
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
+    filters = relationship("PackageElementFilter",
+                           back_populates="package_element")
 
 
 class PackageElementCalculation(Base):
@@ -1405,8 +1434,10 @@ class PackageElementFilter(Base):
     __tablename__ = "NAV_PACK_ELEMENT_FILTER"
 
     NPEF_ID = Column(Integer, primary_key=True)
-    NPE_ID = Column(Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID"))
-    DMI_ID = Column(Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"))
+    NPE_ID = Column(Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID"),
+                    nullable=False)
+    DMI_ID = Column(Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"),
+                    nullable=False)
     reg = Column("NPEF_REG", DateTime, default=datetime.now)
     reg_by = Column(
         "NPEF_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
@@ -1414,6 +1445,9 @@ class PackageElementFilter(Base):
     )
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
+
+    package_element = relationship("PackageElement", back_populates="filters")
+    default_module_item = relationship("DefaultModuleItem")
 
 
 class PackageName(Base):
