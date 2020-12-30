@@ -142,8 +142,9 @@ class Clearing(Base):
     __tablename__ = "CLEARING"
 
     CL_ID = Column(Integer, primary_key=True)
-    CL_NAME_DE = Column(Unicode(length=100))
-    CL_NAME_EN = Column(Unicode(length=100))
+    # names are never null in the database
+    CL_NAME_DE = Column(Unicode(length=100), nullable=False)
+    CL_NAME_EN = Column(Unicode(length=100), nullable=False)
     CL_DESCRIPTION_DE = Column(Unicode(length=255))  # always NULL
     CL_DESCRIPTION_EN = Column(Unicode(length=255))  # always NULL
     reg = Column("CL_REG", DateTime, default=datetime.now)
@@ -160,6 +161,17 @@ class Clearing(Base):
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
+
+    @property
+    def final_state(self) -> bool:
+        """Return if the Clearing is a final state."""
+        return self.CL_NAME_DE in [
+            "06 - Freigegeben",
+            "09 - ohne Freigabeverfahren",
+            "04 - validiert (ohne Freigabe)",
+            "08 – gängige Praxis (nicht validiert)",
+            "10 - TCC Status"
+        ]
 
 
 class Country(Base):
@@ -417,6 +429,7 @@ class DefaultModule(Base):
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
+    clearing = relationship("Clearing")
 
 
 class DefaultModuleAttribute(Base):
@@ -1011,9 +1024,10 @@ class NavDomain(Base):
     __tablename__ = "NAVDOMAIN"
 
     ND_ID = Column(Integer, primary_key=True)
-    ND_SHORT = Column(Unicode(length=10))
-    ND_NAME_DE = Column(Unicode(length=100))
-    ND_NAME_EN = Column(Unicode(length=100))
+    # names are never null in the database
+    ND_SHORT = Column(Unicode(length=10), nullable=False)
+    ND_NAME_DE = Column(Unicode(length=100), nullable=False)
+    ND_NAME_EN = Column(Unicode(length=100), nullable=False)
     reg = Column("ND_REG", DateTime, default=datetime.now)
     reg_by = Column(
         "ND_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
@@ -1192,8 +1206,9 @@ class NavSave(Base):
     N_ID = Column(Integer, ForeignKey("NAV.N_ID", ondelete="CASCADE"))
     P_ID = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"))
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
-    NS_NAME_DE = Column(Unicode(length=256))
-    NS_NAME_EN = Column(Unicode(length=256))
+    # the names could be null, but are never in the db.
+    NS_NAME_DE = Column(Unicode(length=256), nullable=False)
+    NS_NAME_EN = Column(Unicode(length=256), nullable=False)
     NS_CRM = Column(Unicode(length=256))
     NS_TYPE = Column(Integer, nullable=False)
     reg = Column("NS_REG", DateTime, default=datetime.now)
@@ -1208,7 +1223,8 @@ class NavSave(Base):
 
     save_calculations = relationship("NavSaveCalculation",
                                      back_populates="nav_save")
-    selections = relationship("NavSaveSelection", back_populates="nav_save")
+    selections: List[NavSaveSelection] = \
+        relationship("NavSaveSelection", back_populates="nav_save")
 
     @property
     def nav_save_type(self) -> 'NavSaveType':
@@ -1377,8 +1393,8 @@ class PackageElement(Base):
     level = relationship("NavLevel")
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
-    filters = relationship("PackageElementFilter",
-                           back_populates="package_element")
+    filters: List[PackageElementFilter] =\
+        relationship("PackageElementFilter", back_populates="package_element")
 
 
 class PackageElementCalculation(Base):
