@@ -27,7 +27,7 @@ from sqlalchemy.orm import sessionmaker, relationship, Session, deferred, \
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode
-from tsl.variables import STD_DB_PATH
+from tsl.variables import STD_DB_PATH, ClearingState
 
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
@@ -172,6 +172,21 @@ class Clearing(Base):
             "08 – gängige Praxis (nicht validiert)",
             "10 - TCC Status"
         ]
+
+    @property
+    def final_state(self) -> ClearingState:
+        """Return if the Clearing is a final state."""
+        if self.CL_NAME_DE in [
+            "06 - Freigegeben",
+            "09 - ohne Freigabeverfahren",
+            "04 - validiert (ohne Freigabe)",
+            "08 – gängige Praxis (nicht validiert)",
+            "10 - TCC Status"
+        ]:
+            return ClearingState.Final
+        elif self.CL_NAME_DE == "05 - Freigabeverfahren läuft":
+            return ClearingState.Intermediate
+        return ClearingState.NotFinal
 
 
 class Country(Base):

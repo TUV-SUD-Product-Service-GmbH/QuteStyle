@@ -1,4 +1,6 @@
 """Variables for TSL Lib."""
+from enum import IntEnum
+
 STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
               "/{}?driver=ODBC Driver 17 for SQL Server;" \
               "MultiSubnetFailover=Yes"
@@ -154,3 +156,11 @@ QEVENT_LOOKUP = {
     203: "QEvent.WinIdChange",
     126: "QEvent.ZOrderChange",
 }
+
+
+class ClearingState(IntEnum):
+    """Clearing states grouped."""
+
+    Final = 0
+    Intermediate = 1
+    NotFinal = 2
