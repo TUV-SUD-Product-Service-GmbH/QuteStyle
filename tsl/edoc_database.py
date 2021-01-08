@@ -582,7 +582,7 @@ class Edoc(Base):
     )
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
 
-    package = relationship("Package")
+    package = relationship("Package", back_populates="edocs")
     header = relationship("Header")
     phases: List["EdocPhase"] = relationship("EdocPhase",
                                              back_populates="edoc")
@@ -1291,7 +1291,7 @@ class NavSaveSelection(Base):
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
 
     nav_save = relationship("NavSave", back_populates="selections")
-    package = relationship("Package")
+    package = relationship("Package", back_populates="selections")
 
 
 class NavSaveType(IntEnum):
@@ -1352,6 +1352,8 @@ class Package(Base):
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
+    selections = relationship("NavSaveSelection", back_populates="package")
+    edocs = relationship("Edoc", back_populates="package")
 
 
 class PackageCategory(Base):
@@ -1762,7 +1764,7 @@ class ServiceClassDefinition(Base):
     __tablename__ = "SERVICECLASS"
 
     SCL_ID = Column(Integer, primary_key=True)
-    SCL_LEVEL = Column(Integer)
+    SCL_LEVEL = Column(Integer, nullable=False)
     SCL_REMARK_DE = Column(Unicode(length=500))
     SCL_REMARK_EN = Column(Unicode(length=500))
     reg = Column("SCL_REG", DateTime, default=datetime.now)
