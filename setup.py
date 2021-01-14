@@ -9,12 +9,13 @@ setup(name='tsl',
       author='Walid Amokrane, Tilman Krummeck',
       author_email='PS-TF-Entwicklung@tuev-sued.de',
       license='MIT',
-      packages=['tsl'],
+      packages=['tsl', 'tsl.gen'],
       package_data={
             'tsl': ['py.typed'],
       },
       install_requires=[
             'sqlalchemy',
             'pyodbc',
+            'PyQt5'
       ],
       zip_safe=False)

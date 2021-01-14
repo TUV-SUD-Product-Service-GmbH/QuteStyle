@@ -41,18 +41,65 @@ Base.metadata.bind = ENGINE
 AdminSession = sessionmaker(bind=ENGINE)  # pylint: disable=invalid-name
 
 USER_ID: Optional[int] = None
+TEAM_UUID: Optional[str] = None
+TEAM_ID: Optional[int] = None
+TEAM_NAME: Optional[str] = None
 
 
+# pylint: disable=global-statement
 def get_user_id() -> int:
     """Get the database id for the current user."""
-    global USER_ID  # pylint: disable=global-statement
+    global USER_ID
     if USER_ID is None:
-        with session_scope() as session:
-            username = os.getlogin()
-            log.debug("Getting database id for user %s", username)
-            user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
-            USER_ID = user.ST_ID
-    return USER_ID
+        _fetch_user_id()
+    return cast(int, USER_ID)
+
+
+def get_user_group_id() -> int:
+    """Get the database id for the current users team."""
+    global TEAM_UUID
+    global TEAM_ID
+    if TEAM_UUID is None:
+        _fetch_user_id()
+    if TEAM_ID is None:
+        _fetch_team()
+    return cast(int, TEAM_ID)
+
+def get_user_group_name() -> str:
+    """Get the database id for the current users team."""
+    global TEAM_UUID
+    global TEAM_NAME
+    if TEAM_UUID is None:
+        _fetch_user_id()
+    if TEAM_ID is None:
+        _fetch_team()
+    return str(TEAM_NAME)
+
+
+def _fetch_user_id() -> None:
+    """Fetch and set the user id from the database."""
+    global USER_ID
+    global TEAM_UUID
+    with session_scope(False) as session:
+        username = os.getlogin()
+        log.debug("Getting database id for user %s", username)
+        user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
+        USER_ID = user.ST_ID
+        TEAM_UUID = user.ST_TEAM
+
+
+def _fetch_team() -> None:
+    """Fetch and set the user id from the database."""
+    global TEAM_UUID
+    global TEAM_ID
+    global TEAM_NAME
+    with session_scope(False) as session:
+        log.debug("Getting team name and id for uuid %s", TEAM_UUID)
+        team = session.query(TeamSublocation) \
+            .filter_by(ST_TEAM=TEAM_UUID).one()
+        TEAM_ID = team.ST_ID
+        TEAM_NAME = team.ST_SURNAME
+# pylint: enable=global-statement
 
 
 # session fixture for use in with statement
@@ -163,17 +210,6 @@ class Clearing(Base):
     update_user = relationship("Staff", foreign_keys=[update_by])
 
     @property
-    def final_state(self) -> bool:
-        """Return if the Clearing is a final state."""
-        return self.CL_NAME_DE in [
-            "06 - Freigegeben",
-            "09 - ohne Freigabeverfahren",
-            "04 - validiert (ohne Freigabe)",
-            "08 – gängige Praxis (nicht validiert)",
-            "10 - TCC Status"
-        ]
-
-    @property
     def final_state(self) -> ClearingState:
         """Return if the Clearing is a final state."""
         if self.CL_NAME_DE in [
@@ -184,7 +220,7 @@ class Clearing(Base):
             "10 - TCC Status"
         ]:
             return ClearingState.Final
-        elif self.CL_NAME_DE == "05 - Freigabeverfahren läuft":
+        if self.CL_NAME_DE == "05 - Freigabeverfahren läuft":
             return ClearingState.Intermediate
         return ClearingState.NotFinal
 

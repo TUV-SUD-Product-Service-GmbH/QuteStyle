@@ -1,2 +1,3 @@
-sqlalchemy==1.3.20
+sqlalchemy==1.3.22
 pyodbc==4.0.30
+PyQt5==5.15.2

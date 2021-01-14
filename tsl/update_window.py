@@ -1,14 +1,18 @@
 """Main window class for TSL applications."""
+import json
 import logging
 import os
 import subprocess
 import sys
 from typing import Optional
 
-from PyQt5.QtCore import Qt, pyqtSlot, QObject, QEvent, QThread
+from PyQt5.QtCore import Qt, pyqtSlot, QObject, QEvent, QThread, QSettings
+from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QWidget, QMainWindow, QProgressDialog, QMessageBox
 
+from tsl.edoc_database import get_user_group_name
 from tsl.updater import LAGER_PATH, Updater
+from tsl.whats_new_window import WhatsNewWindow
 
 LOG_NAME = ".".join(["tsl", __name__])
 log = logging.getLogger(LOG_NAME)  # pylint: disable=invalid-name
@@ -19,7 +23,8 @@ class TSLMainWindow(QMainWindow):
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments
     def __init__(self, update: bool, help_text: str, name: str, version: str,
-                 parent: QWidget = None) -> None:
+                 force_whats_new: bool = False, parent: QWidget = None)\
+            -> None:
         """Create a new TSL main window."""
         super(TSLMainWindow, self).__init__(parent)
         self._update_status: Optional[bool] = None
@@ -30,6 +35,8 @@ class TSLMainWindow(QMainWindow):
         self._update: bool = update
         self._updater: Optional[Updater] = None
         self._updater_thread: Optional[QThread] = None
+        self._force_whats_new: bool = force_whats_new
+        self._whats_new_window: Optional[WhatsNewWindow] = None
 
     def show(self) -> None:
         """Override show to start update just before."""
@@ -50,6 +57,56 @@ class TSLMainWindow(QMainWindow):
             log.debug("Suppressing update with -u or running from IDE.")
             self.update_status(False)
         super(TSLMainWindow, self).show()
+        self._handle_last_run()
+
+    def _handle_last_run(self) -> None:
+        """Check if the What's new window needs to be shown."""
+        last_run = QSettings().value("last_run", (0, 0, 0))
+        log.debug("Last run showed details for version %s", last_run)
+        current_ver = tuple([int(num) for num in self._version.split(".")])
+        if last_run < current_ver or self._force_whats_new:
+            log.debug("Current version newer than last run %s", self._version)
+            # if we force whats new display, we show the error message, even if
+            # nothing is visible.
+            self._display_whats_new(not self._force_whats_new)
+            QSettings().setValue("last_run", current_ver)
+
+    @pyqtSlot(name="on_display_whats_new")
+    def on_whats_new(self) -> None:
+        """Display the WhatsNewWindow."""
+        self._display_whats_new(False)
+
+    def _display_whats_new(self, silent: bool = True) -> None:
+        with open(f"changes/{self._version}/{self._version}.json",
+                  encoding="utf-8") as fhdl:
+            entries = json.loads(fhdl.read())
+
+        # filter out entries, for which a team restriction is specified and
+        # that do not contain the user's team in this specification
+        grp = get_user_group_name()
+        entries = [entry for entry in entries
+                   if grp in entry["user_groups"]
+                   or not entry["user_groups"]]
+
+        if not entries:
+            if not silent:
+                log.warning("There are no relevant entries for the user.")
+                title = self.tr("Keine Neuerungen")
+                text = self.tr("Die aktuelle Version enthält keine Neuerungen,"
+                               " die für den aktuellen Nutzer verfügbar sind.")
+                QMessageBox.information(self, title, text)
+            return
+        self._whats_new_window = WhatsNewWindow(entries, self._version)
+        self._whats_new_window.show()
+
+    # pylint: disable=invalid-name
+    def closeEvent(self, close_event: QCloseEvent) -> None:
+        """Handle a close event."""
+        if self._whats_new_window:
+            log.debug("WhatsNewWindow is still open, closing.")
+            self._whats_new_window.close()
+        super(TSLMainWindow, self).closeEvent(close_event)
+    # pylint: enable=invalid-name
 
     def _handle_update_window(self) -> None:
         """Handle the update window."""
