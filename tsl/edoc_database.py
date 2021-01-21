@@ -65,6 +65,7 @@ def get_user_group_id() -> int:
         _fetch_team()
     return cast(int, TEAM_ID)
 
+
 def get_user_group_name() -> str:
     """Get the database id for the current users team."""
     global TEAM_UUID
@@ -1615,6 +1616,7 @@ class Process(Base):
     PC_CREATEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     PC_DISABLED = Column(Boolean)
 
+    projects = relationship("Project", back_populates="process")
 
 class ProcessPhase(Base):
     """ProcessPhase Model."""
@@ -1743,7 +1745,7 @@ class Project(Base):
                                           foreign_keys=[P_CUSTOMER_A])
     manufacturer_address = relationship("CustomerAddress",
                                         foreign_keys=[P_CUSTOMER_B])
-    process = relationship("Process")
+    process = relationship("Process", back_populates="projects")
     project_manager = relationship("Staff", foreign_keys=[P_PROJECTMANAGER])
     project_handler = relationship("Staff", foreign_keys=[P_HANDLEDBY])
     register_user = relationship("Staff", foreign_keys=[P_REGBY])
