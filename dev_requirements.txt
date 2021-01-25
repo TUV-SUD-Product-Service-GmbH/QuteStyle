@@ -1,0 +1,4 @@
+prospector==1.2.0
+pytest==6.2.1
+mypy==0.790
+sqlalchemy-stubs==0.4

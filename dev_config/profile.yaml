@@ -1,0 +1,18 @@
+strictness: veryhigh
+test-warnings: true
+doc-warnings: true
+member-warnings: true
+full-pep8: true
+pep8:
+    run: true
+    disable:
+        - N802
+pep257:
+  disable:
+    - D212
+    - D203
+ignore-paths:
+  - venv
+  - dist
+  - build
+  - views\gen
