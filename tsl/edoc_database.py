@@ -24,6 +24,7 @@ from sqlalchemy import create_engine, Column, Integer, Unicode, DateTime, \
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session, deferred, \
     validates
+from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode
@@ -32,8 +33,12 @@ from tsl.variables import STD_DB_PATH, ClearingState
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
 # pre pool ping will ensure, that connection is reestablished if not alive
-ENGINE = create_engine(os.getenv("EDOC_DB_PATH", STD_DB_PATH.format("EDOC")),
-                       pool_pre_ping=True)
+# check_same_thread and poolclass are necessary so that unit test can use a
+# in memory sqlite database across different threads.
+ENGINE = create_engine(
+    os.getenv("EDOC_DB_PATH", STD_DB_PATH.format("EDOC")),
+    connect_args={'check_same_thread': False}, poolclass=StaticPool,
+    pool_pre_ping=True)
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE

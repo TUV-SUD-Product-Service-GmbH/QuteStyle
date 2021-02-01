@@ -18,6 +18,8 @@ from tsl.variables import STD_DB_PATH
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
 # pre pool ping will ensure, that connection is reestablished if not alive
+# check_same_thread and poolclass are necessary so that unit test can use a
+# in memory sqlite database across different threads.
 ENGINE = create_engine(
     os.getenv("PSE_DB_PATH", STD_DB_PATH.format("PSExplorer")),
     connect_args={'check_same_thread': False}, poolclass=StaticPool,
