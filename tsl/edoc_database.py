@@ -252,6 +252,66 @@ class Country(Base):
     update_user = relationship("Staff", foreign_keys=[update_by])
 
 
+class CustomList(Base):
+    """CustomerList table model."""
+
+    __tablename__ = "CUSTOM_LIST"
+
+    CUL_ID = Column(Integer, primary_key=True, nullable=False)
+    CUL_NAME_DE = Column(Unicode(length=256))
+    CUL_NAME_EN = Column(Unicode(length=256))
+    reg = Column("CUL_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "CUL_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("CUL_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "CUL_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
+
+
+class CustomListElement(Base):
+    """CustomerListElement table model."""
+
+    __tablename__ = "CUSTOM_LIST_ELEMENT"
+
+    CULE_ID = Column(Integer, primary_key=True, nullable=False)
+    CUL_ID = Column(Integer, ForeignKey("CUSTOM_LIST.CUL_ID"))
+
+    CULE_NAME_DE = Column(Unicode(length=512))
+    CULE_NAME_EN = Column(Unicode(length=512))
+    CULE_INDENT = Column(Integer)
+    CULE_ORDER = Column(Integer)
+    reg = Column("CULE_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "CULE_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("CULE_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "CULE_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+    CULE_STYLE = Column(Integer, nullable=False)
+    CULE_TESTBASE = Column(Integer, nullable=False)
+    CULE_MODULBASE = Column(Integer, nullable=False)
+    CULE_DEF_COMMENT_DE = Column(Unicode(length=2048))
+    CULE_DEF_COMMENT_EN = Column(Unicode(length=2048))
+    DI_ID = Column(Integer)
+    CULE_MARKETABILITY = Column(Boolean, nullable=False)
+    CULE_NUMBER = Column(Unicode(length=10))
+    CULE_ID_MAP_LIDL = Column(Integer)
+
+    custom_list = relationship("CustomList")
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
+
+
 class CustomerAddress(Base):
     """CustomerAddress table model."""
 
@@ -350,6 +410,7 @@ class DefaultItem(Base):
 
     clearing = relationship("Clearing")
     annexes = relationship("DefaultItemAnnex", back_populates="default_item")
+    custom = relationship("DefaultItemCustom", back_populates="default_item")
     pictures = relationship("DefaultItemPicture",
                             back_populates="default_item")
     template_type = relationship("TemplateType")
@@ -377,6 +438,32 @@ class DefaultItemAnnex(Base):
     DIAX_COPY = Column(Boolean)
 
     default_item = relationship("DefaultItem", back_populates="annexes",
+                                lazy="joined")
+
+
+class DefaultItemCustom(Base):
+    """DefaultItemCustom table model."""
+
+    __tablename__ = "DEFAULT_ITEM_CUSTOM"
+
+    DICU_ID = Column(Integer, primary_key=True)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
+    reg = Column("DICU_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "DICU_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("DICU_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DICU_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+    CUL_ID = Column(Integer, ForeignKey("CUSTOM_LIST.CUL_ID"), nullable=False)
+    CULE_ID = Column(Integer, ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"), nullable=False)
+
+    custom_list = relationship("CustomList")
+    custom_list_element = relationship("CustomListElement")
+    default_item = relationship("DefaultItem", back_populates="custom",
                                 lazy="joined")
 
 
