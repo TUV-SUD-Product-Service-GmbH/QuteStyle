@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from typing import Iterator, Optional
 
 from sqlalchemy import create_engine, Column, Integer, Unicode, Float, \
-    ForeignKey, DateTime, BLOB, Boolean
+    ForeignKey, DateTime, Boolean, SmallInteger, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 from sqlalchemy.pool import StaticPool
@@ -90,8 +90,8 @@ class Project(Base):
     DELR_ID = Column(Integer)
     P_WC_ID = Column(Unicode(length=36))
     P_NAME = Column(NullUnicode(length=31))
-    P_CUSTOMER_A = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
-    P_CUSTOMER_B = Column(Integer, ForeignKey('CUSTOMER_ADDRESS.CU_ID'))
+    P_CUSTOMER_A = Column(Integer, ForeignKey('CUSTOMER.CU_ID'))
+    P_CUSTOMER_B = Column(Integer, ForeignKey('CUSTOMER.CU_ID'))
     P_PROJECTMANAGER = Column(Integer, ForeignKey('STAFF.ST_ID'))
     P_TOKEN = Column(NullUnicode(length=61))
     P_DATE_APPOINTMENT = Column(DateTime)
@@ -99,13 +99,54 @@ class Project(Base):
     BATCH_NUMBER = Column(Unicode(length=16))
 
     customer_contact = relationship('CustomerContact')
-    ordering_party_address = relationship('CustomerAddress',
+    ordering_party_address = relationship('Customer',
                                           foreign_keys=[P_CUSTOMER_A])
-    manufacturer_address = relationship('CustomerAddress',
+    manufacturer_address = relationship('Customer',
                                         foreign_keys=[P_CUSTOMER_B])
     process = relationship('Process')
     phase = relationship('ProcessPhase')
     staff = relationship('Staff')
+
+
+class Customer(Base):
+    """Customer table model."""
+
+    __tablename__ = 'CUSTOMER'
+
+    CU_ID = Column(Integer, primary_key=True)
+    MD_ID = Column(Integer)
+    CU_NUMBER = Column(Unicode(length=10))
+    CU_ACTIVE = Column(Boolean)
+    CU_AUTHORIZATION = Column(Unicode(length=30))
+    CU_SUPPLIER_NO = Column(Unicode(length=24))
+    CU_CLASS = Column(Unicode(length=2))
+    CU_ATTENDENT = Column(Unicode(length=40))
+    CU_DATE = Column(DateTime)
+    CU_UPDATE = Column(DateTime)
+    CU_LOCKED = Column(Unicode(length=2))
+    CU_BOOKING_AREA = Column(Unicode(length=4))
+    CU_SERVERID = Column(Integer)
+    CU_UPDATE_TYPE = Column(SmallInteger)
+    CU_ISSUPPLIER = Column(Boolean)
+    CU_LANGUAGE = Column(Unicode(length=2))
+    CU_USER_STATE = Column(Unicode(length=5))
+    CU_VBUND = Column(Unicode(length=40))
+    CU_LOEKZ = Column(Unicode(length=1))
+    RUN_ID = Column(Integer)
+    CU_KTOKD = Column(Unicode(length=10))
+    DEFAULT_CONTACT_PERSON = Column(Integer)
+    IS_SURVEY_PARTICIPANT = Column(Boolean)
+    SURVEY_REJECT_REASON = Column(Unicode(length=512))
+    SEND_SURVEYS_TO_MANUFACTURER = Column(Boolean)
+    TAX_ID_NUMBER = Column(Unicode(length=64))
+    CU_MARK = Column(Unicode(length=256))
+    CU_DISABLED_PSE = Column(DateTime)
+    MDO_NUMBER = Column(Unicode(length=10))
+    CREATED_BY = Column(Integer)
+    UPDATED_BY = Column(Integer)
+    DUNSNUMBER = Column(Unicode(length=10))
+    EINVOICING_RELEVANCE = Column(Unicode(length=10))
+    PRINT_OPTION = Column(Unicode(length=3))
 
 
 class CustomerContact(Base):
@@ -153,7 +194,7 @@ class TemplateData(Base):
 
     TPD_ID = Column(Integer, primary_key=True, nullable=False)
     TP_ID = Column(Integer, nullable=False)
-    TPD_DATA = Column(BLOB)
+    TPD_DATA = Column(LargeBinary)
 
 
 class Template(Base):
