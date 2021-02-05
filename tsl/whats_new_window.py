@@ -4,6 +4,7 @@ from enum import IntEnum
 from typing import List, TypedDict
 
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget
 
 from tsl.gen.ui_whats_new_window import Ui_whats_new_window
@@ -79,7 +80,9 @@ class WhatsNewWindow(QMainWindow):
             f"{len(self._entries)} - {entry['title']}"
         )
 
-        self._ui.text_label.setText(entry["text"])
+        entry_font = QFont("Arial", 9)
+        self._ui.text_label.setFont(entry_font)
+        self._ui.text_label.setText(entry['text'])
 
         prev_disable = self._current_entry_idx == 0
         self._ui.previous_button.setDisabled(prev_disable)

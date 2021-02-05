@@ -4,7 +4,7 @@ import logging
 import os
 from winreg import OpenKey, HKEY_CURRENT_USER, KEY_READ, QueryValueEx
 from contextlib import contextmanager
-from typing import Iterator, Optional
+from typing import Iterator, Optional, List
 
 from sqlalchemy import create_engine, Column, Integer, Unicode, Float, \
     ForeignKey, DateTime, Boolean, SmallInteger, LargeBinary
@@ -99,10 +99,8 @@ class Project(Base):
     BATCH_NUMBER = Column(Unicode(length=16))
 
     customer_contact = relationship('CustomerContact')
-    ordering_party_address = relationship('Customer',
-                                          foreign_keys=[P_CUSTOMER_A])
-    manufacturer_address = relationship('Customer',
-                                        foreign_keys=[P_CUSTOMER_B])
+    ordering_party = relationship('Customer', foreign_keys=[P_CUSTOMER_A])
+    manufacturer = relationship('Customer', foreign_keys=[P_CUSTOMER_B])
     process = relationship('Process')
     phase = relationship('ProcessPhase')
     staff = relationship('Staff')
@@ -148,6 +146,8 @@ class Customer(Base):
     EINVOICING_RELEVANCE = Column(Unicode(length=10))
     PRINT_OPTION = Column(Unicode(length=3))
 
+    addresses: List['CustomerAddress'] = relationship(  # type: ignore
+        'CustomerAddress', back_populates="customer")
 
 class CustomerContact(Base):
     """CustomerContact table model."""
@@ -167,11 +167,13 @@ class CustomerAddress(Base):
     __tablename__ = 'CUSTOMER_ADDRESS'
 
     CA_ID = Column(Integer, primary_key=True, nullable=False)
-    CU_ID = Column(Integer, nullable=False)
+    CU_ID = Column(Integer, ForeignKey('CUSTOMER.CU_ID'), nullable=False)
     CA_NAME = Column(NullUnicode(length=166), nullable=False)
     CA_STREET = Column(NullUnicode(length=101))
     CA_ZIPCODE = Column(NullUnicode(length=11))
     CA_CITY = Column(NullUnicode(length=41))
+
+    customer = relationship('Customer', back_populates="addresses")
 
 
 class Staff(Base):
