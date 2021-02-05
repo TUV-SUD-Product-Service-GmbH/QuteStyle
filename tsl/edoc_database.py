@@ -459,7 +459,8 @@ class DefaultItemCustom(Base):
         onupdate=get_user_id
     )
     CUL_ID = Column(Integer, ForeignKey("CUSTOM_LIST.CUL_ID"), nullable=False)
-    CULE_ID = Column(Integer, ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"), nullable=False)
+    CULE_ID = Column(Integer, ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"),
+                     nullable=False)
 
     custom_list = relationship("CustomList")
     custom_list_element = relationship("CustomListElement")
@@ -776,6 +777,8 @@ class EdocModuleItem(Base):
     nav_level = relationship("NavLevel")
     phase_results = relationship("EdocModuleItemPhase",
                                  back_populates="edoc_module_item")
+    comparisons: List[EdocModuleItemComparison] = \
+        relationship("EdocModuleItemComparison", back_populates="item")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
@@ -807,6 +810,9 @@ class EdocModuleItemComparison(Base):
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
 
+    module = relationship("EdocModule")
+    item = relationship("EdocModuleItem", back_populates="comparisons")
+
 
 class EdocModuleItemComparisonPhase(Base):
     """Comparison table for EdocModuleItems."""
@@ -819,9 +825,9 @@ class EdocModuleItemComparisonPhase(Base):
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
     PRP_ID = Column(Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"),
                     default=1)
-    EMICP_TEXT_DE = Column(Unicode(length=500))
-    EMICP_TEXT_EN = Column(Unicode(length=500))
-    EMICP_TEXT_FR = Column(Unicode(length=500))
+    EMICP_TEXT_DE = Column(Unicode(length=500), default="")
+    EMICP_TEXT_EN = Column(Unicode(length=500), default="")
+    EMICP_TEXT_FR = Column(Unicode(length=500), default="")
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
     update = Column("ER_UPDATE", DateTime, onupdate=datetime.now)
     update_by = Column(
@@ -981,7 +987,8 @@ class EdocModule(Base):
     offline_by = relationship("Staff", foreign_keys=[EM_OFFLINE_BY])
     phases: List[EdocModulePhase] = relationship("EdocModulePhase",
                                                  back_populates="edoc_module")
-    items = relationship("EdocModuleItem", back_populates="edoc_module")
+    items: List[EdocModuleItem] = \
+        relationship("EdocModuleItem", back_populates="edoc_module")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
@@ -1709,6 +1716,7 @@ class Process(Base):
     PC_DISABLED = Column(Boolean)
 
     projects = relationship("Project", back_populates="process")
+
 
 class ProcessPhase(Base):
     """ProcessPhase Model."""
