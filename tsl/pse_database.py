@@ -54,9 +54,9 @@ class Process(Base):
     __tablename__ = 'PROCESS'
 
     PC_ID = Column(Integer, primary_key=True, nullable=False)
-    PC_NAME = Column(NullUnicode(length=256))
-    PC_IAN = Column(NullUnicode(length=256))
-    PC_PATH = Column(NullUnicode(length=50))
+    PC_NAME = Column(NullUnicode(length=256), nullable=False, default="")
+    PC_IAN = Column(NullUnicode(length=256), nullable=False, default="")
+    PC_PATH = Column(NullUnicode(length=50), nullable=False, default="")
 
 
 class ProcessPhase(Base):
@@ -65,9 +65,9 @@ class ProcessPhase(Base):
     __tablename__ = 'PROCESSPHASE'
 
     PRP_ID = Column(Integer, primary_key=True, nullable=False)
-    PRP_SHORT_DE = Column(NullUnicode(length=256))
-    PRP_SHORT_EN = Column(NullUnicode(length=256))
-    PRP_SHORT_FR = Column(NullUnicode(length=256))
+    PRP_SHORT_DE = Column(NullUnicode(length=256), nullable=False, default="")
+    PRP_SHORT_EN = Column(NullUnicode(length=256), nullable=False, default="")
+    PRP_SHORT_FR = Column(NullUnicode(length=256), nullable=False, default="")
 
 
 class Project(Base):
@@ -77,23 +77,23 @@ class Project(Base):
 
     P_ID = Column(Integer, primary_key=True, nullable=False)
     PC_ID = Column(Integer, ForeignKey('PROCESS.PC_ID'))
-    P_IAN = Column(NullUnicode(length=256))
-    P_PRODUCT = Column(NullUnicode(length=256))
-    P_CONTACT = Column(NullUnicode(length=256))
+    P_IAN = Column(NullUnicode(length=256), nullable=False, default="")
+    P_PRODUCT = Column(NullUnicode(length=256), nullable=False, default="")
+    P_CONTACT = Column(NullUnicode(length=256), nullable=False, default="")
     P_CONTACT_CUC_ID = Column(Integer, ForeignKey('CUSTOMER_CONTACT.CUC_ID'))
     P_DEADLINE = Column(DateTime)
     P_ORDERSIZE = Column(Float)
     P_PROCESSPHASE = Column(Integer, ForeignKey('PROCESSPHASE.PRP_ID'))
-    P_MODEL = Column(NullUnicode(length=256))
+    P_MODEL = Column(NullUnicode(length=256), nullable=False, default="")
     P_ZARA_NUMBER = Column(NullUnicode(length=11))
-    P_FOLDER = Column(NullUnicode(length=256))
+    P_FOLDER = Column(NullUnicode(length=256), nullable=False, default="")
     DELR_ID = Column(Integer)
     P_WC_ID = Column(Unicode(length=36))
-    P_NAME = Column(NullUnicode(length=31))
+    P_NAME = Column(NullUnicode(length=31), nullable=False, default="")
     P_CUSTOMER_A = Column(Integer, ForeignKey('CUSTOMER.CU_ID'))
     P_CUSTOMER_B = Column(Integer, ForeignKey('CUSTOMER.CU_ID'))
     P_PROJECTMANAGER = Column(Integer, ForeignKey('STAFF.ST_ID'))
-    P_TOKEN = Column(NullUnicode(length=61))
+    P_TOKEN = Column(NullUnicode(length=61), nullable=False, default="")
     P_DATE_APPOINTMENT = Column(DateTime)
     P_EXPECTED_TS_RECEIPT = Column(DateTime)
     BATCH_NUMBER = Column(Unicode(length=16))
@@ -155,10 +155,10 @@ class CustomerContact(Base):
     __tablename__ = 'CUSTOMER_CONTACT'
 
     CUC_ID = Column(Integer, primary_key=True, nullable=False)
-    CUC_FORENAME = Column(NullUnicode(length=51))
-    CUC_SURNAME = Column(NullUnicode(length=36))
-    ANRED = Column(NullUnicode(length=31))
-    CUC_MAIL = Column(NullUnicode(length=256))
+    CUC_FORENAME = Column(NullUnicode(length=51), nullable=False, default="")
+    CUC_SURNAME = Column(NullUnicode(length=36), nullable=False, default="")
+    ANRED = Column(NullUnicode(length=31), nullable=False, default="")
+    CUC_MAIL = Column(NullUnicode(length=256), nullable=False, default="")
 
 
 class CustomerAddress(Base):
@@ -168,10 +168,10 @@ class CustomerAddress(Base):
 
     CA_ID = Column(Integer, primary_key=True, nullable=False)
     CU_ID = Column(Integer, ForeignKey('CUSTOMER.CU_ID'), nullable=False)
-    CA_NAME = Column(NullUnicode(length=166), nullable=False)
-    CA_STREET = Column(NullUnicode(length=101))
-    CA_ZIPCODE = Column(NullUnicode(length=11))
-    CA_CITY = Column(NullUnicode(length=41))
+    CA_NAME = Column(NullUnicode(length=166), nullable=False, default="")
+    CA_STREET = Column(NullUnicode(length=101), nullable=False, default="")
+    CA_ZIPCODE = Column(NullUnicode(length=11), nullable=False, default="")
+    CA_CITY = Column(NullUnicode(length=41), nullable=False, default="")
 
     customer = relationship('Customer', back_populates="addresses")
 
@@ -182,11 +182,11 @@ class Staff(Base):
     __tablename__ = 'STAFF'
 
     ST_ID = Column(Integer, primary_key=True, nullable=False)
-    ST_SURNAME = Column(NullUnicode(length=61))
-    ST_FORENAME = Column(NullUnicode(length=51))
-    ST_PHONE = Column(NullUnicode(length=81))
-    ST_FAX = Column(NullUnicode(length=81))
-    ST_EMAIL = Column(NullUnicode(length=81))
+    ST_SURNAME = Column(NullUnicode(length=61), nullable=False, default="")
+    ST_FORENAME = Column(NullUnicode(length=51), nullable=False, default="")
+    ST_PHONE = Column(NullUnicode(length=81), nullable=False, default="")
+    ST_FAX = Column(NullUnicode(length=81), nullable=False, default="")
+    ST_EMAIL = Column(NullUnicode(length=81), nullable=False, default="")
 
 
 class TemplateData(Base):
@@ -200,7 +200,13 @@ class TemplateData(Base):
 
 
 class Template(Base):
-    """TemplateData table model."""
+    """
+    TemplateData table model.
+
+    If the template represents an eDoc DefaultModule, the TP_FILENAME can be
+    empty. In this case, the DM_ID must exist. Nevertheless it is possible
+    to have a DM_ID and a TP_FILENAME at the same time.
+    """
 
     __tablename__ = 'TEMPLATE'
 

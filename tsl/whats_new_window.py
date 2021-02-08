@@ -80,7 +80,7 @@ class WhatsNewWindow(QMainWindow):
             f"{len(self._entries)} - {entry['title']}"
         )
 
-        entry_font = QFont("Arial", 9)
+        entry_font = QFont("Segoe UI", 9)
         self._ui.text_label.setFont(entry_font)
         self._ui.text_label.setText(entry['text'])
 

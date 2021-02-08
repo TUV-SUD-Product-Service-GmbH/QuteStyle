@@ -349,7 +349,7 @@ class DefaultItem(Base):
     DI_VERSION = Column(Integer)
     DI_NAME = Column(Unicode(length=100))
     TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
-    TPSC_ID = Column(Integer)  # todo: link ForeignKey
+    TPSC_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"))
     DI_REQUIREMENT_DE = Column(Unicode(length=1500))
     DI_REQUIREMENT_EN = Column(Unicode(length=1500))
     DI_REQUIREMENT_FR = Column(Unicode(length=1500))
@@ -414,6 +414,9 @@ class DefaultItem(Base):
     pictures = relationship("DefaultItemPicture",
                             back_populates="default_item")
     template_type = relationship("TemplateType")
+    template_scope = relationship("TemplateScope")
+    test_bases: List[DefaultItemBase] = \
+        relationship("DefaultItemBase", back_populates="default_item")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
@@ -439,6 +442,19 @@ class DefaultItemAnnex(Base):
 
     default_item = relationship("DefaultItem", back_populates="annexes",
                                 lazy="joined")
+
+
+class DefaultItemAttribute(Base):
+    """Attribute of a DefaultItem."""
+
+    __tablename__ = "DEFAULT_ITEM_ATTRIBUTES"
+
+    DIA_ID = Column(Integer, primary_key=True)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
+    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+
+    default_item = relationship("DefaultItem", back_populates="attributes")
+    attribute = relationship("Attribute")
 
 
 class DefaultItemCustom(Base):
@@ -468,17 +484,44 @@ class DefaultItemCustom(Base):
                                 lazy="joined")
 
 
-class DefaultItemAttribute(Base):
-    """Attribute of a DefaultItem."""
+class DefaultItemBase(Base):
+    """Test base for a default item."""
 
-    __tablename__ = "DEFAULT_ITEM_ATTRIBUTES"
+    __tablename__ = "DEFAULT_ITEM_BASE"
 
-    DIA_ID = Column(Integer, primary_key=True)
+    DIB_ID = Column(Integer, primary_key=True)
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
-    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+    B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
+    DIB_TYPE = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"), default=0, )
+    DIB_SUBCLAUSE = Column(Unicode(length=512), default="")
+    DIB_SUBCLAUSE_MERKER = Column(Unicode(length=512))
 
-    default_item = relationship("DefaultItem", back_populates="attributes")
-    attribute = relationship("Attribute")
+    default_item = relationship("DefaultItem", back_populates="test_bases")
+    test_base = relationship("TestBase")
+
+
+class DefaultModuleItemParameter(Base):
+    """Parameter for a DefaultItem."""
+
+    __tablename__ = "DEFAULT_MODUL_ITEM_PARAMETER"
+
+    DMIP_ID = Column(Integer, primary_key=True)
+    DMI_ID = Column(Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"))
+    reg = Column("DMIP_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "DMIP_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("DMIP_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "DMIP_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+    MP_ID = Column(Integer, ForeignKey("MODUL_PARAMETER.MP_ID"))
+
+    default_module_item: List["DefaultModuleItem"] = \
+        relationship("DefaultModuleItem", back_populates="parameters")
+    parameter = relationship("ModuleParameter")
 
 
 class DefaultItemPicture(Base):
@@ -514,7 +557,7 @@ class DefaultModule(Base):
     DM_LETTER = Column(Unicode(length=10))
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"))
     TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
-    TPSC_ID = Column(Integer)
+    TPSC_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"))
     DM_IS_MASTER = Column(Boolean)
     DM_COMMENT = Column(Unicode(length=500))
     CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
@@ -564,17 +607,26 @@ class DefaultModule(Base):
                               back_populates="default_module")
     header = relationship("Header")
     items: List[DefaultModuleItem]\
-        = relationship("DefaultModuleItem", back_populates="default_module")
+        = relationship("DefaultModuleItem", back_populates="default_module",
+                       order_by="DefaultModuleItem.DMI_NUMBER")
 
     calculations: List[DefaultModuleCalc] = \
         relationship("DefaultModuleCalc", back_populates="default_module")
     template_type = relationship("TemplateType")
+    template_scope = relationship("TemplateScope")
     links = relationship("DefaultModuleLink", back_populates="default_module")
     test_bases = relationship("DefaultModuleTestBase")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
     clearing = relationship("Clearing")
+
+    history: List["DefaultModuleHistory"] = \
+        relationship("DefaultModuleHistory", back_populates="default_module")
+
+    tf_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY])
+    vt_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY_VT])
+    created_for_user = relationship("Staff", foreign_keys=[DM_CREATED_FOR])
 
 
 class DefaultModuleAttribute(Base):
@@ -627,6 +679,60 @@ class DefaultModuleCalc(Base):
     team = relationship("Staff")
 
 
+class DefaultModuleHistory(Base):
+    """DefaultModuleHistory."""
+
+    __tablename__ = "MODUL_HISTORY"
+
+    MH_ID = Column(Integer, primary_key=True)
+    MH_COMMENT = Column(Unicode(length=1000))
+    MH_DOCUMENT_NAME = Column(Unicode(length=255))
+    MH_DOCUMENT = Column(LargeBinary)
+    MH_CLEAR_DOCUMENT_NAME = Column(Unicode(length=255))
+    MH_CLEAR_DOCUMENT = Column(LargeBinary)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
+    DM_VERSION = Column(Integer)
+    DM_NAME = Column(Unicode(length=255))
+    DM_LETTER = Column(Unicode(length=10))
+    CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
+    DM_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    DM_CLEAR_DATE = Column(DateTime)
+    reg = Column("MH_REG", DateTime, default=datetime.now)
+    reg_by = Column(
+        "MH_REGBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        default=get_user_id
+    )
+    update = Column("MH_UPDATE", DateTime, onupdate=datetime.now)
+    update_by = Column(
+        "MH_UPDATEBY", Integer, ForeignKey("V_PSEX_STAFF.ST_ID"),
+        onupdate=get_user_id
+    )
+    DM_TESTBASE_DE = Column(Unicode(length=500))
+    DM_TESTBASE_EN = Column(Unicode(length=500))
+    DM_TESTBASE_FR = Column(Unicode(length=500))
+    DM_IS_CUSTOMER = Column(Boolean)
+    DM_IS_MARKETABILITY = Column(Boolean)
+    DM_IS_USABILITY = Column(Boolean)
+    CT_ID = Column(Integer, ForeignKey("CALC_TYPE.CT_ID"))
+    DM_SCOPE_DE = Column(Unicode(length=500))
+    DM_SCOPE_EN = Column(Unicode(length=500))
+    DM_SCOPE_FR = Column(Unicode(length=500))
+    DM_CLEAR_BY_VT = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    DM_CLEAR_DATE_VT = Column(DateTime)
+    DM_CREATED_FOR = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    DM_CREATED_FOR_DATE = Column(DateTime)
+    DM_REVISION = Column(Unicode(length=60))
+
+    default_module: "DefaultModule" = relationship("DefaultModule",
+                                                   back_populates="history")
+    clearing = relationship("Clearing")
+    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    update_user = relationship("Staff", foreign_keys=[update_by])
+    tf_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY])
+    vt_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY_VT])
+    created_for_user = relationship("Staff", foreign_keys=[DM_CREATED_FOR])
+
+
 class DefaultModuleItem(Base):
     """DefaultModuleItem (Link between DefaultModule and DefaultItem)."""
 
@@ -660,6 +766,10 @@ class DefaultModuleItem(Base):
 
     default_module = relationship("DefaultModule", back_populates="items")
     default_item = relationship("DefaultItem")
+
+    parameters: List[DefaultModuleItemParameter] = \
+        relationship("DefaultModuleItemParameter",
+                     back_populates="default_module_item")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
@@ -738,9 +848,9 @@ class EdocModuleItem(Base):
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
     DI_VERSION = Column(Integer)
-    EMI_REQUIREMENT_DE = Column(NullUnicode(length=1500))
-    EMI_REQUIREMENT_EN = Column(NullUnicode(length=1500))
-    EMI_REQUIREMENT_FR = Column(NullUnicode(length=1500))
+    EMI_REQUIREMENT_DE = Column(NullUnicode(length=1500), nullable=False, default="")
+    EMI_REQUIREMENT_EN = Column(NullUnicode(length=1500), nullable=False, default="")
+    EMI_REQUIREMENT_FR = Column(NullUnicode(length=1500), nullable=False, default="")
     # column is nullable in db, but actually never is. there are 6 items
     # without indent, but they are from 2009/2010
     EMI_INDENT = Column(Integer, nullable=False)
@@ -1126,10 +1236,10 @@ class KindOfTest(Base):
     HR_SHORT = Column(Unicode(length=20))
 
 
-class ModulParameter(Base):
+class ModuleParameter(Base):
     """ModuleParameter."""
 
-    __tablename__ = "MODULE_PARAMETER"
+    __tablename__ = "MODUL_PARAMETER"
 
     MP_ID = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
@@ -1446,7 +1556,7 @@ class Package(Base):
 
     NP_ID = Column(Integer, primary_key=True)
     N_ID = Column(Integer, ForeignKey("NAV.N_ID", ondelete="CASCADE"))
-    NP_NAME_DE = Column(NullUnicode(length=150), nullable=False)
+    NP_NAME_DE = Column(NullUnicode(length=150), nullable=False, default="")
     NP_NAME_EN = Column(Unicode(length=150))
     NP_COMMENT_DE = Column(Unicode(length=800))
     NP_COMMENT_EN = Column(Unicode(length=800))
@@ -1569,7 +1679,7 @@ class PackageElementCalculation(Base):
     NPEC_FACTOR = Column(Float)
     NPEC_PRICE = Column(Numeric(precision=18, scale=2))
     NPEC_COMMENT = Column(Unicode(length=500))
-    NPEC_TASK = Column(NullUnicode(length=500))
+    NPEC_TASK = Column(NullUnicode(length=500), nullable=False, default="")
     ZM_ID = Column(Unicode(length=50))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
     reg = Column("NPEC_REG", DateTime, default=datetime.now)
@@ -1772,8 +1882,8 @@ class Project(Base):
 
     P_ID = Column(Integer, primary_key=True, nullable=False)
     P_FOLDER = Column(Unicode(length=256))
-    P_PRODUCT = Column(NullUnicode(length=256))
-    P_MODEL = Column(NullUnicode(length=256))
+    P_PRODUCT = Column(NullUnicode(length=256), nullable=False, default="")
+    P_MODEL = Column(NullUnicode(length=256), nullable=False, default="")
     PC_ID = Column(Integer, ForeignKey("V_PSEX_PROCESS.PC_ID"))
     P_DATE_DONE = Column(DateTime)
     P_PREDATE = Column(DateTime)
@@ -1950,6 +2060,15 @@ class Staff(Base):
     ST_DOMAIN = Column(Unicode(length=32))
     ST_GENDER = Column(Unicode(length=50))
 
+    @property
+    def full_name(self) -> str:
+        """Get the user's full name."""
+        full_name = self.ST_SURNAME
+        if self.ST_FORENAME:
+            full_name += ", "
+            full_name += self.ST_FORENAME
+        return full_name
+
 
 class StatisticModule(Base):
     """Statistic Module."""
@@ -1994,7 +2113,7 @@ class SubOrder(Base):
     SO_CREATED = Column(DateTime)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     SO_DEADLINE = Column(DateTime)
-    SO_TASK = Column(NullUnicode(length=1024))
+    SO_TASK = Column(NullUnicode(length=1024), nullable=False, default="")
     SO_HOURS = Column(Numeric(precision=18, scale=6))
     SO_ACC_HOURS = Column(Numeric)
     SO_COMMENT = Column(Unicode(length=2000))
@@ -2072,6 +2191,21 @@ class TeamSublocation(Base):
         return self.ST_SURNAME
 
 
+class TemplateScope(Base):
+    """TemplateScope table model."""
+
+    __tablename__ = 'V_PSEX_TEMPLATE_SCOPE'
+
+    TPSC_ID = Column(Integer, primary_key=True, nullable=False)
+    TPSC_NAME_DE = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_EN = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_FR = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_DE = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_EN = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_FR = Column(Unicode(length=256), nullable=False)
+    TPSC_PATH = Column(Unicode(length=256), nullable=False)
+
+
 class TemplateType(Base):
     """TemplateType."""
 
@@ -2125,7 +2259,6 @@ class TestBase(Base):
     B_DOA = Column(Integer, nullable=False)
 
     test_base_type = relationship("TestBaseType")
-    default_item = relationship("DefaultItem")
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
