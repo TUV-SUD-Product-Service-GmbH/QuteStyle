@@ -17,7 +17,7 @@ else:
     StrEngine = TypeDecorator
 
 
-# pylint: disable=abstract-method
+# pylint: disable=abstract-method, too-few-public-methods
 class NullUnicode(StrEngine):
     """
     Handles NULL values for strings like empty strings.

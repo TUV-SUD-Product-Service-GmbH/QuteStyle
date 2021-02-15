@@ -13,6 +13,4 @@ pep257:
     - D203
 ignore-paths:
   - venv
-  - dist
-  - build
-  - views\gen
+  - tsl\gen

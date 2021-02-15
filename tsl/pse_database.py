@@ -85,7 +85,7 @@ class Project(Base):
     P_ORDERSIZE = Column(Float)
     P_PROCESSPHASE = Column(Integer, ForeignKey('PROCESSPHASE.PRP_ID'))
     P_MODEL = Column(NullUnicode(length=256), nullable=False, default="")
-    P_ZARA_NUMBER = Column(NullUnicode(length=11))
+    P_ZARA_NUMBER = Column(NullUnicode(length=11), nullable=False, default="")
     P_FOLDER = Column(NullUnicode(length=256), nullable=False, default="")
     DELR_ID = Column(Integer)
     P_WC_ID = Column(Unicode(length=36))
@@ -148,6 +148,7 @@ class Customer(Base):
 
     addresses: List['CustomerAddress'] = relationship(  # type: ignore
         'CustomerAddress', back_populates="customer")
+
 
 class CustomerContact(Base):
     """CustomerContact table model."""
