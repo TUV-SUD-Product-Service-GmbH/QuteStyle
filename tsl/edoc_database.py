@@ -3,11 +3,6 @@ Database connection and models for the PSE database.
 
 WARNING! Delete cascades do not work properly, when delete is executed on a
 query. Always use session.delete()!
-
-INFORMATION! We are using datetime.now as default/onupdate for reg and update
-columns even if datetime.utcnow would be the correct choice to mimik Navigator
-behaviour.
-
 """
 # pylint: disable=too-many-lines
 from __future__ import annotations
@@ -33,8 +28,9 @@ from sqlalchemy import (
     BigInteger,
     NCHAR,
     String,
+    DECIMAL,
 )
-from sqlalchemy.dialects.mssql import BIT
+from sqlalchemy.dialects.mssql import BIT, MONEY, IMAGE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     sessionmaker,
@@ -42,6 +38,8 @@ from sqlalchemy.orm import (
     Session,
     deferred,
     validates,
+    load_only,
+    backref,
 )
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
@@ -110,7 +108,12 @@ def _fetch_user_id() -> None:
     with session_scope(False) as session:
         username = os.getlogin()
         log.debug("Getting database id for user %s", username)
-        user = session.query(Staff).filter_by(ST_WINDOWSID=username).one()
+        user = (
+            session.query(Staff)
+            .filter_by(ST_WINDOWSID=username)
+            .options(load_only(Staff.ST_ID, Staff.ST_TEAM))
+            .one()
+        )
         USER_ID = user.ST_ID
         TEAM_UUID = user.ST_TEAM
 
@@ -166,9 +169,11 @@ class AppsCount(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         index=True,
         doc="User that uses the application creating the entry.",
+        default=get_user_id,
     )
     APPST_ID = Column(Integer, index=True)
-    APPSC_REG = Column(
+    reg = Column(
+        "APPSC_REG",
         DateTime,
         server_default=text("(getutcdate())"),
         doc="Time the entry was created / the application started.",
@@ -363,14 +368,14 @@ class Clearing(Base):
         doc="Template status as defined in PSEX. Foreign key is not defined!",
     )
 
-    reg = Column("CL_REG", DateTime, default=datetime.now)
+    reg = Column("CL_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "CL_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("CL_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("CL_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "CL_UPDATEBY",
         Integer,
@@ -402,6 +407,11 @@ class Country(Base):
 
     __tablename__ = "HR_COUNTRY"
 
+    doc = [
+        "Definition of country names as a tree structure. Is used in Navigator"
+        "to assign Navigations to a specific region or country.",
+    ]
+
     HRC_ID = Column(Integer, primary_key=True)
     HRC_LEFT = Column(Integer, index=True, doc="Sort order left oriented")
     HRC_RIGHT = Column(Integer, index=True, doc="Sort order right oriented")
@@ -413,7 +423,7 @@ class Country(Base):
     update = Column(
         "HRC_UPDATE",
         DateTime,
-        onupdate=datetime.now,
+        onupdate=datetime.utcnow,
         server_default=text("(getdate())"),
     )
     update_by = Column(
@@ -432,17 +442,19 @@ class CustomList(Base):
 
     __tablename__ = "CUSTOM_LIST"
 
-    CUL_ID = Column(Integer, primary_key=True, nullable=False)
-    CUL_NAME_DE = Column(Unicode(length=256))
-    CUL_NAME_EN = Column(Unicode(length=256))
-    reg = Column("CUL_REG", DateTime, default=datetime.now)
+    doc = ["Lists that group CustomListElements together."]
+
+    CUL_ID = Column(Integer, primary_key=True)
+    CUL_NAME_DE = Column(Unicode(256), doc="German name of the CustomList.")
+    CUL_NAME_EN = Column(Unicode(256), doc="English name of the CustomList.")
+    reg = Column("CUL_REG", DateTime, server_default=text("(getdate())"))
     reg_by = Column(
         "CUL_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("CUL_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("CUL_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "CUL_UPDATEBY",
         Integer,
@@ -517,14 +529,18 @@ class CustomListElement(Base):
         "page rows.",
     )
 
-    reg = Column("CULE_REG", DateTime, default=datetime.now)
+    reg = Column(
+        "CULE_REG",
+        DateTime,
+        server_default=text("(getdate())"),
+    )
     reg_by = Column(
         "CULE_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("CULE_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("CULE_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "CULE_UPDATEBY",
         Integer,
@@ -601,54 +617,123 @@ class CustomerAddress(Base):
 
     __tablename__ = "V_PSEX_CUSTOMER_ADDRESS"
 
-    CA_ID = Column(Integer, primary_key=True, nullable=False)
+    doc = [
+        "View on the PSE's customer adresses.",
+        "The view is malformed as it defines the CA_ID and a CU_ID which "
+        "stands in contradiction to the customer view where the same keys are "
+        "defined. A one-to-one relationship should define the foreign key "
+        "on one side.",
+    ]
+
+    CA_ID = Column(
+        Integer,
+        primary_key=True,
+        doc="WARNING: Is defined as not nullable and not as primary key in "
+        "the database.",
+    )
     # totally useless, there is a CA_ID on V_PSEX_CUSTOMER to build this
     # one to one relationship. MS SQL would actually prevent this if someone
     # would have defined the foreign keys correctly.
     # CU_ID = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
-    CA_ADDRNUMBER = Column(Unicode(length=10))
-    CA_NATION = Column(Unicode(length=1))
-    CA_TITLE = Column(Unicode(length=4))
-    CA_NAME = Column(Unicode(length=165))
-    CA_NAME_SHORT = Column(Unicode(length=60))
-    CA_NAME1 = Column(Unicode(length=40))
-    CA_NAME2 = Column(Unicode(length=40))
-    CA_NAME3 = Column(Unicode(length=40))
-    CA_NAME4 = Column(Unicode(length=40))
-    CA_CITY = Column(Unicode(length=40))
-    CA_DISTRICT = Column(Unicode(length=50))
-    CA_COUNTRY = Column(Unicode(length=3))
-    CA_LANGUAGE = Column(Unicode(length=2))
-    CA_REGION = Column(Unicode(length=3))
-    CA_PHONE = Column(Unicode(length=60))
-    CA_PHONE2 = Column(Unicode(length=60))
-    CA_FAX = Column(Unicode(length=60))
-    CA_FAX2 = Column(Unicode(length=60))
-    CA_ZIPCODE = Column(Unicode(length=10))
-    CA_PO_POSTCODE = Column(Unicode(length=10))
-    CA_CO_POSTCODE = Column(Unicode(length=50))
-    CA_STREET = Column(Unicode(length=100))
-    CA_STREET1 = Column(Unicode(length=60))
-    CA_PO_BOX = Column(Unicode(length=10))
-    CA_PO_BOX_LOC = Column(Unicode(length=40))
-    CA_PO_BOX_REG = Column(Unicode(length=3))
-    CA_PO_BOX_CTY = Column(Unicode(length=3))
-    CA_HOUSE_NUM1 = Column(Unicode(length=10))
-    CA_HOUSE_NUM2 = Column(Unicode(length=10))
-    CA_HOUSE_NUM3 = Column(Unicode(length=10))
-    CA_STR_SUPPL1 = Column(Unicode(length=40))
-    CA_STR_SUPPL2 = Column(Unicode(length=40))
-    CA_STR_SUPPL3 = Column(Unicode(length=40))
-    CA_LOCATION = Column(Unicode(length=40))
-    CA_BUILDING = Column(Unicode(length=20))
-    CA_FLOOR = Column(Unicode(length=10))
-    CA_ROOMNUMBER = Column(Unicode(length=10))
-    CA_CREATED = Column(DateTime)
-    CA_UPDATED = Column(DateTime)
-    CA_PHONE1 = Column(Unicode(length=60))
-    CA_FAX1 = Column(Unicode(length=60))
-    CA_COMMENT = Column(Unicode(length=2000))
-    RUN_ID = Column(Integer)
+    CA_ADDRNUMBER = Column(
+        String(10, "SQL_Latin1_General_CP1_CI_AS"),
+        doc="UNKOWN: Purpose of this column is unknown.",
+    )
+    CA_NATION = Column(
+        String(1, "SQL_Latin1_General_CP1_CI_AS"),
+        nullable=False,
+        doc="UNKNOWN: Possible values are A, C, H, I, K, M, V",
+    )
+    CA_TITLE = Column(
+        Unicode(4),
+        doc="UNKNOWN: Possible values are 0001 to 0007. Looks like someone "
+        "formatted an Integer as a 4 character string.",
+    )
+    CA_NAME = Column(Unicode(165), nullable=False, doc="Name of the company")
+    CA_NAME_SHORT = Column(
+        Unicode(60), nullable=False, doc="Short name of the company"
+    )
+    CA_NAME1 = Column(Unicode(40), doc="Additional name field")
+    CA_NAME2 = Column(Unicode(40), doc="Additional name field")
+    CA_NAME3 = Column(Unicode(40), doc="Additional name field")
+    CA_NAME4 = Column(Unicode(40), doc="Additional name field")
+    CA_CITY = Column(Unicode(40), doc="City")
+    CA_DISTRICT = Column(Unicode(50), doc="District")
+    CA_COUNTRY = Column(
+        String(3, "SQL_Latin1_General_CP1_CI_AS"),
+        doc="Country code i.e. 'DE'. Is also used for states "
+        "i.e. 'FL' which should be CA_REGION",
+    )
+    CA_LANGUAGE = Column(
+        String(2, "SQL_Latin1_General_CP1_CI_AS"),
+        doc="Language code i.e. 'DE'",
+    )
+    CA_REGION = Column(
+        String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Region code i.e. 'BY'"
+    )
+    CA_PHONE = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Phone number"
+    )
+    CA_PHONE2 = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"),
+        doc="Additional phone number",
+    )
+    CA_FAX = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Fax number"
+    )
+    CA_FAX2 = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Additional fax number"
+    )
+    CA_ZIPCODE = Column(
+        String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Zip code"
+    )
+    CA_PO_POSTCODE = Column(
+        String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post code"
+    )
+    CA_CO_POSTCODE = Column(
+        Unicode(50), doc="UNKOWN: Maybe additional post code"
+    )
+    CA_STREET = Column(Unicode(100), doc="Street name")
+    CA_STREET1 = Column(Unicode(60), doc="Additional street name")
+    CA_PO_BOX = Column(
+        String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box name"
+    )
+    CA_PO_BOX_LOC = Column(Unicode(40), doc="Post box location")
+    CA_PO_BOX_REG = Column(
+        String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box region"
+    )
+    CA_PO_BOX_CTY = Column(
+        String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box city"
+    )
+    CA_HOUSE_NUM1 = Column(Unicode(10), doc="House number")
+    CA_HOUSE_NUM2 = Column(Unicode(10), doc="Additional house number")
+    CA_HOUSE_NUM3 = Column(Unicode(10), doc="Additional house number")
+    CA_STR_SUPPL1 = Column(Unicode(40), doc="Supplier street name")
+    CA_STR_SUPPL2 = Column(Unicode(40), doc="Additional supplier street name")
+    CA_STR_SUPPL3 = Column(Unicode(40), doc="Additional supplier street name")
+    CA_LOCATION = Column(Unicode(40), doc="Location name")
+    CA_BUILDING = Column(Unicode(20), doc="Building name")
+    CA_FLOOR = Column(Unicode(10), doc="Floor number")
+    CA_ROOMNUMBER = Column(Unicode(10), doc="Room number")
+    CA_PHONE1 = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"),
+        doc="Additional phone number",
+    )
+    CA_FAX1 = Column(
+        String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Additional fax number"
+    )
+    CA_COMMENT = Column(Unicode(2000), doc="Free text comment field")
+    RUN_ID = Column(Integer, doc="UNKNOWN")
+
+    reg = Column(
+        "CA_CREATED",
+        DateTime,
+        nullable=False,
+        server_default=text("(getdate())"),
+    )
+    update = Column(
+        "CA_UPDATED", DateTime, nullable=False, onupdate=datetime.utcnow
+    )
 
     customer = relationship(
         "Customer", back_populates="address", uselist=False
@@ -660,15 +745,19 @@ class CustomerContact(Base):
 
     __tablename__ = "V_PSEX_CUSTOMER_CONTACT"
 
-    CUC_ID = Column(Integer, primary_key=True, nullable=False)
+    doc = ["View on the customer contacts in the PSEX database."]
+
+    CUC_ID = Column(Integer, primary_key=True)
     CU_ID = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
-    CUC_FORENAME = Column(Unicode(length=51))
-    CUC_SURNAME = Column(Unicode(length=36))
-    CUC_PHONE = Column(Unicode(length=50))
-    CUC_MOBILE = Column(Unicode(length=50))
-    CUC_FAX = Column(Unicode(length=50))
-    CUC_MAIL = Column(Unicode(length=255))
-    CUC_SCOPE = Column(Unicode(length=60))
+    CUC_FORENAME = Column(Unicode(35), doc="First name.")
+    CUC_SURNAME = Column(Unicode(35), doc="Last name.")
+    CUC_PHONE = Column(Unicode(50), doc="Phone number.")
+    CUC_MOBILE = Column(Unicode(50), doc="Mobile phone number.")
+    CUC_FAX = Column(Unicode(50), doc="Fax number")
+    CUC_MAIL = Column(Unicode(255), doc="Mail address")
+    CUC_SCOPE = Column(
+        Unicode(60), doc="Scope of the contact, i.e. 'Geschäftsführer'"
+    )
 
     customer = relationship("Customer", back_populates="contacts")
 
@@ -678,72 +767,278 @@ class DefaultItem(Base):
 
     __tablename__ = "DEFAULT_ITEM"
 
+    doc = ["DefaultItem ('Prüfbaustein') that is used in a DefaultModule"]
+
     DI_ID = Column(Integer, primary_key=True)
-    DI_VERSION = Column(Integer)
-    DI_NAME = Column(Unicode(length=100))
-    TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
-    TPSC_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"))
-    DI_REQUIREMENT_DE = Column(Unicode(length=1500))
-    DI_REQUIREMENT_EN = Column(Unicode(length=1500))
-    DI_REQUIREMENT_FR = Column(Unicode(length=1500))
-    DI_NORM = Column(Unicode(length=512))
-    PSI_ID = Column(Integer)  # todo: link ForeignKey
-    DI_TIME = Column(Numeric(precision=18, scale=2))
-    DI_COST = Column(Numeric(precision=18, scale=2))
-    DI_TIME_MIN = Column(Numeric(precision=18, scale=2))
-    DI_INFO = Column(Unicode(length=4000))
-    DI_INFO_CN = Column(Unicode(length=2048))
-    TP_ID = Column(Integer)  # todo: link ForeignKey
-    TPER_ID = Column(Integer)  # todo: link ForeignKey
-    DI_KENNWERT = Column(Unicode(length=60))
-    DI_PRUEFLEVEL = Column(Unicode(length=100))
-    DI_TITLE = Column(Boolean)
-    DI_KEYNOTE = Column(Boolean)
-    CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
-    DI_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DI_CLEAR_DATE = Column(DateTime)
-    reg = Column("DI_REG", DateTime, default=datetime.now)
+    DI_VERSION = Column(
+        Integer,
+        doc="Version of the DefaultItem. Should increase with every change "
+        "made.",
+    )
+    DI_NAME = Column(
+        Unicode(100), index=True, doc="German name of the DefaultItem."
+    )
+    TPT_ID = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"), index=True
+    )
+    TPSC_ID = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"), index=True
+    )
+    DI_REQUIREMENT_DE = Column(
+        Unicode(1500), doc="German requirement definition"
+    )
+    DI_REQUIREMENT_EN = Column(
+        Unicode(1500), doc="English requirement definition"
+    )
+    DI_REQUIREMENT_FR = Column(
+        Unicode(1500), doc="French requirement definition"
+    )
+    DI_NORM = Column(
+        Unicode(512),
+        doc="Normative source, i.e. 'EN 62079:2001; DIN EN 82079-1:2013 / "
+        "4.8.1.2 und Tabelle 1'",
+    )
+    PSI_ID = Column(
+        Integer,
+        server_default=text("((1))"),
+        doc="Used as rank ('Rangfolge') only some (~400 out of 90000) use "
+        "something else than ID 1 (undefined). ForeignKey not defined!",
+    )  # todo: link ForeignKey
+    DI_TIME = Column(
+        DECIMAL(18, 2), server_default=text("((0))"), doc="Execution time"
+    )
+    DI_COST = Column(
+        DECIMAL(18, 2),
+        server_default=text("((0))"),
+        doc="Costs for the DefaultItem (currency)",
+    )
+    DI_TIME_MIN = Column(
+        DECIMAL(18, 2),
+        server_default=text("((0))"),
+        doc="Minimum duration in days, only set for some (~600 out of 90000)",
+    )
+    DI_INFO = Column(Unicode(4000), doc="Info text")
+    DI_INFO_CN = Column(Unicode(2048), doc="Chinese info text")
+    TP_ID = Column(
+        Integer, doc="Template,  ForeignKey not defined!"
+    )  # todo: link ForeignKey
+    TPER_ID = Column(
+        Integer, doc="Test person,  ForeignKey not defined!"
+    )  # todo: link ForeignKey
+    DI_KENNWERT = Column(
+        Unicode(60),
+        doc="UNKNOWN: Unclear what this is, combination of the following "
+        "values separated by commas: '@Five', 'a', 'd', 'f', 'g', 'i', 'k', "
+        "'l', 'm', 'o', 'v', 'w', 'z', '§'",
+    )
+    DI_PRUEFLEVEL = Column(
+        Unicode(100),
+        doc="DEPRECATED: It's en empty string on 33 items, for the rest it's "
+        "NULL.",
+    )
+    DI_TITLE = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if the DefaultItem is a title",
+    )
+    DI_KEYNOTE = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if the DefaultItem is a main item",
+    )
+    CL_ID = Column(
+        Integer, ForeignKey("CLEARING.CL_ID"), server_default=text("((1))")
+    )
+    DI_CLEAR_BY = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        server_default=text("((1))"),
+        doc="Person wo set the clearing state (must not be the person "
+        "that actually set it but who is responsible.",
+    )
+    DI_CLEAR_DATE = Column(
+        DateTime,
+        server_default=text("(getdate())"),
+        doc="Date on which the clearing state was set",
+    )
+    reg = Column("DI_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "DI_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
+        server_default=text("((1))"),
     )
-    update = Column("DI_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DI_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DI_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    DI_MAINFEATURE = Column(Boolean)
-    DI_ADD = Column(Boolean)
-    WST_ID = Column(Integer)
-    DI_DELETED = Column(Boolean)
-    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
-    HRP_ID = Column(Integer, ForeignKey("HR_PRODUCT.HRP_ID"), nullable=False)
-    DI_IS_INFO = Column(Boolean)
-    DI_SOURCE = Column(Integer)
-    DI_PROCEDURE = Column(Integer)
-    DI_TESTSAMPLE_DE = Column(Unicode(length=1000))
-    DI_TESTSAMPLE_EN = Column(Unicode(length=1000))
-    DI_TESTSAMPLE_FR = Column(Unicode(length=1000))
-    REL_ID = Column(Integer)
-    DI_NAME_EN = Column(Unicode(length=100))
-    DI_PARENT = Column(Integer)
-    DI_OLD = Column(Numeric(precision=18, scale=2))
-    DI_OWNER = Column(Integer)
-    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    NL_ID = Column(Integer, ForeignKey("NAVLEVEL.NL_ID"))
-    DI_PRICE_EUR = Column(Numeric(precision=18, scale=2))
-    DI_COSTITEM = Column(Unicode(length=100))
-    ND_ID = Column(Integer, ForeignKey("NAVDOMAIN.ND_ID"))
-    DI_NORM_ALT = Column(Unicode(length=80))
-    DI_HIDE_COL1 = Column(Boolean)
-    DI_INSERT_STANDARD = Column(Boolean)
-    DI_TESTCODE = Column(Unicode(length=512))
-    DI_SECTION = Column(Unicode(length=512))
-    DI_PROTECTED = Column(Boolean)
+    DI_MAINFEATURE = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if the DefaultItem is a main feature",
+    )
+    DI_ADD = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if the DefaultItem is an additional requirement "
+        "('Zusatzanforderung')",
+    )
+    WST_ID = Column(
+        Integer,
+        server_default=text("((1))"),
+        doc="DEPRECATED: Workstation id. Not used anymore in eDOC. ForeignKey "
+        "not set!",
+    )
+    DI_DELETED = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="Defines if a DefaultItem is deleted. It's actually hidden in "
+        "the database.",
+    )
+    HRC_ID = Column(
+        Integer,
+        ForeignKey("HR_COUNTRY.HRC_ID"),
+        index=True,
+        server_default=text("((1))"),
+        doc="Country of the Default Item",
+    )
+    HRP_ID = Column(
+        Integer,
+        ForeignKey("HR_PRODUCT.HRP_ID"),
+        index=True,
+        server_default=text("((1))"),
+        doc="Product of the Default Item",
+    )
+    DI_IS_INFO = Column(
+        BIT,
+        nullable=False,
+        index=True,
+        server_default=text("((0))"),
+        doc="Defines if the DefaultItem is an info ('Infobaustein')",
+    )
+    DI_SOURCE = Column(
+        Integer,
+        doc="DEPRECATED: It's 0 for DefaultItem with DI_ID 1, for all others "
+        "the value is NULL/None",
+    )
+    DI_PROCEDURE = Column(
+        Integer,
+        doc="DEPRECATED: It's 0 for DefaultItem with DI_ID 1, for all others "
+        "the value is NULL/None",
+    )
+    DI_TESTSAMPLE_DE = Column(
+        Unicode(1000),
+        doc="Defines the necessary amount of test samples for this "
+        "DefaultItem in German.",
+    )
+    DI_TESTSAMPLE_EN = Column(
+        Unicode(1000),
+        doc="Defines the necessary amount of test samples for this "
+        "DefaultItem in Englisch.",
+    )
+    DI_TESTSAMPLE_FR = Column(
+        Unicode(1000),
+        doc="Defines the necessary amount of test samples for this "
+        "DefaultItem in French.",
+    )
+    REL_ID = Column(
+        Integer,
+        nullable=False,
+        server_default=text("((1))"),
+        doc="Relevance of the DefaultItem. ForeignKey not set!",
+    )
+    DI_NAME_EN = Column(
+        Unicode(100), index=True, doc="English name of the DefaultItem."
+    )
+    DI_PARENT = Column(
+        Integer,
+        ForeignKey("DEFAULT_ITEM.DI_ID"),
+        index=True,
+        doc="Parent DefaultItem",
+    )
+    DI_OLD = Column(
+        MONEY,
+        nullable=False,
+        server_default=text("((1))"),
+        doc="DEPRECATED: Is always 1",
+    )
+    DI_OWNER = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+        doc="Owner of the DefaultItem",
+    )
+    ST_ID = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+        doc="Team for the DefaultItem",
+    )
+    NL_ID = Column(
+        Integer,
+        ForeignKey("NAVLEVEL.NL_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+    )
+    DI_PRICE_EUR = Column(
+        DECIMAL(18, 2),
+        doc="DEPRECATED: Price for the default item. (Marked as OLD in eDOC)",
+    )
+    DI_COSTITEM = Column(
+        Unicode(100), doc="SAP cost item: Some string like 'PS3517'"
+    )
+    ND_ID = Column(
+        Integer,
+        ForeignKey("NAVDOMAIN.ND_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+    )
+    DI_NORM_ALT = Column(Unicode(80), doc="DEPRECATED: Normative as text")
+    DI_HIDE_COL1 = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="UNKNOWN: sets the checkbox in eDOC labelled: 'CB Unterp. "
+        "ausblenden'",
+    )
+    DI_INSERT_STANDARD = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="Defines if the normative shall be inserted. Sets the checkbox in "
+        "eDOC labelled: 'Norm einfügen'",
+    )
+    DI_TESTCODE = Column(Unicode(512), doc="UNKNOWN")
+    DI_SECTION = Column(Unicode(512), doc="UNKNOWN")
+    DI_PROTECTED = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="Protects a DefaultItem. Only set to True for DefaultItem with "
+        "DI_ID 1",
+    )
+    DI_RESULT_DE = Column(
+        Unicode(2048),
+        server_default=text("(N'')"),
+        doc="German result text template",
+    )
+    DI_RESULT_EN = Column(
+        Unicode(2048),
+        server_default=text("(N'')"),
+        doc="English result text template",
+    )
+    DI_RESULT_FR = Column(
+        Unicode(2048),
+        server_default=text("(N'')"),
+        doc="French result text template",
+    )
 
     clearing = relationship("Clearing")
     annexes = relationship("DefaultItemAnnex", back_populates="default_item")
@@ -765,6 +1060,12 @@ class DefaultItem(Base):
     attributes: List[DefaultItemAttribute] = relationship(
         "DefaultItemAttribute", back_populates="default_item"
     )
+    children = relationship(
+        "DefaultItem", backref=backref("parent", remote_side=[DI_ID])
+    )
+
+    owner = relationship("Staff", foreign_keys=[DI_OWNER])
+    team = relationship("Staff", foreign_keys=[ST_ID])
 
 
 class DefaultItemAnnex(Base):
@@ -772,15 +1073,22 @@ class DefaultItemAnnex(Base):
 
     __tablename__ = "DEFAULT_ITEM_ANNEX"
 
+    doc = ["File annex for a DefaultItem that can be copied to a protocol."]
+
     DIAX_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
-    DIAX_NAME_DE = Column(Unicode(length=500))
-    DIAX_NAME_EN = Column(Unicode(length=500))
-    DIAX_NAME_FR = Column(Unicode(length=500))
-    DIAX_FILENAME = Column(Unicode(length=255))
-    DIAX_CHECKSUM = Column(Unicode(length=32))
-    DIAX_DATA = Column(LargeBinary)
-    DIAX_COPY = Column(Boolean)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
+    DIAX_NAME_DE = Column(Unicode(500), doc="German annex name")
+    DIAX_NAME_EN = Column(Unicode(500), doc="English annex name")
+    DIAX_NAME_FR = Column(Unicode(500), doc="French annex name")
+    DIAX_FILENAME = Column(Unicode(255), doc="Filename of the annex")
+    DIAX_CHECKSUM = Column(Unicode(32), doc="Checksum of the file")
+    DIAX_DATA = deferred(Column(IMAGE, doc="File that is the annex"))
+    DIAX_COPY = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((1))"),
+        doc="Flag that defines if the annex shall be copied into a protocol",
+    )
 
     default_item = relationship(
         "DefaultItem", back_populates="annexes", lazy="joined"
@@ -792,9 +1100,25 @@ class DefaultItemAttribute(Base):
 
     __tablename__ = "DEFAULT_ITEM_ATTRIBUTES"
 
+    doc = ["Link between an Attribute and a DefaultItem."]
+
     DIA_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
-    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+    DI_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_ITEM.DI_ID"),
+        index=True,
+        nullable=False,
+        doc="It's nullable in the database, which doesn't make sense, "
+        "therefore it's not nullable in TSL lib.",
+    )
+    ATT_ID = Column(
+        Integer,
+        ForeignKey("ATTRIBUTES.ATT_ID"),
+        index=True,
+        nullable=False,
+        doc="It's nullable in the database, which doesn't make sense, "
+        "therefore it's not nullable in TSL lib.",
+    )
 
     default_item = relationship("DefaultItem", back_populates="attributes")
     attribute = relationship("Attribute")
@@ -806,24 +1130,35 @@ class DefaultItemCustom(Base):
     __tablename__ = "DEFAULT_ITEM_CUSTOM"
 
     DICU_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
-    reg = Column("DICU_REG", DateTime, default=datetime.now)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
+    reg = Column(
+        "DICU_REG",
+        DateTime,
+        nullable=False,
+        server_default=text("(getdate())"),
+    )
     reg_by = Column(
         "DICU_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("DICU_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DICU_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DICU_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    CUL_ID = Column(Integer, ForeignKey("CUSTOM_LIST.CUL_ID"), nullable=False)
+    CUL_ID = Column(
+        Integer, ForeignKey("CUSTOM_LIST.CUL_ID"), nullable=False, index=True
+    )
     CULE_ID = Column(
-        Integer, ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"), nullable=False
+        Integer,
+        ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"),
+        nullable=False,
+        index=True,
+        server_default=text("((1))"),
     )
 
     custom_list = relationship("CustomList")
@@ -838,16 +1173,32 @@ class DefaultItemBase(Base):
 
     __tablename__ = "DEFAULT_ITEM_BASE"
 
+    doc = ["Link between a TestBase and a DefaultItem"]
+
     DIB_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
+    DI_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_ITEM.DI_ID"),
+        index=True,
+        nullable=False,
+        doc="Set to nullable in TSL database.",
+    )
     B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
     DIB_TYPE = Column(
         Integer,
         ForeignKey("BASE_TYPE.BT_ID"),
-        default=0,
+        nullable=False,
+        server_default=text("((0))"),
     )
-    DIB_SUBCLAUSE = Column(Unicode(length=512), default="")
-    DIB_SUBCLAUSE_MERKER = Column(Unicode(length=512))
+    DIB_SUBCLAUSE = Column(
+        Unicode(512),
+        server_default=text("(N'')"),
+        doc="Subclause that is referenced in the base.",
+    )
+    DIB_SUBCLAUSE_MERKER = Column(
+        Unicode(512),
+        doc="DEPRECATED: Subclause that was referenced in the base (old).",
+    )
 
     default_item = relationship("DefaultItem", back_populates="test_bases")
     test_base = relationship("TestBase")
@@ -858,23 +1209,37 @@ class DefaultModuleItemParameter(Base):
 
     __tablename__ = "DEFAULT_MODUL_ITEM_PARAMETER"
 
+    doc = ["Link between a DefaultModuleItem and a ModulParameter"]
+
     DMIP_ID = Column(Integer, primary_key=True)
-    DMI_ID = Column(Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"))
-    reg = Column("DMIP_REG", DateTime, default=datetime.now)
+    DMI_ID = Column(
+        Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), index=True
+    )
+    reg = Column(
+        "DMIP_REG",
+        DateTime,
+        nullable=False,
+        server_default=text("(getdate())"),
+    )
     reg_by = Column(
         "DMIP_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("DMIP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DMIP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DMIP_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    MP_ID = Column(Integer, ForeignKey("MODUL_PARAMETER.MP_ID"))
+    MP_ID = Column(
+        Integer,
+        ForeignKey("MODUL_PARAMETER.MP_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+    )
 
     default_module_item: List["DefaultModuleItem"] = relationship(
         "DefaultModuleItem", back_populates="parameters"
@@ -887,17 +1252,19 @@ class DefaultItemPicture(Base):
 
     __tablename__ = "DEFAULT_ITEM_PICTURE"
 
+    doc = ["Picture included in a DefaultItem."]
+
     DIP_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
-    DIP_NUMBER = Column(Integer)
-    DIP_TEXT_DE = Column(Unicode(length=500))
-    DIP_TEXT_EN = Column(Unicode(length=500))
-    DIP_TEXT_FR = Column(Unicode(length=500))
-    DIP_FILENAME = Column(Unicode(length=255))
-    DIP_CHECKSUM = Column(Unicode(length=32))
-    DIP_WIDTH = Column(Integer)
-    DIP_HEIGHT = Column(Integer)
-    DIP_DATA = Column(LargeBinary)
+    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
+    DIP_NUMBER = Column(Integer, doc="Number of the picture for ordering")
+    DIP_TEXT_DE = Column(Unicode(500), doc="German picture description")
+    DIP_TEXT_EN = Column(Unicode(500), doc="English picture description")
+    DIP_TEXT_FR = Column(Unicode(500), doc="French picture description")
+    DIP_FILENAME = Column(Unicode(255), doc="Filename of the picture")
+    DIP_CHECKSUM = Column(Unicode(32), doc="Checksum of the picture")
+    DIP_WIDTH = Column(Integer, doc="Width")
+    DIP_HEIGHT = Column(Integer, doc="Height")
+    DIP_DATA = deferred(Column(IMAGE), doc="Picture data")
 
     default_item = relationship(
         "DefaultItem", back_populates="pictures", lazy="joined"
@@ -910,61 +1277,171 @@ class DefaultModule(Base):
     __tablename__ = "DEFAULT_MODUL"
 
     DM_ID = Column(Integer, primary_key=True)
-    DM_VERSION = Column(Integer)
-    DM_ACTIVE = Column(Boolean)
-    DM_NAME = Column(Unicode(length=255), nullable=False)
-    DM_LETTER = Column(Unicode(length=10))
+    DM_VERSION = Column(
+        Integer,
+        doc="Version number of the DefaultModule. Should increase with every "
+        "update of the DefaultModule.",
+    )
+    DM_ACTIVE = Column(
+        BIT,
+        server_default=text("((1))"),
+        doc="Defines if the DefaultModule is active (still in use)",
+    )
+    DM_NAME = Column(
+        Unicode(255),
+        index=True,
+        nullable=False,
+        doc="German name of the DefaultModule. Set to not nullable in TSL "
+        "Library.",
+    )
+    DM_LETTER = Column(
+        Unicode(10),
+        doc="Letter affix when generating the DefaultModuleItem numbers.",
+    )
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"))
-    TPT_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"))
-    TPSC_ID = Column(Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"))
-    DM_IS_MASTER = Column(Boolean)
-    DM_COMMENT = Column(Unicode(length=500))
+    TPT_ID = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"), index=True
+    )
+    TPSC_ID = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"), index=True
+    )
+    DM_IS_MASTER = Column(
+        BIT, doc="Defines if the DefaultModule is a Master Module."
+    )
+    DM_COMMENT = Column(Unicode(500), doc="Free text comment.")
     CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
-    DM_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CLEAR_DATE = Column(DateTime)
-    reg = Column("DM_REG", DateTime, default=datetime.now)
+    DM_CLEAR_BY = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        doc="Person who was responsible for the Clearing.",
+    )
+    DM_CLEAR_DATE = Column(
+        DateTime, doc="Date on which the DefaultModule was cleared."
+    )
+    reg = Column("DM_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "DM_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("DM_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DM_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DM_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    DM_TESTBASE_DE = Column(Unicode(length=500))
-    DM_TESTBASE_EN = Column(Unicode(length=500))
-    DM_TESTBASE_FR = Column(Unicode(length=500))
-    DM_IS_CUSTOMER = Column(Boolean)
-    DM_IS_MARKETABILITY = Column(Boolean)
-    DM_IS_USABILITY = Column(Boolean)
-    CT_ID = Column(Integer, ForeignKey("CALC_TYPE.CT_ID"))
-    DM_SCOPE_DE = Column(Unicode(length=500))
-    DM_SCOPE_EN = Column(Unicode(length=500))
-    DM_SCOPE_FR = Column(Unicode(length=500))
-    DM_CLEAR_BY_VT = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CLEAR_DATE_VT = Column(DateTime)
-    DM_CREATED_FOR = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CREATED_FOR_DATE = Column(DateTime)
-    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
-    HRP_ID = Column(Integer, ForeignKey("HR_PRODUCT.HRP_ID"), nullable=False)
-    DM_IS_INFO = Column(Boolean)
-    DM_SOURCE = Column(Integer)
-    DM_PROCEDURE = Column(Integer)
-    DM_COMMENT_DE = Column(Unicode(length=1024))
-    DM_COMMENT_EN = Column(Unicode(length=1024))
-    DM_COMMENT_FR = Column(Unicode(length=1024))
-    DM_NAME_EN = Column(Unicode(length=255))
-    ND_ID = Column(Integer, ForeignKey("NAVDOMAIN.ND_ID"))
-    DM_ALIAS_DE = Column(Unicode(length=255))
-    DM_ALIAS_EN = Column(Unicode(length=255))
-    DM_PARENT = Column(Integer)
-    DM_REVISION = Column(Unicode(length=60))
+    DM_TESTBASE_DE = Column(Unicode(500), doc="German test base text")
+    DM_TESTBASE_EN = Column(Unicode(500), doc="Englisch test base text")
+    DM_TESTBASE_FR = Column(Unicode(500), doc="French test base text")
+    DM_IS_CUSTOMER = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if DefaultModule is for Customer",
+    )
+    DM_IS_MARKETABILITY = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if DefaultModule is for Marketability",
+    )
+    DM_IS_USABILITY = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc="Defines if DefaultModule is for Usability",
+    )
+    CT_ID = Column(
+        Integer, ForeignKey("CALC_TYPE.CT_ID"), server_default=text("((1))")
+    )
+    DM_SCOPE_DE = Column(
+        Unicode(length=500), doc="Scope of the DefaultModule in German"
+    )
+    DM_SCOPE_EN = Column(
+        Unicode(length=500), doc="Scope of the DefaultModule in German"
+    )
+    DM_SCOPE_FR = Column(
+        Unicode(length=500), doc="Scope of the DefaultModule in German"
+    )
+    DM_CLEAR_BY_VT = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        doc="Responsible person in sales for Clearing",
+    )
+    DM_CLEAR_DATE_VT = Column(DateTime, doc="Clearing date for sales")
+    DM_CREATED_FOR = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        server_default=text("((1))"),
+        doc="Person for whom the module was created.",
+    )
+    DM_CREATED_FOR_DATE = Column(
+        DateTime,
+        doc="Date on which the person for whom the module was created was "
+        "set.",
+    )
+    HRC_ID = Column(
+        Integer,
+        ForeignKey("HR_COUNTRY.HRC_ID"),
+        nullable=False,
+        index=True,
+        server_default=text("((1))"),
+    )
+    HRP_ID = Column(
+        Integer,
+        ForeignKey("HR_PRODUCT.HRP_ID"),
+        nullable=False,
+        index=True,
+        server_default=text("((1))"),
+    )
+    DM_IS_INFO = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="UNKNOWN: sets the checkbox 'info?' in eDOC.",
+    )
+    DM_SOURCE = Column(Integer, doc="UNKNOWN")
+    DM_PROCEDURE = Column(Integer, doc="UNKNOWN")
+    DM_COMMENT_DE = Column(Unicode(1024), doc="German free text comment")
+    DM_COMMENT_EN = Column(Unicode(1024), doc="German free text comment")
+    DM_COMMENT_FR = Column(Unicode(1024), doc="German free text comment")
+    DM_NAME_EN = Column(
+        Unicode(255), index=True, doc="English name of the DefaultModule."
+    )
+    ND_ID = Column(
+        Integer,
+        ForeignKey("NAVDOMAIN.ND_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+    )
+    DM_ALIAS_DE = Column(Unicode(255), doc="German alias name.")
+    DM_ALIAS_EN = Column(Unicode(255), doc="English alias name.")
+    DM_PARENT = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
+    DM_REVISION = Column(
+        Unicode(60),
+        doc="Revision number used by TGR when editing DefaultModules",
+    )
+    DM_HIDE_VALUE = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="UNKNOWN: Used to hide the 'Wertespalte'",
+    )
+    DM_TSL_VERIFIED = Column(
+        BIT,
+        nullable=False,
+        server_default=text("((0))"),
+        doc="DEPRECATED: Introduced on our request, but doesn't do what it "
+        "should.",
+    )
+    DM_TSL_COMMENT = Column(
+        Unicode(1024),
+        doc="DEPRECATED: Introduced on our request, but doesn't do what it "
+        "should.",
+    )
 
+    children = relationship(
+        "DefaultModule", backref=backref("parent", remote_side=[DM_ID])
+    )
     nav_domain = relationship("NavDomain")
     attributes = relationship(
         "DefaultModuleAttribute", back_populates="default_module"
@@ -1002,8 +1479,16 @@ class DefaultModuleAttribute(Base):
 
     __tablename__ = "DEFAULT_MODUL_ATTRIBUTES"
 
+    doc = ["Links an Attribute to a DefaultModule."]
+
     DMA_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
+    DM_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_MODUL.DM_ID"),
+        index=True,
+        nullable=False,
+        doc="Set to not nullable in TSL lib.",
+    )
     ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
 
     default_module = relationship("DefaultModule", back_populates="attributes")
@@ -1015,10 +1500,26 @@ class DefaultModuleTestBase(Base):
 
     __tablename__ = "DEFAULT_MODUL_BASE"
 
+    doc = [
+        "Link between a TestBase and a DefaultModule. "
+        "The link is classified by the TestBaseType."
+    ]
+
     DMB_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
+    DM_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_MODUL.DM_ID"),
+        index=True,
+        nullable=False,
+        doc="Set to not nullable in TSL lib.",
+    )
     B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
-    DMB_TYPE = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"), nullable=False)
+    DMB_TYPE = Column(
+        Integer,
+        ForeignKey("BASE_TYPE.BT_ID"),
+        nullable=False,
+        server_default=text("((0))"),
+    )
 
     test_base_type = relationship("TestBaseType")
     test_base = relationship("TestBase")
@@ -1030,17 +1531,49 @@ class DefaultModuleCalc(Base):
 
     __tablename__ = "DEFAULT_MODUL_CALC"
 
+    doc = ["Calculation for a DefaultModule."]
+
     DMC_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
-    WST_ID = Column(Integer)  # todo: add foreign key
-    DMC_TASK = Column(Unicode(length=500))
-    DMC_TIME_HOURS = Column(Float, nullable=False)
-    DMC_TIME_DAYS = Column(Float)
-    DMC_COSTS = Column(Numeric(precision=18, scale=2))
-    DMC_TRAVEL = Column(Numeric(precision=18, scale=2))
-    DMC_COMMENT = Column(Unicode(length=500))
-    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DMC_COSTS_EXTERNAL = Column(Numeric(precision=18, scale=2))
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), index=True)
+    WST_ID = Column(
+        Integer,
+        doc="Workstation the DefaultModule is executed on. "
+        "ForeignKey not set.",
+    )  # todo: add foreign key
+    DMC_TASK = Column(Unicode(500), doc="Task text for the calculation")
+    DMC_TIME_HOURS = Column(
+        Float(53),
+        server_default=text("((0))"),
+        doc="Execution time in hours (time the tester will spend working "
+        "on this DefaultModule)",
+    )
+    DMC_TIME_DAYS = Column(
+        Float(53),
+        server_default=text("((1))"),
+        doc="Execution time in days (time the DefaultModule is worked on in "
+        "the laboratory).",
+    )
+    DMC_COSTS = Column(
+        DECIMAL(18, 2),
+        server_default=text("((0))"),
+        doc="Additional costs for the DefaultModule's execution.",
+    )
+    DMC_TRAVEL = Column(
+        DECIMAL(18, 2),
+        server_default=text("((0))"),
+        doc="Travel costs when executing the DefaultModule.",
+    )
+    DMC_COMMENT = Column(Unicode(500), doc="Comment for the calculation.")
+    ST_ID = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+        doc="Team that will execute the DefaultModule.",
+    )
+    DMC_COSTS_EXTERNAL = Column(
+        DECIMAL(18, 2), server_default=text("((0))"), doc="External costs."
+    )
 
     default_module = relationship(
         "DefaultModule", back_populates="calculations"
@@ -1053,48 +1586,89 @@ class DefaultModuleHistory(Base):
 
     __tablename__ = "MODUL_HISTORY"
 
+    doc = ["History entry for tracking changes in a DefaultModule."]
+
     MH_ID = Column(Integer, primary_key=True)
-    MH_COMMENT = Column(Unicode(length=1000))
-    MH_DOCUMENT_NAME = Column(Unicode(length=255))
-    MH_DOCUMENT = Column(LargeBinary)
-    MH_CLEAR_DOCUMENT_NAME = Column(Unicode(length=255))
-    MH_CLEAR_DOCUMENT = Column(LargeBinary)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
-    DM_VERSION = Column(Integer)
-    DM_NAME = Column(Unicode(length=255))
-    DM_LETTER = Column(Unicode(length=10))
-    CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"))
-    DM_CLEAR_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CLEAR_DATE = Column(DateTime)
-    reg = Column("MH_REG", DateTime, default=datetime.now)
+    MH_COMMENT = Column(Unicode(1000), doc="Comment for the history entry")
+    MH_DOCUMENT_NAME = Column(
+        Unicode(255), doc="Document name of the attached document."
+    )
+    MH_DOCUMENT = deferred(Column(IMAGE), doc="Document attached")
+    MH_CLEAR_DOCUMENT_NAME = Column(
+        Unicode(255), doc="Document name of the attached clearing sheet."
+    )
+    MH_CLEAR_DOCUMENT = deferred(Column(IMAGE), doc="Clearing sheet attached")
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), index=True)
+    DM_VERSION = Column(
+        Integer, server_default=text("((1))"), doc=DefaultModule.DM_VERSION.doc
+    )
+    DM_NAME = Column(Unicode(255), doc=DefaultModule.DM_NAME.doc)
+    DM_LETTER = Column(Unicode(10), doc=DefaultModule.DM_LETTER.doc)
+    CL_ID = Column(
+        Integer, ForeignKey("CLEARING.CL_ID"), server_default=text("((1))")
+    )
+    DM_CLEAR_BY = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        doc=DefaultModule.DM_CLEAR_BY.doc,
+    )
+    DM_CLEAR_DATE = Column(DateTime, doc=DefaultModule.DM_CLEAR_DATE.doc)
+    reg = Column("MH_REG", DateTime, server_default=text("(getutcdate())"))
     reg_by = Column(
         "MH_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
+        server_default=text("((1))"),
     )
-    update = Column("MH_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("MH_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "MH_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    DM_TESTBASE_DE = Column(Unicode(length=500))
-    DM_TESTBASE_EN = Column(Unicode(length=500))
-    DM_TESTBASE_FR = Column(Unicode(length=500))
-    DM_IS_CUSTOMER = Column(Boolean)
-    DM_IS_MARKETABILITY = Column(Boolean)
-    DM_IS_USABILITY = Column(Boolean)
-    CT_ID = Column(Integer, ForeignKey("CALC_TYPE.CT_ID"))
-    DM_SCOPE_DE = Column(Unicode(length=500))
-    DM_SCOPE_EN = Column(Unicode(length=500))
-    DM_SCOPE_FR = Column(Unicode(length=500))
-    DM_CLEAR_BY_VT = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CLEAR_DATE_VT = Column(DateTime)
-    DM_CREATED_FOR = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    DM_CREATED_FOR_DATE = Column(DateTime)
-    DM_REVISION = Column(Unicode(length=60))
+    DM_TESTBASE_DE = Column(Unicode(500), doc=DefaultModule.DM_TESTBASE_DE.doc)
+    DM_TESTBASE_EN = Column(Unicode(500), doc=DefaultModule.DM_TESTBASE_EN.doc)
+    DM_TESTBASE_FR = Column(Unicode(500), doc=DefaultModule.DM_TESTBASE_FR.doc)
+    DM_IS_CUSTOMER = Column(
+        BIT, server_default=text("((0))"), doc=DefaultModule.DM_IS_CUSTOMER.doc
+    )
+    DM_IS_MARKETABILITY = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc=DefaultModule.DM_IS_MARKETABILITY.doc,
+    )
+    DM_IS_USABILITY = Column(
+        BIT,
+        server_default=text("((0))"),
+        doc=DefaultModule.DM_IS_USABILITY.doc,
+    )
+    CT_ID = Column(
+        Integer,
+        ForeignKey("CALC_TYPE.CT_ID"),
+        server_default=text("((1))"),
+        doc=DefaultModule.CT_ID.doc,
+    )
+    DM_SCOPE_DE = Column(Unicode(500), doc=DefaultModule.DM_SCOPE_DE.doc)
+    DM_SCOPE_EN = Column(Unicode(500), doc=DefaultModule.DM_SCOPE_EN.doc)
+    DM_SCOPE_FR = Column(Unicode(500), doc=DefaultModule.DM_SCOPE_FR.doc)
+    DM_CLEAR_BY_VT = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        doc=DefaultModule.DM_CLEAR_BY_VT.doc,
+    )
+    DM_CLEAR_DATE_VT = Column(DateTime, doc=DefaultModule.DM_CLEAR_DATE_VT.doc)
+    DM_CREATED_FOR = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        server_default=text("((1))"),
+        doc=DefaultModule.DM_CREATED_FOR.doc,
+    )
+    DM_CREATED_FOR_DATE = Column(
+        DateTime, doc=DefaultModule.DM_CREATED_FOR_DATE.doc
+    )
+    DM_REVISION = Column(Unicode(60), doc=DefaultModule.DM_REVISION.doc)
 
     default_module: "DefaultModule" = relationship(
         "DefaultModule", back_populates="history"
@@ -1112,35 +1686,85 @@ class DefaultModuleItem(Base):
 
     __tablename__ = "DEFAULT_MODUL_ITEM"
 
+    doc = ["Links DefaultItems to a DefaultModule"]
+
     DMI_ID = Column(Integer, primary_key=True)
     # keys of DefaultItem and DefaultModule are nullable in database,
     # but the item isn't useful without
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
-    DMI_NUMBER = Column(Integer)
+    DM_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_MODUL.DM_ID"),
+        nullable=False,
+        index=True,
+        doc="Set to not nullable in TSL Library.",
+    )
+    DI_ID = Column(
+        Integer,
+        ForeignKey("DEFAULT_ITEM.DI_ID"),
+        nullable=False,
+        index=True,
+        doc="Set to not nullable in TSL Library.",
+    )
+    DMI_NUMBER = Column(
+        Integer,
+        nullable=False,
+        doc="Order of the items within the DefaultModule. Set to not nullable "
+        "in TSL Library.",
+    )
     # nullable in DB, but never NULL and also useless when NULL
-    DMI_INDENT = Column(Integer, nullable=False)
-    DMI_KENNWERT = Column(Unicode(length=255))
-    DMI_PRUEFLEVEL = Column(Unicode(length=100))
-    DMI_TITLE = Column(Boolean)
-    reg = Column("DMI_REG", DateTime, default=datetime.now)
+    DMI_INDENT = Column(
+        Integer,
+        nullable=False,
+        doc="Indentation of the DefaultItem in the DefaultModule. Set to not "
+        "nullable in TSL Library.",
+    )
+    DMI_KENNWERT = Column(
+        Unicode(255), doc="UNKNOWN: Same values as DEFAULT_ITEM.DI_KENNWERT"
+    )
+    DMI_PRUEFLEVEL = Column(
+        Unicode(100),
+        doc="UNKNOWN: Old links to NavLevel? Values used are 2, 3, 4 and 5 "
+        "and combinations separated by commas.",
+    )
+    DMI_TITLE = Column(
+        BIT, doc="Defines if the DefaultItem shall be treated as a title."
+    )
+    reg = Column("DMI_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "DMI_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("DMI_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DMI_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DMI_UPDATEBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    WST_ID = Column(Integer)  # todo: Check if ForeignKey
-    ST_ID = Column(Integer)  # todo: Check if Team of User
-    DMI_FACTOR = Column(Numeric(precision=18, scale=2))
-    DMI_PRICE = Column(Numeric(precision=18, scale=2))
+    WST_ID = Column(
+        Integer,
+        server_default=text("((1))"),
+        doc="Workstation the DefaultModuleItem is executed on. ForeignKey "
+        "not set.",
+    )  # todo: Check if ForeignKey
+    ST_ID = Column(
+        Integer,
+        ForeignKey("V_PSEX_STAFF.ST_ID"),
+        nullable=False,
+        server_default=text("((1))"),
+        doc="UNKNOWN: We don't know what the team is used for at this place.",
+    )
+    DMI_FACTOR = Column(
+        DECIMAL(18, 2),
+        server_default=text("((1))"),
+        doc="Faktor of the price.",
+    )
+    DMI_PRICE = Column(
+        DECIMAL(18, 2),
+        doc="Specific price for the DefaultItem within the DefaultModule",
+    )
 
     default_module = relationship("DefaultModule", back_populates="items")
     default_item = relationship("DefaultItem")
@@ -1165,7 +1789,7 @@ class DefaultModuleLink(Base):
     DML_TEXT_EN = Column(Unicode(length=1024), nullable=False)
     DML_TEXT_FR = Column(Unicode(length=1024), nullable=False)
     DML_URL = Column(Unicode(length=512), nullable=False)
-    update = Column("DML_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("DML_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "DML_UPDATEBY",
         Integer,
@@ -1190,14 +1814,14 @@ class Edoc(Base):
     # default header is "Modulvorlage Standard" from HEADER table
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"), default=1)
     E_YN_SYMBOL = Column(Boolean, default=True)
-    reg = Column("E_REG", DateTime, default=datetime.now)
+    reg = Column("E_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "E_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("E_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("E_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "E_UPDATEBY",
         Integer,
@@ -1258,14 +1882,14 @@ class EdocModuleItem(Base):
     EMI_KEYNOTE = Column(Boolean)
     EMI_MEASURE = Column(Boolean)
     EMI_ADD = Column(Boolean)
-    reg = Column("EMI_REG", DateTime, default=datetime.now)
+    reg = Column("EMI_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "EMI_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("EMI_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("EMI_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "EMI_UPDATEBY",
         Integer,
@@ -1304,14 +1928,14 @@ class EdocModuleItemComparison(Base):
     EMIC_TEXT_DE = Column(Unicode(length=500))
     EMIC_TEXT_EN = Column(Unicode(length=500))
     EMIC_TEXT_FR = Column(Unicode(length=500))
-    reg = Column("EMIC_REG", DateTime, default=datetime.now)
+    reg = Column("EMIC_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "EMIC_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("EMIC_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("EMIC_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "EMIC_UPDATEBY",
         Integer,
@@ -1342,7 +1966,7 @@ class EdocModuleItemComparisonPhase(Base):
     EMICP_TEXT_EN = Column(Unicode(length=500), default="")
     EMICP_TEXT_FR = Column(Unicode(length=500), default="")
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
-    update = Column("ER_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("ER_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "ER_UPDATEBY",
         Integer,
@@ -1370,14 +1994,14 @@ class EdocModuleItemPhase(Base):
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
     EMIP_HANDLEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     EMIP_HINT = Column(Boolean, default=False)
-    reg = Column("EMIP_REG", DateTime, default=datetime.now)
+    reg = Column("EMIP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "EMIP_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("EMIP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("EMIP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "EMIP_UPDATEBY",
         Integer,
@@ -1413,7 +2037,7 @@ class EdocModuleItemPhaseAnnex(Base):
     EMIPA_FILENAME = Column(Unicode(length=255))
     EMIPA_CHECKSUM = Column(Unicode(length=32))
     EMIPA_DATA = Column(LargeBinary)
-    reg = Column("EMIPA_UPLOAD", DateTime, onupdate=datetime.now)
+    reg = Column("EMIPA_UPLOAD", DateTime, onupdate=datetime.utcnow)
     reg_by = Column(
         "EMIPA_UPLOAD_BY",
         Integer,
@@ -1491,14 +2115,14 @@ class EdocModule(Base):
     SO_NUMBER = Column(Integer)
     EM_OFFLINE_BY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     EM_OFFLINE_SINCE = Column(DateTime)
-    reg = Column("EM_REG", DateTime, default=datetime.now)
+    reg = Column("EM_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "EM_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("EM_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("EM_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "EM_UPDATEBY",
         Integer,
@@ -1609,14 +2233,14 @@ class EdocResult(Base):
     ER_DESCRIPTION_EN = Column(Unicode(length=255))
     ER_DESCRIPTION_FR = Column(Unicode(length=255))
     ER_IS_MODULRESULT = Column(Integer)
-    reg = Column("ER_REG", DateTime, default=datetime.now)
+    reg = Column("ER_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "ER_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("ER_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("ER_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "ER_UPDATEBY",
         Integer,
@@ -1639,14 +2263,14 @@ class Header(Base):
     HEAD_FILENAME = Column(Unicode(length=255))
     HEAD_NAME = Column(Unicode(length=120))
     HEAD_DATA = deferred(Column(LargeBinary))
-    reg = Column("HEAD_REG", DateTime, default=datetime.now)
+    reg = Column("HEAD_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "HEAD_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("HEAD_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("HEAD_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "HEAD_UPDATEBY",
         Integer,
@@ -1683,14 +2307,14 @@ class ModuleParameter(Base):
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     MP_PARAMETER_DE = Column(Unicode(length=256))
     MP_PARAMETER_EN = Column(Unicode(length=256))
-    reg = Column("MP_REG", DateTime, default=datetime.now)
+    reg = Column("MP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "MP_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("MP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("MP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "MP_UPDATEBY",
         Integer,
@@ -1710,7 +2334,7 @@ class NavCountModuleExport(Base):
     NCM_ID = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     NCM_TYPE = Column(Integer)
-    reg = Column("NCM_REG", DateTime, default=datetime.now)
+    reg = Column("NCM_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NCM_REGBY",
         Integer,
@@ -1733,7 +2357,7 @@ class NavDomain(Base):
     ND_SHORT = Column(Unicode(length=10), nullable=False)
     ND_NAME_DE = Column(Unicode(length=100), nullable=False)
     ND_NAME_EN = Column(Unicode(length=100), nullable=False)
-    reg = Column("ND_REG", DateTime, default=datetime.now)
+    reg = Column("ND_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "ND_REGBY",
         Integer,
@@ -1768,14 +2392,14 @@ class Navigation(Base):
     KOT_ID = Column(
         Integer, ForeignKey("V_PSEX_KIND_OF_TEST.KOT_ID"), nullable=False
     )
-    reg = Column("N_REG", DateTime, default=datetime.now)
+    reg = Column("N_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "N_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("N_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("N_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "N_UPDATEBY",
         Integer,
@@ -1902,14 +2526,14 @@ class NavPosition(Base):
     NPOS_POSITION = Column(Integer)
     NPOS_TEXT_DE = Column(Unicode(length=2048))
     NPOS_TEXT_EN = Column(Unicode(length=2048))
-    reg = Column("NPOS_REG", DateTime, default=datetime.now)
+    reg = Column("NPOS_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPOS_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("NPOS_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("NPOS_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "NPOS_UPDATEBY",
         Integer,
@@ -1936,7 +2560,7 @@ class NavSave(Base):
     NS_NAME_EN = Column(Unicode(length=256), nullable=False)
     NS_CRM = Column(Unicode(length=256))
     NS_TYPE = Column(Integer, nullable=False)
-    reg = Column("NS_REG", DateTime, default=datetime.now)
+    reg = Column("NS_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NS_REGBY",
         Integer,
@@ -2036,14 +2660,14 @@ class Package(Base):
     NP_TESTSAMPLES = Column(Integer, nullable=False)
     NP_IS_TEMPLATE = Column(Boolean, nullable=False)
     NP_TEMPLATE_ID = Column(Integer)
-    reg = Column("NP_REG", DateTime, default=datetime.now)
+    reg = Column("NP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NP_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("NP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("NP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "NP_UPDATEBY",
         Integer,
@@ -2082,7 +2706,7 @@ class PackageCategory(Base):
     PC_ID = Column(Integer, primary_key=True)
     PC_NAME_DE = Column(Unicode(length=50))
     PC_NAME_EN = Column(Unicode(length=50))
-    reg = Column("PC_REG", DateTime, default=datetime.now)
+    reg = Column("PC_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "PC_REG_BY",
         Integer,
@@ -2105,14 +2729,14 @@ class PackageElement(Base):
     ZM_LOCATION = Column(Unicode(length=5))
     NPE_CREATE = Column(Boolean)
     CT_ID = Column(Integer, ForeignKey("CALC_TYPE.CT_ID"))
-    reg = Column("NPE_REG", DateTime, default=datetime.now)
+    reg = Column("NPE_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPE_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("NPE_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("NPE_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "NPE_UPDATEBY",
         Integer,
@@ -2165,14 +2789,14 @@ class PackageElementCalculation(Base):
     NPEC_TASK = Column(NullUnicode(length=500), nullable=False, default="")
     ZM_ID = Column(Unicode(length=50))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
-    reg = Column("NPEC_REG", DateTime, default=datetime.now)
+    reg = Column("NPEC_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPEC_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("NPEC_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("NPEC_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "NPEC_UPDATEBY",
         Integer,
@@ -2207,7 +2831,7 @@ class PackageElementFilter(Base):
     DMI_ID = Column(
         Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), nullable=False
     )
-    reg = Column("NPEF_REG", DateTime, default=datetime.now)
+    reg = Column("NPEF_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPEF_REGBY",
         Integer,
@@ -2229,14 +2853,14 @@ class PackageName(Base):
     PN_ID = Column(Integer, primary_key=True)
     PN_NAME_DE = Column(Unicode(length=255))
     PN_NAME_EN = Column(Unicode(length=255))
-    reg = Column("PN_REG", DateTime, default=datetime.now)
+    reg = Column("PN_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "PN_REG_BY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("PN_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("PN_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "PN_UPDATE_BY",
         Integer,
@@ -2256,7 +2880,7 @@ class PackageType(Base):
     PT_ID = Column(Integer, primary_key=True)
     PT_NAME_DE = Column(Unicode(length=255))
     PT_NAME_EN = Column(Unicode(length=255))
-    reg = Column("PT_REG", DateTime, default=datetime.now)
+    reg = Column("PT_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "PT_REG_BY",
         Integer,
@@ -2281,14 +2905,14 @@ class PriceList(Base):
     PL_NAME_EN = Column(Unicode(length=100))
     CUR_ID = Column(Unicode(length=3))
     PL_ORDER = Column(Integer)
-    reg = Column("PL_REG", DateTime, default=datetime.now)
+    reg = Column("PL_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "PL_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("PL_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("PL_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "PL_UPDATEBY",
         Integer,
@@ -2374,7 +2998,7 @@ class Product(Base):
     HRP_NAME_DE = Column(Unicode(length=255))
     HRP_NAME_EN = Column(Unicode(length=255))
     HRP_NAME_FR = Column(Unicode(length=255))
-    update = Column("HRP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("HRP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "HRP_UPDATEBY",
         Integer,
@@ -2490,14 +3114,14 @@ class ProofElement(Base):
     NPR_ID = Column(Integer)
     NPEP_TEXT_DE = Column(Unicode(length=255))
     NPEP_TEXT_EN = Column(Unicode(length=255))
-    reg = Column("NPEP_REG", DateTime, default=datetime.now)
+    reg = Column("NPEP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPEP_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("NPEP_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("NPEP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "NPEP_UPDATEBY",
         Integer,
@@ -2535,14 +3159,14 @@ class ServiceClassDefinition(Base):
     SCL_LEVEL = Column(Integer, nullable=False)
     SCL_REMARK_DE = Column(Unicode(length=500))
     SCL_REMARK_EN = Column(Unicode(length=500))
-    reg = Column("SCL_REG", DateTime, default=datetime.now)
+    reg = Column("SCL_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "SCL_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("SCL_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("SCL_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "SCL_UPDATEBY",
         Integer,
@@ -2757,14 +3381,14 @@ class TestBase(Base):
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
     BT_ID = Column(Integer, ForeignKey("BASE_TYPE.BT_ID"))
     PLK_SHORT = Column(Unicode(length=10))
-    reg = Column("B_REG", DateTime, default=datetime.now)
+    reg = Column("B_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "B_REGBY",
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         default=get_user_id,
     )
-    update = Column("B_UPDATE", DateTime, onupdate=datetime.now)
+    update = Column("B_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "B_UPDATEBY",
         Integer,

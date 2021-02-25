@@ -34,6 +34,9 @@ TYPE_LINKS = {
     "BLOB": "Blob",
     "FLOAT": "Float",
     "NCHAR": "Unicode",
+    "DECIMAL": "Numeric",
+    "MONEY": "Numeric",
+    "IMAGE": "LargeBinary",
 }
 
 
@@ -204,20 +207,34 @@ def _create_desc_element(att: InstrumentedAttribute) -> ElementTree.Element:
         td_desc.append(foreign_element)
         desc_element = ElementTree.Element("p")
         td_desc.append(desc_element)
-    else:
-        desc_element = td_desc
-    if att.comparator.primary_key:
-        desc_element.text = f"The primary key of the table."
+    elif att.comparator.primary_key:
+        desc_element = ElementTree.Element("p")
+        desc_element.text = "The primary key of the table."
+        td_desc.append(desc_element)
     elif att.key == "reg":
+        desc_element = ElementTree.Element("p")
         desc_element.text = "Date and time the element was created."
+        td_desc.append(desc_element)
     elif att.key == "reg_by":
+        desc_element = ElementTree.Element("p")
         desc_element.text = "User that created the element."
+        td_desc.append(desc_element)
     elif att.key == "update":
+        desc_element = ElementTree.Element("p")
         desc_element.text = "Date and time the element was last updated."
+        td_desc.append(desc_element)
     elif att.key == "update_by":
+        desc_element = ElementTree.Element("p")
         desc_element.text = "User that updated the element last."
-    elif att.doc:
-        if att.doc.startswith("UNKNOWN"):
+        td_desc.append(desc_element)
+    elif att.prop.deferred:
+        desc_element = ElementTree.Element("p")
+        desc_element.text = "This column is loaded deferred."
+        td_desc.append(desc_element)
+    if att.doc:
+        desc_element = ElementTree.Element("p")
+        td_desc.append(desc_element)
+        if att.doc.startswith("UNKNOWN") or att.doc.startswith("WARNING"):
             desc_element.set("style", "color: rgb(255,0,0);")
         desc_element.text = att.doc
     return td_desc
@@ -372,6 +389,8 @@ def create_page(title: str, data: str, auth: Tuple[str, str]) -> str:
 
 if __name__ == "__main__":
     for doc_class in Base.__subclasses__():
+        if not doc_class.__name__ == "DefaultModuleItem":
+            continue
         print("Creating documentation for " + doc_class.__name__)
         page_title, page_html = generate_documentation(doc_class)
 
