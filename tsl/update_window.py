@@ -43,10 +43,10 @@ class TSLMainWindow(QMainWindow):
         self._updater_thread: Optional[QThread] = None
         self._force_whats_new: bool = force_whats_new
         self._whats_new_window: Optional[WhatsNewWindow] = None
-        self._load_settings()
 
     def show(self) -> None:
         """Override show to start update just before."""
+        self._load_settings()
         if self._update:
             log.debug("Starting update.")
             # only run the update if not suppressed by -u
@@ -82,10 +82,17 @@ class TSLMainWindow(QMainWindow):
         self._display_whats_new(False)
 
     def _display_whats_new(self, silent: bool = True) -> None:
-        with open(
-            f"changes/{self._version}/{self._version}.json", encoding="utf-8"
-        ) as fhdl:
-            entries = json.loads(fhdl.read())
+        """Display the Window with the changes for the current version."""
+        filename = f"changes/{self._version}/{self._version}.json"
+        try:
+            with open(
+                filename,
+                encoding="utf-8",
+            ) as fhdl:
+                entries = json.loads(fhdl.read())
+        except FileNotFoundError:
+            log.warning("Changes file not found %s", filename)
+            return
 
         # filter out entries, for which a team restriction is specified and
         # that do not contain the user's team in this specification

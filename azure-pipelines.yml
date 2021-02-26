@@ -1,0 +1,50 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- "*"
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- checkout: self  # self represents the repo where the initial Azure Pipelines YAML file was found
+  clean: true
+  submodules: true
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.8'
+  displayName: Set Python Version to 3.8
+- task: PowerShell@2
+  displayName: 'start mssqllocaldb'
+  inputs:
+    targetType: 'inline'
+    script: 'sqllocaldb start mssqllocaldb'
+- script: |
+    mkdir $(venv)
+    python -m venv venv
+  displayName: Create Virtual Environment
+- script: |
+    call venv\Scripts\activate.bat
+    python -m pip install -r requirements.txt
+  displayName: Install Requirements
+- script: |
+    call venv\Scripts\activate.bat
+    python -m pip install -r dev_requirements.txt
+  displayName: Install Development Requirements
+- script: |
+    call venv\Scripts\activate.bat
+    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)
+    python dev_scripts/setup_test_db.py
+  displayName: Setup test database on local server
+- script: |
+    call venv\Scripts\activate.bat
+    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)\src
+    set EDOC_DB_PATH=mssql+pyodbc://(localdb)\mssqllocaldb/edoc_test_db?driver=ODBC Driver 17 for SQL Server
+    set PSE_DB_PATH=mssql+pyodbc://(localdb)\mssqllocaldb/pse_test_db?driver=ODBC Driver 17 for SQL Server
+    python -m pip install pytest-azurepipelines pytest-cov
+    pytest --log-cli-level DEBUG --log-date-format="%Y-%m-%d %H:%M:%S" --junitxml=result.xml -vv tests/ --cov=tsl --cov-report html
+  displayName: Run pytest test cases
