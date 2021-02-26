@@ -22,9 +22,15 @@ class TSLMainWindow(QMainWindow):
     """Main window class for TSL applications."""
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments
-    def __init__(self, update: bool, help_text: str, name: str, version: str,
-                 force_whats_new: bool = False, parent: QWidget = None)\
-            -> None:
+    def __init__(
+        self,
+        update: bool,
+        help_text: str,
+        name: str,
+        version: str,
+        force_whats_new: bool = False,
+        parent: QWidget = None,
+    ) -> None:
         """Create a new TSL main window."""
         super(TSLMainWindow, self).__init__(parent)
         self._update_status: Optional[bool] = None
@@ -37,6 +43,7 @@ class TSLMainWindow(QMainWindow):
         self._updater_thread: Optional[QThread] = None
         self._force_whats_new: bool = force_whats_new
         self._whats_new_window: Optional[WhatsNewWindow] = None
+        self._load_settings()
 
     def show(self) -> None:
         """Override show to start update just before."""
@@ -47,11 +54,9 @@ class TSLMainWindow(QMainWindow):
             self._updater = Updater(self._app_name, self._version)
             self._updater.moveToThread(self._updater_thread)
             self._updater.update_available.connect(self.update_status)
-            self._updater_thread.started.connect(  # type: ignore
-                self._updater.start_update)
+            self._updater_thread.started.connect(self._updater.start_update)
             self._updater.updater_checked.connect(self._updater_thread.quit)
-            self._updater_thread.finished.connect(  # type: ignore
-                self.updater_finished)
+            self._updater_thread.finished.connect(self.updater_finished)
             self._updater_thread.start()
         else:
             log.debug("Suppressing update with -u or running from IDE.")
@@ -77,36 +82,68 @@ class TSLMainWindow(QMainWindow):
         self._display_whats_new(False)
 
     def _display_whats_new(self, silent: bool = True) -> None:
-        with open(f"changes/{self._version}/{self._version}.json",
-                  encoding="utf-8") as fhdl:
+        with open(
+            f"changes/{self._version}/{self._version}.json", encoding="utf-8"
+        ) as fhdl:
             entries = json.loads(fhdl.read())
 
         # filter out entries, for which a team restriction is specified and
         # that do not contain the user's team in this specification
         grp = get_user_group_name()
-        entries = [entry for entry in entries
-                   if grp in entry["user_groups"]
-                   or not entry["user_groups"]]
+        entries = [
+            entry
+            for entry in entries
+            if grp in entry["user_groups"] or not entry["user_groups"]
+        ]
 
         if not entries:
             if not silent:
                 log.warning("There are no relevant entries for the user.")
                 title = self.tr("Keine Neuerungen")
-                text = self.tr("Die aktuelle Version enthält keine Neuerungen,"
-                               " die für den aktuellen Nutzer verfügbar sind.")
+                text = self.tr(
+                    "Die aktuelle Version enthält keine Neuerungen,"
+                    " die für den aktuellen Nutzer verfügbar sind."
+                )
                 QMessageBox.information(self, title, text)
             return
         self._whats_new_window = WhatsNewWindow(entries, self._version)
         self._whats_new_window.show()
 
-    # pylint: disable=invalid-name
-    def closeEvent(self, close_event: QCloseEvent) -> None:
+    def closeEvent(  # pylint: disable=invalid-name
+        self, close_event: QCloseEvent
+    ) -> None:
         """Handle a close event."""
         if self._whats_new_window:
             log.debug("WhatsNewWindow is still open, closing.")
             self._whats_new_window.close()
+        self._save_settings()
         super(TSLMainWindow, self).closeEvent(close_event)
-    # pylint: enable=invalid-name
+
+    def _save_settings(self) -> None:
+        """Save the paint data and state/geometry settings."""
+        log.debug("Saving settings to registry.")
+        settings = QSettings()
+        settings.setValue("state", self.saveState())
+        settings.setValue("geometry", self.saveGeometry())
+        log.debug("Finished writing settings to registry")
+
+    def _load_settings(self) -> None:
+        """Load geometry and state settings of the ui."""
+        log.debug("Loading settings from registry")
+        settings = QSettings()
+        try:
+            self.restoreGeometry(settings.value("geometry"))
+        except TypeError:
+            log.warning(
+                "Could not restore geometry from: %s",
+                settings.value("geometry"),
+            )
+        try:
+            self.restoreState(settings.value("state"))
+        except TypeError:
+            log.warning(
+                "Could not restore state from: %s", settings.value("state")
+            )
 
     def _handle_update_window(self) -> None:
         """Handle the update window."""
@@ -114,8 +151,9 @@ class TSLMainWindow(QMainWindow):
 
         if self._update_status is True:
             log.debug("Update available - updating progress text.")
-            self._progress.setLabelText("Aktualisierung verfügbar - "
-                                        "Vorbereitung im Gange.")
+            self._progress.setLabelText(
+                "Aktualisierung verfügbar - " "Vorbereitung im Gange."
+            )
             self._progress.setValue(0)
 
         elif self._update_status is None:
@@ -128,11 +166,11 @@ class TSLMainWindow(QMainWindow):
 
     def _configure_update(self) -> None:
         """Configure the update functionality."""
-        self._progress: QProgressDialog = \
-            QProgressDialog("Prüfe auf Aktualisierung...", "Abbrechen",
-                            0, 0, self)
+        self._progress = QProgressDialog(
+            "Prüfe auf Aktualisierung...", "Abbrechen", 0, 0, self
+        )
         self._progress.setMinimumDuration(0)
-        self._progress.setCancelButton(None)  # type: ignore
+        self._progress.setCancelButton(None)
         self._progress.setModal(True)
         flags = self._progress.windowFlags()
         self._progress.setWindowFlags(
@@ -144,8 +182,9 @@ class TSLMainWindow(QMainWindow):
         self._progress.installEventFilter(self)
 
     @pyqtSlot(QObject, QEvent, name="eventFilter")
-    def eventFilter(self, obj: QObject, event: QEvent)\
-            -> bool:  # pylint: disable=invalid-name
+    def eventFilter(  # pylint: disable=invalid-name
+        self, obj: QObject, event: QEvent
+    ) -> bool:
         """Filter events received in the MainWindow."""
         if obj is self._progress and event.type() == QEvent.Close:
             # prevent closing of progress dialog.
@@ -157,8 +196,9 @@ class TSLMainWindow(QMainWindow):
     @pyqtSlot(name="on_about")
     def on_about(self) -> None:
         """Show a message box about the used app version."""
-        log.debug("User pressed button to show dialog about %s",
-                  self._app_name)
+        log.debug(
+            "User pressed button to show dialog about %s", self._app_name
+        )
         title = self.tr(f"Über {self._app_name}")
         QMessageBox.about(self, title, self._help_text)
 
@@ -179,13 +219,21 @@ class TSLMainWindow(QMainWindow):
 
         if self._update_status is True:
             log.debug("Update is available.")
-            subprocess.Popen([
-                os.path.join(os.path.expanduser("~"), "TSL", "Updater",
-                             "App-Updater.exe"),
-                r"/ROOT:" + os.path.abspath(sys.argv[0]),
-                r"/TEXTFILE:" + os.path.join(LAGER_PATH, self._app_name,
-                                             "TSL-Update", "update.json")
-            ])
+            subprocess.Popen(
+                [
+                    os.path.join(
+                        os.path.expanduser("~"),
+                        "TSL",
+                        "Updater",
+                        "App-Updater.exe",
+                    ),
+                    r"/ROOT:" + os.path.abspath(sys.argv[0]),
+                    r"/TEXTFILE:"
+                    + os.path.join(
+                        LAGER_PATH, self._app_name, "TSL-Update", "update.json"
+                    ),
+                ]
+            )
             sys.exit()
         else:
             log.debug("No update is available.")

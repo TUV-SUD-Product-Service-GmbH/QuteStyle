@@ -35,12 +35,19 @@ class WhatsNewEntry(TypedDict):
 class WhatsNewWindow(QMainWindow):
     """WhatsNewWindow showing version update information."""
 
-    def __init__(self, entries: List[WhatsNewEntry], version: str,
-                 parent: QWidget = None) -> None:
+    def __init__(
+        self,
+        entries: List[WhatsNewEntry],
+        version: str,
+        parent: QWidget = None,
+    ) -> None:
         """Set up the MainWindow."""
         super(WhatsNewWindow, self).__init__(parent)
-        log.debug("Creating WhatsNewWindow for version %s with entries: %s",
-                  version, entries)
+        log.debug(
+            "Creating WhatsNewWindow for version %s with entries: %s",
+            version,
+            entries,
+        )
         self._ui = Ui_whats_new_window()
         self._ui.setupUi(self)
 
@@ -52,7 +59,7 @@ class WhatsNewWindow(QMainWindow):
 
         self._ui.previous_button.clicked.connect(self.on_previous)
         self._ui.next_button.clicked.connect(self.on_next)
-        self._ui.close_button.clicked.connect(self.close)  # type: ignore
+        self._ui.close_button.clicked.connect(self.close)
 
     @pyqtSlot(name="on_next")
     def on_next(self) -> None:
@@ -70,8 +77,11 @@ class WhatsNewWindow(QMainWindow):
 
     def _display_entry(self) -> None:
         """Display the entry set as current index."""
-        log.debug("Displaying entry %s/%s",
-                  self._current_entry_idx, len(self._entries))
+        log.debug(
+            "Displaying entry %s/%s",
+            self._current_entry_idx,
+            len(self._entries),
+        )
 
         entry = self._entries[self._current_entry_idx]
 
@@ -82,7 +92,7 @@ class WhatsNewWindow(QMainWindow):
 
         entry_font = QFont("Segoe UI", 9)
         self._ui.text_label.setFont(entry_font)
-        self._ui.text_label.setText(entry['text'])
+        self._ui.text_label.setText(entry["text"])
 
         prev_disable = self._current_entry_idx == 0
         self._ui.previous_button.setDisabled(prev_disable)

@@ -69,8 +69,9 @@ class Updater(QObject):
             log.info("Application is run from IDE, not running update check.")
             return False
 
-        json_path = os.path.join(LAGER_PATH, self._app_name,
-                                 "TSL-UPDATE", "update.json")
+        json_path = os.path.join(
+            LAGER_PATH, self._app_name, "TSL-UPDATE", "update.json"
+        )
 
         log.debug("Reading update.json from: %s", json_path)
 
@@ -100,11 +101,9 @@ class Updater(QObject):
         install_path = os.path.join(expanduser("~"), "TSL", "Updater")
         self._copy_worker = CopyWorker(install_path, json_file)
         self._copy_worker.moveToThread(self._updater_thread)
-        self._updater_thread.started.connect(  # type: ignore
-            self._copy_worker.start_copy)
+        self._updater_thread.started.connect(self._copy_worker.start_copy)
         self._copy_worker.copy_finished.connect(self._updater_thread.quit)
-        self._updater_thread.finished.connect(  # type: ignore
-            self.check_finished)
+        self._updater_thread.finished.connect(self.check_finished)
         self._updater_thread.start()
         log.info("Copy worker started.")
 

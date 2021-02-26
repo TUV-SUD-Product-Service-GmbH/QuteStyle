@@ -52,16 +52,18 @@ class CopyWorker(QObject):
     def start_copy(self) -> None:
         """Start to copy the files from the def file to the destination."""
         self.status_changed.emit("Checking TSL definition file of update.")
-        log.debug("Checking file: %s",
-                  os.path.join(self._source, "update.json"))
+        log.debug(
+            "Checking file: %s", os.path.join(self._source, "update.json")
+        )
         if os.path.exists(os.path.join(self._source, "update.json")):
             self.status_changed.emit("Reading TSL definition file.")
             self._parse_json()
         else:
             self.status_changed.emit("update_failed")
             return
-        self.status_changed.emit("Removing obsolete files from "
-                                 "installation folder.")
+        self.status_changed.emit(
+            "Removing obsolete files from " "installation folder."
+        )
         self._remove_files()
         self._remove_empty_folders()
         self.status_changed.emit("Calculating list of files to be copied")
@@ -84,8 +86,9 @@ class CopyWorker(QObject):
                     self.copy_file(dst, src)
                     break
                 except PermissionError:
-                    log.warning("Received permission error copying file to %s",
-                                dst)
+                    log.warning(
+                        "Received permission error copying file to %s", dst
+                    )
                     try_count -= 1
                     time.sleep(5)
             else:
@@ -105,8 +108,9 @@ class CopyWorker(QObject):
                 shutil.copy(src, dst)
                 count = 0
             except PermissionError:
-                log.warning("Could not copy to  %s due to PermissionError",
-                            dst)
+                log.warning(
+                    "Could not copy to  %s due to PermissionError", dst
+                )
                 # sleep 1 second in an event loop
                 loop = QEventLoop()
                 QTimer.singleShot(1000, loop.quit)
@@ -119,8 +123,9 @@ class CopyWorker(QObject):
         for root, _, files in os.walk(self._path):
             for file in files:
                 full_path = os.path.join(root, file)
-                if not any(full_path == dst_path
-                           for _, dst_path in self._file_list):
+                if not any(
+                    full_path == dst_path for _, dst_path in self._file_list
+                ):
                     log.debug("Removing file %s", file)
                     try:
                         os.remove(full_path)
@@ -166,8 +171,10 @@ class CopyWorker(QObject):
             log.debug(dst)
             try:
                 if self._hashes:
-                    if self.hash_file(dst) == \
-                            self._hashes[dst.replace(self._path + "\\", "")]:
+                    if (
+                        self.hash_file(dst)
+                        == self._hashes[dst.replace(self._path + "\\", "")]
+                    ):
                         log.debug("Files are equal")
                         continue
                 else:
@@ -178,15 +185,18 @@ class CopyWorker(QObject):
                 log.debug("File does not exist")
             log.debug("File is to be copied")
             copy_list.append((src, dst))
-        log.debug("Finished reduction of copy_list from %s to %s",
-                  len(self._file_list), len(copy_list))
+        log.debug(
+            "Finished reduction of copy_list from %s to %s",
+            len(self._file_list),
+            len(copy_list),
+        )
         self._file_list = copy_list
 
     @staticmethod
     def hash_file(file: str) -> str:
         """Create a hash for a given file."""
         file_hash = hashlib.sha256()
-        with open(file, 'rb') as fhandle:
+        with open(file, "rb") as fhandle:
             file_block = fhandle.read(65536)
             while len(file_block) > 0:
                 file_hash.update(file_block)
