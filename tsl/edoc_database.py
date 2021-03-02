@@ -40,6 +40,7 @@ from sqlalchemy.orm import (
     validates,
     load_only,
     backref,
+    joinedload,
 )
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
@@ -2751,7 +2752,7 @@ class PackageElement(Base):
         back_populates="package_element",
         cascade="all, delete",
     )
-    proof_elements = relationship(
+    proof_elements: List["ProofElement"] = relationship(
         "ProofElement", cascade="all, delete", back_populates="package_element"
     )
 
@@ -3464,7 +3465,18 @@ def insert_package_into_nav(
     """
     log.debug("Inserting package %s into nav %s", package_id, nav_id)
     assert session.query(Navigation).get(nav_id)
-    pack: Package = session.query(Package).filter_by(NP_ID=package_id).one()
+    pack: Package = (
+        session.query(Package)
+        .filter_by(NP_ID=package_id)
+        .options(
+            joinedload(Package.package_elements).options(
+                joinedload(PackageElement.package_calculations),
+                joinedload(PackageElement.proof_elements),
+            ),
+            joinedload(Package.service_classes),
+        )
+        .one()
+    )
 
     new_pack = Package(
         N_ID=nav_id,

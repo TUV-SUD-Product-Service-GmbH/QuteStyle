@@ -4,4 +4,4 @@ mypy==0.812
 sqlalchemy-stubs==0.4
 pyqt5-stubs==5.15.2.0
 pytest-qt==3.3.0
-coverage==5.0
+coverage==5.5
