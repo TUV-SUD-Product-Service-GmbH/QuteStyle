@@ -1029,20 +1029,6 @@ class DEFAULTMODULANNEX(Base):
     DI_ID = Column(Integer)
 
 
-class DEFAULTMODULLINK(Base):
-    __tablename__ = "DEFAULT_MODUL_LINK"
-    __table_args__ = {"schema": "dbo"}
-
-    DML_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, index=True)
-    DML_TEXT_DE = Column(Unicode(1024))
-    DML_TEXT_EN = Column(Unicode(1024))
-    DML_TEXT_FR = Column(Unicode(1024))
-    DML_URL = Column(Unicode(512))
-    DML_UPDATE = Column(DateTime, server_default=text("(getdate())"))
-    DML_UPDATEBY = Column(Integer)
-
-
 class DEFAULTMODULUPDATE(Base):
     __tablename__ = "DEFAULT_MODUL_UPDATE"
     __table_args__ = {"schema": "dbo"}
@@ -1054,24 +1040,6 @@ class DEFAULTMODULUPDATE(Base):
     )
     DMU_UPDATEBY = Column(Integer, index=True)
 
-
-class EDOC(Base):
-    __tablename__ = "EDOC"
-    __table_args__ = {"schema": "dbo"}
-
-    E_ID = Column(Integer, primary_key=True)
-    E_VERSION = Column(Integer)
-    E_NAME = Column(Unicode(255), index=True)
-    HEAD_ID = Column(Integer, server_default=text("(6)"))
-    E_YN_SYMBOL = Column(BIT, server_default=text("((1))"))
-    E_REG = Column(DateTime)
-    E_REGBY = Column(Integer)
-    E_UPDATE = Column(DateTime)
-    E_UPDATEBY = Column(Integer)
-    E_REMINDER = Column(Integer)
-    NP_ID = Column(Integer)
-    E_ANNEX = Column(Unicode(4000))
-    E_TABLE = Column(Unicode(4000))
 
 
 class EDOCOFFICECOUNT(Base):

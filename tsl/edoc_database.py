@@ -6,41 +6,41 @@ query. Always use session.delete()!
 """
 # pylint: disable=too-many-lines
 from __future__ import annotations
+
 import logging
 import os
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime
 from enum import IntEnum
-from typing import List, Iterator, Optional, Dict, cast
+from typing import Dict, Iterator, List, Optional, cast
 
 from sqlalchemy import (
-    create_engine,
-    Column,
-    Integer,
-    Unicode,
-    DateTime,
-    Boolean,
-    Float,
-    Numeric,
-    LargeBinary,
-    text,
-    BigInteger,
-    NCHAR,
-    String,
     DECIMAL,
+    NCHAR,
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    LargeBinary,
+    Numeric,
+    String,
+    Unicode,
+    create_engine,
+    text,
 )
-from sqlalchemy.dialects.mssql import BIT, MONEY, IMAGE
+from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
-    sessionmaker,
-    relationship,
     Session,
-    deferred,
-    validates,
-    load_only,
     backref,
-    joinedload,
+    deferred,
+    load_only,
+    relationship,
+    sessionmaker,
+    validates,
 )
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
@@ -1783,14 +1783,25 @@ class DefaultModuleLink(Base):
 
     __tablename__ = "DEFAULT_MODUL_LINK"
 
+    doc = [
+        "Defines a link (i.e. web link) providing additional information "
+        "to a DefaultModule."
+    ]
+
     DML_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
-    # the next four columns can never be NULL from eDOC
-    DML_TEXT_DE = Column(Unicode(length=1024), nullable=False)
-    DML_TEXT_EN = Column(Unicode(length=1024), nullable=False)
-    DML_TEXT_FR = Column(Unicode(length=1024), nullable=False)
-    DML_URL = Column(Unicode(length=512), nullable=False)
-    update = Column("DML_UPDATE", DateTime, onupdate=datetime.utcnow)
+    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), index=True)
+    # the next four columns are never NULL, so we set the not nullable
+    DML_TEXT_DE = Column(
+        Unicode(1024), nullable=False, doc="German link description"
+    )
+    DML_TEXT_EN = Column(
+        Unicode(1024), nullable=False, doc="English link description"
+    )
+    DML_TEXT_FR = Column(
+        Unicode(1024), nullable=False, doc="French link description"
+    )
+    DML_URL = Column(Unicode(512), nullable=False, doc="Url for the link")
+    update = Column("DML_UPDATE", DateTime, server_default=text("(getdate())"))
     update_by = Column(
         "DML_UPDATEBY",
         Integer,
@@ -1809,12 +1820,29 @@ class Edoc(Base):
     __tablename__ = "EDOC"
 
     E_ID = Column(Integer, primary_key=True)
-    E_VERSION = Column(Integer, default=1)
+    E_VERSION = Column(
+        Integer,
+        default=1,
+        doc="Version number of the protocol. Should/must be increased by "
+        "1 when saving changes.",
+    )
     # E_NAME is nullable in database, but never actually NULL
-    E_NAME = Column(Unicode(length=255), nullable=False)
+    E_NAME = Column(
+        Unicode(255),
+        index=True,
+        nullable=False,
+        doc="Name of the protocol. Set to not nullable in TSL-Lib since "
+        "there's no sense in a protocol without name.",
+    )
     # default header is "Modulvorlage Standard" from HEADER table
-    HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"), default=1)
-    E_YN_SYMBOL = Column(Boolean, default=True)
+    HEAD_ID = Column(
+        Integer, ForeignKey("HEADER.HEAD_ID"), server_default=text("(6)")
+    )
+    E_YN_SYMBOL = Column(
+        BIT,
+        server_default=text("((1))"),
+        doc="Defines if Y/N is used for the protocol or P/F.",
+    )
     reg = Column("E_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "E_REGBY",
@@ -1830,6 +1858,9 @@ class Edoc(Base):
         onupdate=get_user_id,
     )
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
+    E_REMINDER = Column(Integer, doc="UNKNOWN")
+    E_ANNEX = Column(Unicode(4000), doc="UNKNOWN")
+    E_TABLE = Column(Unicode(4000), doc="UNKNOWN")
 
     package = relationship("Package", back_populates="edocs")
     header = relationship("Header")
@@ -2827,7 +2858,9 @@ class PackageElementFilter(Base):
 
     NPEF_ID = Column(Integer, primary_key=True)
     NPE_ID = Column(
-        Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID"), nullable=False
+        Integer,
+        ForeignKey("NAV_PACK_ELEMENT.NPE_ID", ondelete="CASCADE"),
+        nullable=False,
     )
     DMI_ID = Column(
         Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), nullable=False
@@ -3446,118 +3479,3 @@ class ZaraProduct(Base):
     ZM_PRODUCT = Column(Unicode(length=5))
     ZM_PROUDCT_NAME = Column(Unicode(length=255))
     ZM_PRODUCT_LANGUAGE = Column(Unicode(length=2))
-
-
-# SCRIPTS
-def insert_package_into_nav(
-    nav_id: int, package_id: int, session: Session, copy_pe: bool = True
-) -> int:
-    """
-    Insert a copy of the given package into the given navigation.
-
-    Returns the id of the new package.
-
-    If copy_pe is false, the PackageElements won"t be copied along with the
-    Package. This should be used if the PackageElements will be created
-    otherwise (i.e. copied from the LIDL Phasen Service).
-
-    Based on dbo.SP_NAV_INSERT_PACKAGE in dbo.EDOC.
-    """
-    log.debug("Inserting package %s into nav %s", package_id, nav_id)
-    assert session.query(Navigation).get(nav_id)
-    pack: Package = (
-        session.query(Package)
-        .filter_by(NP_ID=package_id)
-        .options(
-            joinedload(Package.package_elements).options(
-                joinedload(PackageElement.package_calculations),
-                joinedload(PackageElement.proof_elements),
-            ),
-            joinedload(Package.service_classes),
-        )
-        .one()
-    )
-
-    new_pack = Package(
-        N_ID=nav_id,
-        NP_NAME_DE=pack.NP_NAME_DE,
-        NP_NAME_EN=pack.NP_NAME_EN,
-        NP_COMMENT_DE=pack.NP_COMMENT_DE,
-        NP_COMMENT_EN=pack.NP_COMMENT_EN,
-        CL_ID=pack.CL_ID,
-        NP_CLEARDATE=pack.NP_CLEARDATE,
-        NP_CLEARBY=pack.NP_CLEARBY,
-        ZM_PRODUCT=pack.ZM_PRODUCT,
-        PT_ID=pack.PT_ID,
-        NP_TESTSAMPLES=pack.NP_TESTSAMPLES,
-        NP_IS_TEMPLATE=False,
-        NP_TEMPLATE_ID=pack.NP_ID,
-        PN_ID=pack.PN_ID,
-    )
-    session.add(new_pack)
-    session.flush()
-
-    new_pack_id = new_pack.NP_ID
-
-    for service_class in cast(List[ServiceClass], pack.service_classes):
-        new_class = ServiceClass(
-            NP_ID=new_pack.NP_ID, SCL_ID=service_class.SCL_ID
-        )
-        session.add(new_class)
-
-    if copy_pe:
-        for package_element in cast(
-            List[PackageElement], pack.package_elements
-        ):
-            copy_package_element(new_pack.NP_ID, package_element, session)
-    session.flush()
-    return new_pack_id
-
-
-def copy_package_element(
-    new_pack_id: int, package_element: PackageElement, session: Session
-) -> int:
-    """Copy the PackageElement to the Package with the given id."""
-    new_element = PackageElement(
-        NP_ID=new_pack_id,
-        DM_ID=package_element.DM_ID,
-        NL_ID=package_element.NL_ID,
-        ZM_LOCATION=package_element.ZM_LOCATION,
-        CT_ID=package_element.CT_ID,
-        NPE_CREATE=package_element.NPE_CREATE,
-        NPE_CREATE_SO=package_element.NPE_CREATE_SO,
-    )
-    session.add(new_element)
-    session.flush()
-    for calculation in cast(
-        List[PackageElementCalculation], package_element.package_calculations
-    ):
-        new_calc = PackageElementCalculation(
-            NPE_ID=new_element.NPE_ID,
-            ST_ID=calculation.ST_ID,
-            NPEC_DELTA_START=calculation.NPEC_DELTA_START,
-            NPEC_TIME_DAYS=calculation.NPEC_TIME_DAYS,
-            NPEC_TIME_HOURS=calculation.NPEC_TIME_HOURS,
-            NPEC_RATE=calculation.NPEC_RATE,
-            NPEC_COSTS=calculation.NPEC_COSTS,
-            NPEC_TRAVEL=calculation.NPEC_TRAVEL,
-            NPEC_FACTOR=calculation.NPEC_FACTOR,
-            NPEC_PRICE=calculation.NPEC_PRICE,
-            NPEC_COMMENT=calculation.NPEC_COMMENT,
-            NPEC_TASK=calculation.NPEC_TASK,
-            ZM_ID=calculation.ZM_ID,
-            NPOS_ID=calculation.NPOS_ID,
-        )
-        session.add(new_calc)
-    for proof_element in cast(
-        List[ProofElement], package_element.proof_elements
-    ):
-        new_proof = ProofElement(
-            NPE_ID=new_element.NPE_ID,
-            NPEP_TYPE=proof_element.NPEP_TYPE,
-            NPR_ID=proof_element.NPR_ID,
-            NPEP_TEXT_DE=proof_element.NPEP_TEXT_DE,
-            NPEP_TEXT_EN=proof_element.NPEP_TEXT_EN,
-        )
-        session.add(new_proof)
-    return new_element.NPE_ID
