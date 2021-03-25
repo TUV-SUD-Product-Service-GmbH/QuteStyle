@@ -2691,7 +2691,7 @@ class Package(Base):
     PT_ID = Column(Integer, ForeignKey("PACKAGE_TYPE.PT_ID"), nullable=False)
     NP_TESTSAMPLES = Column(Integer, nullable=False)
     NP_IS_TEMPLATE = Column(Boolean, nullable=False)
-    NP_TEMPLATE_ID = Column(Integer)
+    NP_TEMPLATE_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
     reg = Column("NP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NP_REGBY",
@@ -2728,6 +2728,12 @@ class Package(Base):
     update_user = relationship("Staff", foreign_keys=[update_by])
     selections = relationship("NavSaveSelection", back_populates="package")
     edocs = relationship("Edoc", back_populates="package")
+
+    created_from = relationship(
+        "Package",
+        backref=backref("template", remote_side=[NP_ID]),
+        uselist=True,
+    )
 
 
 class PackageCategory(Base):
@@ -3174,10 +3180,17 @@ class ProofElement(Base):
 class ServiceClass(Base):
     """Service Class of a Package."""
 
+    doc = [
+        "Defines the service class of a Package by creating a link between "
+        "the Package and the ServiceClassDefinition"
+    ]
+
     __tablename__ = "NAV_PACK_SERVICECLASS"
 
     NPS_ID = Column(Integer, primary_key=True)
-    NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID", ondelete="CASCADE"))
+    NP_ID = Column(
+        Integer, ForeignKey("NAV_PACK.NP_ID", ondelete="CASCADE"), index=True
+    )
     SCL_ID = Column(Integer, ForeignKey("SERVICECLASS.SCL_ID"))
 
     package = relationship("Package", back_populates="service_classes")

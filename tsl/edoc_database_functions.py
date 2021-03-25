@@ -1,21 +1,67 @@
 """Functions for common eDOC database operations."""
 import logging
-from typing import List, cast
+from typing import Any, List, Sequence, cast
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload, load_only
 from sqlalchemy.orm.session import Session
 
 from tsl.edoc_database import (
-    Navigation,
     Package,
     PackageElement,
     PackageElementCalculation,
     PackageElementFilter,
     ProofElement,
     ServiceClass,
+    get_user_id,
 )
 
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
+
+
+def _sp_insert_package_with_filter(
+    nav_id: int, package_id: int, session: Session, copy_filter: bool = False
+) -> int:
+    """
+    Copy a Package with all its PackageElements and NavPackFilters.
+
+    Calls the internal database procedure SP_NAV_INSERT_PACKAGE/
+    SP_NAV_INSERT_PACKAGE_WITH_FILTER depending on copy_filter.
+    """
+    if copy_filter:
+        procedure = "SP_NAV_INSERT_PACKAGE_WITH_FILTER"
+    else:
+        procedure = "SP_NAV_INSERT_PACKAGE"
+    execute_stored_procedure(
+        session, procedure, (nav_id, package_id, get_user_id())
+    )
+    session.flush()
+
+    # The stored procedure doesn't return the ID of the new Package hence we
+    # need to get it manually (It's not nice, but should be safe because this
+    # would fail only if the user manages to insert a Package in parallel and
+    # faster to/as this method).
+    new_package = (
+        session.query(Package)
+        .filter_by(
+            reg_by=get_user_id(), N_ID=nav_id, NP_TEMPLATE_ID=package_id
+        )
+        .order_by(desc(Package.reg))
+        .options(load_only(Package.NP_ID))
+        .limit(1)
+        .all()[0]
+    )
+    log.debug("NP_ID of new Package: %s", new_package.NP_ID)
+    return cast(int, new_package.NP_ID)
+
+
+def execute_stored_procedure(  # type: ignore
+    session: Session, procedure: str, args: Sequence[Any]
+) -> None:
+    """Execute a stored procedure on the database."""
+    statement = f"EXEC dbo.{procedure} " + ", ".join(str(arg) for arg in args)
+    log.debug("Constructed statement: %s", statement)
+    session.execute(f"SET NOCOUNT ON;{statement};SET NOCOUNT OFF;")
 
 
 def insert_package_into_nav(
@@ -30,66 +76,63 @@ def insert_package_into_nav(
 
     Returns the id of the new package.
 
-    If copy_pe is false, the PackageElements won"t be copied along with the
+    If copy_pe is false, the PackageElements won't be copied along with the
     Package. This should be used if the PackageElements will be created
     otherwise (i.e. copied from the LIDL Phasen Service).
 
-    If copy_filters is True, all filters for each PackageElement are copied.
-
-    Based on dbo.SP_NAV_INSERT_PACKAGE in dbo.EDOC.
+    Otherwise, we will use the database procedure dbo.SP_NAV_INSERT_PACKAGE
+    when coyping without PackageElementFilters or
+    dbo.SP_NAV_INSERT_PACKAGE_WITH_FILTER when also copying filters.
     """
     log.debug("Copying package %s into nav %s", package_id, nav_id)
-    assert session.query(Navigation).get(nav_id)
-    pack: Package = (
-        session.query(Package)
-        .filter_by(NP_ID=package_id)
-        .options(
-            joinedload(Package.package_elements).options(
-                joinedload(PackageElement.package_calculations),
-                joinedload(PackageElement.proof_elements),
-                joinedload(PackageElement.filters),
-            ),
-            joinedload(Package.service_classes),
-        )
-        .one()
-    )
 
-    new_pack = Package(
-        N_ID=nav_id,
-        NP_NAME_DE=pack.NP_NAME_DE,
-        NP_NAME_EN=pack.NP_NAME_EN,
-        NP_COMMENT_DE=pack.NP_COMMENT_DE,
-        NP_COMMENT_EN=pack.NP_COMMENT_EN,
-        CL_ID=pack.CL_ID,
-        NP_CLEARDATE=pack.NP_CLEARDATE,
-        NP_CLEARBY=pack.NP_CLEARBY,
-        ZM_PRODUCT=pack.ZM_PRODUCT,
-        PT_ID=pack.PT_ID,
-        NP_TESTSAMPLES=pack.NP_TESTSAMPLES,
-        NP_IS_TEMPLATE=False,
-        NP_TEMPLATE_ID=pack.NP_ID,
-        PN_ID=pack.PN_ID,
-    )
-    session.add(new_pack)
-    session.flush()
-
-    new_pack_id = new_pack.NP_ID
-
-    for service_class in cast(List[ServiceClass], pack.service_classes):
-        log.debug("Creating new service class: %s", service_class.SCL_ID)
-        new_class = ServiceClass(
-            NP_ID=new_pack.NP_ID, SCL_ID=service_class.SCL_ID
-        )
-        session.add(new_class)
+    # cannot copy NavPackFilters when not copying PackageElements
+    assert not (
+        copy_pe is False and copy_filters is True
+    ), "Can't copy PackageElementFilters when not copying PackageElements."
 
     if copy_pe:
-        for package_element in cast(
-            List[PackageElement], pack.package_elements
-        ):
-            copy_package_element(
-                new_pack.NP_ID, package_element, session, copy_filters
+        new_pack_id = _sp_insert_package_with_filter(
+            nav_id, package_id, session, copy_filters
+        )
+    else:
+        log.debug("Copying manually because copying PackageElements is off.")
+        pack: Package = (
+            session.query(Package)
+            .filter_by(NP_ID=package_id)
+            .options(
+                joinedload(Package.service_classes),
             )
-    session.flush()
+            .one()
+        )
+
+        new_pack = Package(
+            N_ID=nav_id,
+            NP_NAME_DE=pack.NP_NAME_DE,
+            NP_NAME_EN=pack.NP_NAME_EN,
+            NP_COMMENT_DE=pack.NP_COMMENT_DE,
+            NP_COMMENT_EN=pack.NP_COMMENT_EN,
+            CL_ID=pack.CL_ID,
+            NP_CLEARDATE=pack.NP_CLEARDATE,
+            NP_CLEARBY=pack.NP_CLEARBY,
+            ZM_PRODUCT=pack.ZM_PRODUCT,
+            PT_ID=pack.PT_ID,
+            NP_TESTSAMPLES=pack.NP_TESTSAMPLES,
+            NP_IS_TEMPLATE=False,
+            NP_TEMPLATE_ID=pack.NP_ID,
+            PN_ID=pack.PN_ID,
+        )
+
+        for service_class in cast(List[ServiceClass], pack.service_classes):
+            log.debug("Creating new service class: %s", service_class.SCL_ID)
+            new_pack.service_classes.append(
+                ServiceClass(SCL_ID=service_class.SCL_ID)
+            )
+
+        session.add(new_pack)
+        session.flush()
+
+        new_pack_id = new_pack.NP_ID
     return new_pack_id
 
 

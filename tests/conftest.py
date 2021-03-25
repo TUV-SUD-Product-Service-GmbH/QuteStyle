@@ -1,12 +1,19 @@
 """Configuration for ChemUp unit tests with pytest."""
-import os
 import logging
+import os
 
-from PyQt5.QtCore import QSettings, QCoreApplication, qInstallMessageHandler
-from tsl.edoc_database import ENGINE, Base, session_scope, Staff
-from tsl.pse_database import Base as PSE_Base, ENGINE as PSE_ENGINE
+from PyQt5.QtCore import QCoreApplication, QSettings, qInstallMessageHandler
+
+from tsl.edoc_database import (
+    ENGINE,
+    Base,
+    Staff,
+    _fetch_user_id,
+    session_scope,
+)
 from tsl.init import qt_message_handler
-
+from tsl.pse_database import ENGINE as PSE_ENGINE
+from tsl.pse_database import Base as PSE_Base
 
 # pylint: disable=invalid-name
 log = logging.getLogger(".".join(["tsl", __name__]))
@@ -18,10 +25,17 @@ TFPATH = os.path.join("tests", "test_files")
 def init_user() -> None:
     """Create a new dummy user for use in the tests."""
     with session_scope() as session:
-        user = Staff(ST_WINDOWSID=os.getlogin(), ST_SURNAME="TSL-Toolbox",
-                     ST_ACTIVE=True, ST_TYPE=1, ST_SKILLGROUP="00000000",
-                     ST_FORENAME="Klaus")
+        user = Staff(
+            ST_WINDOWSID=os.getlogin(),
+            ST_SURNAME="TSL-Toolbox",
+            ST_ACTIVE=True,
+            ST_TYPE=1,
+            ST_SKILLGROUP="00000000",
+            ST_FORENAME="Klaus",
+        )
         session.add(user)
+    # Init the user variables before creating test data for tests.
+    _fetch_user_id()
 
 
 def pytest_runtest_setup() -> None:

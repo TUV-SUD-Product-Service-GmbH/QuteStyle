@@ -2127,15 +2127,6 @@ class NAVPACKELEMENTPROOF(Base):
     NPEP_UPDATEBY = Column(Integer)
 
 
-class NAVPACKSERVICECLAS(Base):
-    __tablename__ = "NAV_PACK_SERVICECLASS"
-    __table_args__ = {"schema": "dbo"}
-
-    NPS_ID = Column(Integer, primary_key=True)
-    NP_ID = Column(Integer, index=True)
-    SCL_ID = Column(Integer)
-
-
 class NAVSAVE(Base):
     __tablename__ = "NAV_SAVE"
     __table_args__ = {"schema": "dbo"}

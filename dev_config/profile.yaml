@@ -14,3 +14,5 @@ pep257:
 ignore-paths:
   - venv
   - tsl\gen
+mccabe:
+  run: false
