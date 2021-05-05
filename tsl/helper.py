@@ -7,8 +7,7 @@ from PyQt5.QtGui import QPixmap
 from sqlalchemy.orm.exc import NoResultFound
 
 from tsl.pse_database import AdminSession, Project, Process
-
-PATH = r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
+from tsl.variables import PATH
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 

@@ -1,4 +1,5 @@
 """Variables for TSL Lib."""
+import os
 from enum import IntEnum
 
 STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
@@ -164,3 +165,7 @@ class ClearingState(IntEnum):
     Final = 0
     Intermediate = 1
     NotFinal = 2
+
+
+# use PSE_PATH environment variable to change the path (i.e. for testing)
+PATH = os.getenv("PSE_PATH", r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS")

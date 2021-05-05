@@ -116,6 +116,7 @@ class TSLMainWindow(QMainWindow):
         self._whats_new_window = WhatsNewWindow(entries, self._version)
         self._whats_new_window.show()
 
+    @pyqtSlot(QCloseEvent, name="closeEvent")
     def closeEvent(  # pylint: disable=invalid-name
         self, close_event: QCloseEvent
     ) -> None:

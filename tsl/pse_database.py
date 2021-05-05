@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker, relationship, Session
 from sqlalchemy.pool import StaticPool
 
 from tsl.common_db import NullUnicode
-from tsl.variables import STD_DB_PATH
+from tsl.variables import STD_DB_PATH, PATH
 
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
@@ -57,6 +57,11 @@ class Process(Base):
     PC_NAME = Column(NullUnicode(length=256), nullable=False, default="")
     PC_IAN = Column(NullUnicode(length=256), nullable=False, default="")
     PC_PATH = Column(NullUnicode(length=50), nullable=False, default="")
+
+    @property
+    def process_archive(self) -> str:
+        """Return the full path to the process archive of the Process"""
+        return os.path.join(PATH, "PSEX", self.PC_PATH)
 
 
 class ProcessPhase(Base):
@@ -104,6 +109,11 @@ class Project(Base):
     process = relationship('Process')
     phase = relationship('ProcessPhase')
     staff = relationship('Staff')
+
+    @property
+    def project_folder(self) -> str:
+        """Return the full path to the project folder of the Project"""
+        return os.path.join(PATH, self.P_FOLDER)
 
 
 class Customer(Base):

@@ -46,7 +46,7 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode
-from tsl.variables import STD_DB_PATH, ClearingState
+from tsl.variables import STD_DB_PATH, ClearingState, PATH
 
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
@@ -2993,6 +2993,11 @@ class Process(Base):
 
     projects = relationship("Project", back_populates="process")
 
+    @property
+    def process_archive(self) -> str:
+        """Return the full path to the process archive of the Process"""
+        return os.path.join(PATH, "PSEX", self.PC_PATH)
+
 
 class ProcessPhase(Base):
     """ProcessPhase Model."""
@@ -3139,6 +3144,11 @@ class Project(Base):
     kind_of_test = relationship("KindOfTest")
     sub_orders = relationship("SubOrder", back_populates="project")
     edoc = relationship("Edoc", back_populates="project")
+
+    @property
+    def project_folder(self) -> str:
+        """Return the full path to the project folder of the Project"""
+        return os.path.join(PATH, self.P_FOLDER)
 
 
 class ProofElement(Base):
