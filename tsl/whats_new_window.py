@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QMainWindow, QWidget
 
 from tsl.gen.ui_whats_new_window import Ui_whats_new_window
 
-
 LOG_NAME = ".".join(["tsl", __name__])
 log = logging.getLogger(LOG_NAME)  # pylint: disable=invalid-name
 
@@ -60,6 +59,7 @@ class WhatsNewWindow(QMainWindow):
         self._ui.previous_button.clicked.connect(self.on_previous)
         self._ui.next_button.clicked.connect(self.on_next)
         self._ui.close_button.clicked.connect(self.close)
+        self._ui.text_label.setOpenExternalLinks(True)
 
     @pyqtSlot(name="on_next")
     def on_next(self) -> None:
