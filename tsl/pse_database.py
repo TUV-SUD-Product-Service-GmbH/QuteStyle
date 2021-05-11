@@ -130,6 +130,11 @@ class Project(Base):
     staff = relationship("Staff")
     sub_orders = relationship("SubOrder", back_populates="project")
 
+    @property
+    def project_folder(self) -> str:
+        """Return the full path to the project folder of the Project"""
+        return os.path.join(PATH, self.P_FOLDER)
+
 
 class Customer(Base):
     """Customer table model."""
