@@ -304,7 +304,7 @@ class AttributeType(Base):
         "to convert the values to an integer before use.",
     )
 
-    attributes: List[Attribute] = relationship(
+    attributes: List[Attribute] = relationship(  # type: ignore
         "Attribute", back_populates="attribute_type"
     )
 
@@ -1049,7 +1049,7 @@ class DefaultItem(Base):
     )
     template_type = relationship("TemplateType")
     template_scope = relationship("TemplateScope")
-    test_bases: List[DefaultItemBase] = relationship(
+    test_bases: List[DefaultItemBase] = relationship(  # type: ignore
         "DefaultItemBase", back_populates="default_item"
     )
     custom_list_elements = relationship(
@@ -1058,7 +1058,7 @@ class DefaultItem(Base):
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
     level = relationship("NavLevel")
-    attributes: List[DefaultItemAttribute] = relationship(
+    attributes: List[DefaultItemAttribute] = relationship(  # type: ignore
         "DefaultItemAttribute", back_populates="default_item"
     )
     children = relationship(
@@ -1242,7 +1242,7 @@ class DefaultModuleItemParameter(Base):
         server_default=text("((1))"),
     )
 
-    default_module_item: List["DefaultModuleItem"] = relationship(
+    default_module_item: List["DefaultModuleItem"] = relationship(  # type: ignore
         "DefaultModuleItem", back_populates="parameters"
     )
     parameter = relationship("ModuleParameter")
@@ -1448,13 +1448,13 @@ class DefaultModule(Base):
         "DefaultModuleAttribute", back_populates="default_module"
     )
     header = relationship("Header")
-    items: List[DefaultModuleItem] = relationship(
+    items: List[DefaultModuleItem] = relationship(  # type: ignore
         "DefaultModuleItem",
         back_populates="default_module",
         order_by="DefaultModuleItem.DMI_NUMBER",
     )
 
-    calculations: List[DefaultModuleCalc] = relationship(
+    calculations: List[DefaultModuleCalc] = relationship(  # type: ignore
         "DefaultModuleCalc", back_populates="default_module"
     )
     template_type = relationship("TemplateType")
@@ -1466,7 +1466,7 @@ class DefaultModule(Base):
     update_user = relationship("Staff", foreign_keys=[update_by])
     clearing = relationship("Clearing")
 
-    history: List["DefaultModuleHistory"] = relationship(
+    history: List["DefaultModuleHistory"] = relationship(  # type: ignore
         "DefaultModuleHistory", back_populates="default_module"
     )
 
@@ -1671,7 +1671,7 @@ class DefaultModuleHistory(Base):
     )
     DM_REVISION = Column(Unicode(60), doc=DefaultModule.DM_REVISION.doc)
 
-    default_module: "DefaultModule" = relationship(
+    default_module: "DefaultModule" = relationship(  # type: ignore
         "DefaultModule", back_populates="history"
     )
     clearing = relationship("Clearing")
@@ -1770,7 +1770,7 @@ class DefaultModuleItem(Base):
     default_module = relationship("DefaultModule", back_populates="items")
     default_item = relationship("DefaultItem")
 
-    parameters: List[DefaultModuleItemParameter] = relationship(
+    parameters: List[DefaultModuleItemParameter] = relationship(  # type: ignore
         "DefaultModuleItemParameter", back_populates="default_module_item"
     )
 
@@ -1864,10 +1864,10 @@ class Edoc(Base):
 
     package = relationship("Package", back_populates="edocs")
     header = relationship("Header")
-    phases: List["EdocPhase"] = relationship(
+    phases: List["EdocPhase"] = relationship(  # type: ignore
         "EdocPhase", back_populates="edoc"
     )
-    modules: List["EdocModule"] = relationship(
+    modules: List["EdocModule"] = relationship(  # type: ignore
         "EdocModule", back_populates="edoc", order_by="EdocModule.EM_NUMBER"
     )
 
@@ -1937,10 +1937,10 @@ class EdocModuleItem(Base):
     default_module = relationship("DefaultModule")
     default_item = relationship("DefaultItem")
     nav_level = relationship("NavLevel")
-    phase_results: List[EdocModuleItemPhase] = relationship(
+    phase_results: List[EdocModuleItemPhase] = relationship(  # type: ignore
         "EdocModuleItemPhase", back_populates="edoc_module_item"
     )
-    comparisons: List[EdocModuleItemComparison] = relationship(
+    comparisons: List[EdocModuleItemComparison] = relationship(  # type: ignore
         "EdocModuleItemComparison", back_populates="item"
     )
 
@@ -2168,10 +2168,10 @@ class EdocModule(Base):
     edoc = relationship("Edoc", back_populates="modules")
     default_module = relationship("DefaultModule")
     offline_by = relationship("Staff", foreign_keys=[EM_OFFLINE_BY])
-    phases: List[EdocModulePhase] = relationship(
+    phases: List[EdocModulePhase] = relationship(  # type: ignore
         "EdocModulePhase", back_populates="edoc_module"
     )
-    items: List[EdocModuleItem] = relationship(
+    items: List[EdocModuleItem] = relationship(  # type: ignore
         "EdocModuleItem", back_populates="edoc_module"
     )
 
@@ -2439,7 +2439,7 @@ class Navigation(Base):
         onupdate=get_user_id,
     )
 
-    packages: List["Package"] = relationship(
+    packages: List["Package"] = relationship(  # type: ignore
         "Package", back_populates="navigation"
     )
 
@@ -2607,7 +2607,7 @@ class NavSave(Base):
     save_calculations = relationship(
         "NavSaveCalculation", back_populates="nav_save"
     )
-    selections: List[NavSaveSelection] = relationship(
+    selections: List[NavSaveSelection] = relationship(  # type: ignore
         "NavSaveSelection", back_populates="nav_save"
     )
 
@@ -2710,13 +2710,13 @@ class Package(Base):
 
     clearing_state = relationship("Clearing")
 
-    package_elements: List["PackageElement"] = relationship(
+    package_elements: List["PackageElement"] = relationship(  # type: ignore
         "PackageElement", back_populates="package", cascade="all, delete"
     )
 
     navigation = relationship("Navigation", back_populates="packages")
 
-    service_classes: List["ServiceClass"] = relationship(
+    service_classes: List["ServiceClass"] = relationship(  # type: ignore
         "ServiceClass", back_populates="package", cascade="all, delete"
     )
 
@@ -2784,12 +2784,12 @@ class PackageElement(Base):
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
     package = relationship("Package", back_populates="package_elements")
-    package_calculations: List["PackageElementCalculation"] = relationship(
+    package_calculations: List["PackageElementCalculation"] = relationship(  # type: ignore
         "PackageElementCalculation",
         back_populates="package_element",
         cascade="all, delete",
     )
-    proof_elements: List["ProofElement"] = relationship(
+    proof_elements: List["ProofElement"] = relationship(  # type: ignore
         "ProofElement", cascade="all, delete", back_populates="package_element"
     )
 
@@ -2798,7 +2798,7 @@ class PackageElement(Base):
     level = relationship("NavLevel")
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
-    filters: List[PackageElementFilter] = relationship(
+    filters: List[PackageElementFilter] = relationship(  # type: ignore
         "PackageElementFilter", back_populates="package_element"
     )
 
@@ -2996,6 +2996,7 @@ class Process(Base):
     @property
     def process_archive(self) -> str:
         """Return the full path to the process archive of the Process"""
+        assert self.PC_PATH is not None
         return os.path.join(PATH, "PSEX", self.PC_PATH)
 
 
@@ -3148,6 +3149,7 @@ class Project(Base):
     @property
     def project_folder(self) -> str:
         """Return the full path to the project folder of the Project"""
+        assert self.P_FOLDER is not None
         return os.path.join(PATH, self.P_FOLDER)
 
 

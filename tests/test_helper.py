@@ -13,6 +13,7 @@ def test_check_project_path() -> None:
                 P_ID=1234575,
                 P_FOLDER=r"Projects\2018\1234575",
                 P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
+                P_DISABLED=False,
             )
         )
         session.add(
@@ -20,6 +21,7 @@ def test_check_project_path() -> None:
                 P_ID=1504436,
                 P_FOLDER=r"Projects\2020\1504436",
                 P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
+                P_DISABLED=False,
             )
         )
     assert (

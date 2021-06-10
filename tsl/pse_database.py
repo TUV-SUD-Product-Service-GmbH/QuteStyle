@@ -3,7 +3,8 @@ import errno
 import logging
 import os
 from contextlib import contextmanager
-from typing import Iterator, List, Optional
+from datetime import datetime
+from typing import Iterator, List, Optional, cast
 from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
 
 from sqlalchemy import (
@@ -26,7 +27,7 @@ from sqlalchemy.dialects.mssql import (
     UNIQUEIDENTIFIER,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship, sessionmaker
+from sqlalchemy.orm import Session, relationship, sessionmaker, load_only
 from sqlalchemy.pool import StaticPool
 
 from tsl.common_db import NullUnicode
@@ -48,6 +49,32 @@ Base = declarative_base()
 Base.metadata.bind = ENGINE
 
 AdminSession = sessionmaker(bind=ENGINE)  # pylint: disable=invalid-name
+
+USER_ID: Optional[int] = None
+
+
+# pylint: disable=global-statement
+def _fetch_user_id() -> None:
+    """Fetch and set the user id from the database."""
+    global USER_ID
+    with session_scope(False) as session:
+        username = os.getlogin()
+        log.debug("Getting database id for user %s", username)
+        user = (
+            session.query(Staff)
+            .filter_by(ST_WINDOWSID=username)
+            .options(load_only(Staff.ST_ID, Staff.ST_TEAM))
+            .one()
+        )
+        USER_ID = user.ST_ID
+
+
+def get_user_id() -> int:
+    """Get the database id for the current user."""
+    global USER_ID
+    if USER_ID is None:
+        _fetch_user_id()
+    return cast(int, USER_ID)
 
 
 @contextmanager
@@ -79,7 +106,7 @@ class Process(Base):
 
     @property
     def process_archive(self) -> str:
-        """Return the full path to the process archive of the Process"""
+        """Return the full path to the process archive of the Process."""
         return os.path.join(PATH, "PSEX", self.PC_PATH)
 
 
@@ -121,9 +148,11 @@ class Project(Base):
     P_DATE_APPOINTMENT = Column(DateTime)
     P_EXPECTED_TS_RECEIPT = Column(DateTime)
     BATCH_NUMBER = Column(Unicode(length=16))
-
-    P_REGBY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
-    P_REGDATE = Column(DateTime, nullable=False)
+    P_DISABLED = Column(BIT, nullable=False)
+    P_REGBY = Column(
+        Integer, ForeignKey("STAFF.ST_ID"), nullable=False, default=get_user_id
+    )
+    P_REGDATE = Column(DateTime, nullable=False, default=datetime.utcnow)
     P_UPDATEBY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     P_UPDATE = Column(DateTime)
 
@@ -139,7 +168,7 @@ class Project(Base):
 
     @property
     def project_folder(self) -> str:
-        """Return the full path to the project folder of the Project"""
+        """Return the full path to the project folder of the Project."""
         return os.path.join(PATH, self.P_FOLDER)
 
 
@@ -226,6 +255,12 @@ class Staff(Base):
     ST_PHONE = Column(NullUnicode(length=81), nullable=False, default="")
     ST_FAX = Column(NullUnicode(length=81), nullable=False, default="")
     ST_EMAIL = Column(NullUnicode(length=81), nullable=False, default="")
+    ST_TEAM = Column(Unicode(length=36))
+    ST_WINDOWSID = Column(Unicode(32))
+    ST_ACTIVE = Column(BIT, nullable=False)
+    ST_TYPE = Column(Integer, nullable=False)
+    # ForeignKey('dbo.SKILLGROUP.SG_ID')
+    ST_SKILLGROUP = Column(Unicode(8), nullable=False)
 
 
 class TemplateData(Base):
@@ -353,7 +388,9 @@ class SubOrder(Base):
 
     __tablename__ = "SUBORDERS"
 
-    P_ID = Column(ForeignKey("PROJECT.P_ID"), primary_key=True, nullable=False)
+    P_ID = Column(
+        Integer, ForeignKey("PROJECT.P_ID"), primary_key=True, nullable=False
+    )
     SO_NUMBER = Column(Integer, primary_key=True, nullable=False)
     SO_DISPOBY = Column(Integer)
     SO_CREATED = Column(DateTime)
@@ -412,13 +449,13 @@ class SubOrder(Base):
     ORDER_SIGN = Column(Unicode(35))
     ORDER_DATE = Column(DateTime)
     ORDER_POSITION = Column(Unicode(6))
-    SO_CHECKBY_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    SO_DISPOBY_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    SO_READYBY_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    SO_REGBY_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    SO_UPDATEBY_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    ST_ID_TEAM = Column(ForeignKey("HIERARCHY.HR_NEW_ID"))
-    AL_ID = Column(ForeignKey("ANONYMIZATION_LOG.AL_ID"))
+    SO_CHECKBY_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    SO_DISPOBY_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    SO_READYBY_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    SO_REGBY_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    SO_UPDATEBY_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    ST_ID_TEAM = Column(Integer, ForeignKey("HIERARCHY.HR_NEW_ID"))
+    AL_ID = Column(Integer, ForeignKey("ANONYMIZATION_LOG.AL_ID"))
     SO_PLANNED_MATERIAL = Column(DECIMAL(18, 2))
     SO_PLANNED_LICENSE = Column(DECIMAL(18, 2))
     BANF_REQUEST = Column(DateTime)
@@ -431,8 +468,8 @@ class SubOrder(Base):
     SO_CONFIRMED_DATE = Column(DateTime)
     LIMS_STATUS = Column(Unicode(16))
     LIMS_REMARK = Column(Unicode(256))
-    SOC_ID = Column(ForeignKey("SUBORDER_CATEGORY.ID"))
-    RFAE_ID = Column(ForeignKey("REASON_FOR_ADDITIONAL_EFFORT.ID"))
+    SOC_ID = Column(Integer, ForeignKey("SUBORDER_CATEGORY.ID"))
+    RFAE_ID = Column(Integer, ForeignKey("REASON_FOR_ADDITIONAL_EFFORT.ID"))
     FROM_STARLIMS = Column(BIT, nullable=False)
     SO_COORDINATOR = Column(Integer)
     STARLIMS_DISTINCTIVE_FLAG = Column(Integer)
@@ -499,23 +536,21 @@ class Hierarchy(Base):
     HR_NEW_ID = Column(Integer, nullable=False, unique=True)
     HR_LEVEL = Column(Integer, nullable=False)
     HR_EMAIL = Column(Unicode(80))
-    ST_ID = Column(ForeignKey("STAFF.ST_ID"))
-    CC_ID = Column(ForeignKey("KST.CC_ID"))
+    ST_ID = Column(Integer, ForeignKey("STAFF.ST_ID"))
+    CC_ID = Column(Unicode(10), ForeignKey("KST.CC_ID"))
     POSTING_TARGET = Column(Unicode(4))
     COSTING_DATA_ORDER_SIZE = Column(DECIMAL(19, 4))
     CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(ForeignKey("STAFF.ST_ID"), nullable=False)
+    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
     HR_LAST_UPDATED = Column(DateTime)
-    UPDATED_BY = Column(ForeignKey("STAFF.ST_ID"))
+    UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     IS_PLACEHOLDER = Column(BIT, nullable=False)
 
     kst = relationship("Kst")
     created_by = relationship(
         "Staff", primaryjoin="Hierarchy.CREATED_BY == Staff.ST_ID"
     )
-    st_id = relationship(
-        "Staff", primaryjoin="Hierarchy.ST_ID == Staff.ST_ID"
-    )
+    st_id = relationship("Staff", primaryjoin="Hierarchy.ST_ID == Staff.ST_ID")
     updated_by = relationship(
         "Staff", primaryjoin="Hierarchy.UPDATED_BY == Staff.ST_ID"
     )
@@ -531,9 +566,9 @@ class Kst(Base):
     CC_BOOKINGAREA = Column(Unicode(4))
     CC_TYPE = Column(Integer)
     CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(ForeignKey("STAFF.ST_ID"), nullable=False)
+    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
     UPDATED = Column(DateTime)
-    UPDATED_BY = Column(ForeignKey("STAFF.ST_ID"))
+    UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     CC_GLOBAL_PARTNER_MANDATORY = Column(BIT, nullable=False)
     VALID_FROM = Column(DateTime)
     VALID_UNTIL = Column(DateTime)
@@ -541,8 +576,12 @@ class Kst(Base):
     KTEXT = Column(Unicode(256))
     LTEXT = Column(Unicode(256))
 
-    created_by = relationship("Staff", primaryjoin="Kst.CREATED_BY == Staff.ST_ID")
-    updated_by = relationship("Staff", primaryjoin="Kst.UPDATED_BY == Staff.ST_ID")
+    created_by = relationship(
+        "Staff", primaryjoin="Kst.CREATED_BY == Staff.ST_ID"
+    )
+    updated_by = relationship(
+        "Staff", primaryjoin="Kst.UPDATED_BY == Staff.ST_ID"
+    )
 
 
 class SuborderCategory(Base):
@@ -555,9 +594,9 @@ class SuborderCategory(Base):
     NAME_EN = Column(Unicode(256), nullable=False)
     NAME_FR = Column(Unicode(256), nullable=False)
     CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(ForeignKey("STAFF.ST_ID"), nullable=False)
+    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
     UPDATED = Column(DateTime)
-    UPDATED_BY = Column(ForeignKey("STAFF.ST_ID"))
+    UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
     created_by = relationship(
         "Staff", primaryjoin="SuborderCategory.CREATED_BY == Staff.ST_ID"
@@ -602,9 +641,9 @@ class ReasonForAdditionalEffort(Base):
     NAME_EN = Column(Unicode(256), nullable=False)
     NAME_FR = Column(Unicode(256), nullable=False)
     CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(ForeignKey("STAFF.ST_ID"), nullable=False)
+    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
     UPDATED = Column(DateTime)
-    UPDATED_BY = Column(ForeignKey("STAFF.ST_ID"))
+    UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
     created_by = relationship(
         "Staff",

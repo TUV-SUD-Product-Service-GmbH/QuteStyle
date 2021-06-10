@@ -14,6 +14,9 @@ from tsl.edoc_database import (
 from tsl.init import qt_message_handler
 from tsl.pse_database import ENGINE as PSE_ENGINE
 from tsl.pse_database import Base as PSE_Base
+from tsl.pse_database import _fetch_user_id as _pse_fetch_user_id
+from tsl.pse_database import session_scope as pse_session_scope
+from tsl.pse_database import Staff as PseStaff
 
 # pylint: disable=invalid-name
 log = logging.getLogger(".".join(["tsl", __name__]))
@@ -23,19 +26,23 @@ TFPATH = os.path.join("tests", "test_files")
 
 
 def init_user() -> None:
-    """Create a new dummy user for use in the tests."""
-    with session_scope() as session:
-        user = Staff(
-            ST_WINDOWSID=os.getlogin(),
-            ST_SURNAME="TSL-Toolbox",
-            ST_ACTIVE=True,
-            ST_TYPE=1,
-            ST_SKILLGROUP="00000000",
-            ST_FORENAME="Klaus",
-        )
-        session.add(user)
-    # Init the user variables before creating test data for tests.
-    _fetch_user_id()
+    """Create a new dummy user for use in the tests in PSE and EDOC db."""
+    for scope, fetch, staff in (
+        (session_scope, _fetch_user_id, Staff),
+        (pse_session_scope, _pse_fetch_user_id, PseStaff),
+    ):
+        with scope() as session:
+            user = staff(
+                ST_WINDOWSID=os.getlogin(),
+                ST_SURNAME="TSL-Toolbox",
+                ST_ACTIVE=True,
+                ST_TYPE=1,
+                ST_SKILLGROUP="00000000",
+                ST_FORENAME="Klaus",
+            )
+            session.add(user)
+        # Init the user variables before creating test data for tests.
+        fetch()
 
 
 def pytest_runtest_setup() -> None:
