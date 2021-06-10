@@ -1937,7 +1937,7 @@ class EdocModuleItem(Base):
     default_module = relationship("DefaultModule")
     default_item = relationship("DefaultItem")
     nav_level = relationship("NavLevel")
-    phase_results = relationship(
+    phase_results: List[EdocModuleItemPhase] = relationship(
         "EdocModuleItemPhase", back_populates="edoc_module_item"
     )
     comparisons: List[EdocModuleItemComparison] = relationship(
