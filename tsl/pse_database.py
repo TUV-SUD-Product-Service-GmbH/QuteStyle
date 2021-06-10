@@ -122,12 +122,19 @@ class Project(Base):
     P_EXPECTED_TS_RECEIPT = Column(DateTime)
     BATCH_NUMBER = Column(Unicode(length=16))
 
+    P_REGBY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
+    P_REGDATE = Column(DateTime, nullable=False)
+    P_UPDATEBY = Column(Integer, ForeignKey("STAFF.ST_ID"))
+    P_UPDATE = Column(DateTime)
+
     customer_contact = relationship("CustomerContact")
     ordering_party = relationship("Customer", foreign_keys=[P_CUSTOMER_A])
     manufacturer = relationship("Customer", foreign_keys=[P_CUSTOMER_B])
     process = relationship("Process")
     phase = relationship("ProcessPhase")
-    staff = relationship("Staff")
+    project_manager = relationship("Staff", foreign_keys=[P_PROJECTMANAGER])
+    created_by = relationship("Staff", foreign_keys=[P_REGBY])
+    update_by = relationship("Staff", foreign_keys=[P_UPDATEBY])
     sub_orders = relationship("SubOrder", back_populates="project")
 
     @property
