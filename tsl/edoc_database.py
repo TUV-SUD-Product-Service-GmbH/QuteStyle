@@ -2990,6 +2990,8 @@ class Process(Base):
     PC_REGDATE = Column(DateTime)
     PC_CREATEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     PC_DISABLED = Column(Boolean)
+    PC_KEY2 = Column(Unicode(length=16))
+    PC_KEY3 = Column(Unicode(length=16))
 
     projects = relationship("Project", back_populates="process")
 
