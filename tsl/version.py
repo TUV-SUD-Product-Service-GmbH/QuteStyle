@@ -1,2 +1,2 @@
 """Version definition for TSL Library."""
-VERSION = "1.0.64"
+VERSION = "1.0.65"

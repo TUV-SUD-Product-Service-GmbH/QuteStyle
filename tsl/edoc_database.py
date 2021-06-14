@@ -2024,7 +2024,9 @@ class EdocModuleItemPhase(Base):
     EMIP_COMMENT = Column(Unicode(length=500), default="")
     EMIP_READY = Column(Boolean, default=False)
     ER_ID = Column(Integer, ForeignKey("EDOCRESULT.ER_ID"), default=1)
-    EMIP_HANDLEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
+    EMIP_HANDLEDBY = Column(
+        Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), default=1
+    )
     EMIP_HINT = Column(Boolean, default=False)
     reg = Column("EMIP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
