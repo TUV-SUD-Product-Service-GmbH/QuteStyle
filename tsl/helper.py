@@ -34,9 +34,12 @@ def get_project_path(project_id: int) -> str:
     log.info("Searching correct path for project id %s", project_id)
     session = AdminSession()
     try:
-        project = session.query(Project).filter(Project.P_ID == project_id)\
-            .filter(Project.P_WC_ID ==
-                    "BB8E7738-0ACB-423C-8626-18AA3355B8FF").one()
+        project = (
+            session.query(Project)
+            .filter(Project.P_ID == project_id)
+            .filter(Project.P_WC_ID == "BB8E7738-0ACB-423C-8626-18AA3355B8FF")
+            .one()
+        )
         log.debug("Got project: %s", project)
         return os.path.join(PATH, project.P_FOLDER)
     except NoResultFound:
@@ -50,8 +53,9 @@ def get_process_path(process_id: int) -> str:
     log.info("Searching correct path for process id %s", process_id)
     session = AdminSession()
     try:
-        process = session.query(Process) \
-            .filter(Process.PC_ID == process_id).one()
+        process = (
+            session.query(Process).filter(Process.PC_ID == process_id).one()
+        )
         log.debug("Got process: %s", process)
         return os.path.join(PATH, "PSEX", process.PC_PATH)
     except NoResultFound:
