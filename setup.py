@@ -9,7 +9,7 @@ setup(name='tsl',
       author='Walid Amokrane, Tilman Krummeck',
       author_email='PS-TF-Entwicklung@tuev-sued.de',
       license='MIT',
-      packages=['tsl', 'tsl.gen'],
+      packages=['tsl', 'tsl.gen', 'tsl.dev'],
       package_data={
             'tsl': ['py.typed'],
       },
