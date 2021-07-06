@@ -28,7 +28,7 @@ from sqlalchemy.dialects.mssql import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, relationship, sessionmaker, load_only
-from sqlalchemy.pool import SingletonThreadPool
+from sqlalchemy.pool import StaticPool
 
 from tsl.common_db import NullUnicode
 from tsl.variables import STD_DB_PATH, PATH
@@ -36,11 +36,12 @@ from tsl.variables import STD_DB_PATH, PATH
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
 # pre pool ping will ensure, that connection is reestablished if not alive
-# SingletonThreadPool forces to have one connection per thread. This enables
-# parallel db communication
+# check_same_thread and poolclass are necessary so that unit test can use a
+# in memory sqlite database across different threads.
 ENGINE = create_engine(
     os.getenv("PSE_DB_PATH", STD_DB_PATH.format("PSExplorer")),
-    poolclass=SingletonThreadPool,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
     pool_pre_ping=True,
 )
 
