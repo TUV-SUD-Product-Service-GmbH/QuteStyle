@@ -42,7 +42,7 @@ from sqlalchemy.orm import (
     sessionmaker,
     validates,
 )
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.pool import SingletonThreadPool
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode
@@ -51,12 +51,11 @@ from tsl.variables import STD_DB_PATH, ClearingState, PATH
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
 # pre pool ping will ensure, that connection is reestablished if not alive
-# check_same_thread and poolclass are necessary so that unit test can use a
-# in memory sqlite database across different threads.
+# SingletonThreadPool forces to have one connection per thread. This enables
+# parallel db communication
 ENGINE = create_engine(
     os.getenv("EDOC_DB_PATH", STD_DB_PATH.format("EDOC")),
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
+    poolclass=SingletonThreadPool,
     pool_pre_ping=True,
 )
 
