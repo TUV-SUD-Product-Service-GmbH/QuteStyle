@@ -165,6 +165,7 @@ class Project(Base):
     created_by = relationship("Staff", foreign_keys=[P_REGBY])
     update_by = relationship("Staff", foreign_keys=[P_UPDATEBY])
     sub_orders = relationship("SubOrder", back_populates="project")
+    project_failure_rel = relationship("ProjectFailureRel")
 
     @property
     def project_folder(self) -> str:
@@ -653,6 +654,40 @@ class ReasonForAdditionalEffort(Base):
         "Staff",
         primaryjoin="ReasonForAdditionalEffort.UPDATED_BY == Staff.ST_ID",
     )
+
+
+class ProjectFailureRel(Base):
+    """ProjectFailureRel table model."""
+
+    __tablename__ = 'PROJECT_FAILURE_REL'
+
+    ID = Column(Integer, primary_key=True)
+    P_ID = Column(ForeignKey('PROJECT.P_ID'), nullable=False)
+    SO_NUMBER = Column(Integer)
+    FAIL_ID = Column(ForeignKey('FAILURE_MD.FAIL_ID'), nullable=False)
+
+    failure_md = relationship('FailureMd')
+    project = relationship('Project')
+
+
+class FailureMd(Base):
+    """FailureMd table model."""
+
+    __tablename__ = 'FAILURE_MD'
+
+    FAIL_ID = Column(Integer, primary_key=True)
+    MD_ID = Column(Integer, nullable=False)
+    FAIL_KEY = Column(Unicode(16), nullable=False)
+    FAIL_TEXT_EN = Column(Unicode(150))
+    FAIL_TEXT_DE = Column(Unicode(150))
+    FAIL_TEXT_FR = Column(Unicode(150))
+    FAIL_EXAMPLE_EN = Column(Unicode(500))
+    FAIL_EXAMPLE_DE = Column(Unicode(500))
+    FAIL_EXAMPLE_FR = Column(Unicode(500))
+    Created = Column(DateTime, nullable=False)
+    CreatedBy = Column(Integer)
+    Updated = Column(DateTime)
+    UpdatedBy = Column(Integer)
 
 
 def get_selected_psex_id() -> Optional[int]:
