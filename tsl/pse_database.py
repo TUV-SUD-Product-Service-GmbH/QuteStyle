@@ -18,32 +18,18 @@ from sqlalchemy import (
     LargeBinary,
     SmallInteger,
     Unicode,
-    create_engine,
 )
-from sqlalchemy.dialects.mssql import (
-    BIT,
-    MONEY,
-    TINYINT,
-    UNIQUEIDENTIFIER,
-)
+from sqlalchemy.dialects.mssql import BIT, MONEY, TINYINT, UNIQUEIDENTIFIER
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship, sessionmaker, load_only
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import Session, load_only, relationship, sessionmaker
 
-from tsl.common_db import NullUnicode
-from tsl.variables import STD_DB_PATH, PATH
+from tsl.common_db import NullUnicode, create_db_engine
+from tsl.variables import PATH
+from tsl.vault import Vault
 
 log = logging.getLogger("tsl.pse_database")  # pylint: disable=invalid-name
 
-# pre pool ping will ensure, that connection is reestablished if not alive
-# check_same_thread and poolclass are necessary so that unit test can use a
-# in memory sqlite database across different threads.
-ENGINE = create_engine(
-    os.getenv("PSE_DB_PATH", STD_DB_PATH.format("PSExplorer")),
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-    pool_pre_ping=True,
-)
+ENGINE = create_db_engine(Vault.Application.PSE)
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE

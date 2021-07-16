@@ -51,8 +51,10 @@ def pytest_runtest_setup() -> None:
 
     # raise an exception if the database path isn't configured correctly
     # see https://pswiki.tuev-sued.com/display/TSL/Unit-Tests
-    assert "test_db" in PSE_ENGINE.url.database
-    assert "test_db" in ENGINE.url.database
+    assert os.getenv("PSE_ENV") == "DEV"
+    assert os.getenv("EDOC_ENV") == "DEV"
+    assert "test_db" in PSE_ENGINE.url.query["odbc_connect"]
+    assert "test_db" in ENGINE.url.query["odbc_connect"]
 
     QCoreApplication.setOrganizationName("TÜV SÜD Product Service GmbH")
     QCoreApplication.setOrganizationDomain("tuvsud.com")
@@ -61,10 +63,7 @@ def pytest_runtest_setup() -> None:
     # remove the old personal settings file
     delete_settings()
 
-    log.debug("Using db path for pse: %s", os.getenv("PSE_DB_PATH"))
     PSE_Base.metadata.create_all()
-
-    log.debug("Using db path for edoc: %s", os.getenv("EDOC_DB_PATH"))
     Base.metadata.create_all()
 
     # add the current user to the database
@@ -74,15 +73,17 @@ def pytest_runtest_setup() -> None:
 def pytest_runtest_teardown() -> None:
     """Execute this function after every test case."""
     # raise the same exception as in setup. if those functions hit the real
-    # database, we're done
-    assert "test_db" in PSE_ENGINE.url.database
-    assert "test_db" in ENGINE.url.database
+    # database, we're done because everything gets deleted
+    assert os.getenv("PSE_ENV") == "DEV"
+    assert os.getenv("EDOC_ENV") == "DEV"
+    assert "test_db" in PSE_ENGINE.url.query["odbc_connect"]
+    assert "test_db" in ENGINE.url.query["odbc_connect"]
 
     Base.metadata.drop_all()
     PSE_Base.metadata.drop_all()
 
 
 def delete_settings() -> None:
-    """Remove the personal settings file on X drive."""
+    """Remove the settings stored in QSettings."""
     settings = QSettings()
     settings.clear()

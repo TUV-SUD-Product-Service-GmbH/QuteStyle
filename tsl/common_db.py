@@ -1,18 +1,21 @@
 """Common db stuff."""
-import cProfile
-import contextlib
-import io
-import pstats
-from typing import Optional, TYPE_CHECKING
+import logging
+import os
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import TypeDecorator, Unicode
-from sqlalchemy.engine import Dialect
+from sqlalchemy.engine import Dialect, Engine, create_engine
+from sqlalchemy.pool import StaticPool
 
+from tsl.init import check_ide
+from tsl.vault import Vault
+
+log = logging.getLogger("tsl.common_db")  # pylint: disable=invalid-name
 
 # add typing that is used only when running type check
 # this does not work during normal execution
 if TYPE_CHECKING:
-    StrEngine = TypeDecorator[str]  # noqa
+    StrEngine = TypeDecorator[str]  # noqa  # pragma: no cover
 else:
     StrEngine = TypeDecorator
 
@@ -34,16 +37,26 @@ class NullUnicode(StrEngine):
         return value or ""
 
 
-@contextlib.contextmanager  # type: ignore
-def profiled() -> None:  # type: ignore
-    """Print profile information about a code block."""
-    profile = cProfile.Profile()
-    profile.enable()
-    yield
-    profile.disable()
-    string = io.StringIO()
-    process = pstats.Stats(profile, stream=string).sort_stats('cumulative')
-    process.print_stats()
-    # uncomment this to see who's calling what
-    # ps.print_callers()
-    print(string.getvalue())
+def create_db_engine(
+    app: Vault.Application, env: Vault.Environment = None
+) -> Engine:
+    """Create a database engine for the given application."""
+    print("Creating Engine for Application: %s with Environment %s", app, env)
+    if not env:
+        env_name = os.getenv(
+            f"{app.name}_ENV", "DEV" if check_ide() else "PROD"
+        )
+        env = Vault.Environment[env_name]
+        print("Environment for Engine: %s", env.name)
+    conn_str = Vault.return_conn_str(app, env)
+    # pre pool ping will ensure, that connection is reestablished if not alive
+    # check_same_thread and poolclass are necessary so that unit test can use a
+    # in memory sqlite database across different threads.
+    engine = create_engine(
+        "mssql+pyodbc:///?odbc_connect=" + conn_str,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        pool_pre_ping=True,
+    )
+    print("Created engine for %s: %s", app, engine)
+    return engine

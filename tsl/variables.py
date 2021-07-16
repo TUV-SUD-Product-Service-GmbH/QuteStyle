@@ -2,9 +2,7 @@
 import os
 from enum import IntEnum
 
-STD_DB_PATH = "mssql+pyodbc://lv_edoc:hooters@psexplorerhost.muc.de.itgr.net" \
-              "/{}?driver=ODBC Driver 17 for SQL Server;" \
-              "MultiSubnetFailover=Yes"
+from tsl.init import check_ide
 
 PSE_STORAGE_PATH = r"\\DE001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS\PSEX"
 
@@ -168,4 +166,9 @@ class ClearingState(IntEnum):
 
 
 # use PSE_PATH environment variable to change the path (i.e. for testing)
-PATH = os.getenv("PSE_PATH", r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS")
+_ENV = os.getenv("PSE_FOLDER")
+PATH = (
+    r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
+    if os.getenv("PSE_FOLDER") != "1"
+    else "pse_test"
+)

@@ -37,14 +37,16 @@ steps:
   displayName: Install Development Requirements
 - script: |
     call venv\Scripts\activate.bat
-    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)
+    set PIPELINE=1
+    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)\tsl
     python dev_scripts/setup_test_db.py
   displayName: Setup test database on local server
 - script: |
     call venv\Scripts\activate.bat
-    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)\src
-    set EDOC_DB_PATH=mssql+pyodbc://(localdb)\mssqllocaldb/edoc_test_db?driver=ODBC Driver 17 for SQL Server
-    set PSE_DB_PATH=mssql+pyodbc://(localdb)\mssqllocaldb/pse_test_db?driver=ODBC Driver 17 for SQL Server
+    set PYTHONPATH=%PYTHONPATH%;$(System.DefaultWorkingDirectory);$(System.DefaultWorkingDirectory)\tsl
+    set PIPELINE=1
+    set EDOC_ENV=DEV
+    set PSE_ENV=DEV
     python -m pip install pytest-azurepipelines pytest-cov
     pytest --log-cli-level DEBUG --log-date-format="%Y-%m-%d %H:%M:%S" --junitxml=result.xml -vv tests/ --cov=tsl --cov-report html
   displayName: Run pytest test cases

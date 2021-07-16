@@ -28,7 +28,6 @@ from sqlalchemy import (
     Numeric,
     String,
     Unicode,
-    create_engine,
     text,
 )
 from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY
@@ -42,23 +41,15 @@ from sqlalchemy.orm import (
     sessionmaker,
     validates,
 )
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql.schema import ForeignKey
 
-from tsl.common_db import NullUnicode
-from tsl.variables import STD_DB_PATH, ClearingState, PATH
+from tsl.common_db import NullUnicode, create_db_engine
+from tsl.variables import PATH, ClearingState
+from tsl.vault import Vault
 
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
-# pre pool ping will ensure, that connection is reestablished if not alive
-# check_same_thread and poolclass are necessary so that unit test can use a
-# in memory sqlite database across different threads.
-ENGINE = create_engine(
-    os.getenv("EDOC_DB_PATH", STD_DB_PATH.format("EDOC")),
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-    pool_pre_ping=True,
-)
+ENGINE = create_db_engine(Vault.Application.EDOC)
 
 Base = declarative_base()
 Base.metadata.bind = ENGINE
@@ -1242,9 +1233,9 @@ class DefaultModuleItemParameter(Base):
         server_default=text("((1))"),
     )
 
-    default_module_item: List["DefaultModuleItem"] = relationship(  # type: ignore
+    default_module_item: List["DefaultModuleItem"] = relationship(
         "DefaultModuleItem", back_populates="parameters"
-    )
+    )  # type: ignore
     parameter = relationship("ModuleParameter")
 
 
@@ -1770,9 +1761,9 @@ class DefaultModuleItem(Base):
     default_module = relationship("DefaultModule", back_populates="items")
     default_item = relationship("DefaultItem")
 
-    parameters: List[DefaultModuleItemParameter] = relationship(  # type: ignore
+    parameters: List[DefaultModuleItemParameter] = relationship(
         "DefaultModuleItemParameter", back_populates="default_module_item"
-    )
+    )  # type: ignore
 
     reg_user = relationship("Staff", foreign_keys=[reg_by])
     update_user = relationship("Staff", foreign_keys=[update_by])
@@ -2786,11 +2777,11 @@ class PackageElement(Base):
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
     package = relationship("Package", back_populates="package_elements")
-    package_calculations: List["PackageElementCalculation"] = relationship(  # type: ignore
+    package_calculations: List["PackageElementCalculation"] = relationship(
         "PackageElementCalculation",
         back_populates="package_element",
         cascade="all, delete",
-    )
+    )  # type: ignore
     proof_elements: List["ProofElement"] = relationship(  # type: ignore
         "ProofElement", cascade="all, delete", back_populates="package_element"
     )
@@ -2999,7 +2990,7 @@ class Process(Base):
 
     @property
     def process_archive(self) -> str:
-        """Return the full path to the process archive of the Process"""
+        """Return the full path to the process archive of the Process."""
         assert self.PC_PATH is not None
         return os.path.join(PATH, "PSEX", self.PC_PATH)
 
@@ -3152,7 +3143,7 @@ class Project(Base):
 
     @property
     def project_folder(self) -> str:
-        """Return the full path to the project folder of the Project"""
+        """Return the full path to the project folder of the Project."""
         assert self.P_FOLDER is not None
         return os.path.join(PATH, self.P_FOLDER)
 
