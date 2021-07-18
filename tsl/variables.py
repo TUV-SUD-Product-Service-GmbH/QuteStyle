@@ -2,8 +2,6 @@
 import os
 from enum import IntEnum
 
-from tsl.init import check_ide
-
 PSE_STORAGE_PATH = r"\\DE001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS\PSEX"
 
 QEVENT_LOOKUP = {
@@ -166,7 +164,6 @@ class ClearingState(IntEnum):
 
 
 # use PSE_PATH environment variable to change the path (i.e. for testing)
-_ENV = os.getenv("PSE_FOLDER")
 PATH = (
     r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
     if os.getenv("PSE_FOLDER") != "1"

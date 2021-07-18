@@ -26,8 +26,9 @@ def add_edoc_procedures() -> None:
     print("Connection: " + edoc_conn_str)
     connection = pyodbc.connect(edoc_conn_str, autocommit=True)
     cursor = connection.cursor()
-
-    proc_path = os.path.join("tests", "test_procedures")
+    proc_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "test_procedures"
+    )
     for file in os.listdir(proc_path):
         with open(os.path.join(proc_path, file)) as fhandle:
             escaped_sql = fhandle.read()
