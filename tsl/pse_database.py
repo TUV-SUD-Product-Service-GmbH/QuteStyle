@@ -151,7 +151,7 @@ class Project(Base):
     created_by = relationship("Staff", foreign_keys=[P_REGBY])
     update_by = relationship("Staff", foreign_keys=[P_UPDATEBY])
     sub_orders = relationship("SubOrder", back_populates="project")
-    project_failure_rel = relationship("ProjectFailureRel")
+    project_failure_rel = relationship("ProjectFailureRel", back_populates="project")
 
     @property
     def project_folder(self) -> str:
@@ -653,7 +653,7 @@ class ProjectFailureRel(Base):
     FAIL_ID = Column(ForeignKey('FAILURE_MD.FAIL_ID'), nullable=False)
 
     failure_md = relationship('FailureMd')
-    project = relationship('Project')
+    project = relationship('Project', back_populates="project_failure_rel")
 
 
 class FailureMd(Base):
