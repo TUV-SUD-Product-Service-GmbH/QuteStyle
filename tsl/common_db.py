@@ -41,13 +41,21 @@ def create_db_engine(
     app: Vault.Application, env: Vault.Environment = None
 ) -> Engine:
     """Create a database engine for the given application."""
-    print("Creating Engine for Application: %s with Environment %s", app, env)
+    if check_ide():
+        # only print for debug purposes in IDE!
+        print(
+            "Creating Engine for Application: {} with Environment {}".format(
+                app, env
+            )
+        )
     if not env:
         env_name = os.getenv(
             f"{app.name}_ENV", "DEV" if check_ide() else "PROD"
         )
         env = Vault.Environment[env_name]
-        print("Environment for Engine: %s", env.name)
+        if check_ide():
+            # only print for debug purposes in IDE!
+            print("Environment for Engine: " + env.name)
     conn_str = Vault.return_conn_str(app, env)
     # pre pool ping will ensure, that connection is reestablished if not alive
     # check_same_thread and poolclass are necessary so that unit test can use a
@@ -58,5 +66,7 @@ def create_db_engine(
         poolclass=StaticPool,
         pool_pre_ping=True,
     )
-    print("Created engine for %s: %s", app, engine)
+    if check_ide():
+        # only print for debug purposes in IDE!
+        print("Created engine for {}: {}".format(app, engine))
     return engine

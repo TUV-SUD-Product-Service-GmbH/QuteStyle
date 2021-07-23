@@ -12,6 +12,8 @@ import os
 import urllib.parse
 from enum import Enum
 
+from tsl.init import check_ide
+
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
 
 
@@ -68,6 +70,8 @@ class Vault:
         server = os.getenv(f"{appn}_DB_SERVER", Vault._get_server(app, env))
         user = os.getenv(f"{appn}_DB_USER", Vault._get_user(app, env))
         password = os.getenv(f"{appn}_DB_USER", Vault._get_password(app, env))
+        if "+" in password or ";" in password:
+            raise ValueError("Password MUST not contain a '+' or ';'.")
         name = os.getenv(f"{appn}_DB_NAME", Vault._get_name(app, env))
 
         conn_str = f"Driver={{{driver}}};" f"Server={server};"
@@ -83,7 +87,9 @@ class Vault:
             conn_str += "MultiSubnetFailover=yes;"
         if env != Vault.Environment.DEV:
             conn_str += "Encrypt=yes;TrustServerCertificate=yes"
-        print("Returning " + conn_str)
+        if check_ide():
+            # only print for debug purposes in IDE!
+            print("Returning " + conn_str)
         return urllib.parse.quote(conn_str)
 
     @staticmethod
@@ -139,7 +145,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: "chemup",
-                Vault.Environment.PROD: "pschemup",
+                Vault.Environment.PROD: "ps_chemup",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: "",
@@ -170,7 +176,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: r"Zu8LU3fAriFz6x59",
-                Vault.Environment.PROD: "+*Ps20cHeW02Up#",
+                Vault.Environment.PROD: "u6()D#[[$8G2v5b-",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: "",
