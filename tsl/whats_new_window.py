@@ -40,7 +40,7 @@ class WhatsNewWindow(QMainWindow):
         version: str,
         parent: QWidget = None,
     ) -> None:
-        """Set up the MainWindow."""
+        """Set up the WhatsNewWindow."""
         super(WhatsNewWindow, self).__init__(parent)
         log.debug(
             "Creating WhatsNewWindow for version %s with entries: %s",

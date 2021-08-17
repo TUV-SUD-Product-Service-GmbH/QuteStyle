@@ -193,7 +193,7 @@ class TSLMainWindow(QMainWindow):
     def eventFilter(  # pylint: disable=invalid-name
         self, obj: QObject, event: QEvent
     ) -> bool:
-        """Filter events received in the MainWindow."""
+        """Filter events received in the StyledMainWindow."""
         if obj is self._progress and event.type() == QEvent.Close:
             # prevent closing of progress dialog.
             log.debug("Filtering close event of progress dialog.")

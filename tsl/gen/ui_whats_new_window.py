@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'tsl\ui\whats_new_window.ui'
+# Form implementation generated from reading ui file 'C:\Users\krumm-ti\Documents\PycharmProjects\TSL-Library\tsl\ui\whats_new_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -25,7 +25,9 @@ class Ui_whats_new_window(object):
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 369, 249))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.scrollAreaWidgetContents)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(
+            self.scrollAreaWidgetContents
+        )
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.text_label = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.text_label.setText("")
@@ -36,7 +38,12 @@ class Ui_whats_new_window(object):
         self.verticalLayout.addWidget(self.scrollArea)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Minimum,
+        )
         self.horizontalLayout.addItem(spacerItem)
         self.previous_button = QtWidgets.QPushButton(self.centralwidget)
         self.previous_button.setObjectName("previous_button")
@@ -62,10 +69,21 @@ class Ui_whats_new_window(object):
 
     def retranslateUi(self, whats_new_window):
         _translate = QtCore.QCoreApplication.translate
-        whats_new_window.setWindowTitle(_translate("whats_new_window", "MainWindow"))
-        self.previous_button.setToolTip(_translate("whats_new_window", "Den letzten Eintrag anzeigen."))
+        whats_new_window.setWindowTitle(
+            _translate("whats_new_window", "StyledMainWindow")
+        )
+        self.previous_button.setToolTip(
+            _translate("whats_new_window", "Den letzten Eintrag anzeigen.")
+        )
         self.previous_button.setText(_translate("whats_new_window", "Zurück"))
-        self.next_button.setToolTip(_translate("whats_new_window", "Den nächsten Eintrag anzeigen."))
+        self.next_button.setToolTip(
+            _translate("whats_new_window", "Den nächsten Eintrag anzeigen.")
+        )
         self.next_button.setText(_translate("whats_new_window", "Weiter"))
-        self.close_button.setToolTip(_translate("whats_new_window", "Das Fenster schließen. Sie können das Fenster erneut anzeigen, indem Sie im Menü \"Hilfe\" den Eintrag \"Neuerung\" anwählen."))
+        self.close_button.setToolTip(
+            _translate(
+                "whats_new_window",
+                'Das Fenster schließen. Sie können das Fenster erneut anzeigen, indem Sie im Menü "Hilfe" den Eintrag "Neuerung" anwählen.',
+            )
+        )
         self.close_button.setText(_translate("whats_new_window", "Schließen"))

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   class="ionicon"
+   viewBox="0 0 20 20"
+   version="1.1"
+   id="svg3676"
+   sodipodi:docname="swap.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   width="20"
+   height="20">
+  <metadata
+     id="metadata3682">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Swap Horizontal</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3680" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     id="namedview3678"
+     showgrid="false"
+     inkscape:zoom="20.85965"
+     inkscape:cx="15.005614"
+     inkscape:cy="0.80757209"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3676" />
+  <title
+     id="title3672">Swap Horizontal</title>
+  <path
+     d="m 11.970655,0.71982625 4.97964,4.99701595 -4.97964,4.9970158 m 4.21802,-4.9970158 H 2.7227662 M 7.7024002,19.280173 2.7227662,14.283156 7.7024002,9.2861402 M 3.5230642,14.283156 H 16.950295"
+     id="path3674"
+     inkscape:connector-curvature="0"
+     style="fill:none;stroke:currentColor;stroke-width:1.42523348;stroke-linecap:round;stroke-linejoin:round" />
+</svg>

@@ -434,7 +434,7 @@ class CustomList(Base):
 
     __tablename__ = "CUSTOM_LIST"
 
-    doc = ["Lists that group CustomListElements together."]
+    doc = ["Lists that _group CustomListElements together."]
 
     CUL_ID = Column(Integer, primary_key=True)
     CUL_NAME_DE = Column(Unicode(256), doc="German name of the CustomList.")
