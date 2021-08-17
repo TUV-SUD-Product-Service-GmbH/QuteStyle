@@ -17,8 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 from tsl.init import SETTINGS, init
-from tsl.resources_rc import qInitResources
-from tsl.style import get_style
+from tsl.style import get_style, DEFAULT_STYLE, THEMES
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.icon_button import IconButton
@@ -40,7 +39,7 @@ class RightWidget(ColumnBaseWidget):
         layout = QHBoxLayout()
 
         pse_info_button = IconButton(
-            icon_path=":/svg_icons/icon_clipboard.svg"
+            self, icon_path=":/svg_icons/icon_clipboard.svg"
         )
         layout.addWidget(pse_info_button)
         rcolumn_spacer1 = QSpacerItem(
@@ -80,7 +79,7 @@ class InfoWidget(ColumnBaseWidget):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.addWidget(QLabel("Switch style"))
-        button = IconButton(":/svg_icons/icon_send.svg")
+        button = IconButton(self, ":/svg_icons/icon_send.svg")
         layout.addWidget(button)
         button.clicked.connect(self.switch_style)
 
@@ -178,7 +177,7 @@ class StyledMainWindow(TSLStyledMainWindow):
                 "Snow White",
                 "Darcula",
                 "Princess Pink",
-            ).index(QSettings().value("style", "Darcula"))
+            ).index(QSettings().value("style", DEFAULT_STYLE))
         except KeyError:
             self._current_idx = 0
 
@@ -187,7 +186,7 @@ class StyledMainWindow(TSLStyledMainWindow):
         self._current_idx += 1
         if self._current_idx == 3:
             self._current_idx = 0
-        style_name = ("Snow White", "Darcula", "Princess Pink")[
+        style_name = tuple(THEMES.keys())[
             self._current_idx
         ]
         QSettings().setValue("style", style_name)
@@ -202,8 +201,6 @@ if __name__ == "__main__":
     # activate highdpi icons and scaling
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-
-    qInitResources()
 
     APP = QApplication(sys.argv)
     QCoreApplication.setApplicationName(APP_NAME)

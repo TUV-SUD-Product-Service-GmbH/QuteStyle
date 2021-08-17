@@ -9,9 +9,9 @@ from PyQt5.QtCore import (
     QPropertyAnimation,
     QSize,
     Qt,
-    pyqtSlot,
+    pyqtSlot, pyqtSignal,
 )
-from PyQt5.QtGui import QMouseEvent, QResizeEvent
+from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from tsl.resources_rc import qInitResources
 from tsl.style import get_style
 from tsl.update_window import TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
@@ -51,6 +52,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
     MIN_SIZE: QSize = QSize(0, 0)
 
+    # Signal that is emitted when the window has shut down.
+    shutdown_complete = pyqtSignal(name="shutdown_complete")
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         update: bool,
@@ -64,6 +68,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         super().__init__(
             update, help_text, name, version, force_whats_new, parent
         )
+
+        # Load the TSL-Library ressource file.
+        qInitResources()
 
         # Set the global stylesheet.
         self.set_style()
@@ -441,3 +448,37 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         widget_class = self._left_column.current_widget()
         self._left_menu.set_button_active(widget_class, False)
         self._start_box_animation(False, False)
+
+    def closeEvent(self, close_event: QCloseEvent) -> None:
+        """Handle a close event."""
+        widgets = [
+            self._content.widget(idx) for idx in range(self._content.count())
+        ]
+        for widget in widgets:
+            log.debug("Requesting shutdown from widget")
+            if not widget.request_shutdown():
+                log.debug("Widget %s can't be shutdown", widget)
+                close_event.ignore()
+                return
+        super().closeEvent(close_event)
+
+        for widget in widgets:
+            widget.store_settings()
+            widget.shutdown_completed.connect(self.on_widget_shutdown)
+            widget.shutdown()
+
+    def on_widget_shutdown(self, widget: MainWidget) -> None:
+        """Handle a completed widget shutdown."""
+        log.debug("Widget completed shutdown: %s", widget)
+        self._content.removeWidget(widget)
+        if not self._content.count():
+            log.debug("All widgets have shut down.")
+            self.shutdown_complete.emit()
+        else:
+            log.debug(
+                "Those widgets are still shutting down: %s",
+                [
+                    self._content.widget(idx)
+                    for idx in range(self._content.count())
+                ],
+            )

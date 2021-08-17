@@ -1,5 +1,11 @@
 """Base widget definitions."""
+import logging
+from typing import List, Optional
+
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget
+
+log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
 class ColumnBaseWidget(QWidget):
@@ -14,3 +20,50 @@ class MainWidget(QWidget):
 
     ICON: str
     NAME: str
+    GROUPS: List[str] = []
+
+    shutdown_completed = pyqtSignal(QWidget, name="shutdown_completed")
+
+    def __init__(self, parent: QWidget = None) -> None:
+        """Init the BaseWidget for a Widget in TSL-Toolbox."""
+        self._thread: Optional[QThread] = None
+        super().__init__(parent)
+
+    def __repr__(self) -> str:
+        """Return a str representation for the MainWidget."""
+        return f"<{self.__class__} {self.NAME} {id(self)}>"
+
+    def shutdown(self) -> None:
+        """Shutdown the application."""
+        log.debug("Shutting down tab %s", self.NAME)
+        if self._thread is not None and self._thread.isRunning():
+            log.debug("Thread is in running state %s", self.NAME)
+            # Disconnect the current handlers before attaching a new slot.
+            # In case of nav_loader a new thread would be started in the
+            # original finished handler which will then lead to an error
+            # when closing the app because this thread is still running.
+            # Restarting the app in this case fails.
+            self._thread.finished.disconnect()
+            self._thread.finished.connect(  # type: ignore
+                self.on_thread_finished
+            )
+        else:
+            self.on_thread_finished()
+
+    def store_settings(self) -> None:  # pragma: no cover
+        """Store the settings."""
+
+    @pyqtSlot(name="on_thread_finished")
+    def on_thread_finished(self) -> None:
+        """Handle the shutdown when the thread has finished."""
+        log.debug("On thread finished base class %s", self.NAME)
+        self.shutdown_completed.emit(self)
+
+    def request_shutdown(self) -> bool:  # pylint: disable=no-self-use
+        """
+        Request shutdown from a widget so that the widget can interfere.
+
+        If a widget wants to cancel the shutdown, it must reimplement this
+        method and return False.
+        """
+        return True

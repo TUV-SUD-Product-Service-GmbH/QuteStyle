@@ -6,6 +6,10 @@ from PyQt5.QtCore import QSettings
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
+# Use this variable when referencing a default style so that adapting to a new
+# default style will only require changes in the lib.
+DEFAULT_STYLE = "Darcula"
+
 THEMES: Dict[str, Dict[str, str]] = {
     "Snow White": {
         "dark_one": "#1b1e23",
@@ -34,7 +38,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "red": "#ff5555",
         "yellow": "#f1fa8c",
     },
-    "Darcula": {
+    "Princess Pink": {
         "dark_one": "#282a36",
         "dark_two": "#2B2E3B",
         "dark_three": "#333645",
@@ -61,7 +65,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "red": "#ff5555",
         "yellow": "#f1fa8c",
     },
-    "Princess Pink": {
+    "Darcula": {
         "dark_one": "#1b1e23",
         "dark_two": "#1e2229",
         "dark_three": "#21252d",
@@ -95,18 +99,18 @@ def get_style() -> str:
     """Return the current style sheet that is stored in QSettings."""
     # Use the Darcula style if not style is stored yet as default.
     log.debug("Stored style: %s", QSettings().value("style"))
-    style = QSettings().value("style", "Darcula")
+    style = QSettings().value("style", DEFAULT_STYLE)
     try:
         return MAIN_STYLE.format(**THEMES[style])
     except KeyError:
         # In case a stored style was removed.
         log.warning("Could not find style %s", style)
-        return MAIN_STYLE.format(**THEMES["Darcula"])
+        return MAIN_STYLE.format(**THEMES[DEFAULT_STYLE])
 
 
 def get_color(name: str) -> str:
     """Return the color code for the given name."""
-    return THEMES[QSettings().value("style", "Darcula")][name]
+    return THEMES[QSettings().value("style", DEFAULT_STYLE)][name]
 
 
 MAIN_STYLE = """
@@ -180,9 +184,23 @@ QLineEdit {{
     selection-background-color: {context_color};
     color: {text_foreground};
 }}
+QLineEdit#column_line_edit {{
+    background-color: {bg_one};
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding-left: 10px;
+    padding-right: 10px;
+    selection-color: {text_active};
+    selection-background-color: {context_color};
+    color: {text_foreground};
+}}
 QLineEdit:focus {{
     border: 1px solid {context_color};
     background-color: {bg_one};
+}}
+QLineEdit#column_line_edit:focus {{
+    border: 1px solid {context_color};
+    background-color: {bg_two};
 }}
 
 /* QScrollBar */
@@ -433,6 +451,16 @@ QFrame#div {{
     color: {text_description};
     padding-left: 10px;
     padding-right: 10px;
+}}
+/* Label that has no padding on the left side */
+QLabel#left_label {{
+    font: 9pt "Segoe UI";
+    color: {text_description};
+    padding-left: 0px;
+    padding-right: 10px;
+}}
+QLabel#welcome_label {{
+    font: 14pt "Segoe UI";
 }}
 /* Completer*/
 #completer_popup{{

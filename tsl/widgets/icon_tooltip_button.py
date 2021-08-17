@@ -21,10 +21,10 @@ class IconTooltipButton(IconButton):
         icon_path: str,
         bgs: BackgroundColors = None,
         text: str = None,
-        parent: QWidget = None
+        parent: QWidget = None,
     ) -> None:
         """Create a new IconTooltipButton."""
-        super().__init__(icon_path, bgs, text, parent)
+        super().__init__(parent, icon_path, bgs, text)
 
         # App is needed to show the tooltip outside of the button's rect.
         self._app_parent = app_parent

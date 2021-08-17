@@ -29,10 +29,10 @@ class IconButton(QPushButton):
 
     def __init__(
         self,
-        icon_path: str,
+        parent: QWidget = None,
+        icon_path: str = ":/svg_icons/no_icon.svg",
         bgs: BackgroundColors = None,
         text: str = None,
-        parent: QWidget = None,
     ) -> None:
         """Create a new IconButton."""
         if text:
