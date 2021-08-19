@@ -1,8 +1,8 @@
 """Tests for tsl.helper."""
 import pytest
 
-from tsl.pse_database import session_scope, Project, Process
-from tsl.helper import get_project_path, get_process_path
+from tsl.helper import get_process_path, get_project_path
+from tsl.pse_database import Process, Project, session_scope
 
 
 def test_check_project_path() -> None:

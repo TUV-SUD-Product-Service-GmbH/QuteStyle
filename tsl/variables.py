@@ -158,9 +158,9 @@ QEVENT_LOOKUP = {
 class ClearingState(IntEnum):
     """Clearing states grouped."""
 
-    Final = 0
-    Intermediate = 1
-    NotFinal = 2
+    FINAL = 0
+    INTERMEDIATE = 1
+    NOT_FINAL = 2
 
 
 # use PSE_PATH environment variable to change the path (i.e. for testing)

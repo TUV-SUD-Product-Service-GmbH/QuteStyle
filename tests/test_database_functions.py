@@ -1,11 +1,12 @@
 """Test for edoc database methods."""
 import logging
 from datetime import datetime
-from typing import Any, Sequence, cast
+from typing import Any, List, Sequence, cast
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.sql.elements import TextClause
 
 from tsl import edoc_database_functions
 from tsl.edoc_database import (
@@ -37,9 +38,9 @@ log = logging.getLogger(  # pylint: disable=invalid-name
 def test_execute_stored_procedure(monkeypatch: MonkeyPatch) -> None:
     """Test that executing a stored procedure works as expected."""
 
-    def mock_execute(_: Session, statement: str) -> None:
+    def mock_execute(_: Session, statement: TextClause) -> None:
         assert (
-            statement == "SET NOCOUNT ON;"
+            statement.text == "SET NOCOUNT ON;"
             "EXEC dbo.TEST_PROCEDURE 1, 2, Test-Arg;"
             "SET NOCOUNT OFF;"
         )
@@ -153,7 +154,7 @@ def generic_copy_test_with_sp(
         _check_copied_package(new_nav_id, new_package, old_package)
 
 
-def _check_copied_package(  # noqa: MC0001
+def _check_copied_package(  # noqa: MC0001  # pylint: disable=too-many-branches
     new_nav_id: int, new_package: Package, old_package: Package
 ) -> None:
     """Check that a copied Package is correct."""
@@ -171,8 +172,9 @@ def _check_copied_package(  # noqa: MC0001
                 assert new_value == old_package.NP_ID
             else:
                 assert old_value == new_value
-        except AttributeError:
+        except AttributeError as att_error:
             if column.name == "NP_REG":
+                assert new_package.reg
                 assert new_package.reg.date() == datetime.now().date()
             elif column.name == "NP_UPDATE":
                 assert new_package.update is None
@@ -181,12 +183,14 @@ def _check_copied_package(  # noqa: MC0001
             elif column.name == "NP_UPDATEBY":
                 assert new_package.update_by is None
             else:
-                raise ValueError("Found unknown Attribute: " + column.name)
+                raise ValueError(
+                    "Found unknown Attribute: " + column.name
+                ) from att_error
 
     old_scl = [scl.definition.SCL_ID for scl in old_package.service_classes]
     new_scl = [scl.definition.SCL_ID for scl in new_package.service_classes]
 
-    assert sorted(old_scl) == sorted(new_scl)
+    assert sorted(cast(List[int], old_scl)) == sorted(cast(List[int], new_scl))
 
 
 def create_test_navigation() -> int:

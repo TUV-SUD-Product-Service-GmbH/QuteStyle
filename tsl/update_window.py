@@ -4,11 +4,19 @@ import logging
 import os
 import subprocess
 import sys
-from typing import Optional
+from typing import Optional, cast
 
-from PyQt5.QtCore import Qt, pyqtSlot, QObject, QEvent, QThread, QSettings
+from PyQt5.QtCore import (
+    QEvent,
+    QObject,
+    QSettings,
+    Qt,
+    QThread,
+    pyqtBoundSignal,
+    pyqtSlot,
+)
 from PyQt5.QtGui import QCloseEvent
-from PyQt5.QtWidgets import QWidget, QMainWindow, QProgressDialog, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QProgressDialog, QWidget
 
 from tsl.edoc_database import get_user_group_name
 from tsl.updater import LAGER_PATH, Updater
@@ -32,7 +40,7 @@ class TSLMainWindow(QMainWindow):
         parent: QWidget = None,
     ) -> None:
         """Create a new TSL main window."""
-        super(TSLMainWindow, self).__init__(parent)
+        super().__init__(parent)
         self._update_status: Optional[bool] = None
         self._configure_update()
         self._help_text: str = help_text
@@ -54,21 +62,25 @@ class TSLMainWindow(QMainWindow):
             self._updater = Updater(self._app_name, self._version)
             self._updater.moveToThread(self._updater_thread)
             self._updater.update_available.connect(self.update_status)
-            self._updater_thread.started.connect(self._updater.start_update)
+            cast(pyqtBoundSignal, self._updater_thread.started).connect(
+                self._updater.start_update
+            )
             self._updater.updater_checked.connect(self._updater_thread.quit)
-            self._updater_thread.finished.connect(self.updater_finished)
+            cast(pyqtBoundSignal, self._updater_thread.finished).connect(
+                self.updater_finished
+            )
             self._updater_thread.start()
         else:
             log.debug("Suppressing update with -u or running from IDE.")
             self.update_status(False)
-        super(TSLMainWindow, self).show()
+        super().show()
         self._handle_last_run()
 
     def _handle_last_run(self) -> None:
         """Check if the What's new window needs to be shown."""
         last_run = QSettings().value("last_run", (0, 0, 0))
         log.debug("Last run showed details for version %s", last_run)
-        current_ver = tuple([int(num) for num in self._version.split(".")])
+        current_ver = tuple(int(num) for num in self._version.split("."))
         if last_run < current_ver or self._force_whats_new:
             log.debug("Current version newer than last run %s", self._version)
             # if we force whats new display, we show the error message, even if
@@ -125,7 +137,7 @@ class TSLMainWindow(QMainWindow):
             log.debug("WhatsNewWindow is still open, closing.")
             self._whats_new_window.close()
         self._save_settings()
-        super(TSLMainWindow, self).closeEvent(close_event)
+        super().closeEvent(close_event)
 
     def _save_settings(self) -> None:
         """Save the paint data and state/geometry settings."""
@@ -227,7 +239,7 @@ class TSLMainWindow(QMainWindow):
 
         if self._update_status is True:
             log.debug("Update is available.")
-            subprocess.Popen(
+            with subprocess.Popen(
                 [
                     os.path.join(
                         os.path.expanduser("~"),
@@ -241,12 +253,12 @@ class TSLMainWindow(QMainWindow):
                         LAGER_PATH, self._app_name, "TSL-Update", "update.json"
                     ),
                 ]
-            )
-            sys.exit()
+            ):
+                sys.exit()
         else:
             log.debug("No update is available.")
 
     def _close_progress_window(self) -> None:
-        """Uninstall the eventfilter and then close the progress window."""
+        """Uninstall the event filter and then close the progress window."""
         self._progress.removeEventFilter(self)
         self._progress.close()

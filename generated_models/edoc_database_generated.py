@@ -1,9 +1,10 @@
 # coding: utf-8
 from sqlalchemy import (
-    BigInteger,
     CHAR,
-    Column,
     DECIMAL,
+    NCHAR,
+    BigInteger,
+    Column,
     Date,
     DateTime,
     Float,
@@ -11,7 +12,6 @@ from sqlalchemy import (
     Index,
     Integer,
     LargeBinary,
-    NCHAR,
     Numeric,
     String,
     Table,
@@ -26,8 +26,8 @@ from sqlalchemy.dialects.mssql import (
     TINYINT,
     UNIQUEIDENTIFIER,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -1039,7 +1039,6 @@ class DEFAULTMODULUPDATE(Base):
         DateTime, nullable=False, server_default=text("(getdate())")
     )
     DMU_UPDATEBY = Column(Integer, index=True)
-
 
 
 class EDOCOFFICECOUNT(Base):

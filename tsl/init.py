@@ -20,22 +20,25 @@ key logging: Initialize logging to log output to the stdout stream and also
 """
 
 import logging
-import traceback
 import os
 import sys
-import winreg  # type: ignore
-from typing import Callable, TypedDict
+import traceback
+import winreg
+from types import TracebackType
+from typing import Type, TypedDict
 
-try:
-    from PyQt5.QtWidgets import QMessageBox
-    from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtFatalMsg, \
-        QtCriticalMsg, QtWarningMsg, QtInfoMsg, qInstallMessageHandler
-except ModuleNotFoundError:
-    # if PyQt5 is not installed, we skip the imports
-    pass
+from PyQt5.QtCore import (
+    QMessageLogContext,
+    QtCriticalMsg,
+    QtFatalMsg,
+    QtInfoMsg,
+    QtMsgType,
+    QtWarningMsg,
+    qInstallMessageHandler,
+)
+from PyQt5.QtWidgets import QMessageBox
 
 from tsl.version import VERSION
-
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
@@ -49,9 +52,7 @@ class SettingsDict(TypedDict):
 
 
 SETTINGS = SettingsDict(
-    log_level=logging.DEBUG,
-    full_log=False,
-    name_log="logfile.log"
+    log_level=logging.DEBUG, full_log=False, name_log="logfile.log"
 )
 
 
@@ -71,21 +72,24 @@ def edit_registry_keys(app_name: str) -> None:
     log.info("Updating registry keys for %s", app_name)
     data = {
         os.path.join("Software", app_name): os.path.abspath(sys.argv[0]),
-        os.path.join("Software", "TÜV SÜD", app_name):
-            os.path.split(os.path.abspath(sys.argv[0]))[0]
+        os.path.join("Software", "TÜV SÜD", app_name): os.path.split(
+            os.path.abspath(sys.argv[0])
+        )[0],
     }
     for key, value in data.items():
         winreg.CreateKey(winreg.HKEY_CURRENT_USER, key)
-        registry_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key, 0,
-                                      winreg.KEY_WRITE)
-        winreg.SetValueEx(registry_key, "ApplicationPath", 0, winreg.REG_SZ,
-                          value)
+        registry_key = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, key, 0, winreg.KEY_WRITE
+        )
+        winreg.SetValueEx(
+            registry_key, "ApplicationPath", 0, winreg.REG_SZ, value
+        )
         winreg.CloseKey(registry_key)
 
 
-def excepthook(cls: Callable, exception: Exception,
-               trace: traceback  # type: ignore
-               ) -> None:
+def excepthook(
+    cls: Type[BaseException], exception: BaseException, trace: TracebackType
+) -> None:
     """Override the system except hook to catch PyQt exceptions."""
     log.critical("Critical error occurred:")
     traceback_text = ""
@@ -98,7 +102,7 @@ def excepthook(cls: Callable, exception: Exception,
     try:
         error_message_box("{}: {}".format(cls, exception), traceback_text)
     except ImportError:
-        log.warning("Not showing error message since PyQt5 is not installed.")
+        log.warning("Not showing error message since PyQt is not installed.")
 
 
 def error_message_box(error_message: str, traceb: str) -> None:
@@ -112,13 +116,13 @@ def error_message_box(error_message: str, traceb: str) -> None:
         msg.setWindowTitle("An error occurred")
         msg.exec()
     except NameError:
-        log.info("PyQt5 is not installed, not showing exception message")
+        log.info("PyQt is not installed, not showing exception message")
 
 
 def set_excepthook(app_name: str) -> None:
-    """Set the excepthook to catch PyQt5 exceptions in signals and slots."""
+    """Set the excepthook to catch PyQt exceptions in signals and slots."""
     log.info("Setting custom except hook for %s", app_name)
-    sys.excepthook = excepthook  # type: ignore
+    sys.excepthook = excepthook
 
 
 def create_logger(app_name: str) -> None:
@@ -131,10 +135,12 @@ def create_logger(app_name: str) -> None:
 
     The function will configure the log level according to SETTINGS["level"].
     """
-    format_str = '%(asctime)s.%(msecs)03d %(threadName)10s  - ' \
-                 '%(name)-50s - %(funcName)-25s:%(lineno)-4s - ' \
-                 '%(levelname)-8s - %(message)s'
-    date_format = '%Y-%m-%d %H:%M:%S'
+    format_str = (
+        "%(asctime)s.%(msecs)03d %(threadName)10s  - "
+        "%(name)-50s - %(funcName)-25s:%(lineno)-4s - "
+        "%(levelname)-8s - %(message)s"
+    )
+    date_format = "%Y-%m-%d %H:%M:%S"
     formatter = logging.Formatter(format_str, date_format)
 
     try:
@@ -164,13 +170,14 @@ def create_logger(app_name: str) -> None:
     try:
         qInstallMessageHandler(qt_message_handler)
     except NameError:
-        log.info("PyQt5 is not installed, not configuring Qt message handler")
+        log.info("PyQt is not installed, not configuring Qt message handler")
     log.info("Successfully initialized logging for '%s'", app_name)
     log.info("TSL-Library version %s", VERSION)
 
 
-def qt_message_handler(mode: QtMsgType, context: QMessageLogContext,
-                       message: str) -> None:
+def qt_message_handler(
+    mode: QtMsgType, context: QMessageLogContext, message: str
+) -> None:
     """Handle a Qt log message and write it to python logging."""
     if mode == QtInfoMsg:
         level = logging.INFO
@@ -186,8 +193,12 @@ def qt_message_handler(mode: QtMsgType, context: QMessageLogContext,
     log.log(level, msg)
 
 
-def init(app_name: str, logs: bool = False, registry: bool = False,
-         hook: bool = False) -> None:
+def init(
+    app_name: str,
+    logs: bool = False,
+    registry: bool = False,
+    hook: bool = False,
+) -> None:
     """
     Init the application and setup different TSL specific functions.
 

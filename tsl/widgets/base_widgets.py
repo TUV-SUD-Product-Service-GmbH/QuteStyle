@@ -44,9 +44,7 @@ class MainWidget(QWidget):
             # when closing the app because this thread is still running.
             # Restarting the app in this case fails.
             self._thread.finished.disconnect()
-            self._thread.finished.connect(  # type: ignore
-                self.on_thread_finished
-            )
+            self._thread.finished.connect(self.on_thread_finished)
         else:
             self.on_thread_finished()
 

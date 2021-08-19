@@ -1,7 +1,7 @@
 """Common db stuff."""
 import logging
 import os
-from typing import TYPE_CHECKING, Optional
+from typing import Optional, Type
 
 from sqlalchemy import TypeDecorator, Unicode
 from sqlalchemy.engine import Dialect, Engine, create_engine
@@ -12,16 +12,8 @@ from tsl.vault import Vault
 
 log = logging.getLogger("tsl.common_db")  # pylint: disable=invalid-name
 
-# add typing that is used only when running type check
-# this does not work during normal execution
-if TYPE_CHECKING:
-    StrEngine = TypeDecorator[str]  # noqa  # pragma: no cover
-else:
-    StrEngine = TypeDecorator
 
-
-# pylint: disable=abstract-method, too-few-public-methods
-class NullUnicode(StrEngine):
+class NullUnicode(TypeDecorator):  # pylint: disable=abstract-method
     """
     Handles NULL values for strings like empty strings.
 
@@ -31,10 +23,16 @@ class NullUnicode(StrEngine):
 
     impl = Unicode
 
-    # pylint: disable=no-self-use
-    def process_result_value(self, value: Optional[str], _: Dialect) -> str:
+    def process_result_value(  # pylint: disable=no-self-use
+        self, value: Optional[str], _: Dialect
+    ) -> str:
         """Return the value or an empty str if the value is None (NULL)."""
         return value or ""
+
+    @property
+    def python_type(self) -> Type[str]:
+        """Return the type expected by instances of this type."""
+        return str
 
 
 def create_db_engine(

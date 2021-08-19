@@ -31,8 +31,13 @@ if __name__ == "__main__":
     TREE.write("../tsl/resources/resources.qrc")
 
     print("Generating resource_rc.py with new resources.qrc")
-    assert subprocess.call("PyRCC5 -o ../tsl/resources_rc.py "
-                           "../tsl/resources/resources.qrc") == 0
+    assert (
+        subprocess.call(
+            "PyRCC5 -o ../tsl/resources_rc.py "
+            "../tsl/resources/resources.qrc"
+        )
+        == 0
+    )
 
     print("Deleting resources.qrc")
     os.remove("../tsl/resources/resources.qrc")

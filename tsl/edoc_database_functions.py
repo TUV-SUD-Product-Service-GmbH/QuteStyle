@@ -2,7 +2,7 @@
 import logging
 from typing import Any, List, Sequence, cast
 
-from sqlalchemy import desc
+from sqlalchemy import desc, text
 from sqlalchemy.orm import joinedload, load_only
 from sqlalchemy.orm.session import Session
 
@@ -61,7 +61,7 @@ def execute_stored_procedure(  # type: ignore
     """Execute a stored procedure on the database."""
     statement = f"EXEC dbo.{procedure} " + ", ".join(str(arg) for arg in args)
     log.debug("Constructed statement: %s", statement)
-    session.execute(f"SET NOCOUNT ON;{statement};SET NOCOUNT OFF;")
+    session.execute(text(f"SET NOCOUNT ON;{statement};SET NOCOUNT OFF;"))
 
 
 def insert_package_into_nav(
@@ -92,48 +92,48 @@ def insert_package_into_nav(
     ), "Can't copy PackageElementFilters when not copying PackageElements."
 
     if copy_pe:
-        new_pack_id = _sp_insert_package_with_filter(
+        return _sp_insert_package_with_filter(
             nav_id, package_id, session, copy_filters
         )
-    else:
-        log.debug("Copying manually because copying PackageElements is off.")
-        pack: Package = (
-            session.query(Package)
-            .filter_by(NP_ID=package_id)
-            .options(
-                joinedload(Package.service_classes),
-            )
-            .one()
+
+    log.debug("Copying manually because copying PackageElements is off.")
+    pack: Package = (
+        session.query(Package)
+        .filter_by(NP_ID=package_id)
+        .options(
+            joinedload(Package.service_classes),
+        )
+        .one()
+    )
+
+    new_pack = Package(
+        N_ID=nav_id,
+        NP_NAME_DE=pack.NP_NAME_DE,
+        NP_NAME_EN=pack.NP_NAME_EN,
+        NP_COMMENT_DE=pack.NP_COMMENT_DE,
+        NP_COMMENT_EN=pack.NP_COMMENT_EN,
+        CL_ID=pack.CL_ID,
+        NP_CLEARDATE=pack.NP_CLEARDATE,
+        NP_CLEARBY=pack.NP_CLEARBY,
+        ZM_PRODUCT=pack.ZM_PRODUCT,
+        PT_ID=pack.PT_ID,
+        NP_TESTSAMPLES=pack.NP_TESTSAMPLES,
+        NP_IS_TEMPLATE=False,
+        NP_TEMPLATE_ID=pack.NP_ID,
+        PN_ID=pack.PN_ID,
+    )
+
+    for service_class in cast(List[ServiceClass], pack.service_classes):
+        log.debug("Creating new service class: %s", service_class.SCL_ID)
+        new_pack.service_classes.append(
+            ServiceClass(SCL_ID=service_class.SCL_ID)
         )
 
-        new_pack = Package(
-            N_ID=nav_id,
-            NP_NAME_DE=pack.NP_NAME_DE,
-            NP_NAME_EN=pack.NP_NAME_EN,
-            NP_COMMENT_DE=pack.NP_COMMENT_DE,
-            NP_COMMENT_EN=pack.NP_COMMENT_EN,
-            CL_ID=pack.CL_ID,
-            NP_CLEARDATE=pack.NP_CLEARDATE,
-            NP_CLEARBY=pack.NP_CLEARBY,
-            ZM_PRODUCT=pack.ZM_PRODUCT,
-            PT_ID=pack.PT_ID,
-            NP_TESTSAMPLES=pack.NP_TESTSAMPLES,
-            NP_IS_TEMPLATE=False,
-            NP_TEMPLATE_ID=pack.NP_ID,
-            PN_ID=pack.PN_ID,
-        )
+    session.add(new_pack)
+    session.flush()
 
-        for service_class in cast(List[ServiceClass], pack.service_classes):
-            log.debug("Creating new service class: %s", service_class.SCL_ID)
-            new_pack.service_classes.append(
-                ServiceClass(SCL_ID=service_class.SCL_ID)
-            )
-
-        session.add(new_pack)
-        session.flush()
-
-        new_pack_id = new_pack.NP_ID
-    return new_pack_id
+    # it must be and int after the flush
+    return cast(int, new_pack.NP_ID)
 
 
 def copy_package_element(
@@ -203,4 +203,5 @@ def copy_package_element(
                     NPE_ID=new_element.NPE_ID, DMI_ID=filt.DMI_ID
                 )
             )
-    return new_element.NPE_ID
+    # new element was flushed, hence NPE_ID must available at this point
+    return cast(int, new_element.NPE_ID)

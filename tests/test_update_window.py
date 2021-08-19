@@ -1,6 +1,6 @@
 """Tests for the TSLMainWindow."""
-from PyQt5.QtCore import QSize, QSettings, QPoint
-from pytestqt.qtbot import QtBot  # type: ignore
+from PyQt5.QtCore import QPoint, QSettings, QSize
+from pytestqt.qtbot import QtBot
 
 from tsl.update_window import TSLMainWindow
 

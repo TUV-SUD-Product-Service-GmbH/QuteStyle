@@ -3,8 +3,14 @@ import logging
 from typing import Optional, TypedDict
 
 from PyQt5.QtCore import QEvent, QRect, Qt
-from PyQt5.QtGui import (QBrush, QColor, QMouseEvent, QPainter, QPaintEvent,
-                         QPixmap)
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QMouseEvent,
+    QPainter,
+    QPaintEvent,
+    QPixmap,
+)
 from PyQt5.QtWidgets import QPushButton, QWidget
 
 from tsl.style import get_color

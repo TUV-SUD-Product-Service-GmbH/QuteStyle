@@ -7,7 +7,7 @@ You will need to provide valid confluence credentials as environment variables
 
 import json
 import os
-from typing import Tuple, Type, Dict, cast
+from typing import Dict, Tuple, Type, cast
 from xml.etree import ElementTree
 
 import requests
@@ -174,7 +174,7 @@ def _create_lib_default_element(
                 td_s_default.text = att.comparator.default.arg.text
     if att.onupdate:
         if att.onupdate.is_callable:
-            ou_text = f"On Update: INTERNAL CALLABLE"
+            ou_text = "On Update: INTERNAL CALLABLE"
         else:
             ou_text = f"On Update: {att.comparator.onupdate.arg.text}"
         if td_s_default.text:
@@ -245,7 +245,7 @@ def _create_type_element(att: InstrumentedAttribute) -> ElementTree.Element:
     td_type = ElementTree.Element("td")
     try:
         type_str = str(att.comparator.type)
-        type_key = type_str.split("(")[0]
+        type_key = type_str.split("(", maxsplit=1)[0]
         link = TYPE_BASE_LINK + TYPE_LINKS[type_key]
         element = ElementTree.Element("a", {"href": link})
         element.text = type_str

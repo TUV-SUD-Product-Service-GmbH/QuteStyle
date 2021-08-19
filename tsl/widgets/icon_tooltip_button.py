@@ -5,7 +5,7 @@ from typing import Tuple
 from PyQt5.QtCore import QEvent, QPoint
 from PyQt5.QtWidgets import QWidget
 
-from tsl.widgets.icon_button import IconButton, BackgroundColors
+from tsl.widgets.icon_button import BackgroundColors, IconButton
 from tsl.widgets.tooltip import ToolTip
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name

@@ -1,4 +1,6 @@
 """Database connection and models for the PSE database."""
+from __future__ import annotations
+
 import errno
 import logging
 import os
@@ -20,8 +22,13 @@ from sqlalchemy import (
     Unicode,
 )
 from sqlalchemy.dialects.mssql import BIT, MONEY, TINYINT, UNIQUEIDENTIFIER
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, load_only, relationship, sessionmaker
+from sqlalchemy.orm import (
+    Session,
+    declarative_base,
+    load_only,
+    relationship,
+    sessionmaker,
+)
 
 from tsl.common_db import NullUnicode, create_db_engine
 from tsl.variables import PATH
@@ -72,7 +79,7 @@ def session_scope(commit: bool = True) -> Iterator[Session]:
         yield session
         if commit:
             session.commit()
-    except:  # nopep8
+    except:
         session.rollback()
         raise
     finally:
@@ -93,6 +100,7 @@ class Process(Base):
     @property
     def process_archive(self) -> str:
         """Return the full path to the process archive of the Process."""
+        assert self.PC_PATH
         return os.path.join(PATH, "PSEX", self.PC_PATH)
 
 
@@ -108,7 +116,7 @@ class ProcessPhase(Base):
 
 
 class Project(Base):
-    """Project table model."""
+    """PROJECT table model."""
 
     __tablename__ = "PROJECT"
 
@@ -142,20 +150,37 @@ class Project(Base):
     P_UPDATEBY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     P_UPDATE = Column(DateTime)
 
-    customer_contact = relationship("CustomerContact")
-    ordering_party = relationship("Customer", foreign_keys=[P_CUSTOMER_A])
-    manufacturer = relationship("Customer", foreign_keys=[P_CUSTOMER_B])
-    process = relationship("Process")
-    phase = relationship("ProcessPhase")
-    project_manager = relationship("Staff", foreign_keys=[P_PROJECTMANAGER])
-    created_by = relationship("Staff", foreign_keys=[P_REGBY])
-    update_by = relationship("Staff", foreign_keys=[P_UPDATEBY])
-    sub_orders = relationship("SubOrder", back_populates="project")
-    project_failure_rel = relationship("ProjectFailureRel", back_populates="project")
+    customer_contact: CustomerContact = relationship(
+        "CustomerContact", uselist=False
+    )
+    ordering_party: Customer = relationship(
+        "Customer", foreign_keys=[P_CUSTOMER_A], uselist=False
+    )
+    manufacturer: Customer = relationship(
+        "Customer", foreign_keys=[P_CUSTOMER_B], uselist=False
+    )
+    process: Process = relationship("Process", uselist=False)
+    phase: ProcessPhase = relationship("ProcessPhase", uselist=False)
+    project_manager: Staff = relationship(
+        "Staff", foreign_keys=[P_PROJECTMANAGER], uselist=False
+    )
+    created_by: Staff = relationship(
+        "Staff", foreign_keys=[P_REGBY], uselist=False
+    )
+    update_by: Staff = relationship(
+        "Staff", foreign_keys=[P_UPDATEBY], uselist=False
+    )
+    sub_orders: SubOrder = relationship(
+        "SubOrder", back_populates="project", uselist=False
+    )
+    project_failure_rel: ProjectFailureRel = relationship(
+        "ProjectFailureRel", back_populates="project", uselist=False
+    )
 
     @property
     def project_folder(self) -> str:
         """Return the full path to the project folder of the Project."""
+        assert self.P_FOLDER
         return os.path.join(PATH, self.P_FOLDER)
 
 
@@ -199,8 +224,8 @@ class Customer(Base):
     EINVOICING_RELEVANCE = Column(Unicode(length=10))
     PRINT_OPTION = Column(Unicode(length=3))
 
-    addresses: List["CustomerAddress"] = relationship(  # type: ignore
-        "CustomerAddress", back_populates="customer"
+    addresses: List["CustomerAddress"] = relationship(
+        "CustomerAddress", back_populates="customer", uselist=False
     )
 
 
@@ -228,7 +253,9 @@ class CustomerAddress(Base):
     CA_ZIPCODE = Column(NullUnicode(length=11), nullable=False, default="")
     CA_CITY = Column(NullUnicode(length=41), nullable=False, default="")
 
-    customer = relationship("Customer", back_populates="addresses")
+    customer: Customer = relationship(
+        "Customer", back_populates="addresses", uselist=False
+    )
 
 
 class Staff(Base):
@@ -306,8 +333,8 @@ class Template(Base):
     DM_ID = Column(Integer)
     TP_OLD_TP = Column(Integer)
 
-    temp_scope = relationship("TemplateScope")
-    temp_type = relationship("TemplateType")
+    temp_scope: TemplateScope = relationship("TemplateScope", uselist=False)
+    temp_type: TemplateType = relationship("TemplateType", uselist=False)
 
 
 class TemplateScope(Base):
@@ -477,32 +504,47 @@ class SubOrder(Base):
     SO_EXTERNAL_CERT_EXISTS = Column(BIT, nullable=False)
     SO_CERT_COMMENT = Column(Unicode(512))
 
-    anonymization_log = relationship("AnonymizationLog")
-    project = relationship("Project", back_populates="sub_orders")
-    reason_for_additional_effort = relationship("ReasonForAdditionalEffort")
-    suborder_category = relationship("SuborderCategory")
-    so_checkby_team = relationship(
+    anonymization_log: AnonymizationLog = relationship(
+        "AnonymizationLog", uselist=False
+    )
+    project: Project = relationship(
+        "Project", back_populates="sub_orders", uselist=False
+    )
+    reason_for_additional_effort: ReasonForAdditionalEffort = relationship(
+        "ReasonForAdditionalEffort", uselist=False
+    )
+    suborder_category: SuborderCategory = relationship(
+        "SuborderCategory", uselist=False
+    )
+    so_checkby_team: Hierarchy = relationship(
         "Hierarchy",
         primaryjoin="SubOrder.SO_CHECKBY_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
-    so_dispoby_team = relationship(
+    so_dispoby_team: Hierarchy = relationship(
         "Hierarchy",
         primaryjoin="SubOrder.SO_DISPOBY_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
-    so_dreadyby_team = relationship(
+    so_dreadyby_team: Hierarchy = relationship(
         "Hierarchy",
         primaryjoin="SubOrder.SO_READYBY_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
-    so_regby_team = relationship(
+    so_regby_team: Hierarchy = relationship(
         "Hierarchy",
         primaryjoin="SubOrder.SO_REGBY_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
-    so_updateby_team = relationship(
+    so_updateby_team: Hierarchy = relationship(
         "Hierarchy",
         primaryjoin="SubOrder.SO_UPDATEBY_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
-    st_id_team = relationship(
-        "Hierarchy", primaryjoin="SubOrder.ST_ID_TEAM == Hierarchy.HR_NEW_ID"
+    st_id_team: Hierarchy = relationship(
+        "Hierarchy",
+        primaryjoin="SubOrder.ST_ID_TEAM == Hierarchy.HR_NEW_ID",
+        uselist=False,
     )
 
 
@@ -533,13 +575,19 @@ class Hierarchy(Base):
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     IS_PLACEHOLDER = Column(BIT, nullable=False)
 
-    kst = relationship("Kst")
-    created_by = relationship(
-        "Staff", primaryjoin="Hierarchy.CREATED_BY == Staff.ST_ID"
+    kst: Kst = relationship("Kst", uselist=False)
+    created_by: Staff = relationship(
+        "Staff",
+        primaryjoin="Hierarchy.CREATED_BY == Staff.ST_ID",
+        uselist=False,
     )
-    st_id = relationship("Staff", primaryjoin="Hierarchy.ST_ID == Staff.ST_ID")
-    updated_by = relationship(
-        "Staff", primaryjoin="Hierarchy.UPDATED_BY == Staff.ST_ID"
+    st_id: Staff = relationship(
+        "Staff", primaryjoin="Hierarchy.ST_ID == Staff.ST_ID", uselist=False
+    )
+    updated_by: Staff = relationship(
+        "Staff",
+        primaryjoin="Hierarchy.UPDATED_BY == Staff.ST_ID",
+        uselist=False,
     )
 
 
@@ -563,11 +611,11 @@ class Kst(Base):
     KTEXT = Column(Unicode(256))
     LTEXT = Column(Unicode(256))
 
-    created_by = relationship(
-        "Staff", primaryjoin="Kst.CREATED_BY == Staff.ST_ID"
+    created_by: Staff = relationship(
+        "Staff", primaryjoin="Kst.CREATED_BY == Staff.ST_ID", uselist=False
     )
-    updated_by = relationship(
-        "Staff", primaryjoin="Kst.UPDATED_BY == Staff.ST_ID"
+    updated_by: Staff = relationship(
+        "Staff", primaryjoin="Kst.UPDATED_BY == Staff.ST_ID", uselist=False
     )
 
 
@@ -585,11 +633,15 @@ class SuborderCategory(Base):
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
-    created_by = relationship(
-        "Staff", primaryjoin="SuborderCategory.CREATED_BY == Staff.ST_ID"
+    created_by: Staff = relationship(
+        "Staff",
+        primaryjoin="SuborderCategory.CREATED_BY == Staff.ST_ID",
+        uselist=False,
     )
-    updated_by = relationship(
-        "Staff", primaryjoin="SuborderCategory.UPDATED_BY == Staff.ST_ID"
+    updated_by: Staff = relationship(
+        "Staff",
+        primaryjoin="SuborderCategory.UPDATED_BY == Staff.ST_ID",
+        uselist=False,
     )
 
 
@@ -632,34 +684,38 @@ class ReasonForAdditionalEffort(Base):
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
-    created_by = relationship(
+    created_by: Staff = relationship(
         "Staff",
         primaryjoin="ReasonForAdditionalEffort.CREATED_BY == Staff.ST_ID",
+        uselist=False,
     )
-    updated_by = relationship(
+    updated_by: Staff = relationship(
         "Staff",
         primaryjoin="ReasonForAdditionalEffort.UPDATED_BY == Staff.ST_ID",
+        uselist=False,
     )
 
 
 class ProjectFailureRel(Base):
     """ProjectFailureRel table model."""
 
-    __tablename__ = 'PROJECT_FAILURE_REL'
+    __tablename__ = "PROJECT_FAILURE_REL"
 
     ID = Column(Integer, primary_key=True)
-    P_ID = Column(ForeignKey('PROJECT.P_ID'), nullable=False)
+    P_ID = Column(Integer, ForeignKey("PROJECT.P_ID"), nullable=False)
     SO_NUMBER = Column(Integer)
-    FAIL_ID = Column(ForeignKey('FAILURE_MD.FAIL_ID'), nullable=False)
+    FAIL_ID = Column(Integer, ForeignKey("FAILURE_MD.FAIL_ID"), nullable=False)
 
-    failure_md = relationship('FailureMd')
-    project = relationship('Project', back_populates="project_failure_rel")
+    failure_md: FailureMd = relationship("FailureMd")
+    project: Project = relationship(
+        "Project", back_populates="project_failure_rel"
+    )
 
 
 class FailureMd(Base):
     """FailureMd table model."""
 
-    __tablename__ = 'FAILURE_MD'
+    __tablename__ = "FAILURE_MD"
 
     FAIL_ID = Column(Integer, primary_key=True)
     MD_ID = Column(Integer, nullable=False)

@@ -1,9 +1,9 @@
 """Entry defining a software change for the WhatsNewWindow."""
 import logging
 from enum import IntEnum
-from typing import List, TypedDict
+from typing import List, TypedDict, cast
 
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtBoundSignal, pyqtSlot
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget
 
@@ -16,8 +16,8 @@ log = logging.getLogger(LOG_NAME)  # pylint: disable=invalid-name
 class WhatsNewEntryType(IntEnum):
     """Definition of the type of a WhatsNewEntry."""
 
-    Feature = 0
-    Fix = 1
+    FEATURE = 0
+    BUGFIX = 1
 
 
 class WhatsNewEntry(TypedDict):
@@ -41,7 +41,7 @@ class WhatsNewWindow(QMainWindow):
         parent: QWidget = None,
     ) -> None:
         """Set up the WhatsNewWindow."""
-        super(WhatsNewWindow, self).__init__(parent)
+        super().__init__(parent)
         log.debug(
             "Creating WhatsNewWindow for version %s with entries: %s",
             version,
@@ -56,9 +56,15 @@ class WhatsNewWindow(QMainWindow):
         self._current_entry_idx = 0
         self._display_entry()
 
-        self._ui.previous_button.clicked.connect(self.on_previous)
-        self._ui.next_button.clicked.connect(self.on_next)
-        self._ui.close_button.clicked.connect(self.close)
+        cast(pyqtBoundSignal, self._ui.previous_button.clicked).connect(
+            self.on_previous
+        )
+        cast(pyqtBoundSignal, self._ui.next_button.clicked).connect(
+            self.on_next
+        )
+        cast(pyqtBoundSignal, self._ui.close_button.clicked).connect(
+            self.close
+        )
         self._ui.text_label.setOpenExternalLinks(True)
 
     @pyqtSlot(name="on_next")

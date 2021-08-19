@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 from tsl.init import SETTINGS, init
-from tsl.style import get_style, DEFAULT_STYLE, THEMES
+from tsl.style import DEFAULT_STYLE, THEMES, get_style
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.icon_button import IconButton
@@ -34,7 +34,7 @@ class RightWidget(ColumnBaseWidget):
 
     def __init__(self, parent: QWidget = None) -> None:
         """Create a new RightWidget."""
-        super(RightWidget, self).__init__(parent)
+        super().__init__(parent)
 
         layout = QHBoxLayout()
 
@@ -186,9 +186,7 @@ class StyledMainWindow(TSLStyledMainWindow):
         self._current_idx += 1
         if self._current_idx == 3:
             self._current_idx = 0
-        style_name = tuple(THEMES.keys())[
-            self._current_idx
-        ]
+        style_name = tuple(THEMES.keys())[self._current_idx]
         QSettings().setValue("style", style_name)
         self.setStyleSheet(get_style())
         self.update()

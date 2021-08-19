@@ -6,7 +6,7 @@ import sys
 from typing import Iterable, List
 
 import pyodbc
-from PyQt5 import uic  # type: ignore
+from PyQt5 import uic  # type: ignore  # pylint: disable=wrong-import-order
 
 from tsl.vault import Vault
 

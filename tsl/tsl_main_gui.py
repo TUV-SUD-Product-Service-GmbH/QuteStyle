@@ -9,7 +9,8 @@ from PyQt5.QtCore import (
     QPropertyAnimation,
     QSize,
     Qt,
-    pyqtSlot, pyqtSignal,
+    pyqtSignal,
+    pyqtSlot,
 )
 from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent
 from PyQt5.QtWidgets import (

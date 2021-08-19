@@ -9,7 +9,7 @@ import shutil
 import time
 from typing import Dict, List, Tuple
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QEventLoop, QTimer
+from PyQt5.QtCore import QEventLoop, QObject, QTimer, pyqtSignal, pyqtSlot
 
 log = logging.getLogger("tsl.copy_worker")  # pylint: disable=invalid-name
 
@@ -32,7 +32,7 @@ class CopyWorker(QObject):
         The file is the former txt file. You can use any path you want as we
         will look for the update.json anyway.
         """
-        super(CopyWorker, self).__init__(parent)
+        super().__init__(parent)
         self._path = path
         self._exe_path = ""
         self._source = ntpath.split(file)[0]
@@ -49,7 +49,9 @@ class CopyWorker(QObject):
         return os.path.join(self._path, self._app_name)
 
     @pyqtSlot(name="start_copy")
-    def start_copy(self) -> None:
+    def start_copy(  # pylint: disable=too-many-branches
+        self,
+    ) -> None:
         """Start to copy the files from the def file to the destination."""
         self.status_changed.emit("Checking TSL definition file of update.")
         log.debug(

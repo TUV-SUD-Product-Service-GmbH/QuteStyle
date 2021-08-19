@@ -3,9 +3,15 @@ import json
 import logging
 import os
 from os.path import expanduser
-from typing import cast, Optional
+from typing import Optional, cast
 
-from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import (
+    QObject,
+    QThread,
+    pyqtBoundSignal,
+    pyqtSignal,
+    pyqtSlot,
+)
 
 from tsl.copy_worker import CopyWorker
 from tsl.init import check_ide
@@ -36,7 +42,7 @@ class Updater(QObject):
 
     def __init__(self, app_name: str, version: str, parent: QObject = None):
         """Init the Updater."""
-        super(Updater, self).__init__(parent)
+        super().__init__(parent)
 
         log.info("Creating new Updater for app %s (%s)", app_name, version)
 
@@ -101,9 +107,13 @@ class Updater(QObject):
         install_path = os.path.join(expanduser("~"), "TSL", "Updater")
         self._copy_worker = CopyWorker(install_path, json_file)
         self._copy_worker.moveToThread(self._updater_thread)
-        self._updater_thread.started.connect(self._copy_worker.start_copy)
+        cast(pyqtBoundSignal, self._updater_thread.started).connect(
+            self._copy_worker.start_copy
+        )
         self._copy_worker.copy_finished.connect(self._updater_thread.quit)
-        self._updater_thread.finished.connect(self.check_finished)
+        cast(pyqtBoundSignal, self._updater_thread.finished).connect(
+            self.check_finished
+        )
         self._updater_thread.start()
         log.info("Copy worker started.")
 

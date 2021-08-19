@@ -1,12 +1,13 @@
 """TSL Library - helper: useful functions for TSL tools."""
 import logging
 import os
+from typing import cast
 
-from PyQt5.QtCore import QByteArray, QBuffer, QIODevice
+from PyQt5.QtCore import QBuffer, QByteArray, QIODevice
 from PyQt5.QtGui import QPixmap
 from sqlalchemy.orm.exc import NoResultFound
 
-from tsl.pse_database import AdminSession, Project, Process
+from tsl.pse_database import AdminSession, Process, Project
 from tsl.variables import PATH
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
@@ -23,7 +24,9 @@ def encode_pixmap(pixmap: QPixmap) -> str:
 
 def decode_pixmap(pixmap_string: str) -> QPixmap:
     """Decode a QPixmap from a Base64 str."""
-    byte_array = QByteArray.fromBase64(pixmap_string.encode("utf-8"))
+    byte_array = QByteArray.fromBase64(
+        cast(QByteArray, pixmap_string.encode("utf-8"))
+    )
     qpixmap = QPixmap()
     qpixmap.loadFromData(byte_array)
     return qpixmap
@@ -42,8 +45,10 @@ def get_project_path(project_id: int) -> str:
         )
         log.debug("Got project: %s", project)
         return os.path.join(PATH, project.P_FOLDER)
-    except NoResultFound:
-        raise ValueError(f"No path found for project id {project_id}")
+    except NoResultFound as no_result_found:
+        raise ValueError(
+            f"No path found for project id {project_id}"
+        ) from no_result_found
     finally:
         session.close()
 
@@ -58,7 +63,9 @@ def get_process_path(process_id: int) -> str:
         )
         log.debug("Got process: %s", process)
         return os.path.join(PATH, "PSEX", process.PC_PATH)
-    except NoResultFound:
-        raise ValueError(f"No path found for process id {process_id}")
+    except NoResultFound as no_result_found:
+        raise ValueError(
+            f"No path found for process id {process_id}"
+        ) from no_result_found
     finally:
         session.close()

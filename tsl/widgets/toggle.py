@@ -1,7 +1,7 @@
 """Toggle button (custom checkbox)."""
 from typing import Union
 
-from PyQt5.QtCore import (  # type: ignore
+from PyQt5.QtCore import (  # type: ignore # for pyqtProperty
     QEasingCurve,
     QPoint,
     QPropertyAnimation,

@@ -31,10 +31,10 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     Session,
     backref,
+    declarative_base,
     deferred,
     load_only,
     relationship,
@@ -137,7 +137,7 @@ def session_scope(commit: bool = True) -> Iterator[Session]:
         yield session
         if commit:
             session.commit()
-    except:  # nopep8
+    except:
         session.rollback()
         raise
     finally:
@@ -216,7 +216,7 @@ class AppsCount(Base):
         "egger-hl.",
     )
 
-    user = relationship("Staff")
+    user: Staff = relationship("Staff", uselist=False)
 
 
 class Attribute(Base):
@@ -263,9 +263,15 @@ class Attribute(Base):
         onupdate=get_user_id,
     )
 
-    attribute_type = relationship("AttributeType", back_populates="attributes")
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    attribute_type: AttributeType = relationship(
+        "AttributeType", back_populates="attributes", uselist=False
+    )
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class AttributeType(Base):
@@ -295,8 +301,8 @@ class AttributeType(Base):
         "to convert the values to an integer before use.",
     )
 
-    attributes: List[Attribute] = relationship(  # type: ignore
-        "Attribute", back_populates="attribute_type"
+    attributes: List[Attribute] = relationship(
+        "Attribute", back_populates="attribute_type", uselist=True
     )
 
 
@@ -375,8 +381,12 @@ class Clearing(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
     @property
     def final_state(self) -> ClearingState:
@@ -388,10 +398,10 @@ class Clearing(Base):
             "08 – gängige Praxis (nicht validiert)",
             "10 - TCC Status",
         ]:
-            return ClearingState.Final
+            return ClearingState.FINAL
         if self.CL_NAME_DE == "05 - Freigabeverfahren läuft":
-            return ClearingState.Intermediate
-        return ClearingState.NotFinal
+            return ClearingState.INTERMEDIATE
+        return ClearingState.NOT_FINAL
 
 
 class Country(Base):
@@ -426,7 +436,9 @@ class Country(Base):
         server_default=text("((1))"),
     )
 
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class CustomList(Base):
@@ -454,8 +466,12 @@ class CustomList(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class CustomListElement(Base):
@@ -540,12 +556,16 @@ class CustomListElement(Base):
         onupdate=get_user_id,
     )
 
-    custom_list = relationship("CustomList")
-    default_item = relationship(
-        "DefaultItem", back_populates="custom_list_elements"
+    custom_list: CustomList = relationship("CustomList", uselist=False)
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="custom_list_elements", uselist=False
     )
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Customer(Base):
@@ -600,8 +620,12 @@ class Customer(Base):
         Integer, doc="UNKNOWN, but not a Foreign Key as appears nowhere else."
     )
 
-    address = relationship("CustomerAddress", back_populates="customer")
-    contacts = relationship("CustomerContact", back_populates="customer")
+    address: CustomerAddress = relationship(
+        "CustomerAddress", back_populates="customer", uselist=False
+    )
+    contacts: CustomerContact = relationship(
+        "CustomerContact", back_populates="customer", uselist=False
+    )
 
 
 class CustomerAddress(Base):
@@ -727,7 +751,7 @@ class CustomerAddress(Base):
         "CA_UPDATED", DateTime, nullable=False, onupdate=datetime.utcnow
     )
 
-    customer = relationship(
+    customer: Customer = relationship(
         "Customer", back_populates="address", uselist=False
     )
 
@@ -751,7 +775,9 @@ class CustomerContact(Base):
         Unicode(60), doc="Scope of the contact, i.e. 'Geschäftsführer'"
     )
 
-    customer = relationship("Customer", back_populates="contacts")
+    customer: Customer = relationship(
+        "Customer", back_populates="contacts", uselist=False
+    )
 
 
 class DefaultItem(Base):
@@ -1032,32 +1058,46 @@ class DefaultItem(Base):
         doc="French result text template",
     )
 
-    clearing = relationship("Clearing")
-    annexes = relationship("DefaultItemAnnex", back_populates="default_item")
-    custom = relationship("DefaultItemCustom", back_populates="default_item")
-    pictures = relationship(
-        "DefaultItemPicture", back_populates="default_item"
+    clearing: Clearing = relationship("Clearing", uselist=False)
+    annexes: List[DefaultItemAnnex] = relationship(
+        "DefaultItemAnnex", back_populates="default_item", uselist=True
     )
-    template_type = relationship("TemplateType")
-    template_scope = relationship("TemplateScope")
-    test_bases: List[DefaultItemBase] = relationship(  # type: ignore
-        "DefaultItemBase", back_populates="default_item"
+    custom: DefaultItemCustom = relationship(
+        "DefaultItemCustom", back_populates="default_item", uselist=False
     )
-    custom_list_elements = relationship(
-        "CustomListElement", back_populates="default_item"
+    pictures: List[DefaultItemPicture] = relationship(
+        "DefaultItemPicture", back_populates="default_item", uselist=True
     )
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    level = relationship("NavLevel")
-    attributes: List[DefaultItemAttribute] = relationship(  # type: ignore
-        "DefaultItemAttribute", back_populates="default_item"
+    template_type: TemplateType = relationship("TemplateType", uselist=False)
+    template_scope: TemplateScope = relationship(
+        "TemplateScope", uselist=False
     )
-    children = relationship(
-        "DefaultItem", backref=backref("parent", remote_side=[DI_ID])
+    test_bases: List[DefaultItemBase] = relationship(
+        "DefaultItemBase", back_populates="default_item", uselist=True
+    )
+    custom_list_elements: List[CustomListElement] = relationship(
+        "CustomListElement", back_populates="default_item", uselist=True
+    )
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    level: NavLevel = relationship("NavLevel", uselist=False)
+    attributes: List[DefaultItemAttribute] = relationship(
+        "DefaultItemAttribute", back_populates="default_item", uselist=True
+    )
+    children: DefaultItem = relationship(
+        "DefaultItem",
+        backref=backref("parent", remote_side=[DI_ID]),
+        uselist=False,
     )
 
-    owner = relationship("Staff", foreign_keys=[DI_OWNER])
-    team = relationship("Staff", foreign_keys=[ST_ID])
+    owner: Staff = relationship(
+        "Staff", foreign_keys=[DI_OWNER], uselist=False
+    )
+    team: Staff = relationship("Staff", foreign_keys=[ST_ID], uselist=False)
 
 
 class DefaultItemAnnex(Base):
@@ -1082,8 +1122,8 @@ class DefaultItemAnnex(Base):
         doc="Flag that defines if the annex shall be copied into a protocol",
     )
 
-    default_item = relationship(
-        "DefaultItem", back_populates="annexes", lazy="joined"
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="annexes", lazy="joined", uselist=False
     )
 
 
@@ -1112,8 +1152,10 @@ class DefaultItemAttribute(Base):
         "therefore it's not nullable in TSL lib.",
     )
 
-    default_item = relationship("DefaultItem", back_populates="attributes")
-    attribute = relationship("Attribute")
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="attributes", uselist=False
+    )
+    attribute: Attribute = relationship("Attribute", uselist=False)
 
 
 class DefaultItemCustom(Base):
@@ -1153,10 +1195,12 @@ class DefaultItemCustom(Base):
         server_default=text("((1))"),
     )
 
-    custom_list = relationship("CustomList")
-    custom_list_element = relationship("CustomListElement")
-    default_item = relationship(
-        "DefaultItem", back_populates="custom", lazy="joined"
+    custom_list: CustomList = relationship("CustomList", uselist=False)
+    custom_list_element: CustomListElement = relationship(
+        "CustomListElement", uselist=False
+    )
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="custom", lazy="joined", uselist=False
     )
 
 
@@ -1192,8 +1236,10 @@ class DefaultItemBase(Base):
         doc="DEPRECATED: Subclause that was referenced in the base (old).",
     )
 
-    default_item = relationship("DefaultItem", back_populates="test_bases")
-    test_base = relationship("TestBase")
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="test_bases", uselist=False
+    )
+    test_base: TestBase = relationship("TestBase", uselist=False)
 
 
 class DefaultModuleItemParameter(Base):
@@ -1233,10 +1279,10 @@ class DefaultModuleItemParameter(Base):
         server_default=text("((1))"),
     )
 
-    default_module_item: List["DefaultModuleItem"] = relationship(
-        "DefaultModuleItem", back_populates="parameters"
-    )  # type: ignore
-    parameter = relationship("ModuleParameter")
+    default_module_item: List[DefaultModuleItem] = relationship(
+        "DefaultModuleItem", back_populates="parameters", uselist=True
+    )
+    parameter: ModuleParameter = relationship("ModuleParameter", uselist=False)
 
 
 class DefaultItemPicture(Base):
@@ -1258,8 +1304,8 @@ class DefaultItemPicture(Base):
     DIP_HEIGHT = Column(Integer, doc="Height")
     DIP_DATA = deferred(Column(IMAGE), doc="Picture data")
 
-    default_item = relationship(
-        "DefaultItem", back_populates="pictures", lazy="joined"
+    default_item: DefaultItem = relationship(
+        "DefaultItem", back_populates="pictures", lazy="joined", uselist=False
     )
 
 
@@ -1431,39 +1477,58 @@ class DefaultModule(Base):
         "should.",
     )
 
-    children = relationship(
-        "DefaultModule", backref=backref("parent", remote_side=[DM_ID])
+    children: DefaultModule = relationship(
+        "DefaultModule",
+        backref=backref("parent", remote_side=[DM_ID]),
+        uselist=False,
     )
-    nav_domain = relationship("NavDomain")
-    attributes = relationship(
-        "DefaultModuleAttribute", back_populates="default_module"
+    nav_domain: NavDomain = relationship("NavDomain", uselist=False)
+    attributes: List[DefaultModuleAttribute] = relationship(
+        "DefaultModuleAttribute", back_populates="default_module", uselist=True
     )
-    header = relationship("Header")
-    items: List[DefaultModuleItem] = relationship(  # type: ignore
+    header: Header = relationship("Header", uselist=False)
+    items: List[DefaultModuleItem] = relationship(
         "DefaultModuleItem",
         back_populates="default_module",
         order_by="DefaultModuleItem.DMI_NUMBER",
+        uselist=True,
     )
 
-    calculations: List[DefaultModuleCalc] = relationship(  # type: ignore
-        "DefaultModuleCalc", back_populates="default_module"
+    calculations: List[DefaultModuleCalc] = relationship(
+        "DefaultModuleCalc", back_populates="default_module", uselist=True
     )
-    template_type = relationship("TemplateType")
-    template_scope = relationship("TemplateScope")
-    links = relationship("DefaultModuleLink", back_populates="default_module")
-    test_bases = relationship("DefaultModuleTestBase")
-
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    clearing = relationship("Clearing")
-
-    history: List["DefaultModuleHistory"] = relationship(  # type: ignore
-        "DefaultModuleHistory", back_populates="default_module"
+    template_type: TemplateType = relationship("TemplateType", uselist=False)
+    template_scope: TemplateScope = relationship(
+        "TemplateScope", uselist=False
+    )
+    links: DefaultModuleLink = relationship(
+        "DefaultModuleLink", back_populates="default_module", uselist=False
+    )
+    test_bases: DefaultModuleTestBase = relationship(
+        "DefaultModuleTestBase", uselist=False
     )
 
-    tf_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY])
-    vt_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY_VT])
-    created_for_user = relationship("Staff", foreign_keys=[DM_CREATED_FOR])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    clearing: Clearing = relationship("Clearing", uselist=False)
+
+    history: List["DefaultModuleHistory"] = relationship(
+        "DefaultModuleHistory", back_populates="default_module", uselist=True
+    )
+
+    tf_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CLEAR_BY], uselist=False
+    )
+    vt_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CLEAR_BY_VT], uselist=False
+    )
+    created_for_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CREATED_FOR], uselist=False
+    )
 
 
 class DefaultModuleAttribute(Base):
@@ -1483,8 +1548,10 @@ class DefaultModuleAttribute(Base):
     )
     ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
 
-    default_module = relationship("DefaultModule", back_populates="attributes")
-    attribute = relationship("Attribute")
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="attributes", uselist=False
+    )
+    attribute: Attribute = relationship("Attribute", uselist=False)
 
 
 class DefaultModuleTestBase(Base):
@@ -1513,9 +1580,11 @@ class DefaultModuleTestBase(Base):
         server_default=text("((0))"),
     )
 
-    test_base_type = relationship("TestBaseType")
-    test_base = relationship("TestBase")
-    default_module = relationship("DefaultModule", back_populates="test_bases")
+    test_base_type: TestBaseType = relationship("TestBaseType", uselist=False)
+    test_base: TestBase = relationship("TestBase", uselist=False)
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="test_bases", uselist=False
+    )
 
 
 class DefaultModuleCalc(Base):
@@ -1567,10 +1636,10 @@ class DefaultModuleCalc(Base):
         DECIMAL(18, 2), server_default=text("((0))"), doc="External costs."
     )
 
-    default_module = relationship(
-        "DefaultModule", back_populates="calculations"
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="calculations", uselist=False
     )
-    team = relationship("Staff")
+    team: Staff = relationship("Staff", uselist=False)
 
 
 class DefaultModuleHistory(Base):
@@ -1662,15 +1731,25 @@ class DefaultModuleHistory(Base):
     )
     DM_REVISION = Column(Unicode(60), doc=DefaultModule.DM_REVISION.doc)
 
-    default_module: "DefaultModule" = relationship(  # type: ignore
-        "DefaultModule", back_populates="history"
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="history", uselist=False
     )
-    clearing = relationship("Clearing")
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    tf_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY])
-    vt_user = relationship("Staff", foreign_keys=[DM_CLEAR_BY_VT])
-    created_for_user = relationship("Staff", foreign_keys=[DM_CREATED_FOR])
+    clearing: Clearing = relationship("Clearing", uselist=False)
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    tf_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CLEAR_BY], uselist=False
+    )
+    vt_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CLEAR_BY_VT], uselist=False
+    )
+    created_for_user: Staff = relationship(
+        "Staff", foreign_keys=[DM_CREATED_FOR], uselist=False
+    )
 
 
 class DefaultModuleItem(Base):
@@ -1758,15 +1837,23 @@ class DefaultModuleItem(Base):
         doc="Specific price for the DefaultItem within the DefaultModule",
     )
 
-    default_module = relationship("DefaultModule", back_populates="items")
-    default_item = relationship("DefaultItem")
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="items", uselist=False
+    )
+    default_item: DefaultItem = relationship("DefaultItem", uselist=False)
 
     parameters: List[DefaultModuleItemParameter] = relationship(
-        "DefaultModuleItemParameter", back_populates="default_module_item"
-    )  # type: ignore
+        "DefaultModuleItemParameter",
+        back_populates="default_module_item",
+        uselist=True,
+    )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class DefaultModuleLink(Base):
@@ -1800,9 +1887,13 @@ class DefaultModuleLink(Base):
         onupdate=get_user_id,
     )
 
-    default_module = relationship("DefaultModule", back_populates="links")
+    default_module: DefaultModule = relationship(
+        "DefaultModule", back_populates="links", uselist=False
+    )
 
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Edoc(Base):
@@ -1853,19 +1944,32 @@ class Edoc(Base):
     E_ANNEX = Column(Unicode(4000), doc="UNKNOWN")
     E_TABLE = Column(Unicode(4000), doc="UNKNOWN")
 
-    package = relationship("Package", back_populates="edocs")
-    header = relationship("Header")
-    phases: List["EdocPhase"] = relationship(  # type: ignore
-        "EdocPhase", back_populates="edoc"
+    package: Package = relationship(
+        "Package", back_populates="edocs", uselist=False
     )
-    modules: List["EdocModule"] = relationship(  # type: ignore
-        "EdocModule", back_populates="edoc", order_by="EdocModule.EM_NUMBER"
+    header: Header = relationship("Header", uselist=False)
+    phases: List["EdocPhase"] = relationship(
+        "EdocPhase", back_populates="edoc", uselist=True
+    )
+    modules: List["EdocModule"] = relationship(
+        "EdocModule",
+        back_populates="edoc",
+        order_by="EdocModule.EM_NUMBER",
+        uselist=True,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    items = relationship("EdocModuleItem", back_populates="edoc")
-    project = relationship("Project", back_populates="edoc")
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    items: EdocModuleItem = relationship(
+        "EdocModuleItem", back_populates="edoc", uselist=False
+    )
+    project: Project = relationship(
+        "Project", back_populates="edoc", uselist=False
+    )
 
 
 class EdocModuleItem(Base):
@@ -1923,20 +2027,28 @@ class EdocModuleItem(Base):
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     NL_ID = Column(Integer, ForeignKey("NAVLEVEL.NL_ID"))
 
-    edoc = relationship("Edoc", back_populates="items")
-    edoc_module = relationship("EdocModule", back_populates="items")
-    default_module = relationship("DefaultModule")
-    default_item = relationship("DefaultItem")
-    nav_level = relationship("NavLevel")
-    phase_results: List[EdocModuleItemPhase] = relationship(  # type: ignore
-        "EdocModuleItemPhase", back_populates="edoc_module_item"
+    edoc: Edoc = relationship("Edoc", back_populates="items", uselist=False)
+    edoc_module: EdocModule = relationship(
+        "EdocModule", back_populates="items", uselist=False
     )
-    comparisons: List[EdocModuleItemComparison] = relationship(  # type: ignore
-        "EdocModuleItemComparison", back_populates="item"
+    default_module: DefaultModule = relationship(
+        "DefaultModule", uselist=False
+    )
+    default_item: DefaultItem = relationship("DefaultItem", uselist=False)
+    nav_level: NavLevel = relationship("NavLevel", uselist=False)
+    phase_results: List[EdocModuleItemPhase] = relationship(
+        "EdocModuleItemPhase", back_populates="edoc_module_item", uselist=True
+    )
+    comparisons: List[EdocModuleItemComparison] = relationship(
+        "EdocModuleItemComparison", back_populates="item", uselist=True
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class EdocModuleItemComparison(Base):
@@ -1966,11 +2078,17 @@ class EdocModuleItemComparison(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
-    module = relationship("EdocModule")
-    item = relationship("EdocModuleItem", back_populates="comparisons")
+    module: EdocModule = relationship("EdocModule", uselist=False)
+    item: EdocModuleItem = relationship(
+        "EdocModuleItem", back_populates="comparisons", uselist=False
+    )
 
 
 class EdocModuleItemComparisonPhase(Base):
@@ -1997,7 +2115,9 @@ class EdocModuleItemComparisonPhase(Base):
         onupdate=get_user_id,
     )
 
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class EdocModuleItemPhase(Base):
@@ -2038,15 +2158,21 @@ class EdocModuleItemPhase(Base):
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), default=1)
     EMIP_IS_COPY = Column(Boolean, nullable=False, default=False)
 
-    edoc_module = relationship("EdocModule")
-    edoc_module_item = relationship(
-        "EdocModuleItem", back_populates="phase_results"
+    edoc_module: EdocModule = relationship("EdocModule", uselist=False)
+    edoc_module_item: EdocModuleItem = relationship(
+        "EdocModuleItem", back_populates="phase_results", uselist=False
     )
-    phase = relationship("ProcessPhase")
-    handleby = relationship("Staff", foreign_keys=[EMIP_HANDLEDBY])
-    result = relationship("EdocResult")
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    phase: ProcessPhase = relationship("ProcessPhase", uselist=False)
+    handleby: Staff = relationship(
+        "Staff", foreign_keys=[EMIP_HANDLEDBY], uselist=False
+    )
+    result: EdocResult = relationship("EdocResult", uselist=False)
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class EdocModuleItemPhaseAnnex(Base):
@@ -2070,9 +2196,13 @@ class EdocModuleItemPhaseAnnex(Base):
         onupdate=get_user_id,
     )
 
-    edoc_module_item_phase = relationship("EdocModuleItemPhase")
+    edoc_module_item_phase: EdocModuleItemPhase = relationship(
+        "EdocModuleItemPhase", uselist=False
+    )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
 
 class EdocModuleItemPicture(Base):
@@ -2093,8 +2223,10 @@ class EdocModuleItemPicture(Base):
     EMIPC_HEIGHT = Column(Integer)
     EMIPC_DATA = deferred(Column(LargeBinary))
 
-    edoc_module_item = relationship("EdocModuleItem")
-    edoc_module = relationship("EdocModule")
+    edoc_module_item: EdocModuleItem = relationship(
+        "EdocModuleItem", uselist=False
+    )
+    edoc_module: EdocModule = relationship("EdocModule", uselist=False)
 
 
 class EdocModulePhase(Base):
@@ -2121,7 +2253,9 @@ class EdocModulePhase(Base):
     SO_NUMBER = Column(Integer)
     EMP_WITH_ADD = Column(Boolean)
 
-    edoc_module = relationship("EdocModule", back_populates="phases")
+    edoc_module: EdocModule = relationship(
+        "EdocModule", back_populates="phases", uselist=False
+    )
 
 
 class EdocModule(Base):
@@ -2158,23 +2292,31 @@ class EdocModule(Base):
     EM_FILTER_PARAM = Column(Unicode(length=512))
     EM_FILTER_ITEMS = Column(Unicode(length=2048))
 
-    edoc = relationship("Edoc", back_populates="modules")
-    default_module = relationship("DefaultModule")
-    offline_by = relationship("Staff", foreign_keys=[EM_OFFLINE_BY])
-    phases: List[EdocModulePhase] = relationship(  # type: ignore
-        "EdocModulePhase", back_populates="edoc_module"
+    edoc: Edoc = relationship("Edoc", back_populates="modules", uselist=False)
+    default_module: DefaultModule = relationship(
+        "DefaultModule", uselist=False
     )
-    items: List[EdocModuleItem] = relationship(  # type: ignore
-        "EdocModuleItem", back_populates="edoc_module"
+    offline_by: Staff = relationship(
+        "Staff", foreign_keys=[EM_OFFLINE_BY], uselist=False
+    )
+    phases: List[EdocModulePhase] = relationship(
+        "EdocModulePhase", back_populates="edoc_module", uselist=True
+    )
+    items: List[EdocModuleItem] = relationship(
+        "EdocModuleItem", back_populates="edoc_module", uselist=True
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
     @validates(
         "EM_NAME",
         "EM_LETTER",
-        "EM_FILTER_LEVEL",  # type: ignore
+        "EM_FILTER_LEVEL",
         "EM_FILTER_PARAM",
         "EM_FILTER_ITEMS",
     )
@@ -2226,16 +2368,18 @@ class EdocPhase(Base):
     EP_USABILITY_COMMENT_FR = Column(Unicode)
     EP_PHASEALIAS = Column(Unicode(length=100))
 
-    edoc = relationship("Edoc", back_populates="phases")
-    project = relationship("Project")
-    result = relationship("EdocResult", foreign_keys=[ER_ID])
-    usability_result = relationship(
-        "EdocResult", foreign_keys=[EP_USABILITY_RESULT]
+    edoc: Edoc = relationship("Edoc", back_populates="phases", uselist=False)
+    project: Project = relationship("Project", uselist=False)
+    result: EdocResult = relationship(
+        "EdocResult", foreign_keys=[ER_ID], uselist=False
     )
-    marketability_result = relationship(
-        "EdocResult", foreign_keys=[EP_MARKETABILITY_RESULT]
+    usability_result: EdocResult = relationship(
+        "EdocResult", foreign_keys=[EP_USABILITY_RESULT], uselist=False
     )
-    process_phase = relationship("ProcessPhase")
+    marketability_result: EdocResult = relationship(
+        "EdocResult", foreign_keys=[EP_MARKETABILITY_RESULT], uselist=False
+    )
+    process_phase: ProcessPhase = relationship("ProcessPhase", uselist=False)
 
 
 class EdocResult(Base):
@@ -2274,8 +2418,12 @@ class EdocResult(Base):
     )
     ER_SHOW_IN_PROOF = Column(Boolean)
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Header(Base):
@@ -2306,8 +2454,12 @@ class Header(Base):
     HEAD_DEFAULT_REPORT = Column(Boolean)
     HEAD_NAME_EN = Column(Unicode(length=120))
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class KindOfTest(Base):
@@ -2347,8 +2499,12 @@ class ModuleParameter(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class NavCountModuleExport(Base):
@@ -2367,9 +2523,13 @@ class NavCountModuleExport(Base):
         default=get_user_id,
     )
 
-    default_module = relationship("DefaultModule")
+    default_module: DefaultModule = relationship(
+        "DefaultModule", uselist=False
+    )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
 
 class NavDomain(Base):
@@ -2393,7 +2553,9 @@ class NavDomain(Base):
     ND_ORDER_EXPORT = Column(Integer, nullable=False)
     ND_ORDER_PLAN_DEFAULT = Column(Integer, nullable=False)
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
 
 class Navigation(Base):
@@ -2432,18 +2594,24 @@ class Navigation(Base):
         onupdate=get_user_id,
     )
 
-    packages: List["Package"] = relationship(  # type: ignore
+    packages: List["Package"] = relationship(
         "Package", back_populates="navigation"
     )
 
-    country = relationship("Country")
-    product = relationship("Product")
-    kind_of_test = relationship("KindOfTest")
+    country: Country = relationship("Country", uselist=False)
+    product: Product = relationship("Product", uselist=False)
+    kind_of_test: KindOfTest = relationship("KindOfTest", uselist=False)
 
-    nav_saves = relationship("NavSave", back_populates="navigation")
+    nav_saves: NavSave = relationship(
+        "NavSave", back_populates="navigation", uselist=False
+    )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
     @property
     def lidl_phasen(self) -> List["Package"]:
@@ -2566,8 +2734,12 @@ class NavPosition(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class NavSave(Base):
@@ -2593,20 +2765,25 @@ class NavSave(Base):
         default=get_user_id,
     )
 
-    navigation = relationship("Navigation", back_populates="nav_saves")
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    project = relationship("Project")
-
-    save_calculations = relationship(
-        "NavSaveCalculation", back_populates="nav_save"
+    navigation: Navigation = relationship(
+        "Navigation", back_populates="nav_saves", uselist=False
     )
-    selections: List[NavSaveSelection] = relationship(  # type: ignore
-        "NavSaveSelection", back_populates="nav_save"
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    project: Project = relationship("Project", uselist=False)
+
+    save_calculations: NavSaveCalculation = relationship(
+        "NavSaveCalculation", back_populates="nav_save", uselist=False
+    )
+    selections: List[NavSaveSelection] = relationship(
+        "NavSaveSelection", back_populates="nav_save", uselist=True
     )
 
     @property
     def nav_save_type(self) -> "NavSaveType":
         """Return the NavSaveType for the NavSave object."""
+        assert isinstance(self.NS_TYPE, int)
         return NavSaveType(self.NS_TYPE)
 
     @nav_save_type.setter
@@ -2638,10 +2815,14 @@ class NavSaveCalculation(Base):
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False)
     NSC_COSTS_EXTERNAL = Column(Numeric(precision=18, scale=2))
 
-    nav_save = relationship("NavSave", back_populates="save_calculations")
-    calculation = relationship("PackageElementCalculation")
-    user = relationship("Staff")
-    nav_position = relationship("NavPosition")
+    nav_save: NavSave = relationship(
+        "NavSave", back_populates="save_calculations", uselist=False
+    )
+    calculation: PackageElementCalculation = relationship(
+        "PackageElementCalculation", uselist=False
+    )
+    user: Staff = relationship("Staff", uselist=False)
+    nav_position: NavPosition = relationship("NavPosition", uselist=False)
 
 
 class NavSaveSelection(Base):
@@ -2653,17 +2834,21 @@ class NavSaveSelection(Base):
     NS_ID = Column(Integer, ForeignKey("NAV_SAVE.NS_ID"))
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
 
-    nav_save = relationship("NavSave", back_populates="selections")
-    package = relationship("Package", back_populates="selections")
+    nav_save: NavSave = relationship(
+        "NavSave", back_populates="selections", uselist=False
+    )
+    package: Package = relationship(
+        "Package", back_populates="selections", uselist=False
+    )
 
 
 class NavSaveType(IntEnum):
     """Values for the different NavSaveTypes."""
 
-    Manual = 1
-    Project = 2
-    Offer = 3
-    Opportunity = 4
+    MANUAL = 1
+    PROJECT = 2
+    OFFER = 3
+    OPPORTUNITY = 4
 
 
 class Package(Base):
@@ -2701,31 +2886,47 @@ class Package(Base):
     )
     PN_ID = Column(Integer, ForeignKey("PACKAGE_NAME.PN_ID"), nullable=False)
 
-    clearing_state = relationship("Clearing")
+    clearing_state: Clearing = relationship("Clearing", uselist=False)
 
-    package_elements: List["PackageElement"] = relationship(  # type: ignore
-        "PackageElement", back_populates="package", cascade="all, delete"
+    package_elements: List[PackageElement] = relationship(
+        "PackageElement",
+        back_populates="package",
+        cascade="all, delete",
+        uselist=True,
     )
 
-    navigation = relationship("Navigation", back_populates="packages")
-
-    service_classes: List["ServiceClass"] = relationship(  # type: ignore
-        "ServiceClass", back_populates="package", cascade="all, delete"
+    navigation: Navigation = relationship(
+        "Navigation", back_populates="packages", uselist=False
     )
 
-    package_type = relationship("PackageType")
+    service_classes: List[ServiceClass] = relationship(
+        "ServiceClass",
+        back_populates="package",
+        cascade="all, delete",
+        uselist=True,
+    )
 
-    package_name = relationship("PackageName")
+    package_type: PackageType = relationship("PackageType", uselist=False)
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    selections = relationship("NavSaveSelection", back_populates="package")
-    edocs = relationship("Edoc", back_populates="package")
+    package_name: PackageName = relationship("PackageName", uselist=False)
 
-    created_from = relationship(
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    selections: NavSaveSelection = relationship(
+        "NavSaveSelection", back_populates="package", uselist=False
+    )
+    edocs: List[Edoc] = relationship(
+        "Edoc", back_populates="package", uselist=True
+    )
+
+    created_from: Package = relationship(
         "Package",
         backref=backref("template", remote_side=[NP_ID]),
-        uselist=True,
+        uselist=False,
     )
 
 
@@ -2745,7 +2946,9 @@ class PackageCategory(Base):
         default=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
 
 class PackageElement(Base):
@@ -2776,23 +2979,35 @@ class PackageElement(Base):
     )
     NPE_CREATE_SO = Column(Boolean, nullable=False)
 
-    package = relationship("Package", back_populates="package_elements")
-    package_calculations: List["PackageElementCalculation"] = relationship(
+    package: Package = relationship(
+        "Package", back_populates="package_elements", uselist=False
+    )
+    package_calculations: List[PackageElementCalculation] = relationship(
         "PackageElementCalculation",
         back_populates="package_element",
         cascade="all, delete",
-    )  # type: ignore
-    proof_elements: List["ProofElement"] = relationship(  # type: ignore
-        "ProofElement", cascade="all, delete", back_populates="package_element"
+        uselist=True,
+    )
+    proof_elements: List[ProofElement] = relationship(
+        "ProofElement",
+        cascade="all, delete",
+        back_populates="package_element",
+        uselist=True,
     )
 
-    default_module = relationship("DefaultModule")
+    default_module: DefaultModule = relationship(
+        "DefaultModule", uselist=False
+    )
 
-    level = relationship("NavLevel")
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
-    filters: List[PackageElementFilter] = relationship(  # type: ignore
-        "PackageElementFilter", back_populates="package_element"
+    level: NavLevel = relationship("NavLevel", uselist=False)
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
+    filters: List[PackageElementFilter] = relationship(
+        "PackageElementFilter", back_populates="package_element", uselist=True
     )
 
 
@@ -2839,15 +3054,19 @@ class PackageElementCalculation(Base):
     NPEC_COSTS_OLD = Column(Numeric(precision=18, scale=2))
     NPEC_COSTS_EXTERNAL_OLD = Column(Numeric(precision=18, scale=2))
 
-    package_element = relationship(
-        "PackageElement", back_populates="package_calculations"
+    package_element: PackageElement = relationship(
+        "PackageElement", back_populates="package_calculations", uselist=False
     )
 
-    nav_position = relationship("NavPosition")
+    nav_position: NavPosition = relationship("NavPosition", uselist=False)
 
-    team = relationship("Staff", foreign_keys=[ST_ID])
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    team: Staff = relationship("Staff", foreign_keys=[ST_ID], uselist=False)
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class PackageElementFilter(Base):
@@ -2872,10 +3091,16 @@ class PackageElementFilter(Base):
         default=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
-    package_element = relationship("PackageElement", back_populates="filters")
-    default_module_item = relationship("DefaultModuleItem")
+    package_element: PackageElement = relationship(
+        "PackageElement", back_populates="filters", uselist=False
+    )
+    default_module_item: DefaultModuleItem = relationship(
+        "DefaultModuleItem", uselist=False
+    )
 
 
 class PackageName(Base):
@@ -2901,8 +3126,12 @@ class PackageName(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class PackageType(Base):
@@ -2922,9 +3151,13 @@ class PackageType(Base):
     )
     PC_ID = Column(Integer, ForeignKey("PACKAGE_CAT.PC_ID"))
 
-    package_category = relationship("PackageCategory")
+    package_category: PackageCategory = relationship(
+        "PackageCategory", uselist=False
+    )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
 
 
 class PriceList(Base):
@@ -2956,8 +3189,12 @@ class PriceList(Base):
     PL_FACTOR_CC = Column(Numeric(precision=18, scale=5))
     PL_FACTOR_PROFIT = Column(Numeric(precision=18, scale=5))
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Process(Base):
@@ -2986,7 +3223,9 @@ class Process(Base):
     PC_KEY2 = Column(Unicode(length=16))
     PC_KEY3 = Column(Unicode(length=16))
 
-    projects = relationship("Project", back_populates="process")
+    projects: List[Project] = relationship(
+        "Project", back_populates="process", uselist=True
+    )
 
     @property
     def process_archive(self) -> str:
@@ -3047,11 +3286,13 @@ class Product(Base):
         onupdate=get_user_id,
     )
 
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Project(Base):
-    """PSE Project (view on PSE database)."""
+    """PSE PROJECT (view on PSE database)."""
 
     __tablename__ = "V_PSEX_PROJECT"
 
@@ -3126,20 +3367,32 @@ class Project(Base):
     P_RETEST = Column(Integer, nullable=False)
     P_RETEST_OF = Column(Integer)
 
-    customer_contact = relationship("CustomerContact")
-    ordering_party_address = relationship(
-        "Customer", foreign_keys=[P_CUSTOMER_A]
+    customer_contact: CustomerContact = relationship(
+        "CustomerContact", uselist=False
     )
-    manufacturer_address = relationship(
-        "Customer", foreign_keys=[P_CUSTOMER_B]
+    ordering_party_address: Customer = relationship(
+        "Customer", foreign_keys=[P_CUSTOMER_A], uselist=False
     )
-    process = relationship("Process", back_populates="projects")
-    project_manager = relationship("Staff", foreign_keys=[P_PROJECTMANAGER])
-    project_handler = relationship("Staff", foreign_keys=[P_HANDLEDBY])
-    register_user = relationship("Staff", foreign_keys=[P_REGBY])
-    kind_of_test = relationship("KindOfTest")
-    sub_orders = relationship("SubOrder", back_populates="project")
-    edoc = relationship("Edoc", back_populates="project")
+    manufacturer_address: Customer = relationship(
+        "Customer", foreign_keys=[P_CUSTOMER_B], uselist=False
+    )
+    process: Process = relationship(
+        "Process", back_populates="projects", uselist=False
+    )
+    project_manager: Staff = relationship(
+        "Staff", foreign_keys=[P_PROJECTMANAGER], uselist=False
+    )
+    project_handler: Staff = relationship(
+        "Staff", foreign_keys=[P_HANDLEDBY], uselist=False
+    )
+    register_user: Staff = relationship(
+        "Staff", foreign_keys=[P_REGBY], uselist=False
+    )
+    kind_of_test: KindOfTest = relationship("KindOfTest", uselist=False)
+    sub_orders: SubOrder = relationship(
+        "SubOrder", back_populates="project", uselist=False
+    )
+    edoc: Edoc = relationship("Edoc", back_populates="project", uselist=False)
 
     @property
     def project_folder(self) -> str:
@@ -3176,12 +3429,16 @@ class ProofElement(Base):
         onupdate=get_user_id,
     )
 
-    package_element = relationship(
-        "PackageElement", back_populates="proof_elements"
+    package_element: PackageElement = relationship(
+        "PackageElement", back_populates="proof_elements", uselist=False
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class ServiceClass(Base):
@@ -3200,8 +3457,12 @@ class ServiceClass(Base):
     )
     SCL_ID = Column(Integer, ForeignKey("SERVICECLASS.SCL_ID"))
 
-    package = relationship("Package", back_populates="service_classes")
-    definition = relationship("ServiceClassDefinition")
+    package: Package = relationship(
+        "Package", back_populates="service_classes", uselist=False
+    )
+    definition: ServiceClassDefinition = relationship(
+        "ServiceClassDefinition", uselist=False
+    )
 
 
 class ServiceClassDefinition(Base):
@@ -3228,8 +3489,12 @@ class ServiceClassDefinition(Base):
         onupdate=get_user_id,
     )
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class Staff(Base):
@@ -3265,6 +3530,7 @@ class Staff(Base):
     @property
     def full_name(self) -> str:
         """Get the user's full name."""
+        assert isinstance(self.ST_SURNAME, str)
         full_name = self.ST_SURNAME
         if self.ST_FORENAME:
             full_name += ", "
@@ -3283,7 +3549,9 @@ class StatisticModule(Base):
     STAT_ID = Column(Integer, ForeignKey("STATISTIC_TYPE.STAT_ID"))
     STAM_REG = Column(DateTime)
 
-    statistic_type = relationship("StatisticType")
+    statistic_type: StatisticType = relationship(
+        "StatisticType", uselist=False
+    )
 
 
 class StatisticType(Base):
@@ -3351,15 +3619,31 @@ class SubOrder(Base):
     S_KPI_NUMBER = Column(Integer)
     REPORT_SENT = Column(DateTime)
 
-    project = relationship("Project", back_populates="sub_orders")
-    dispo_user = relationship("Staff", foreign_keys=[SO_DISPOBY])
-    user = relationship("Staff", foreign_keys=[ST_ID])
-    team = relationship("Staff", foreign_keys=[ST_ID_TEAM])
-    update_team = relationship("Staff", foreign_keys=[SO_UPDATEBY_TEAM])
-    reg_team = relationship("Staff", foreign_keys=[SO_REGBY_TEAM])
-    ready_team = relationship("Staff", foreign_keys=[SO_READYBY_TEAM])
-    dispo_team = relationship("Staff", foreign_keys=[SO_DISPOBY_TEAM])
-    check_team = relationship("Staff", foreign_keys=[SO_CHECKBY_TEAM])
+    project: Project = relationship(
+        "Project", back_populates="sub_orders", uselist=False
+    )
+    dispo_user: Staff = relationship(
+        "Staff", foreign_keys=[SO_DISPOBY], uselist=False
+    )
+    user: Staff = relationship("Staff", foreign_keys=[ST_ID], uselist=False)
+    team: Staff = relationship(
+        "Staff", foreign_keys=[ST_ID_TEAM], uselist=False
+    )
+    update_team: Staff = relationship(
+        "Staff", foreign_keys=[SO_UPDATEBY_TEAM], uselist=False
+    )
+    reg_team: Staff = relationship(
+        "Staff", foreign_keys=[SO_REGBY_TEAM], uselist=False
+    )
+    ready_team: Staff = relationship(
+        "Staff", foreign_keys=[SO_READYBY_TEAM], uselist=False
+    )
+    dispo_team: Staff = relationship(
+        "Staff", foreign_keys=[SO_DISPOBY_TEAM], uselist=False
+    )
+    check_team: Staff = relationship(
+        "Staff", foreign_keys=[SO_CHECKBY_TEAM], uselist=False
+    )
 
 
 class Team(Base):
@@ -3460,10 +3744,14 @@ class TestBase(Base):
     B_COMMENT_FR = Column(Unicode(length=512))
     B_DOA = Column(Integer, nullable=False)
 
-    test_base_type = relationship("TestBaseType")
+    test_base_type: TestBaseType = relationship("TestBaseType", uselist=False)
 
-    reg_user = relationship("Staff", foreign_keys=[reg_by])
-    update_user = relationship("Staff", foreign_keys=[update_by])
+    reg_user: Staff = relationship(
+        "Staff", foreign_keys=[reg_by], uselist=False
+    )
+    update_user: Staff = relationship(
+        "Staff", foreign_keys=[update_by], uselist=False
+    )
 
 
 class TestBaseType(Base):

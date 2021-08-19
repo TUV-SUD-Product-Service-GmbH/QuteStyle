@@ -23,7 +23,7 @@ class TitleBar(QWidget):
         parent: QWidget,
         app_parent: QWidget,
         right_widget_class: Type[ColumnBaseWidget],
-        name: str
+        name: str,
     ) -> None:
         """Create a new TitleBar."""
         super().__init__(parent)

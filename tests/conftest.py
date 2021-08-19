@@ -14,9 +14,9 @@ from tsl.edoc_database import (
 from tsl.init import qt_message_handler
 from tsl.pse_database import ENGINE as PSE_ENGINE
 from tsl.pse_database import Base as PSE_Base
+from tsl.pse_database import Staff as PseStaff
 from tsl.pse_database import _fetch_user_id as _pse_fetch_user_id
 from tsl.pse_database import session_scope as pse_session_scope
-from tsl.pse_database import Staff as PseStaff
 
 # pylint: disable=invalid-name
 log = logging.getLogger(".".join(["tsl", __name__]))

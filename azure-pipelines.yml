@@ -8,7 +8,8 @@ trigger:
 
 pool:
   vmImage: 'windows-2019'
-
+variables:
+  PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
 steps:
 - checkout: self  # self represents the repo where the initial Azure Pipelines YAML file was found
   clean: true
@@ -27,10 +28,21 @@ steps:
     mkdir $(venv)
     python -m venv venv
   displayName: Create Virtual Environment
+- task: Cache@2
+  inputs:
+    key: pip | dev_requirements.txt | requirements.txt
+    path: $(PIP_CACHE_DIR)
+  displayName: Cache requirements
 - script: |
     call venv\Scripts\activate.bat
     python -m pip install -r requirements.txt
-  displayName: Install Requirements
+    python -m pip install -r dev_requirements.txt
+  displayName: Install requirements
+- script: |
+    set PATH=%PATH%;$(System.DefaultWorkingDirectory)\venv\Scripts
+    echo %PATH%
+    pre-commit run --all-files
+  displayName: run pre-commit
 - script: |
     call venv\Scripts\activate.bat
     python -m pip install -r dev_requirements.txt

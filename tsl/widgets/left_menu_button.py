@@ -1,9 +1,9 @@
 """Button for the LeftMenu."""
 import logging
-from typing import Tuple, Type, Union, Optional
+from typing import Optional, Tuple, Type, Union
 
-from PyQt5.QtCore import Qt, QRect, QEvent, QPoint
-from PyQt5.QtGui import QPainter, QColor, QPixmap, QPaintEvent, QMouseEvent
+from PyQt5.QtCore import QEvent, QPoint, QRect, Qt
+from PyQt5.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
 from PyQt5.QtWidgets import QWidget
 
 from tsl.style import get_color
@@ -26,7 +26,7 @@ class LeftMenuButton(IconTooltipButton):
         text: str,
         tooltip_text: str,
         icon_path: str,
-        widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget], None]
+        widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget], None],
     ) -> None:
         """Create a new LeftMenuButton."""
         bgs = BackgroundColors(
