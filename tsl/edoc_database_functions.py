@@ -1,6 +1,6 @@
 """Functions for common eDOC database operations."""
 import logging
-from typing import Any, List, Sequence, cast
+from typing import Any, Sequence, cast
 
 from sqlalchemy import desc, text
 from sqlalchemy.orm import joinedload, load_only
@@ -123,7 +123,7 @@ def insert_package_into_nav(
         PN_ID=pack.PN_ID,
     )
 
-    for service_class in cast(List[ServiceClass], pack.service_classes):
+    for service_class in pack.service_classes:
         log.debug("Creating new service class: %s", service_class.SCL_ID)
         new_pack.service_classes.append(
             ServiceClass(SCL_ID=service_class.SCL_ID)
@@ -132,8 +132,7 @@ def insert_package_into_nav(
     session.add(new_pack)
     session.flush()
 
-    # it must be and int after the flush
-    return cast(int, new_pack.NP_ID)
+    return new_pack.NP_ID
 
 
 def copy_package_element(
@@ -164,9 +163,7 @@ def copy_package_element(
     )
     session.add(new_element)
     session.flush()
-    for calculation in cast(
-        List[PackageElementCalculation], package_element.package_calculations
-    ):
+    for calculation in package_element.package_calculations:
         new_calc = PackageElementCalculation(
             NPE_ID=new_element.NPE_ID,
             ST_ID=calculation.ST_ID,
@@ -184,9 +181,7 @@ def copy_package_element(
             NPOS_ID=calculation.NPOS_ID,
         )
         session.add(new_calc)
-    for proof_element in cast(
-        List[ProofElement], package_element.proof_elements
-    ):
+    for proof_element in package_element.proof_elements:
         new_proof = ProofElement(
             NPE_ID=new_element.NPE_ID,
             NPEP_TYPE=proof_element.NPEP_TYPE,
@@ -204,4 +199,4 @@ def copy_package_element(
                 )
             )
     # new element was flushed, hence NPE_ID must available at this point
-    return cast(int, new_element.NPE_ID)
+    return new_element.NPE_ID

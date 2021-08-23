@@ -23,6 +23,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mssql import BIT, MONEY, TINYINT, UNIQUEIDENTIFIER
 from sqlalchemy.orm import (
+    Mapped,
     Session,
     declarative_base,
     load_only,
@@ -92,10 +93,16 @@ class Process(Base):
 
     __tablename__ = "PROCESS"
 
-    PC_ID = Column(Integer, primary_key=True, nullable=False)
-    PC_NAME = Column(NullUnicode(length=256), nullable=False, default="")
-    PC_IAN = Column(NullUnicode(length=256), nullable=False, default="")
-    PC_PATH = Column(NullUnicode(length=50), nullable=False, default="")
+    PC_ID: Mapped[int] = Column(Integer, primary_key=True)
+    PC_NAME: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    PC_IAN: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    PC_PATH: Mapped[str] = Column(
+        NullUnicode(length=50), nullable=False, default=""
+    )
 
     @property
     def process_archive(self) -> str:
@@ -109,10 +116,16 @@ class ProcessPhase(Base):
 
     __tablename__ = "PROCESSPHASE"
 
-    PRP_ID = Column(Integer, primary_key=True, nullable=False)
-    PRP_SHORT_DE = Column(NullUnicode(length=256), nullable=False, default="")
-    PRP_SHORT_EN = Column(NullUnicode(length=256), nullable=False, default="")
-    PRP_SHORT_FR = Column(NullUnicode(length=256), nullable=False, default="")
+    PRP_ID: Mapped[int] = Column(Integer, primary_key=True)
+    PRP_SHORT_DE: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    PRP_SHORT_EN: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    PRP_SHORT_FR: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
 
 
 class Project(Base):
@@ -120,33 +133,51 @@ class Project(Base):
 
     __tablename__ = "PROJECT"
 
-    P_ID = Column(Integer, primary_key=True, nullable=False)
+    P_ID: Mapped[int] = Column(Integer, primary_key=True)
     PC_ID = Column(Integer, ForeignKey("PROCESS.PC_ID"))
-    P_IAN = Column(NullUnicode(length=256), nullable=False, default="")
-    P_PRODUCT = Column(NullUnicode(length=256), nullable=False, default="")
-    P_CONTACT = Column(NullUnicode(length=256), nullable=False, default="")
+    P_IAN: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    P_PRODUCT: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    P_CONTACT: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
     P_CONTACT_CUC_ID = Column(Integer, ForeignKey("CUSTOMER_CONTACT.CUC_ID"))
     P_DEADLINE = Column(DateTime)
     P_ORDERSIZE = Column(Float)
     P_PROCESSPHASE = Column(Integer, ForeignKey("PROCESSPHASE.PRP_ID"))
-    P_MODEL = Column(NullUnicode(length=256), nullable=False, default="")
-    P_ZARA_NUMBER = Column(NullUnicode(length=11), nullable=False, default="")
-    P_FOLDER = Column(NullUnicode(length=256), nullable=False, default="")
+    P_MODEL: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    P_ZARA_NUMBER: Mapped[str] = Column(
+        NullUnicode(length=11), nullable=False, default=""
+    )
+    P_FOLDER: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
     DELR_ID = Column(Integer)
     P_WC_ID = Column(Unicode(length=36))
-    P_NAME = Column(NullUnicode(length=31), nullable=False, default="")
+    P_NAME: Mapped[str] = Column(
+        NullUnicode(length=31), nullable=False, default=""
+    )
     P_CUSTOMER_A = Column(Integer, ForeignKey("CUSTOMER.CU_ID"))
     P_CUSTOMER_B = Column(Integer, ForeignKey("CUSTOMER.CU_ID"))
     P_PROJECTMANAGER = Column(Integer, ForeignKey("STAFF.ST_ID"))
-    P_TOKEN = Column(NullUnicode(length=61), nullable=False, default="")
+    P_TOKEN: Mapped[str] = Column(
+        NullUnicode(length=61), nullable=False, default=""
+    )
     P_DATE_APPOINTMENT = Column(DateTime)
     P_EXPECTED_TS_RECEIPT = Column(DateTime)
     BATCH_NUMBER = Column(Unicode(length=16))
-    P_DISABLED = Column(BIT, nullable=False)
-    P_REGBY = Column(
+    P_DISABLED: Mapped[bool] = Column(BIT, nullable=False)
+    P_REGBY: Mapped[int] = Column(
         Integer, ForeignKey("STAFF.ST_ID"), nullable=False, default=get_user_id
     )
-    P_REGDATE = Column(DateTime, nullable=False, default=datetime.utcnow)
+    P_REGDATE: Mapped[datetime] = Column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
     P_UPDATEBY = Column(Integer, ForeignKey("STAFF.ST_ID"))
     P_UPDATE = Column(DateTime)
 
@@ -189,7 +220,7 @@ class Customer(Base):
 
     __tablename__ = "CUSTOMER"
 
-    CU_ID = Column(Integer, primary_key=True)
+    CU_ID: Mapped[int] = Column(Integer, primary_key=True)
     MD_ID = Column(Integer)
     CU_NUMBER = Column(Unicode(length=10))
     CU_ACTIVE = Column(Boolean)
@@ -234,11 +265,19 @@ class CustomerContact(Base):
 
     __tablename__ = "CUSTOMER_CONTACT"
 
-    CUC_ID = Column(Integer, primary_key=True, nullable=False)
-    CUC_FORENAME = Column(NullUnicode(length=51), nullable=False, default="")
-    CUC_SURNAME = Column(NullUnicode(length=36), nullable=False, default="")
-    ANRED = Column(NullUnicode(length=31), nullable=False, default="")
-    CUC_MAIL = Column(NullUnicode(length=256), nullable=False, default="")
+    CUC_ID: Mapped[int] = Column(Integer, primary_key=True)
+    CUC_FORENAME: Mapped[str] = Column(
+        NullUnicode(length=51), nullable=False, default=""
+    )
+    CUC_SURNAME: Mapped[str] = Column(
+        NullUnicode(length=36), nullable=False, default=""
+    )
+    ANRED: Mapped[str] = Column(
+        NullUnicode(length=31), nullable=False, default=""
+    )
+    CUC_MAIL: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
 
 
 class CustomerAddress(Base):
@@ -246,12 +285,22 @@ class CustomerAddress(Base):
 
     __tablename__ = "CUSTOMER_ADDRESS"
 
-    CA_ID = Column(Integer, primary_key=True, nullable=False)
-    CU_ID = Column(Integer, ForeignKey("CUSTOMER.CU_ID"), nullable=False)
-    CA_NAME = Column(NullUnicode(length=166), nullable=False, default="")
-    CA_STREET = Column(NullUnicode(length=101), nullable=False, default="")
-    CA_ZIPCODE = Column(NullUnicode(length=11), nullable=False, default="")
-    CA_CITY = Column(NullUnicode(length=41), nullable=False, default="")
+    CA_ID: Mapped[int] = Column(Integer, primary_key=True)
+    CU_ID: Mapped[int] = Column(
+        Integer, ForeignKey("CUSTOMER.CU_ID"), nullable=False
+    )
+    CA_NAME: Mapped[str] = Column(
+        NullUnicode(length=166), nullable=False, default=""
+    )
+    CA_STREET: Mapped[str] = Column(
+        NullUnicode(length=101), nullable=False, default=""
+    )
+    CA_ZIPCODE: Mapped[str] = Column(
+        NullUnicode(length=11), nullable=False, default=""
+    )
+    CA_CITY: Mapped[str] = Column(
+        NullUnicode(length=41), nullable=False, default=""
+    )
 
     customer: Customer = relationship(
         "Customer", back_populates="addresses", uselist=False
@@ -263,18 +312,28 @@ class Staff(Base):
 
     __tablename__ = "STAFF"
 
-    ST_ID = Column(Integer, primary_key=True, nullable=False)
-    ST_SURNAME = Column(NullUnicode(length=61), nullable=False, default="")
-    ST_FORENAME = Column(NullUnicode(length=51), nullable=False, default="")
-    ST_PHONE = Column(NullUnicode(length=81), nullable=False, default="")
-    ST_FAX = Column(NullUnicode(length=81), nullable=False, default="")
-    ST_EMAIL = Column(NullUnicode(length=81), nullable=False, default="")
+    ST_ID: Mapped[int] = Column(Integer, primary_key=True)
+    ST_SURNAME: Mapped[str] = Column(
+        NullUnicode(length=61), nullable=False, default=""
+    )
+    ST_FORENAME: Mapped[str] = Column(
+        NullUnicode(length=51), nullable=False, default=""
+    )
+    ST_PHONE: Mapped[str] = Column(
+        NullUnicode(length=81), nullable=False, default=""
+    )
+    ST_FAX: Mapped[str] = Column(
+        NullUnicode(length=81), nullable=False, default=""
+    )
+    ST_EMAIL: Mapped[str] = Column(
+        NullUnicode(length=81), nullable=False, default=""
+    )
     ST_TEAM = Column(Unicode(length=36))
     ST_WINDOWSID = Column(Unicode(32))
-    ST_ACTIVE = Column(BIT, nullable=False)
-    ST_TYPE = Column(Integer, nullable=False)
+    ST_ACTIVE: Mapped[bool] = Column(BIT, nullable=False)
+    ST_TYPE: Mapped[int] = Column(Integer, nullable=False)
     # ForeignKey('dbo.SKILLGROUP.SG_ID')
-    ST_SKILLGROUP = Column(Unicode(8), nullable=False)
+    ST_SKILLGROUP: Mapped[str] = Column(Unicode(8), nullable=False)
 
 
 class TemplateData(Base):
@@ -282,8 +341,8 @@ class TemplateData(Base):
 
     __tablename__ = "TEMPLATE_DATA"
 
-    TPD_ID = Column(Integer, primary_key=True, nullable=False)
-    TP_ID = Column(Integer, nullable=False)
+    TPD_ID: Mapped[int] = Column(Integer, primary_key=True)
+    TP_ID: Mapped[int] = Column(Integer, nullable=False)
     TPD_DATA = Column(LargeBinary)
 
 
@@ -298,16 +357,16 @@ class Template(Base):
 
     __tablename__ = "TEMPLATE"
 
-    TP_ID = Column(Integer, primary_key=True, nullable=False)
-    MD_ID = Column(Integer, nullable=False)
-    TPST_ID = Column(Integer, nullable=False)
-    TPT_ID = Column(
+    TP_ID: Mapped[int] = Column(Integer, primary_key=True)
+    MD_ID: Mapped[int] = Column(Integer, nullable=False)
+    TPST_ID: Mapped[int] = Column(Integer, nullable=False)
+    TPT_ID: Mapped[int] = Column(
         Integer, ForeignKey("TEMPLATE_TYPE.TPT_ID"), nullable=False
     )
-    TPSC_ID = Column(
+    TPSC_ID: Mapped[int] = Column(
         Integer, ForeignKey("TEMPLATE_SCOPE.TPSC_ID"), nullable=False
     )
-    TPF_ID = Column(Integer, nullable=False)
+    TPF_ID: Mapped[int] = Column(Integer, nullable=False)
     TP_NAME_D = Column(Unicode(length=256))
     TP_NAME_E = Column(Unicode(length=256))
     TP_TIME_HOURS = Column(Float)
@@ -324,7 +383,7 @@ class Template(Base):
     TP_UPDATE = Column(DateTime)
     TP_UPDATEBY = Column(Integer)
     TP_ISGLOBAL = Column(Boolean)
-    TP_DISABLED = Column(Boolean, nullable=False)
+    TP_DISABLED: Mapped[bool] = Column(Boolean, nullable=False)
     TP_TRANSFER_STATUS = Column(Unicode(length=51))
     TP_ORIGINATING_SERVERID = Column(Integer)
     TP_ROOT_TEMPLATE_ID = Column(Integer)
@@ -342,16 +401,16 @@ class TemplateScope(Base):
 
     __tablename__ = "TEMPLATE_SCOPE"
 
-    TPSC_ID = Column(Integer, primary_key=True, nullable=False)
-    TPSC_NAME_DE = Column(Unicode(length=256), nullable=False)
-    TPSC_NAME_EN = Column(Unicode(length=256), nullable=False)
-    TPSC_NAME_FR = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_DE = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_EN = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_FR = Column(Unicode(length=256), nullable=False)
-    TPSC_PATH = Column(Unicode(length=256), nullable=False)
-    CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(Integer, nullable=False)
+    TPSC_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
+    TPSC_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_PATH: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CREATED_BY: Mapped[int] = Column(Integer, nullable=False)
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer)
 
@@ -361,14 +420,14 @@ class TemplateStatus(Base):
 
     __tablename__ = "TEMPLATE_STATUS"
 
-    TPST_ID = Column(Integer, primary_key=True, nullable=False)
-    TPST_NAME_DE = Column(Unicode(length=256), nullable=False)
-    TPST_NAME_EN = Column(Unicode(length=256), nullable=False)
-    TPST_NAME_FR = Column(Unicode(length=256), nullable=False)
-    TPST_SHORT_DE = Column(Unicode(length=256), nullable=False)
-    TPST_SHORT_EN = Column(Unicode(length=256), nullable=False)
-    TPST_SHORT_FR = Column(Unicode(length=256), nullable=False)
-    CREATED = Column(DateTime, nullable=False)
+    TPST_ID: Mapped[int] = Column(Integer, primary_key=True)
+    TPST_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPST_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPST_NAME_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPST_SHORT_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer)
 
@@ -378,23 +437,23 @@ class TemplateType(Base):
 
     __tablename__ = "TEMPLATE_TYPE"
 
-    TPT_ID = Column(Integer, primary_key=True, nullable=False)
-    TPT_NAME_DE = Column(Unicode(length=256), nullable=False)
-    TPT_NAME_EN = Column(Unicode(length=256), nullable=False)
-    TPT_NAME_FR = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_DE = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_EN = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_FR = Column(Unicode(length=256), nullable=False)
-    TPT_PATH = Column(Unicode(length=256), nullable=False)
-    TPT_PREFIX = Column(Unicode(length=256), nullable=False)
-    TPT_MODULETYPE = Column(Unicode(length=256), nullable=False)
-    TPT_SHOWINPROZESSFOLDER = Column(Boolean, nullable=False)
-    TPT_SHOWINTEMPLATEMANAGER = Column(Boolean, nullable=False)
-    CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(Integer, nullable=False)
+    TPT_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
+    TPT_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_PATH: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_PREFIX: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_MODULETYPE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHOWINPROZESSFOLDER: Mapped[bool] = Column(Boolean, nullable=False)
+    TPT_SHOWINTEMPLATEMANAGER: Mapped[bool] = Column(Boolean, nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CREATED_BY: Mapped[int] = Column(Integer, nullable=False)
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer)
-    TPT_INCLUDE_IN_TRADE_REPORT = Column(Boolean, nullable=False)
+    TPT_INCLUDE_IN_TRADE_REPORT: Mapped[bool] = Column(Boolean, nullable=False)
 
 
 class SubOrder(Base):
@@ -402,10 +461,10 @@ class SubOrder(Base):
 
     __tablename__ = "SUBORDERS"
 
-    P_ID = Column(
-        Integer, ForeignKey("PROJECT.P_ID"), primary_key=True, nullable=False
+    P_ID: Mapped[int] = Column(
+        Integer, ForeignKey("PROJECT.P_ID"), primary_key=True
     )
-    SO_NUMBER = Column(Integer, primary_key=True, nullable=False)
+    SO_NUMBER: Mapped[int] = Column(Integer, primary_key=True)
     SO_DISPOBY = Column(Integer)
     SO_CREATED = Column(DateTime)
     ST_ID = Column(Integer)
@@ -430,7 +489,7 @@ class SubOrder(Base):
     SO_ACC_POS = Column(Unicode(10))
     SO_INTERN = Column(BIT)
     SO_PREDATE = Column(DateTime)
-    SO_PREDATE_REMINDER = Column(BIT, nullable=False)
+    SO_PREDATE_REMINDER: Mapped[bool] = Column(BIT, nullable=False)
     SO_PREDATE_INFO = Column(Unicode(255))
     SO_WAIT = Column(BIT)
     SO_REGBY = Column(Integer)
@@ -438,7 +497,7 @@ class SubOrder(Base):
     SO_UPDATEBY = Column(Integer)
     SO_UPDATE = Column(DateTime)
     SO_TRANSFERSTATUS = Column(Unicode(50))
-    SO_DISABLED = Column(BIT, nullable=False)
+    SO_DISABLED: Mapped[bool] = Column(BIT, nullable=False)
     SO_ForeignExpenditure = Column(MONEY)
     SO_PostedFromForeign = Column(MONEY)
     SO_IsTransferredBack = Column(BIT)
@@ -449,8 +508,8 @@ class SubOrder(Base):
     SO_CUSTOMER_B = Column(Integer)
     SO_CUSTOMER_O = Column(Integer)
     SO_PARENT = Column(Integer)
-    SO_SORT = Column(Integer, nullable=False)
-    SO_ADMINISTRATIVE = Column(BIT, nullable=False)
+    SO_SORT: Mapped[int] = Column(Integer, nullable=False)
+    SO_ADMINISTRATIVE: Mapped[bool] = Column(BIT, nullable=False)
     SO_APPOINTMENTDATE = Column(DateTime)
     PLAN_ACTUAL_HOUR = Column(DECIMAL(8, 2))
     PLAN_TRAVEL = Column(DECIMAL(18, 2))
@@ -474,7 +533,7 @@ class SubOrder(Base):
     SO_PLANNED_LICENSE = Column(DECIMAL(18, 2))
     BANF_REQUEST = Column(DateTime)
     BANF_ORDER = Column(DateTime)
-    B2B = Column(BIT, nullable=False)
+    B2B: Mapped[bool] = Column(BIT, nullable=False)
     SO_REPORT_NUMBER = Column(Unicode(256))
     ZM_ID = Column(Unicode(18))
     SO_REMARK = Column(Unicode(1024))
@@ -484,24 +543,26 @@ class SubOrder(Base):
     LIMS_REMARK = Column(Unicode(256))
     SOC_ID = Column(Integer, ForeignKey("SUBORDER_CATEGORY.ID"))
     RFAE_ID = Column(Integer, ForeignKey("REASON_FOR_ADDITIONAL_EFFORT.ID"))
-    FROM_STARLIMS = Column(BIT, nullable=False)
+    FROM_STARLIMS: Mapped[bool] = Column(BIT, nullable=False)
     SO_COORDINATOR = Column(Integer)
     STARLIMS_DISTINCTIVE_FLAG = Column(Integer)
-    DEADLINE_CALCULATION_WITHOUT_HOLIDAYS = Column(BIT, nullable=False)
+    DEADLINE_CALCULATION_WITHOUT_HOLIDAYS: Mapped[bool] = Column(
+        BIT, nullable=False
+    )
     SO_MODEL = Column(Unicode(255))
     TRANSFER_TO_STARLIMS = Column(DateTime)
     STARLIMS_PROJECT_NUMBER = Column(Unicode(25))
-    URGENT = Column(BIT, nullable=False)
+    URGENT: Mapped[bool] = Column(BIT, nullable=False)
     SO_POSTING_DONE_DATE = Column(DateTime)
-    KPI = Column(BIT, nullable=False)
+    KPI: Mapped[bool] = Column(BIT, nullable=False)
     SO_DATE_READY_REASON = Column(Unicode(512))
     SO_DATE_READY_CHANGED = Column(DateTime)
     SO_DATE_CHECK_REASON = Column(Unicode(512))
     SO_DATE_CHECK_CHANGED = Column(DateTime)
     REPORT_SENT = Column(DateTime)
     S_KPI_NUMBER = Column(Integer)
-    SO_TUV_CERT_EXISTS = Column(BIT, nullable=False)
-    SO_EXTERNAL_CERT_EXISTS = Column(BIT, nullable=False)
+    SO_TUV_CERT_EXISTS: Mapped[bool] = Column(BIT, nullable=False)
+    SO_EXTERNAL_CERT_EXISTS: Mapped[bool] = Column(BIT, nullable=False)
     SO_CERT_COMMENT = Column(Unicode(512))
 
     anonymization_log: AnonymizationLog = relationship(
@@ -553,27 +614,27 @@ class Hierarchy(Base):
 
     __tablename__ = "HIERARCHY"
 
-    HR_ID = Column(UNIQUEIDENTIFIER, primary_key=True)
+    HR_ID: Mapped[str] = Column(UNIQUEIDENTIFIER, primary_key=True)
     HR_LOCATION = Column(Unicode(40))
     HR_SHORT = Column(Unicode(20))
     HR_PREFIX = Column(Unicode(20))
-    HR_ACTIVE = Column(BIT, nullable=False)
+    HR_ACTIVE: Mapped[bool] = Column(BIT, nullable=False)
     HR_TYPE = Column(Unicode(50))
     HR_CURRENT = Column(BIT)
     HR_PARENT = Column(UNIQUEIDENTIFIER)
     HR_UPDATE_TYPE = Column(TINYINT)
-    HR_NEW_ID = Column(Integer, nullable=False, unique=True)
-    HR_LEVEL = Column(Integer, nullable=False)
+    HR_NEW_ID: Mapped[int] = Column(Integer, nullable=False, unique=True)
+    HR_LEVEL: Mapped[int] = Column(Integer, nullable=False)
     HR_EMAIL = Column(Unicode(80))
     ST_ID = Column(Integer, ForeignKey("STAFF.ST_ID"))
     CC_ID = Column(Unicode(10), ForeignKey("KST.CC_ID"))
     POSTING_TARGET = Column(Unicode(4))
     COSTING_DATA_ORDER_SIZE = Column(DECIMAL(19, 4))
-    CREATED = Column(DateTime, nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
     CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
     HR_LAST_UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
-    IS_PLACEHOLDER = Column(BIT, nullable=False)
+    IS_PLACEHOLDER: Mapped[bool] = Column(BIT, nullable=False)
 
     kst: Kst = relationship("Kst", uselist=False)
     created_by: Staff = relationship(
@@ -596,15 +657,17 @@ class Kst(Base):
 
     __tablename__ = "KST"
 
-    CC_ID = Column(Unicode(10), primary_key=True)
+    CC_ID: Mapped[str] = Column(Unicode(10), primary_key=True)
     CC_NAME = Column(Unicode(16))
     CC_BOOKINGAREA = Column(Unicode(4))
     CC_TYPE = Column(Integer)
-    CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CREATED_BY: Mapped[int] = Column(
+        Integer, ForeignKey("STAFF.ST_ID"), nullable=False
+    )
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
-    CC_GLOBAL_PARTNER_MANDATORY = Column(BIT, nullable=False)
+    CC_GLOBAL_PARTNER_MANDATORY: Mapped[bool] = Column(BIT, nullable=False)
     VALID_FROM = Column(DateTime)
     VALID_UNTIL = Column(DateTime)
     RUN_ID = Column(Integer)
@@ -624,12 +687,14 @@ class SuborderCategory(Base):
 
     __tablename__ = "SUBORDER_CATEGORY"
 
-    ID = Column(Integer, primary_key=True)
-    NAME_DE = Column(Unicode(256), nullable=False)
-    NAME_EN = Column(Unicode(256), nullable=False)
-    NAME_FR = Column(Unicode(256), nullable=False)
-    CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
+    ID: Mapped[int] = Column(Integer, primary_key=True)
+    NAME_DE: Mapped[str] = Column(Unicode(256), nullable=False)
+    NAME_EN: Mapped[str] = Column(Unicode(256), nullable=False)
+    NAME_FR: Mapped[str] = Column(Unicode(256), nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CREATED_BY: Mapped[int] = Column(
+        Integer, ForeignKey("STAFF.ST_ID"), nullable=False
+    )
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
@@ -650,24 +715,24 @@ class AnonymizationLog(Base):
 
     __tablename__ = "ANONYMIZATION_LOG"
 
-    AL_ID = Column(Integer, primary_key=True)
-    AL_DATE = Column(DateTime, nullable=False)
-    AL_COUNT_ACCOUNTING = Column(Integer, nullable=False)
-    AL_COUNT_CHANCES = Column(Integer, nullable=False)
-    AL_COUNT_PROCESS = Column(Integer, nullable=False)
-    AL_COUNT_PROCESSFOLDER = Column(Integer, nullable=False)
-    AL_COUNT_PROJECT = Column(Integer, nullable=False)
-    AL_COUNT_PROKALKMODUL = Column(Integer, nullable=False)
-    AL_COUNT_SUBORDERS = Column(Integer, nullable=False)
-    AL_COUNT_TESTSAMPLE = Column(Integer, nullable=False)
-    AL_ERROR_ACCOUNTING = Column(Integer, nullable=False)
-    AL_ERROR_CHANCES = Column(Integer, nullable=False)
-    AL_ERROR_PROCESS = Column(Integer, nullable=False)
-    AL_ERROR_PROCESSFOLDER = Column(Integer, nullable=False)
-    AL_ERROR_PROJECT = Column(Integer, nullable=False)
-    AL_ERROR_PROKALKMODUL = Column(Integer, nullable=False)
-    AL_ERROR_SUBORDERS = Column(Integer, nullable=False)
-    AL_ERROR_TESTSAMPLE = Column(Integer, nullable=False)
+    AL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    AL_DATE: Mapped[datetime] = Column(DateTime, nullable=False)
+    AL_COUNT_ACCOUNTING: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_CHANCES: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_PROCESS: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_PROCESSFOLDER: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_PROJECT: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_PROKALKMODUL: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_SUBORDERS: Mapped[int] = Column(Integer, nullable=False)
+    AL_COUNT_TESTSAMPLE: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_ACCOUNTING: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_CHANCES: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_PROCESS: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_PROCESSFOLDER: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_PROJECT: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_PROKALKMODUL: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_SUBORDERS: Mapped[int] = Column(Integer, nullable=False)
+    AL_ERROR_TESTSAMPLE: Mapped[int] = Column(Integer, nullable=False)
 
 
 class ReasonForAdditionalEffort(Base):
@@ -675,12 +740,14 @@ class ReasonForAdditionalEffort(Base):
 
     __tablename__ = "REASON_FOR_ADDITIONAL_EFFORT"
 
-    ID = Column(Integer, primary_key=True)
-    NAME_DE = Column(Unicode(256), nullable=False)
-    NAME_EN = Column(Unicode(256), nullable=False)
-    NAME_FR = Column(Unicode(256), nullable=False)
-    CREATED = Column(DateTime, nullable=False)
-    CREATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"), nullable=False)
+    ID: Mapped[int] = Column(Integer, primary_key=True)
+    NAME_DE: Mapped[str] = Column(Unicode(256), nullable=False)
+    NAME_EN: Mapped[str] = Column(Unicode(256), nullable=False)
+    NAME_FR: Mapped[str] = Column(Unicode(256), nullable=False)
+    CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CREATED_BY: Mapped[int] = Column(
+        Integer, ForeignKey("STAFF.ST_ID"), nullable=False
+    )
     UPDATED = Column(DateTime)
     UPDATED_BY = Column(Integer, ForeignKey("STAFF.ST_ID"))
 
@@ -701,10 +768,14 @@ class ProjectFailureRel(Base):
 
     __tablename__ = "PROJECT_FAILURE_REL"
 
-    ID = Column(Integer, primary_key=True)
-    P_ID = Column(Integer, ForeignKey("PROJECT.P_ID"), nullable=False)
+    ID: Mapped[int] = Column(Integer, primary_key=True)
+    P_ID: Mapped[int] = Column(
+        Integer, ForeignKey("PROJECT.P_ID"), nullable=False
+    )
     SO_NUMBER = Column(Integer)
-    FAIL_ID = Column(Integer, ForeignKey("FAILURE_MD.FAIL_ID"), nullable=False)
+    FAIL_ID: Mapped[int] = Column(
+        Integer, ForeignKey("FAILURE_MD.FAIL_ID"), nullable=False
+    )
 
     failure_md: FailureMd = relationship("FailureMd")
     project: Project = relationship(
@@ -717,16 +788,16 @@ class FailureMd(Base):
 
     __tablename__ = "FAILURE_MD"
 
-    FAIL_ID = Column(Integer, primary_key=True)
-    MD_ID = Column(Integer, nullable=False)
-    FAIL_KEY = Column(Unicode(16), nullable=False)
+    FAIL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    MD_ID: Mapped[int] = Column(Integer, nullable=False)
+    FAIL_KEY: Mapped[str] = Column(Unicode(16), nullable=False)
     FAIL_TEXT_EN = Column(Unicode(150))
     FAIL_TEXT_DE = Column(Unicode(150))
     FAIL_TEXT_FR = Column(Unicode(150))
     FAIL_EXAMPLE_EN = Column(Unicode(500))
     FAIL_EXAMPLE_DE = Column(Unicode(500))
     FAIL_EXAMPLE_FR = Column(Unicode(500))
-    Created = Column(DateTime, nullable=False)
+    Created: Mapped[datetime] = Column(DateTime, nullable=False)
     CreatedBy = Column(Integer)
     Updated = Column(DateTime)
     UpdatedBy = Column(Integer)

@@ -4,17 +4,9 @@ import logging
 import os
 import subprocess
 import sys
-from typing import Optional, cast
+from typing import Optional
 
-from PyQt5.QtCore import (
-    QEvent,
-    QObject,
-    QSettings,
-    Qt,
-    QThread,
-    pyqtBoundSignal,
-    pyqtSlot,
-)
+from PyQt5.QtCore import QEvent, QObject, QSettings, Qt, QThread, pyqtSlot
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QProgressDialog, QWidget
 
@@ -62,13 +54,9 @@ class TSLMainWindow(QMainWindow):
             self._updater = Updater(self._app_name, self._version)
             self._updater.moveToThread(self._updater_thread)
             self._updater.update_available.connect(self.update_status)
-            cast(pyqtBoundSignal, self._updater_thread.started).connect(
-                self._updater.start_update
-            )
+            self._updater_thread.started.connect(self._updater.start_update)
             self._updater.updater_checked.connect(self._updater_thread.quit)
-            cast(pyqtBoundSignal, self._updater_thread.finished).connect(
-                self.updater_finished
-            )
+            self._updater_thread.finished.connect(self.updater_finished)
             self._updater_thread.start()
         else:
             log.debug("Suppressing update with -u or running from IDE.")

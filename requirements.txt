@@ -1,7 +1,7 @@
-pyodbc==4.0.31
+pyodbc==4.0.32
 PyQt5==5.15.4
 pytest==6.2.4
 pytest-qt==4.0.2
 requests==2.26.0
 setuptools==57.4.0
-sqlalchemy==1.4.22
+sqlalchemy==1.4.23

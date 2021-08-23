@@ -70,7 +70,7 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-        args: [ "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
+        args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
         exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*"
 
 # Should be activated once there is time to check setup.py:

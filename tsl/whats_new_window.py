@@ -1,9 +1,9 @@
 """Entry defining a software change for the WhatsNewWindow."""
 import logging
 from enum import IntEnum
-from typing import List, TypedDict, cast
+from typing import List, TypedDict
 
-from PyQt5.QtCore import pyqtBoundSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget
 
@@ -56,15 +56,9 @@ class WhatsNewWindow(QMainWindow):
         self._current_entry_idx = 0
         self._display_entry()
 
-        cast(pyqtBoundSignal, self._ui.previous_button.clicked).connect(
-            self.on_previous
-        )
-        cast(pyqtBoundSignal, self._ui.next_button.clicked).connect(
-            self.on_next
-        )
-        cast(pyqtBoundSignal, self._ui.close_button.clicked).connect(
-            self.close
-        )
+        self._ui.previous_button.clicked.connect(self.on_previous)
+        self._ui.next_button.clicked.connect(self.on_next)
+        self._ui.close_button.clicked.connect(self.close)
         self._ui.text_label.setOpenExternalLinks(True)
 
     @pyqtSlot(name="on_next")

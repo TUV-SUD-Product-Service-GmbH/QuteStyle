@@ -1,7 +1,7 @@
 """Test for edoc database methods."""
 import logging
 from datetime import datetime
-from typing import Any, List, Sequence, cast
+from typing import Any, Sequence
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -190,7 +190,7 @@ def _check_copied_package(  # noqa: MC0001  # pylint: disable=too-many-branches
     old_scl = [scl.definition.SCL_ID for scl in old_package.service_classes]
     new_scl = [scl.definition.SCL_ID for scl in new_package.service_classes]
 
-    assert sorted(cast(List[int], old_scl)) == sorted(cast(List[int], new_scl))
+    assert sorted(old_scl) == sorted(new_scl)
 
 
 def create_test_navigation() -> int:
@@ -202,7 +202,7 @@ def create_test_navigation() -> int:
         nav.kind_of_test = KindOfTest()
         session.add(nav)
         session.flush()
-    return cast(int, nav.N_ID)
+    return nav.N_ID
 
 
 def create_test_package() -> int:
@@ -234,4 +234,4 @@ def create_test_package() -> int:
             package_element = PackageElement(NPE_CREATE_SO=False)
             package.package_elements.append(package_element)
         session.flush()
-    return cast(int, package.NP_ID)
+    return package.NP_ID

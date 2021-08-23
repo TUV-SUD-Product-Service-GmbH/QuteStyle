@@ -6,7 +6,7 @@ import sys
 from typing import Iterable, List
 
 import pyodbc
-from PyQt5 import uic  # type: ignore  # pylint: disable=wrong-import-order
+from PyQt5 import uic  # pylint: disable=wrong-import-order
 
 from tsl.vault import Vault
 
@@ -30,7 +30,7 @@ def add_edoc_procedures() -> None:
         os.path.dirname(os.path.abspath(__file__)), "test_procedures"
     )
     for file in os.listdir(proc_path):
-        with open(os.path.join(proc_path, file)) as fhandle:
+        with open(os.path.join(proc_path, file), encoding="utf-8") as fhandle:
             escaped_sql = fhandle.read()
             print("Creating procedure " + file.replace(".sql", ""))
             cursor.execute(escaped_sql)
@@ -49,9 +49,13 @@ def compile_ui_files(src_folders: List[str]) -> None:
         for file in os.listdir(folder):
             print("Converting file {}".format(file))
             new_file = "ui_" + file.replace(".ui", "") + ".py"
-            with open(os.path.join(folder, file), "r") as source:
+            with open(
+                os.path.join(folder, file), "r", encoding="utf-8"
+            ) as source:
                 with open(
-                    os.path.join(os.path.dirname(folder), "gen", new_file), "w"
+                    os.path.join(os.path.dirname(folder), "gen", new_file),
+                    "w",
+                    encoding="utf-8",
                 ) as target:
                     uic.compileUi(source, target)
         # run black after ui files are created

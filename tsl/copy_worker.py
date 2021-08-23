@@ -207,7 +207,9 @@ class CopyWorker(QObject):
 
     def _parse_json(self) -> None:
         """Parse the update json_file."""
-        with open(os.path.join(self._source, "update.json")) as fhandle:
+        with open(
+            os.path.join(self._source, "update.json"), encoding="utf-8"
+        ) as fhandle:
             json_obj = json.load(fhandle)
         log.debug("Parsed json: %s", str(json_obj))
         for file in json_obj["files"]:

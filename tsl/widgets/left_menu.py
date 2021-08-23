@@ -153,7 +153,7 @@ class LeftMenu(QWidget):
     ) -> None:
         """Set the button for the given widget active/inactive."""
         for btn in self.findChildren(LeftMenuButton):
-            if cast(LeftMenuButton, btn).widget_class == widget_class:
+            if btn.widget_class == widget_class:
                 btn.set_active(active)
                 btn.set_active_tab(active)
                 return

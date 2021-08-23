@@ -12,6 +12,7 @@ import os
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime
+from decimal import Decimal
 from enum import IntEnum
 from typing import Dict, Iterator, List, Optional, cast
 
@@ -32,6 +33,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY
 from sqlalchemy.orm import (
+    Mapped,
     Session,
     backref,
     declarative_base,
@@ -155,7 +157,7 @@ class AppsCount(Base):
     ]
 
     __tablename__ = "APPS_COUNT"
-    APPSC_ID = Column(Integer, primary_key=True)
+    APPSC_ID: Mapped[int] = Column(Integer, primary_key=True)
     ST_ID = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
@@ -177,7 +179,7 @@ class AppsCount(Base):
         Unicode(4000),
         doc="Free text containing debug information, computer name, user etc.",
     )
-    APPSC_STARTTIME = Column(
+    APPSC_STARTTIME: Mapped[int] = Column(
         BigInteger,
         nullable=False,
         server_default=text("((0))"),
@@ -229,7 +231,7 @@ class Attribute(Base):
         "EdocModules. The are used as Parameter in eDOC and Navigator.",
     ]
 
-    ATT_ID = Column(Integer, primary_key=True)
+    ATT_ID: Mapped[int] = Column(Integer, primary_key=True)
     ATT_SHORT = Column(Unicode(10), doc="Short name of the Attribute")
     ATT_NAME_DE = Column(Unicode(60), doc="German name of the Attribute")
     ATT_NAME_EN = Column(Unicode(60), doc="English name of the Attribute")
@@ -240,7 +242,7 @@ class Attribute(Base):
         server_default=text("((0))"),
         doc="Type of the Attribute.",
     )
-    ATT_IS_FILTER = Column(
+    ATT_IS_FILTER: Mapped[bool] = Column(
         Boolean,
         nullable=False,
         server_default=text("((1))"),
@@ -289,7 +291,7 @@ class AttributeType(Base):
     ]
 
     # ATTT_ID = Column(Integer, primary_key=True)
-    ATT_TYPE = Column(Integer, primary_key=True)
+    ATT_TYPE: Mapped[int] = Column(Integer, primary_key=True)
     ATTT_NAME_DE = Column(Unicode(100), doc="German name of the Attribute")
     ATTT_NAME_EN = Column(Unicode(100), doc="English name of the Attribute")
     ATTT_NAME_FR = Column(Unicode(100), doc="French name of the Attribute")
@@ -317,7 +319,7 @@ class CalculationType(Base):
         "FACTORY PLANT INSPECTION",
     ]
 
-    CT_ID = Column(Integer, primary_key=True)
+    CT_ID: Mapped[int] = Column(Integer, primary_key=True)
     CT_NAME = Column(Unicode(50), doc="Name in English")
     CT_ORDER = Column(
         Integer,
@@ -340,14 +342,14 @@ class Clearing(Base):
         "Definition of the clearing states, i.e.: '06-Freigegeben'",
     ]
 
-    CL_ID = Column(Integer, primary_key=True)
-    CL_NAME_DE = Column(
+    CL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    CL_NAME_DE: Mapped[str] = Column(
         Unicode(length=100),
         nullable=False,
         doc="German name. Since it's never null in the database, "
         "we set it as nullable=False.",
     )
-    CL_NAME_EN = Column(
+    CL_NAME_EN: Mapped[str] = Column(
         Unicode(length=100),
         nullable=False,
         doc="English name. Since it's never null in the database, "
@@ -414,7 +416,7 @@ class Country(Base):
         "to assign Navigations to a specific region or country.",
     ]
 
-    HRC_ID = Column(Integer, primary_key=True)
+    HRC_ID: Mapped[int] = Column(Integer, primary_key=True)
     HRC_LEFT = Column(Integer, index=True, doc="Sort order left oriented")
     HRC_RIGHT = Column(Integer, index=True, doc="Sort order right oriented")
     HRC_INDENT = Column(Integer, doc="Indentation in the country tree")
@@ -448,7 +450,7 @@ class CustomList(Base):
 
     doc = ["Lists that _group CustomListElements together."]
 
-    CUL_ID = Column(Integer, primary_key=True)
+    CUL_ID: Mapped[int] = Column(Integer, primary_key=True)
     CUL_NAME_DE = Column(Unicode(256), doc="German name of the CustomList.")
     CUL_NAME_EN = Column(Unicode(256), doc="English name of the CustomList.")
     reg = Column("CUL_REG", DateTime, server_default=text("(getdate())"))
@@ -485,7 +487,7 @@ class CustomListElement(Base):
         "to the different DefaultItems of a DefaultModule."
     ]
 
-    CULE_ID = Column(Integer, primary_key=True)
+    CULE_ID: Mapped[int] = Column(Integer, primary_key=True)
     CUL_ID = Column(Integer, ForeignKey("CUSTOM_LIST.CUL_ID"))
     CULE_NAME_DE = Column(Unicode(512), doc="German name")
     CULE_NAME_EN = Column(Unicode(512), doc="English name")
@@ -495,20 +497,20 @@ class CustomListElement(Base):
     CULE_ORDER = Column(
         Integer, doc="Order of the items within the list (CustomList)"
     )
-    CULE_STYLE = Column(
+    CULE_STYLE: Mapped[int] = Column(
         Integer,
         nullable=False,
         server_default=text("((0))"),
         doc="Style shown in the Field 'Art', used values: 0, 1, 2, 3, 4",
     )
-    CULE_TESTBASE = Column(
+    CULE_TESTBASE: Mapped[int] = Column(
         Integer,
         nullable=False,
         server_default=text("((0))"),
         doc="Testbase shown in Field 'Grundlage in Anforderung', "
         "used values: 0, 3, 4, 6, 7",
     )
-    CULE_MODULBASE = Column(
+    CULE_MODULBASE: Mapped[int] = Column(
         Integer,
         nullable=False,
         server_default=text("((0))"),
@@ -524,7 +526,7 @@ class CustomListElement(Base):
         doc="Reference to a DefaultItem that is used as template when "
         "inserting a 'Kategoriebaustein'",
     )
-    CULE_MARKETABILITY = Column(
+    CULE_MARKETABILITY: Mapped[bool] = Column(
         BIT, nullable=False, server_default=text("((0))"), doc="UNKNOWN"
     )
     CULE_NUMBER = Column(
@@ -579,8 +581,8 @@ class Customer(Base):
         "address table does contain partly redundant data."
     ]
 
-    CU_ID = Column(Integer, primary_key=True)
-    CA_ID = Column(
+    CU_ID: Mapped[int] = Column(Integer, primary_key=True)
+    CA_ID: Mapped[int] = Column(
         Integer, ForeignKey("V_PSEX_CUSTOMER_ADDRESS.CA_ID"), nullable=False
     )
     CU_NUMBER = Column(
@@ -589,8 +591,10 @@ class Customer(Base):
         " with 130000",
     )
     CU_ACTIVE = Column(BIT, doc="Defines if the Customer is active.")
-    CU_NAME = Column(Unicode(165), nullable=False, doc="Name of the customer")
-    CU_NAME_SHORT = Column(
+    CU_NAME: Mapped[str] = Column(
+        Unicode(165), nullable=False, doc="Name of the customer"
+    )
+    CU_NAME_SHORT: Mapped[str] = Column(
         Unicode(60), nullable=False, doc="Short name of the customer"
     )
     CU_COUNTRY = Column(
@@ -602,7 +606,7 @@ class Customer(Base):
     CU_ZIPCODE = Column(
         String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Zipcode of address"
     )
-    MD_ID = Column(Integer, nullable=False, doc="UNKNOWN")
+    MD_ID: Mapped[int] = Column(Integer, nullable=False, doc="UNKNOWN")
     CU_SUPPLIER_NO = Column(Unicode(24), doc="Supplier number")
     CU_ATTENDENT = Column(Unicode(40), doc="Attendant of the customer.")
     CU_FAX = Column(
@@ -641,7 +645,7 @@ class CustomerAddress(Base):
         "on one side.",
     ]
 
-    CA_ID = Column(
+    CA_ID: Mapped[int] = Column(
         Integer,
         primary_key=True,
         doc="WARNING: Is defined as not nullable and not as primary key in "
@@ -655,7 +659,7 @@ class CustomerAddress(Base):
         String(10, "SQL_Latin1_General_CP1_CI_AS"),
         doc="UNKOWN: Purpose of this column is unknown.",
     )
-    CA_NATION = Column(
+    CA_NATION: Mapped[str] = Column(
         String(1, "SQL_Latin1_General_CP1_CI_AS"),
         nullable=False,
         doc="UNKNOWN: Possible values are A, C, H, I, K, M, V",
@@ -665,8 +669,10 @@ class CustomerAddress(Base):
         doc="UNKNOWN: Possible values are 0001 to 0007. Looks like someone "
         "formatted an Integer as a 4 character string.",
     )
-    CA_NAME = Column(Unicode(165), nullable=False, doc="Name of the company")
-    CA_NAME_SHORT = Column(
+    CA_NAME: Mapped[str] = Column(
+        Unicode(165), nullable=False, doc="Name of the company"
+    )
+    CA_NAME_SHORT: Mapped[str] = Column(
         Unicode(60), nullable=False, doc="Short name of the company"
     )
     CA_NAME1 = Column(Unicode(40), doc="Additional name field")
@@ -741,13 +747,13 @@ class CustomerAddress(Base):
     CA_COMMENT = Column(Unicode(2000), doc="Free text comment field")
     RUN_ID = Column(Integer, doc="UNKNOWN")
 
-    reg = Column(
+    reg: Mapped[datetime] = Column(
         "CA_CREATED",
         DateTime,
         nullable=False,
         server_default=text("(getdate())"),
     )
-    update = Column(
+    update: Mapped[datetime] = Column(
         "CA_UPDATED", DateTime, nullable=False, onupdate=datetime.utcnow
     )
 
@@ -763,7 +769,7 @@ class CustomerContact(Base):
 
     doc = ["View on the customer contacts in the PSEX database."]
 
-    CUC_ID = Column(Integer, primary_key=True)
+    CUC_ID: Mapped[int] = Column(Integer, primary_key=True)
     CU_ID = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
     CUC_FORENAME = Column(Unicode(35), doc="First name.")
     CUC_SURNAME = Column(Unicode(35), doc="Last name.")
@@ -787,7 +793,7 @@ class DefaultItem(Base):
 
     doc = ["DefaultItem ('Prüfbaustein') that is used in a DefaultModule"]
 
-    DI_ID = Column(Integer, primary_key=True)
+    DI_ID: Mapped[int] = Column(Integer, primary_key=True)
     DI_VERSION = Column(
         Integer,
         doc="Version of the DefaultItem. Should increase with every change "
@@ -911,7 +917,7 @@ class DefaultItem(Base):
         doc="DEPRECATED: Workstation id. Not used anymore in eDOC. ForeignKey "
         "not set!",
     )
-    DI_DELETED = Column(
+    DI_DELETED: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
@@ -932,7 +938,7 @@ class DefaultItem(Base):
         server_default=text("((1))"),
         doc="Product of the Default Item",
     )
-    DI_IS_INFO = Column(
+    DI_IS_INFO: Mapped[bool] = Column(
         BIT,
         nullable=False,
         index=True,
@@ -964,7 +970,7 @@ class DefaultItem(Base):
         doc="Defines the necessary amount of test samples for this "
         "DefaultItem in French.",
     )
-    REL_ID = Column(
+    REL_ID: Mapped[int] = Column(
         Integer,
         nullable=False,
         server_default=text("((1))"),
@@ -979,27 +985,27 @@ class DefaultItem(Base):
         index=True,
         doc="Parent DefaultItem",
     )
-    DI_OLD = Column(
+    DI_OLD: Mapped[Decimal] = Column(
         MONEY,
         nullable=False,
         server_default=text("((1))"),
         doc="DEPRECATED: Is always 1",
     )
-    DI_OWNER = Column(
+    DI_OWNER: Mapped[int] = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         nullable=False,
         server_default=text("((1))"),
         doc="Owner of the DefaultItem",
     )
-    ST_ID = Column(
+    ST_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         nullable=False,
         server_default=text("((1))"),
         doc="Team for the DefaultItem",
     )
-    NL_ID = Column(
+    NL_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("NAVLEVEL.NL_ID"),
         nullable=False,
@@ -1012,21 +1018,21 @@ class DefaultItem(Base):
     DI_COSTITEM = Column(
         Unicode(100), doc="SAP cost item: Some string like 'PS3517'"
     )
-    ND_ID = Column(
+    ND_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("NAVDOMAIN.ND_ID"),
         nullable=False,
         server_default=text("((1))"),
     )
     DI_NORM_ALT = Column(Unicode(80), doc="DEPRECATED: Normative as text")
-    DI_HIDE_COL1 = Column(
+    DI_HIDE_COL1: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
         doc="UNKNOWN: sets the checkbox in eDOC labelled: 'CB Unterp. "
         "ausblenden'",
     )
-    DI_INSERT_STANDARD = Column(
+    DI_INSERT_STANDARD: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
@@ -1035,7 +1041,7 @@ class DefaultItem(Base):
     )
     DI_TESTCODE = Column(Unicode(512), doc="UNKNOWN")
     DI_SECTION = Column(Unicode(512), doc="UNKNOWN")
-    DI_PROTECTED = Column(
+    DI_PROTECTED: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
@@ -1107,7 +1113,7 @@ class DefaultItemAnnex(Base):
 
     doc = ["File annex for a DefaultItem that can be copied to a protocol."]
 
-    DIAX_ID = Column(Integer, primary_key=True)
+    DIAX_ID: Mapped[int] = Column(Integer, primary_key=True)
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
     DIAX_NAME_DE = Column(Unicode(500), doc="German annex name")
     DIAX_NAME_EN = Column(Unicode(500), doc="English annex name")
@@ -1115,7 +1121,7 @@ class DefaultItemAnnex(Base):
     DIAX_FILENAME = Column(Unicode(255), doc="Filename of the annex")
     DIAX_CHECKSUM = Column(Unicode(32), doc="Checksum of the file")
     DIAX_DATA = deferred(Column(IMAGE, doc="File that is the annex"))
-    DIAX_COPY = Column(
+    DIAX_COPY: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((1))"),
@@ -1134,8 +1140,8 @@ class DefaultItemAttribute(Base):
 
     doc = ["Link between an Attribute and a DefaultItem."]
 
-    DIA_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(
+    DIA_ID: Mapped[int] = Column(Integer, primary_key=True)
+    DI_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_ITEM.DI_ID"),
         index=True,
@@ -1143,7 +1149,7 @@ class DefaultItemAttribute(Base):
         doc="It's nullable in the database, which doesn't make sense, "
         "therefore it's not nullable in TSL lib.",
     )
-    ATT_ID = Column(
+    ATT_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("ATTRIBUTES.ATT_ID"),
         index=True,
@@ -1163,9 +1169,9 @@ class DefaultItemCustom(Base):
 
     __tablename__ = "DEFAULT_ITEM_CUSTOM"
 
-    DICU_ID = Column(Integer, primary_key=True)
+    DICU_ID: Mapped[int] = Column(Integer, primary_key=True)
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
-    reg = Column(
+    reg: Mapped[datetime] = Column(
         "DICU_REG",
         DateTime,
         nullable=False,
@@ -1184,10 +1190,10 @@ class DefaultItemCustom(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    CUL_ID = Column(
+    CUL_ID: Mapped[int] = Column(
         Integer, ForeignKey("CUSTOM_LIST.CUL_ID"), nullable=False, index=True
     )
-    CULE_ID = Column(
+    CULE_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("CUSTOM_LIST_ELEMENT.CULE_ID"),
         nullable=False,
@@ -1211,16 +1217,18 @@ class DefaultItemBase(Base):
 
     doc = ["Link between a TestBase and a DefaultItem"]
 
-    DIB_ID = Column(Integer, primary_key=True)
-    DI_ID = Column(
+    DIB_ID: Mapped[int] = Column(Integer, primary_key=True)
+    DI_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_ITEM.DI_ID"),
         index=True,
         nullable=False,
         doc="Set to nullable in TSL database.",
     )
-    B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
-    DIB_TYPE = Column(
+    B_ID: Mapped[int] = Column(
+        Integer, ForeignKey("BASE.B_ID"), nullable=False
+    )
+    DIB_TYPE: Mapped[int] = Column(
         Integer,
         ForeignKey("BASE_TYPE.BT_ID"),
         nullable=False,
@@ -1249,11 +1257,11 @@ class DefaultModuleItemParameter(Base):
 
     doc = ["Link between a DefaultModuleItem and a ModulParameter"]
 
-    DMIP_ID = Column(Integer, primary_key=True)
+    DMIP_ID: Mapped[int] = Column(Integer, primary_key=True)
     DMI_ID = Column(
         Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), index=True
     )
-    reg = Column(
+    reg: Mapped[datetime] = Column(
         "DMIP_REG",
         DateTime,
         nullable=False,
@@ -1272,7 +1280,7 @@ class DefaultModuleItemParameter(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    MP_ID = Column(
+    MP_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("MODUL_PARAMETER.MP_ID"),
         nullable=False,
@@ -1292,7 +1300,7 @@ class DefaultItemPicture(Base):
 
     doc = ["Picture included in a DefaultItem."]
 
-    DIP_ID = Column(Integer, primary_key=True)
+    DIP_ID: Mapped[int] = Column(Integer, primary_key=True)
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), index=True)
     DIP_NUMBER = Column(Integer, doc="Number of the picture for ordering")
     DIP_TEXT_DE = Column(Unicode(500), doc="German picture description")
@@ -1314,7 +1322,7 @@ class DefaultModule(Base):
 
     __tablename__ = "DEFAULT_MODUL"
 
-    DM_ID = Column(Integer, primary_key=True)
+    DM_ID: Mapped[int] = Column(Integer, primary_key=True)
     DM_VERSION = Column(
         Integer,
         doc="Version number of the DefaultModule. Should increase with every "
@@ -1325,7 +1333,7 @@ class DefaultModule(Base):
         server_default=text("((1))"),
         doc="Defines if the DefaultModule is active (still in use)",
     )
-    DM_NAME = Column(
+    DM_NAME: Mapped[str] = Column(
         Unicode(255),
         index=True,
         nullable=False,
@@ -1417,21 +1425,21 @@ class DefaultModule(Base):
         doc="Date on which the person for whom the module was created was "
         "set.",
     )
-    HRC_ID = Column(
+    HRC_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("HR_COUNTRY.HRC_ID"),
         nullable=False,
         index=True,
         server_default=text("((1))"),
     )
-    HRP_ID = Column(
+    HRP_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("HR_PRODUCT.HRP_ID"),
         nullable=False,
         index=True,
         server_default=text("((1))"),
     )
-    DM_IS_INFO = Column(
+    DM_IS_INFO: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
@@ -1445,7 +1453,7 @@ class DefaultModule(Base):
     DM_NAME_EN = Column(
         Unicode(255), index=True, doc="English name of the DefaultModule."
     )
-    ND_ID = Column(
+    ND_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("NAVDOMAIN.ND_ID"),
         nullable=False,
@@ -1458,13 +1466,13 @@ class DefaultModule(Base):
         Unicode(60),
         doc="Revision number used by TGR when editing DefaultModules",
     )
-    DM_HIDE_VALUE = Column(
+    DM_HIDE_VALUE: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
         doc="UNKNOWN: Used to hide the 'Wertespalte'",
     )
-    DM_TSL_VERIFIED = Column(
+    DM_TSL_VERIFIED: Mapped[bool] = Column(
         BIT,
         nullable=False,
         server_default=text("((0))"),
@@ -1538,15 +1546,17 @@ class DefaultModuleAttribute(Base):
 
     doc = ["Links an Attribute to a DefaultModule."]
 
-    DMA_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(
+    DMA_ID: Mapped[int] = Column(Integer, primary_key=True)
+    DM_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_MODUL.DM_ID"),
         index=True,
         nullable=False,
         doc="Set to not nullable in TSL lib.",
     )
-    ATT_ID = Column(Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False)
+    ATT_ID: Mapped[int] = Column(
+        Integer, ForeignKey("ATTRIBUTES.ATT_ID"), nullable=False
+    )
 
     default_module: DefaultModule = relationship(
         "DefaultModule", back_populates="attributes", uselist=False
@@ -1564,16 +1574,18 @@ class DefaultModuleTestBase(Base):
         "The link is classified by the TestBaseType."
     ]
 
-    DMB_ID = Column(Integer, primary_key=True)
-    DM_ID = Column(
+    DMB_ID: Mapped[int] = Column(Integer, primary_key=True)
+    DM_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_MODUL.DM_ID"),
         index=True,
         nullable=False,
         doc="Set to not nullable in TSL lib.",
     )
-    B_ID = Column(Integer, ForeignKey("BASE.B_ID"), nullable=False)
-    DMB_TYPE = Column(
+    B_ID: Mapped[int] = Column(
+        Integer, ForeignKey("BASE.B_ID"), nullable=False
+    )
+    DMB_TYPE: Mapped[int] = Column(
         Integer,
         ForeignKey("BASE_TYPE.BT_ID"),
         nullable=False,
@@ -1594,7 +1606,7 @@ class DefaultModuleCalc(Base):
 
     doc = ["Calculation for a DefaultModule."]
 
-    DMC_ID = Column(Integer, primary_key=True)
+    DMC_ID: Mapped[int] = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), index=True)
     WST_ID = Column(
         Integer,
@@ -1625,7 +1637,7 @@ class DefaultModuleCalc(Base):
         doc="Travel costs when executing the DefaultModule.",
     )
     DMC_COMMENT = Column(Unicode(500), doc="Comment for the calculation.")
-    ST_ID = Column(
+    ST_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         nullable=False,
@@ -1649,7 +1661,7 @@ class DefaultModuleHistory(Base):
 
     doc = ["History entry for tracking changes in a DefaultModule."]
 
-    MH_ID = Column(Integer, primary_key=True)
+    MH_ID: Mapped[int] = Column(Integer, primary_key=True)
     MH_COMMENT = Column(Unicode(1000), doc="Comment for the history entry")
     MH_DOCUMENT_NAME = Column(
         Unicode(255), doc="Document name of the attached document."
@@ -1759,31 +1771,31 @@ class DefaultModuleItem(Base):
 
     doc = ["Links DefaultItems to a DefaultModule"]
 
-    DMI_ID = Column(Integer, primary_key=True)
+    DMI_ID: Mapped[int] = Column(Integer, primary_key=True)
     # keys of DefaultItem and DefaultModule are nullable in database,
     # but the item isn't useful without
-    DM_ID = Column(
+    DM_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_MODUL.DM_ID"),
         nullable=False,
         index=True,
         doc="Set to not nullable in TSL Library.",
     )
-    DI_ID = Column(
+    DI_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("DEFAULT_ITEM.DI_ID"),
         nullable=False,
         index=True,
         doc="Set to not nullable in TSL Library.",
     )
-    DMI_NUMBER = Column(
+    DMI_NUMBER: Mapped[int] = Column(
         Integer,
         nullable=False,
         doc="Order of the items within the DefaultModule. Set to not nullable "
         "in TSL Library.",
     )
     # nullable in DB, but never NULL and also useless when NULL
-    DMI_INDENT = Column(
+    DMI_INDENT: Mapped[int] = Column(
         Integer,
         nullable=False,
         doc="Indentation of the DefaultItem in the DefaultModule. Set to not "
@@ -1820,7 +1832,7 @@ class DefaultModuleItem(Base):
         doc="Workstation the DefaultModuleItem is executed on. ForeignKey "
         "not set.",
     )  # todo: Check if ForeignKey
-    ST_ID = Column(
+    ST_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         nullable=False,
@@ -1866,19 +1878,21 @@ class DefaultModuleLink(Base):
         "to a DefaultModule."
     ]
 
-    DML_ID = Column(Integer, primary_key=True)
+    DML_ID: Mapped[int] = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), index=True)
     # the next four columns are never NULL, so we set the not nullable
-    DML_TEXT_DE = Column(
+    DML_TEXT_DE: Mapped[str] = Column(
         Unicode(1024), nullable=False, doc="German link description"
     )
-    DML_TEXT_EN = Column(
+    DML_TEXT_EN: Mapped[str] = Column(
         Unicode(1024), nullable=False, doc="English link description"
     )
-    DML_TEXT_FR = Column(
+    DML_TEXT_FR: Mapped[str] = Column(
         Unicode(1024), nullable=False, doc="French link description"
     )
-    DML_URL = Column(Unicode(512), nullable=False, doc="Url for the link")
+    DML_URL: Mapped[str] = Column(
+        Unicode(512), nullable=False, doc="Url for the link"
+    )
     update = Column("DML_UPDATE", DateTime, server_default=text("(getdate())"))
     update_by = Column(
         "DML_UPDATEBY",
@@ -1901,7 +1915,7 @@ class Edoc(Base):
 
     __tablename__ = "EDOC"
 
-    E_ID = Column(Integer, primary_key=True)
+    E_ID: Mapped[int] = Column(Integer, primary_key=True)
     E_VERSION = Column(
         Integer,
         default=1,
@@ -1909,7 +1923,7 @@ class Edoc(Base):
         "1 when saving changes.",
     )
     # E_NAME is nullable in database, but never actually NULL
-    E_NAME = Column(
+    E_NAME: Mapped[str] = Column(
         Unicode(255),
         index=True,
         nullable=False,
@@ -1977,7 +1991,7 @@ class EdocModuleItem(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM"
 
-    EMI_ID = Column(Integer, primary_key=True)
+    EMI_ID: Mapped[int] = Column(Integer, primary_key=True)
     EMI_VERSION = Column(Integer)
     EMI_NUMBER = Column(Integer)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
@@ -1985,18 +1999,18 @@ class EdocModuleItem(Base):
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"))
     DI_VERSION = Column(Integer)
-    EMI_REQUIREMENT_DE = Column(
+    EMI_REQUIREMENT_DE: Mapped[str] = Column(
         NullUnicode(length=1500), nullable=False, default=""
     )
-    EMI_REQUIREMENT_EN = Column(
+    EMI_REQUIREMENT_EN: Mapped[str] = Column(
         NullUnicode(length=1500), nullable=False, default=""
     )
-    EMI_REQUIREMENT_FR = Column(
+    EMI_REQUIREMENT_FR: Mapped[str] = Column(
         NullUnicode(length=1500), nullable=False, default=""
     )
     # column is nullable in db, but actually never is. there are 6 items
     # without indent, but they are from 2009/2010
-    EMI_INDENT = Column(Integer, nullable=False)
+    EMI_INDENT: Mapped[int] = Column(Integer, nullable=False)
     WST_ID = Column(Integer)  # todo: add ForeignKey
     EMI_NORM = Column(Unicode(length=80))
     PSI_ID = Column(Integer)
@@ -2056,7 +2070,7 @@ class EdocModuleItemComparison(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM_COMPARISON"
 
-    EMIC_ID = Column(Integer, primary_key=True)
+    EMIC_ID: Mapped[int] = Column(Integer, primary_key=True)
     EMI_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM.EMI_ID"))
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
     EMIC_ORDER = Column(Integer)
@@ -2096,7 +2110,7 @@ class EdocModuleItemComparisonPhase(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM_COMPARISON_PHASE"
 
-    EMICP_ID = Column(Integer, primary_key=True)
+    EMICP_ID: Mapped[int] = Column(Integer, primary_key=True)
     EMIC_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM_COMPARISON.EMIC_ID"))
     EMI_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM.EMI_ID"))
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
@@ -2125,7 +2139,7 @@ class EdocModuleItemPhase(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM_PHASE"
 
-    EMIP_ID = Column(Integer, primary_key=True)
+    EMIP_ID: Mapped[int] = Column(Integer, primary_key=True)
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
     EMI_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM.EMI_ID"))
     PRP_ID = Column(Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"))
@@ -2156,7 +2170,7 @@ class EdocModuleItemPhase(Base):
     WST_ID = Column(Integer)  # todo: add ForeignKey
     SO_NUMBER = Column(Integer)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), default=1)
-    EMIP_IS_COPY = Column(Boolean, nullable=False, default=False)
+    EMIP_IS_COPY: Mapped[bool] = Column(Boolean, nullable=False, default=False)
 
     edoc_module: EdocModule = relationship("EdocModule", uselist=False)
     edoc_module_item: EdocModuleItem = relationship(
@@ -2180,7 +2194,7 @@ class EdocModuleItemPhaseAnnex(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM_PHASE_ANNEX"
 
-    EMIPA_ID = Column(Integer, primary_key=True)
+    EMIPA_ID: Mapped[int] = Column(Integer, primary_key=True)
     EMIP_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM_PHASE.EMIP_ID"))
     EMIPA_NAME_DE = Column(Unicode(length=500))
     EMIPA_NAME_EN = Column(Unicode(length=500))
@@ -2210,7 +2224,7 @@ class EdocModuleItemPicture(Base):
 
     __tablename__ = "EDOC_MODUL_ITEM_PICTURE"
 
-    EMIPC_ID = Column(Integer, primary_key=True)
+    EMIPC_ID: Mapped[int] = Column(Integer, primary_key=True)
     EMI_ID = Column(Integer, ForeignKey("EDOC_MODUL_ITEM.EMI_ID"))
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
     EMIPC_NUMBER = Column(Integer)
@@ -2234,12 +2248,12 @@ class EdocModulePhase(Base):
 
     __tablename__ = "EDOC_MODUL_PHASE"
 
-    EMP_ID = Column(Integer, primary_key=True)
+    EMP_ID: Mapped[int] = Column(Integer, primary_key=True)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     EM_ID = Column(Integer, ForeignKey("EDOC_MODUL.EM_ID"))
     # PRP_ID can't be null as this will surely break eDOC, it's nullable in
     # the DB tough
-    PRP_ID = Column(
+    PRP_ID: Mapped[int] = Column(
         Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"), nullable=False
     )
     EMP_SUMMARY_DE = Column(Unicode)
@@ -2263,12 +2277,12 @@ class EdocModule(Base):
 
     __tablename__ = "EDOC_MODUL"
 
-    EM_ID = Column(Integer, primary_key=True)
+    EM_ID: Mapped[int] = Column(Integer, primary_key=True)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     DM_VERSION = Column(Integer)
     # there is no module in the db that is NULL, name can be empty tough
-    EM_NAME = Column(Unicode(length=255), nullable=False)
+    EM_NAME: Mapped[str] = Column(Unicode(length=255), nullable=False)
     EM_LETTER = Column(Unicode(length=10))
     EM_NUMBER = Column(Integer)
     SO_NUMBER = Column(Integer)
@@ -2338,13 +2352,13 @@ class EdocPhase(Base):
 
     __tablename__ = "EDOC_PHASE"
 
-    EP_ID = Column(Integer, primary_key=True)
+    EP_ID: Mapped[int] = Column(Integer, primary_key=True)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     PRP_ID = Column(
         Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"), default=1
     )
     P_ID = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"))
-    SO_NUMBER = Column(Integer, nullable=False, default=0)
+    SO_NUMBER: Mapped[int] = Column(Integer, nullable=False, default=0)
     EP_TEXT_DE = Column(Unicode(length=500), default="")
     EP_TEXT_EN = Column(Unicode(length=500), default="")
     EP_TEXT_FR = Column(Unicode(length=500), default="")
@@ -2387,7 +2401,7 @@ class EdocResult(Base):
 
     __tablename__ = "EDOCRESULT"
 
-    ER_ID = Column(Integer, primary_key=True)
+    ER_ID: Mapped[int] = Column(Integer, primary_key=True)
     ER_NAME_DE = Column(Unicode(length=50))
     ER_NAME_EN = Column(Unicode(length=50))
     ER_NAME_FR = Column(Unicode(length=50))
@@ -2431,7 +2445,7 @@ class Header(Base):
 
     __tablename__ = "HEADER"
 
-    HEAD_ID = Column(Integer, primary_key=True)
+    HEAD_ID: Mapped[int] = Column(Integer, primary_key=True)
     HEAD_ACTIVE = Column(Boolean)
     HEAD_FILENAME = Column(Unicode(length=255))
     HEAD_NAME = Column(Unicode(length=120))
@@ -2467,7 +2481,7 @@ class KindOfTest(Base):
 
     __tablename__ = "V_PSEX_KIND_OF_TEST"
 
-    KOT_ID = Column(Integer, primary_key=True)
+    KOT_ID: Mapped[int] = Column(Integer, primary_key=True)
     KOT_NAME_DE = Column(Unicode(length=256))
     KOT_NAME_EN = Column(Unicode(length=256))
     KOT_NAME_FR = Column(Unicode(length=256))
@@ -2480,7 +2494,7 @@ class ModuleParameter(Base):
 
     __tablename__ = "MODUL_PARAMETER"
 
-    MP_ID = Column(Integer, primary_key=True)
+    MP_ID: Mapped[int] = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     MP_PARAMETER_DE = Column(Unicode(length=256))
     MP_PARAMETER_EN = Column(Unicode(length=256))
@@ -2512,7 +2526,7 @@ class NavCountModuleExport(Base):
 
     __tablename__ = "NAV_COUNT_MODULEEXPORT"
 
-    NCM_ID = Column(Integer, primary_key=True)
+    NCM_ID: Mapped[int] = Column(Integer, primary_key=True)
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     NCM_TYPE = Column(Integer)
     reg = Column("NCM_REG", DateTime, default=datetime.utcnow)
@@ -2537,11 +2551,11 @@ class NavDomain(Base):
 
     __tablename__ = "NAVDOMAIN"
 
-    ND_ID = Column(Integer, primary_key=True)
+    ND_ID: Mapped[int] = Column(Integer, primary_key=True)
     # names are never null in the database
-    ND_SHORT = Column(Unicode(length=10), nullable=False)
-    ND_NAME_DE = Column(Unicode(length=100), nullable=False)
-    ND_NAME_EN = Column(Unicode(length=100), nullable=False)
+    ND_SHORT: Mapped[str] = Column(Unicode(length=10), nullable=False)
+    ND_NAME_DE: Mapped[str] = Column(Unicode(length=100), nullable=False)
+    ND_NAME_EN: Mapped[str] = Column(Unicode(length=100), nullable=False)
     reg = Column("ND_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "ND_REGBY",
@@ -2550,8 +2564,8 @@ class NavDomain(Base):
         default=get_user_id,
     )
     ND_ORDER = Column(Integer)
-    ND_ORDER_EXPORT = Column(Integer, nullable=False)
-    ND_ORDER_PLAN_DEFAULT = Column(Integer, nullable=False)
+    ND_ORDER_EXPORT: Mapped[int] = Column(Integer, nullable=False)
+    ND_ORDER_PLAN_DEFAULT: Mapped[int] = Column(Integer, nullable=False)
 
     reg_user: Staff = relationship(
         "Staff", foreign_keys=[reg_by], uselist=False
@@ -2563,7 +2577,7 @@ class Navigation(Base):
 
     __tablename__ = "NAV"
 
-    N_ID = Column(Integer, primary_key=True)
+    N_ID: Mapped[int] = Column(Integer, primary_key=True)
     N_TEMPLATE = Column(Integer)
     N_NAME_DE = Column(Unicode(length=120))
     N_NAME_EN = Column(Unicode(length=120))
@@ -2571,12 +2585,18 @@ class Navigation(Base):
     N_COMMENT_DE = Column(Unicode(length=500))
     N_COMMENT_EN = Column(Unicode(length=500))
     N_DURATION = Column(Integer)
-    N_MASTER = Column(Boolean, nullable=False)
-    HR_NEW_ID = Column(Integer, nullable=False)  # not clear what this is
-    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
-    HRP_ID = Column(Integer, ForeignKey("HR_PRODUCT.HRP_ID"), nullable=False)
+    N_MASTER: Mapped[bool] = Column(Boolean, nullable=False)
+    HR_NEW_ID: Mapped[int] = Column(
+        Integer, nullable=False
+    )  # not clear what this is
+    HRC_ID: Mapped[int] = Column(
+        Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False
+    )
+    HRP_ID: Mapped[int] = Column(
+        Integer, ForeignKey("HR_PRODUCT.HRP_ID"), nullable=False
+    )
     ZM_OBJECT = Column(Unicode(length=5))
-    KOT_ID = Column(
+    KOT_ID: Mapped[int] = Column(
         Integer, ForeignKey("V_PSEX_KIND_OF_TEST.KOT_ID"), nullable=False
     )
     reg = Column("N_REG", DateTime, default=datetime.utcnow)
@@ -2619,7 +2639,7 @@ class Navigation(Base):
         # convert the name to a str since it could be None
         return [
             pack
-            for pack in cast(List[Package], self.packages)
+            for pack in self.packages
             if "lidl" in str(pack.NP_NAME_DE).lower()
             and "phasen" in str(pack.NP_NAME_DE).lower()
         ]
@@ -2628,7 +2648,7 @@ class Navigation(Base):
         """Calculate the default ZaraProduct."""
         log.debug("Calculation ZaraProduct for Navigation %s", self.N_ID)
         products: Dict[str, int] = defaultdict(int)
-        for package in cast(List[Package], self.packages):
+        for package in self.packages:
             assert package.ZM_PRODUCT
             products[package.ZM_PRODUCT] += 1
 
@@ -2656,11 +2676,11 @@ class NavEdoc(Base):
 
     __tablename__ = "NAV_EDOC"
 
-    NE_ID = Column(Integer, primary_key=True)
-    NE_NAME = Column(Unicode(length=255), nullable=False)
+    NE_ID: Mapped[int] = Column(Integer, primary_key=True)
+    NE_NAME: Mapped[str] = Column(Unicode(length=255), nullable=False)
     HEAD_ID = Column(Integer, ForeignKey("HEADER.HEAD_ID"), default=1)
-    NE_RANDOM = Column(Integer, nullable=False)
-    ST_ID = Column(
+    NE_RANDOM: Mapped[int] = Column(Integer, nullable=False)
+    ST_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         nullable=False,
@@ -2674,10 +2694,12 @@ class NavEdocModule(Base):
 
     __tablename__ = "NAV_EDOC_MODULE"
 
-    NEM_ID = Column(Integer, primary_key=True)
-    NE_RANDOM = Column(Integer, nullable=False)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
-    ST_ID = Column(
+    NEM_ID: Mapped[int] = Column(Integer, primary_key=True)
+    NE_RANDOM: Mapped[int] = Column(Integer, nullable=False)
+    DM_ID: Mapped[int] = Column(
+        Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False
+    )
+    ST_ID: Mapped[int] = Column(
         Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False, default=1
     )
     NE_NUMBER = Column(Integer)
@@ -2688,12 +2710,16 @@ class NavEdocModuleItem(Base):
 
     __tablename__ = "NAV_EDOC_MODULE_ITEM"
 
-    NEMI_ID = Column(Integer, primary_key=True)
-    NE_RANDOM = Column(Integer, nullable=False)
-    DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False)
-    DI_ID = Column(Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False)
-    NEMI_INDENT = Column(Integer, nullable=False, default=0)
-    DMI_ID = Column(
+    NEMI_ID: Mapped[int] = Column(Integer, primary_key=True)
+    NE_RANDOM: Mapped[int] = Column(Integer, nullable=False)
+    DM_ID: Mapped[int] = Column(
+        Integer, ForeignKey("DEFAULT_MODUL.DM_ID"), nullable=False
+    )
+    DI_ID: Mapped[int] = Column(
+        Integer, ForeignKey("DEFAULT_ITEM.DI_ID"), nullable=False
+    )
+    NEMI_INDENT: Mapped[int] = Column(Integer, nullable=False, default=0)
+    DMI_ID: Mapped[int] = Column(
         Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), nullable=False
     )
     NE_NUMBER = Column(Integer)
@@ -2704,10 +2730,10 @@ class NavLevel(Base):
 
     __tablename__ = "NAVLEVEL"
 
-    NL_ID = Column(Integer, primary_key=True)
-    NL_LEVEL = Column(Integer, unique=True, nullable=False)
-    NL_NAME_DE = Column(Unicode(length=30), nullable=False)
-    NL_NAME_EN = Column(Unicode(length=30), nullable=False)
+    NL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    NL_LEVEL: Mapped[int] = Column(Integer, unique=True, nullable=False)
+    NL_NAME_DE: Mapped[str] = Column(Unicode(length=30), nullable=False)
+    NL_NAME_EN: Mapped[str] = Column(Unicode(length=30), nullable=False)
 
 
 class NavPosition(Base):
@@ -2715,7 +2741,7 @@ class NavPosition(Base):
 
     __tablename__ = "NAVPOSITION"
 
-    NPOS_ID = Column(Integer, primary_key=True)
+    NPOS_ID: Mapped[int] = Column(Integer, primary_key=True)
     NPOS_POSITION = Column(Integer)
     NPOS_TEXT_DE = Column(Unicode(length=2048))
     NPOS_TEXT_EN = Column(Unicode(length=2048))
@@ -2747,16 +2773,16 @@ class NavSave(Base):
 
     __tablename__ = "NAV_SAVE"
 
-    NS_ID = Column(Integer, primary_key=True)
+    NS_ID: Mapped[int] = Column(Integer, primary_key=True)
     NS_COMMENT = Column(Unicode(length=512))
     N_ID = Column(Integer, ForeignKey("NAV.N_ID", ondelete="CASCADE"))
     P_ID = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"))
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     # the names could be null, but are never in the db.
-    NS_NAME_DE = Column(Unicode(length=256), nullable=False)
-    NS_NAME_EN = Column(Unicode(length=256), nullable=False)
+    NS_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    NS_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
     NS_CRM = Column(Unicode(length=256))
-    NS_TYPE = Column(Integer, nullable=False)
+    NS_TYPE: Mapped[int] = Column(Integer, nullable=False)
     reg = Column("NS_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NS_REGBY",
@@ -2797,7 +2823,7 @@ class NavSaveCalculation(Base):
 
     __tablename__ = "NAV_SAVE_CALC"
 
-    NSC_ID = Column(Integer, primary_key=True)
+    NSC_ID: Mapped[int] = Column(Integer, primary_key=True)
     NS_ID = Column(Integer, ForeignKey("NAV_SAVE.NS_ID", ondelete="CASCADE"))
     NPEC_ID = Column(Integer, ForeignKey("NAV_PACK_ELEMENT_CALC.NPEC_ID"))
     NSC_TIME_HOURS = Column(Float)
@@ -2812,7 +2838,9 @@ class NavSaveCalculation(Base):
     NSC_TRAVEL = Column(Numeric(precision=18, scale=2))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
     ZM_ID = Column(Unicode(length=50))
-    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False)
+    ST_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False
+    )
     NSC_COSTS_EXTERNAL = Column(Numeric(precision=18, scale=2))
 
     nav_save: NavSave = relationship(
@@ -2830,7 +2858,7 @@ class NavSaveSelection(Base):
 
     __tablename__ = "NAV_SAVE_SELECTION"
 
-    NSS_ID = Column(Integer, primary_key=True)
+    NSS_ID: Mapped[int] = Column(Integer, primary_key=True)
     NS_ID = Column(Integer, ForeignKey("NAV_SAVE.NS_ID"))
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
 
@@ -2856,19 +2884,25 @@ class Package(Base):
 
     __tablename__ = "NAV_PACK"
 
-    NP_ID = Column(Integer, primary_key=True)
+    NP_ID: Mapped[int] = Column(Integer, primary_key=True)
     N_ID = Column(Integer, ForeignKey("NAV.N_ID", ondelete="CASCADE"))
-    NP_NAME_DE = Column(NullUnicode(length=150), nullable=False, default="")
+    NP_NAME_DE: Mapped[str] = Column(
+        NullUnicode(length=150), nullable=False, default=""
+    )
     NP_NAME_EN = Column(Unicode(length=150))
     NP_COMMENT_DE = Column(Unicode(length=800))
     NP_COMMENT_EN = Column(Unicode(length=800))
-    CL_ID = Column(Integer, ForeignKey("CLEARING.CL_ID"), nullable=False)
+    CL_ID: Mapped[int] = Column(
+        Integer, ForeignKey("CLEARING.CL_ID"), nullable=False
+    )
     NP_CLEARDATE = Column(DateTime)
     NP_CLEARBY = Column(Integer)
     ZM_PRODUCT = Column(Unicode(length=5))
-    PT_ID = Column(Integer, ForeignKey("PACKAGE_TYPE.PT_ID"), nullable=False)
-    NP_TESTSAMPLES = Column(Integer, nullable=False)
-    NP_IS_TEMPLATE = Column(Boolean, nullable=False)
+    PT_ID: Mapped[int] = Column(
+        Integer, ForeignKey("PACKAGE_TYPE.PT_ID"), nullable=False
+    )
+    NP_TESTSAMPLES: Mapped[int] = Column(Integer, nullable=False)
+    NP_IS_TEMPLATE: Mapped[bool] = Column(Boolean, nullable=False)
     NP_TEMPLATE_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID"))
     reg = Column("NP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
@@ -2884,7 +2918,9 @@ class Package(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    PN_ID = Column(Integer, ForeignKey("PACKAGE_NAME.PN_ID"), nullable=False)
+    PN_ID: Mapped[int] = Column(
+        Integer, ForeignKey("PACKAGE_NAME.PN_ID"), nullable=False
+    )
 
     clearing_state: Clearing = relationship("Clearing", uselist=False)
 
@@ -2935,7 +2971,7 @@ class PackageCategory(Base):
 
     __tablename__ = "PACKAGE_CAT"
 
-    PC_ID = Column(Integer, primary_key=True)
+    PC_ID: Mapped[int] = Column(Integer, primary_key=True)
     PC_NAME_DE = Column(Unicode(length=50))
     PC_NAME_EN = Column(Unicode(length=50))
     reg = Column("PC_REG", DateTime, default=datetime.utcnow)
@@ -2956,7 +2992,7 @@ class PackageElement(Base):
 
     __tablename__ = "NAV_PACK_ELEMENT"
 
-    NPE_ID = Column(Integer, primary_key=True)
+    NPE_ID: Mapped[int] = Column(Integer, primary_key=True)
     NP_ID = Column(Integer, ForeignKey("NAV_PACK.NP_ID", ondelete="CASCADE"))
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     NL_ID = Column(Integer, ForeignKey("NAVLEVEL.NL_ID"))
@@ -2977,7 +3013,7 @@ class PackageElement(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    NPE_CREATE_SO = Column(Boolean, nullable=False)
+    NPE_CREATE_SO: Mapped[bool] = Column(Boolean, nullable=False)
 
     package: Package = relationship(
         "Package", back_populates="package_elements", uselist=False
@@ -3016,14 +3052,18 @@ class PackageElementCalculation(Base):
 
     __tablename__ = "NAV_PACK_ELEMENT_CALC"
 
-    NPEC_ID = Column(Integer, primary_key=True)
+    NPEC_ID: Mapped[int] = Column(Integer, primary_key=True)
     NPE_ID = Column(
         Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID", ondelete="CASCADE")
     )
-    ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False)
+    ST_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_STAFF.ST_ID"), nullable=False
+    )
     NPEC_DELTA_START = Column(Float)
     NPEC_TIME_DAYS = Column(Integer)
-    NPEC_TIME_HOURS = Column(Float, nullable=False, default=0.0)
+    NPEC_TIME_HOURS: Mapped[Decimal] = Column(
+        Float, nullable=False, default=0.0
+    )
     NPEC_RATE = Column(Numeric(precision=18, scale=2))
     NPEC_COSTS = Column(Numeric(precision=18, scale=2))
     NPEC_TRAVEL = Column(
@@ -3032,7 +3072,9 @@ class PackageElementCalculation(Base):
     NPEC_FACTOR = Column(Float)
     NPEC_PRICE = Column(Numeric(precision=18, scale=2))
     NPEC_COMMENT = Column(Unicode(length=500))
-    NPEC_TASK = Column(NullUnicode(length=500), nullable=False, default="")
+    NPEC_TASK: Mapped[str] = Column(
+        NullUnicode(length=500), nullable=False, default=""
+    )
     ZM_ID = Column(Unicode(length=50))
     NPOS_ID = Column(Integer, ForeignKey("NAVPOSITION.NPOS_ID"))
     reg = Column("NPEC_REG", DateTime, default=datetime.utcnow)
@@ -3074,13 +3116,13 @@ class PackageElementFilter(Base):
 
     __tablename__ = "NAV_PACK_ELEMENT_FILTER"
 
-    NPEF_ID = Column(Integer, primary_key=True)
-    NPE_ID = Column(
+    NPEF_ID: Mapped[int] = Column(Integer, primary_key=True)
+    NPE_ID: Mapped[int] = Column(
         Integer,
         ForeignKey("NAV_PACK_ELEMENT.NPE_ID", ondelete="CASCADE"),
         nullable=False,
     )
-    DMI_ID = Column(
+    DMI_ID: Mapped[int] = Column(
         Integer, ForeignKey("DEFAULT_MODUL_ITEM.DMI_ID"), nullable=False
     )
     reg = Column("NPEF_REG", DateTime, default=datetime.utcnow)
@@ -3108,7 +3150,7 @@ class PackageName(Base):
 
     __tablename__ = "PACKAGE_NAME"
 
-    PN_ID = Column(Integer, primary_key=True)
+    PN_ID: Mapped[int] = Column(Integer, primary_key=True)
     PN_NAME_DE = Column(Unicode(length=255))
     PN_NAME_EN = Column(Unicode(length=255))
     reg = Column("PN_REG", DateTime, default=datetime.utcnow)
@@ -3139,7 +3181,7 @@ class PackageType(Base):
 
     __tablename__ = "PACKAGE_TYPE"
 
-    PT_ID = Column(Integer, primary_key=True)
+    PT_ID: Mapped[int] = Column(Integer, primary_key=True)
     PT_NAME_DE = Column(Unicode(length=255))
     PT_NAME_EN = Column(Unicode(length=255))
     reg = Column("PT_REG", DateTime, default=datetime.utcnow)
@@ -3165,7 +3207,7 @@ class PriceList(Base):
 
     __tablename__ = "PRICELIST"
 
-    PL_ID = Column(Integer, primary_key=True)
+    PL_ID: Mapped[int] = Column(Integer, primary_key=True)
     PL_SHORT = Column(Unicode(length=10))
     PL_NAME_DE = Column(Unicode(length=100))
     PL_NAME_EN = Column(Unicode(length=100))
@@ -3202,7 +3244,7 @@ class Process(Base):
 
     __tablename__ = "V_PSEX_PROCESS"
 
-    PC_ID = Column(Integer, primary_key=True, nullable=False)
+    PC_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
     PC_PATH = Column(Unicode(length=50))
     PC_WC_ID = Column(Unicode(length=36))
     PC_CLIENT = Column(Integer)  # todo: check if this is a link to Customer
@@ -3239,7 +3281,7 @@ class ProcessPhase(Base):
 
     __tablename__ = "V_PSEX_PROCESSPHASE"
 
-    PRP_ID = Column(Integer, primary_key=True)
+    PRP_ID: Mapped[int] = Column(Integer, primary_key=True)
     PRP_NAME_DE = Column(Unicode(length=256))
     PRP_NAME_EN = Column(Unicode(length=256))
     PRP_NAME_FR = Column(Unicode(length=256))
@@ -3252,13 +3294,13 @@ class ProcessPhase(Base):
     PRP_EDOC_NAME_DE = Column(Unicode(length=256))
     PRP_EDOC_NAME_EN = Column(Unicode(length=256))
     PRP_EDOC_NAME_FR = Column(Unicode(length=256))
-    PRP_EDOC_SHORT_DE = Column(
+    PRP_EDOC_SHORT_DE: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
-    PRP_EDOC_SHORT_EN = Column(
+    PRP_EDOC_SHORT_EN: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
-    PRP_EDOC_SHORT_FR = Column(
+    PRP_EDOC_SHORT_FR: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
     PRP_EDOC_NUMBER = Column(Integer)
@@ -3271,7 +3313,7 @@ class Product(Base):
 
     __tablename__ = "HR_PRODUCT"
 
-    HRP_ID = Column(Integer, primary_key=True)
+    HRP_ID: Mapped[int] = Column(Integer, primary_key=True)
     HRP_LEFT = Column(Integer)
     HRP_RIGHT = Column(Integer)
     HRP_INDENT = Column(Integer)
@@ -3296,16 +3338,20 @@ class Project(Base):
 
     __tablename__ = "V_PSEX_PROJECT"
 
-    P_ID = Column(Integer, primary_key=True, nullable=False)
+    P_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
     P_FOLDER = Column(Unicode(length=256))
-    P_PRODUCT = Column(NullUnicode(length=256), nullable=False, default="")
-    P_MODEL = Column(NullUnicode(length=256), nullable=False, default="")
+    P_PRODUCT: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
+    P_MODEL: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
     PC_ID = Column(Integer, ForeignKey("V_PSEX_PROCESS.PC_ID"))
     P_DATE_DONE = Column(DateTime)
     P_PREDATE = Column(DateTime)
     P_DEADLINE = Column(DateTime)
     P_DATE_ORDER = Column(DateTime)
-    MD_ID = Column(Integer, nullable=False)
+    MD_ID: Mapped[int] = Column(Integer, nullable=False)
     P_CUSTOMER_A = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
     P_CUSTOMER_B = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
     P_STATUS = Column(Integer)
@@ -3357,14 +3403,14 @@ class Project(Base):
     P_PROCESSPHASE = Column(Integer)
     P_IAN = Column(Unicode(length=256))
     P_TOKEN = Column(Unicode(length=60))
-    CATEGORY_ID = Column(Integer, nullable=False)
+    CATEGORY_ID: Mapped[int] = Column(Integer, nullable=False)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     P_CONTACT_CUC_ID = Column(
         Integer, ForeignKey("V_PSEX_CUSTOMER_CONTACT.CUC_ID")
     )
     P_REMARK = Column(Unicode(length=1024))
     BATCH_NUMBER = Column(Unicode(length=16))
-    P_RETEST = Column(Integer, nullable=False)
+    P_RETEST: Mapped[int] = Column(Integer, nullable=False)
     P_RETEST_OF = Column(Integer)
 
     customer_contact: CustomerContact = relationship(
@@ -3406,7 +3452,7 @@ class ProofElement(Base):
 
     __tablename__ = "NAV_PACK_ELEMENT_PROOF"
 
-    NPEP_ID = Column(Integer, primary_key=True)
+    NPEP_ID: Mapped[int] = Column(Integer, primary_key=True)
     NPE_ID = Column(
         Integer, ForeignKey("NAV_PACK_ELEMENT.NPE_ID", ondelete="CASCADE")
     )
@@ -3451,7 +3497,7 @@ class ServiceClass(Base):
 
     __tablename__ = "NAV_PACK_SERVICECLASS"
 
-    NPS_ID = Column(Integer, primary_key=True)
+    NPS_ID: Mapped[int] = Column(Integer, primary_key=True)
     NP_ID = Column(
         Integer, ForeignKey("NAV_PACK.NP_ID", ondelete="CASCADE"), index=True
     )
@@ -3470,8 +3516,8 @@ class ServiceClassDefinition(Base):
 
     __tablename__ = "SERVICECLASS"
 
-    SCL_ID = Column(Integer, primary_key=True)
-    SCL_LEVEL = Column(Integer, nullable=False)
+    SCL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    SCL_LEVEL: Mapped[int] = Column(Integer, nullable=False)
     SCL_REMARK_DE = Column(Unicode(length=500))
     SCL_REMARK_EN = Column(Unicode(length=500))
     reg = Column("SCL_REG", DateTime, default=datetime.utcnow)
@@ -3502,12 +3548,12 @@ class Staff(Base):
 
     __tablename__ = "V_PSEX_STAFF"
 
-    ST_ID = Column(Integer, primary_key=True)
-    ST_SURNAME = Column(Unicode(length=60), nullable=False)
+    ST_ID: Mapped[int] = Column(Integer, primary_key=True)
+    ST_SURNAME: Mapped[str] = Column(Unicode(length=60), nullable=False)
     # ST_FORENAME is nullable in database, but never actually NULL
-    ST_FORENAME = Column(Unicode(length=50), nullable=False)
+    ST_FORENAME: Mapped[str] = Column(Unicode(length=50), nullable=False)
     ST_COSTID = Column(Unicode(length=10))
-    ST_ACTIVE = Column(Boolean, nullable=False)
+    ST_ACTIVE: Mapped[bool] = Column(Boolean, nullable=False)
     ST_NUMBER = Column(Unicode(length=8))
     ST_SHORT = Column(Unicode(length=3))
     ST_PHONE = Column(Unicode(length=40))
@@ -3518,12 +3564,12 @@ class Staff(Base):
     # in the MSSQL this is defined as UNIQUEIDENTIFIER. setting it as str since
     # we cannot use UNIQUEIDENTIFIER on sqlite
     ST_TEAM = Column(Unicode(length=36))
-    ST_TYPE = Column(Integer, nullable=False)
+    ST_TYPE: Mapped[int] = Column(Integer, nullable=False)
     ST_LOCATION = Column(Unicode(length=50))
     ST_UNIT = Column(Unicode(length=12))
     ST_SERVERID = Column(Integer)
     ST_HOURS_PER_DAY = Column(Integer)
-    ST_SKILLGROUP = Column(Unicode(length=8), nullable=False)
+    ST_SKILLGROUP: Mapped[str] = Column(Unicode(length=8), nullable=False)
     ST_DOMAIN = Column(Unicode(length=32))
     ST_GENDER = Column(Unicode(length=50))
 
@@ -3543,7 +3589,7 @@ class StatisticModule(Base):
 
     __tablename__ = "STATISTIC_MODULE"
 
-    STAM_ID = Column(Integer, primary_key=True)
+    STAM_ID: Mapped[int] = Column(Integer, primary_key=True)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     DM_ID = Column(Integer, ForeignKey("DEFAULT_MODUL.DM_ID"))
     STAT_ID = Column(Integer, ForeignKey("STATISTIC_TYPE.STAT_ID"))
@@ -3559,7 +3605,7 @@ class StatisticType(Base):
 
     __tablename__ = "STATISTIC_TYPE"
 
-    STAT_ID = Column(Integer, primary_key=True)
+    STAT_ID: Mapped[int] = Column(Integer, primary_key=True)
     STAT_NAME_DE = Column(Unicode(length=256))
     STAT_NAME_EN = Column(Unicode(length=256))
     STAT_REG = Column(DateTime)
@@ -3577,13 +3623,17 @@ class SubOrder(Base):
 
     __tablename__ = "V_PSEX_SUBORDERS"
 
-    P_ID = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"), primary_key=True)
-    SO_NUMBER = Column(Integer, primary_key=True)
+    P_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_PROJECT.P_ID"), primary_key=True
+    )
+    SO_NUMBER: Mapped[int] = Column(Integer, primary_key=True)
     SO_DISPOBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     SO_CREATED = Column(DateTime)
     ST_ID = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     SO_DEADLINE = Column(DateTime)
-    SO_TASK = Column(NullUnicode(length=1024), nullable=False, default="")
+    SO_TASK: Mapped[str] = Column(
+        NullUnicode(length=1024), nullable=False, default=""
+    )
     SO_HOURS = Column(Numeric(precision=18, scale=6))
     SO_ACC_HOURS = Column(Numeric)
     SO_COMMENT = Column(Unicode(length=2000))
@@ -3651,9 +3701,9 @@ class Team(Base):
 
     __tablename__ = "V_PSEX_HIERARCHY"
 
-    HR_ID = Column(Integer, primary_key=True)
+    HR_ID: Mapped[int] = Column(Integer, primary_key=True)
     HR_SHORT = Column(Unicode(length=21))
-    HR_NEW_ID = Column(Integer, nullable=False)
+    HR_NEW_ID: Mapped[int] = Column(Integer, nullable=False)
     ST_ID = Column(Integer)
 
 
@@ -3662,8 +3712,8 @@ class TeamSublocation(Base):
 
     __tablename__ = "V_TEAM_SUBLOCATION"
 
-    ST_ID = Column(Integer, primary_key=True)
-    ST_SURNAME = Column(Unicode(length=60), nullable=False)
+    ST_ID: Mapped[int] = Column(Integer, primary_key=True)
+    ST_SURNAME: Mapped[str] = Column(Unicode(length=60), nullable=False)
     ST_TEAM = Column(Unicode(length=36))
     Sublocation = Column(Unicode(length=6))  # is always NULL as of 16.10.2020
 
@@ -3678,14 +3728,14 @@ class TemplateScope(Base):
 
     __tablename__ = "V_PSEX_TEMPLATE_SCOPE"
 
-    TPSC_ID = Column(Integer, primary_key=True, nullable=False)
-    TPSC_NAME_DE = Column(Unicode(length=256), nullable=False)
-    TPSC_NAME_EN = Column(Unicode(length=256), nullable=False)
-    TPSC_NAME_FR = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_DE = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_EN = Column(Unicode(length=256), nullable=False)
-    TPSC_SHORT_FR = Column(Unicode(length=256), nullable=False)
-    TPSC_PATH = Column(Unicode(length=256), nullable=False)
+    TPSC_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
+    TPSC_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_NAME_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_SHORT_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPSC_PATH: Mapped[str] = Column(Unicode(length=256), nullable=False)
 
 
 class TemplateType(Base):
@@ -3693,18 +3743,18 @@ class TemplateType(Base):
 
     __tablename__ = "V_PSEX_TEMPLATE_TYPE"
 
-    TPT_ID = Column(Integer, primary_key=True)
-    TPT_NAME_DE = Column(Unicode(length=256), nullable=False)
-    TPT_NAME_EN = Column(Unicode(length=256), nullable=False)
-    TPT_NAME_FR = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_DE = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_EN = Column(Unicode(length=256), nullable=False)
-    TPT_SHORT_FR = Column(Unicode(length=256), nullable=False)
-    TPT_PATH = Column(Unicode(length=256), nullable=False)
-    TPT_PREFIX = Column(Unicode(length=256), nullable=False)
+    TPT_ID: Mapped[int] = Column(Integer, primary_key=True)
+    TPT_NAME_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_NAME_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_DE: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_EN: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_SHORT_FR: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_PATH: Mapped[str] = Column(Unicode(length=256), nullable=False)
+    TPT_PREFIX: Mapped[str] = Column(Unicode(length=256), nullable=False)
     TPT_MODULETYPE = Column(Unicode(length=256))
-    TPT_SHOWINPROZESSFOLDER = Column(Boolean, nullable=False)
-    TPT_SHOWINTEMPLATEMANAGER = Column(Boolean, nullable=False)
+    TPT_SHOWINPROZESSFOLDER: Mapped[bool] = Column(Boolean, nullable=False)
+    TPT_SHOWINTEMPLATEMANAGER: Mapped[bool] = Column(Boolean, nullable=False)
 
 
 class TestBase(Base):
@@ -3712,7 +3762,7 @@ class TestBase(Base):
 
     __tablename__ = "BASE"
 
-    B_ID = Column(Integer, primary_key=True)
+    B_ID: Mapped[int] = Column(Integer, primary_key=True)
     B_NAME_DE = Column(Unicode(length=512))
     B_NAME_EN = Column(Unicode(length=512))
     B_NAME_FR = Column(Unicode(length=512))
@@ -3733,7 +3783,9 @@ class TestBase(Base):
         ForeignKey("V_PSEX_STAFF.ST_ID"),
         onupdate=get_user_id,
     )
-    HRC_ID = Column(Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False)
+    HRC_ID: Mapped[int] = Column(
+        Integer, ForeignKey("HR_COUNTRY.HRC_ID"), nullable=False
+    )
     B_PARENT = Column(Integer, ForeignKey("BASE.B_ID"))
     B_SHORT_DE = Column(Unicode(length=512))
     B_SHORT_EN = Column(Unicode(length=512))
@@ -3742,7 +3794,7 @@ class TestBase(Base):
     B_COMMENT_DE = Column(Unicode(length=512))
     B_COMMENT_EN = Column(Unicode(length=512))
     B_COMMENT_FR = Column(Unicode(length=512))
-    B_DOA = Column(Integer, nullable=False)
+    B_DOA: Mapped[int] = Column(Integer, nullable=False)
 
     test_base_type: TestBaseType = relationship("TestBaseType", uselist=False)
 
@@ -3759,7 +3811,7 @@ class TestBaseType(Base):
 
     __tablename__ = "BASE_TYPE"
 
-    BT_ID = Column(Integer, primary_key=True)
+    BT_ID: Mapped[int] = Column(Integer, primary_key=True)
     BT_SHORT = Column(Unicode(length=6))
     BT_NAME_DE = Column(Unicode(length=50))
     BT_NAME_EN = Column(Unicode(length=50))
@@ -3772,7 +3824,7 @@ class ZaraObject(Base):
 
     __tablename__ = "V_PSEX_ZOBJECT"
 
-    ZM_PRIMARY_FAKE = Column(Integer, primary_key=True)
+    ZM_PRIMARY_FAKE: Mapped[int] = Column(Integer, primary_key=True)
     ZM_OBJECT = Column(Unicode(length=5))
     ZM_OBJECT_NAME = Column(Unicode(length=255))
     ZM_OBJECT_LANGUAGE = Column(Unicode(length=2))
@@ -3783,7 +3835,7 @@ class ZaraProduct(Base):
 
     __tablename__ = "V_PSEX_ZPRODUCT"
 
-    ZM_PRIMARY_FAKE = Column(Integer, primary_key=True)
+    ZM_PRIMARY_FAKE: Mapped[int] = Column(Integer, primary_key=True)
     ZM_PRODUCT = Column(Unicode(length=5))
     ZM_PROUDCT_NAME = Column(Unicode(length=255))
     ZM_PRODUCT_LANGUAGE = Column(Unicode(length=2))

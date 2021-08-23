@@ -5,13 +5,7 @@ import os
 from os.path import expanduser
 from typing import Optional, cast
 
-from PyQt5.QtCore import (
-    QObject,
-    QThread,
-    pyqtBoundSignal,
-    pyqtSignal,
-    pyqtSlot,
-)
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 
 from tsl.copy_worker import CopyWorker
 from tsl.init import check_ide
@@ -96,7 +90,7 @@ class Updater(QObject):
     @staticmethod
     def _extract_version(path: str) -> str:
         """Extract the version number from the given json file."""
-        with open(path) as fhandle:
+        with open(path, encoding="utf-8") as fhandle:
             json_obj = json.load(fhandle)
         return cast(str, json_obj["version"])
 
@@ -107,13 +101,9 @@ class Updater(QObject):
         install_path = os.path.join(expanduser("~"), "TSL", "Updater")
         self._copy_worker = CopyWorker(install_path, json_file)
         self._copy_worker.moveToThread(self._updater_thread)
-        cast(pyqtBoundSignal, self._updater_thread.started).connect(
-            self._copy_worker.start_copy
-        )
+        self._updater_thread.started.connect(self._copy_worker.start_copy)
         self._copy_worker.copy_finished.connect(self._updater_thread.quit)
-        cast(pyqtBoundSignal, self._updater_thread.finished).connect(
-            self.check_finished
-        )
+        self._updater_thread.finished.connect(self.check_finished)
         self._updater_thread.start()
         log.info("Copy worker started.")
 
