@@ -204,8 +204,8 @@ class Project(Base):
     sub_orders: SubOrder = relationship(
         "SubOrder", back_populates="project", uselist=False
     )
-    project_failure_rel: ProjectFailureRel = relationship(
-        "ProjectFailureRel", back_populates="project", uselist=False
+    project_failure_rel: List[ProjectFailureRel] = relationship(
+        "ProjectFailureRel", back_populates="project", uselist=True
     )
 
     @property
@@ -256,7 +256,7 @@ class Customer(Base):
     PRINT_OPTION = Column(Unicode(length=3))
 
     addresses: List["CustomerAddress"] = relationship(
-        "CustomerAddress", back_populates="customer", uselist=False
+        "CustomerAddress", back_populates="customer", uselist=True
     )
 
 

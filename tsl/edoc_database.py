@@ -1068,8 +1068,8 @@ class DefaultItem(Base):
     annexes: List[DefaultItemAnnex] = relationship(
         "DefaultItemAnnex", back_populates="default_item", uselist=True
     )
-    custom: DefaultItemCustom = relationship(
-        "DefaultItemCustom", back_populates="default_item", uselist=False
+    customs: List[DefaultItemCustom] = relationship(
+        "DefaultItemCustom", back_populates="default_item", uselist=True
     )
     pictures: List[DefaultItemPicture] = relationship(
         "DefaultItemPicture", back_populates="default_item", uselist=True
@@ -1206,7 +1206,7 @@ class DefaultItemCustom(Base):
         "CustomListElement", uselist=False
     )
     default_item: DefaultItem = relationship(
-        "DefaultItem", back_populates="custom", lazy="joined", uselist=False
+        "DefaultItem", back_populates="customs", lazy="joined", uselist=False
     )
 
 
