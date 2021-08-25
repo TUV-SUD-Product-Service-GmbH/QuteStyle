@@ -56,6 +56,8 @@ class IconButton(QPushButton):
             self._bgs = bgs
 
         self._set_icon_path = icon_path
+        # the pixmap must be moved to the pixmap store of baumg-mi
+        self._icon = QPixmap(icon_path)
 
         if self.FIXED_WIDTH:
             self.setFixedWidth(self.FIXED_WIDTH)
@@ -96,7 +98,7 @@ class IconButton(QPushButton):
             color = self._icon_color
         else:
             color = get_color("fg_disabled")
-        self.icon_paint(paint, self._set_icon_path, color)
+        self.icon_paint(paint, color)
 
         paint.end()
 
@@ -138,7 +140,6 @@ class IconButton(QPushButton):
     def icon_paint(
         self,
         root_painter: QPainter,
-        icon_path: str,
         color: str,
         rect: QRect = None,
     ) -> None:
@@ -148,15 +149,14 @@ class IconButton(QPushButton):
             # is sufficient, if showing also i.e. a text, a custom rect is
             # necessary.
             rect = self.rect()
-        icon = QPixmap(icon_path)
-        painter = QPainter(icon)
+        painter = QPainter(self._icon)
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.fillRect(icon.rect(), QColor(color))
+        painter.fillRect(self._icon.rect(), QColor(color))
         root_painter.drawPixmap(
-            int((rect.width() - icon.width()) / 2),
-            int((rect.height() - icon.height()) / 2),
-            icon,
+            int((rect.width() - self._icon.width()) / 2),
+            int((rect.height() - self._icon.height()) / 2),
+            self._icon,
         )
         painter.end()
 
@@ -164,4 +164,5 @@ class IconButton(QPushButton):
         """Set the icon to the given path."""
         log.debug("Setting active icon path to %s", icon_path)
         self._set_icon_path = icon_path
+        self._icon = QPixmap(icon_path)
         self.update()

@@ -37,6 +37,10 @@ class LeftMenuButton(IconTooltipButton):
         )
         super().__init__(app_parent, tooltip_text, icon_path, bgs, text)
 
+        # This can't be a class variable because it get's garbage collected
+        # and the app crashes. It should be in the pixmap store of baumg-mi.
+        self.active_menu = QPixmap(":/svg_icons/active_menu.svg")
+
         self._widget_class = widget_class
 
         self._is_active_tab = False
@@ -81,16 +85,17 @@ class LeftMenuButton(IconTooltipButton):
             rect_inside = QRect(4, 5, self.width() - 8, self.height() - 10)
             painter.drawRoundedRect(rect_inside, 8, 8)
 
-        # Draw the text. If the button is active or if the button represents
-        # the active tab, we'll use color text_active (brighter)
-        if self._is_active or self._is_active_tab:
-            text_color = get_color("text_active")
-        else:
-            text_color = get_color("text_foreground")
-        painter.setPen(QColor(text_color))
-        painter.setFont(self.font())
-        rect_text = QRect(45, 0, self.width() - 50, self.height())
-        painter.drawText(rect_text, Qt.AlignVCenter, self.text())
+        if self.width() != self.height():
+            # Draw the text. If the button is active or if the button
+            # represents the active tab, we'll use color text_active (brighter)
+            if self._is_active or self._is_active_tab:
+                text_color = get_color("text_active")
+            else:
+                text_color = get_color("text_foreground")
+            painter.setPen(QColor(text_color))
+            painter.setFont(self.font())
+            rect_text = QRect(45, 0, self.width() - 50, self.height())
+            painter.drawText(rect_text, Qt.AlignVCenter, self.text())
 
         # Draw the icon depending of the hover/click state. If the button is
         # toggled (currently menu button), we always draw context_color.
@@ -102,7 +107,7 @@ class LeftMenuButton(IconTooltipButton):
         # The height of the button defines the rectangle in which the icon is
         # painted, independent of the button's width.
         paint_rect = QRect(0, 0, self.height(), self.height())
-        self.icon_paint(painter, self._set_icon_path, color, paint_rect)
+        self.icon_paint(painter, color, paint_rect)
 
     def set_active_tab(self, is_active: bool) -> None:
         """
@@ -132,11 +137,10 @@ class LeftMenuButton(IconTooltipButton):
         Hint: One can use white color for painting to understand fully what
         this method does.
         """
-        icon = QPixmap(":/svg_icons/active_menu.svg")
-        painter = QPainter(icon)
+        painter = QPainter(self.active_menu)
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        painter.fillRect(icon.rect(), QColor(get_color("bg_one")))
-        root_painter.drawPixmap(self.width() - 5, 0, icon)
+        painter.fillRect(self.active_menu.rect(), QColor(get_color("bg_one")))
+        root_painter.drawPixmap(self.width() - 5, 0, self.active_menu)
         painter.end()
 
     def enterEvent(  # pylint: disable=invalid-name

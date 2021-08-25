@@ -24,6 +24,9 @@ class ToolTip(QLabel):
         shadow.setColor(QColor(0, 0, 0, 80))
         self.setGraphicsEffect(shadow)
 
+    def show(self) -> None:
+        """Show the tooltip and adjust the size before."""
         # Adjust the size. This must be done after the stylesheet was set,
         # because the font settings will change the size needed.
         self.adjustSize()
+        super().show()

@@ -18,6 +18,8 @@ from tsl.style import get_color
 class Toggle(QCheckBox):
     """Toggle button (custom checkbox)."""
 
+    FONT = QFont("Segoe UI", 9)
+
     def __init__(self, parent: QWidget = None) -> None:
         """Create a new Toggle."""
         super().__init__(parent)
@@ -63,38 +65,42 @@ class Toggle(QCheckBox):
         """States if checkbox was hit."""
         return self.contentsRect().contains(pos)
 
+    def setText(self, text: str) -> None:  # pylint: disable=invalid-name
+        """Override setText to calculate a new minimum width."""
+        self.setMaximumWidth(
+            QFontMetrics(Toggle.FONT).horizontalAdvance(text)
+            + self._box_width
+            + self._spacer
+        )
+        super().setText(text)
+
     def paintEvent(  # pylint: disable=invalid-name
         self, _: QPaintEvent
     ) -> None:
         """Draw toggle switch."""
         painter = QPainter(self)
-        font = QFont("Segoe UI", 9)
-        font_metric = QFontMetrics(font)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setFont(font)
 
-        # Draw Text
-        self.setMaximumWidth(
-            font_metric.horizontalAdvance(self.text())
-            + self._box_width
-            + self._spacer
-        )
-        painter.drawText(
-            self._box_width + self._spacer,
-            int(self._box_height / 1.35),
-            self.text(),
-        )
+        # Checking if a text is set is faster for cases with no text.
+        if self.text():
+            painter.setFont(Toggle.FONT)
+            painter.drawText(
+                self._box_width + self._spacer,
+                int(self._box_height / 1.35),
+                self.text(),
+            )
 
         # Draw Rectangle
         painter.setPen(Qt.NoPen)
         if not self.isEnabled():
             color = get_color("bg_disabled")
+            fg_color = QColor(get_color("fg_disabled"))
         else:
-            color = (
-                get_color("icon_pressed")
-                if self.isChecked()
-                else get_color("dark_three")
-            )
+            fg_color = QColor(get_color("icon_color"))
+            if self.isChecked():
+                color = get_color("icon_pressed")
+            else:
+                color = get_color("dark_three")
 
         painter.setBrush(QColor(color))
 
@@ -106,9 +112,6 @@ class Toggle(QCheckBox):
             12,
             12,
         )
-        if not self.isEnabled():
-            painter.setBrush(QColor(get_color("fg_disabled")))
-        else:
-            painter.setBrush(QColor(get_color("icon_color")))
+        painter.setBrush(fg_color)
         painter.drawEllipse(self._position, 3, 16, 16)
         painter.end()
