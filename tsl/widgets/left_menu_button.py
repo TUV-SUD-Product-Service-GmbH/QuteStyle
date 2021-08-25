@@ -99,9 +99,10 @@ class LeftMenuButton(IconTooltipButton):
         else:
             color = self._icon_color
 
-        self.icon_paint(
-            painter, self._set_icon_path, color, QRect(0, 0, 50, self.height())
-        )
+        # The height of the button defines the rectangle in which the icon is
+        # painted, independent of the button's width.
+        paint_rect = QRect(0, 0, self.height(), self.height())
+        self.icon_paint(painter, self._set_icon_path, color, paint_rect)
 
     def set_active_tab(self, is_active: bool) -> None:
         """

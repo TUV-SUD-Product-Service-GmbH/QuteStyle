@@ -2,8 +2,11 @@
 import logging
 import os
 
+from _pytest.config import Config
+from _pytest.python import Function
 from PyQt5.QtCore import QCoreApplication, QSettings, qInstallMessageHandler
 
+from tsl import style
 from tsl.edoc_database import (
     ENGINE,
     Base,
@@ -23,6 +26,15 @@ log = logging.getLogger(".".join(["tsl", __name__]))
 # pylint: enable=invalid-name
 
 TFPATH = os.path.join("tests", "test_files")
+
+
+def pytest_configure(config: Config) -> None:
+    """Configure the tests."""
+    markers = [
+        "style: Test for styling which will reset global default style.",
+    ]
+    for marker in markers:
+        config.addinivalue_line("markers", marker)
 
 
 def init_user() -> None:
@@ -60,8 +72,8 @@ def pytest_runtest_setup() -> None:
     QCoreApplication.setOrganizationDomain("tuvsud.com")
     QCoreApplication.setApplicationName("tsl-lib")
 
-    # remove the old personal settings file
-    delete_settings()
+    # Remove the settings stored with QSettings in the registry.
+    QSettings().clear()
 
     PSE_Base.metadata.create_all()
     Base.metadata.create_all()
@@ -70,7 +82,7 @@ def pytest_runtest_setup() -> None:
     init_user()
 
 
-def pytest_runtest_teardown() -> None:
+def pytest_runtest_teardown(item: Function) -> None:
     """Execute this function after every test case."""
     # raise the same exception as in setup. if those functions hit the real
     # database, we're done because everything gets deleted
@@ -82,8 +94,9 @@ def pytest_runtest_teardown() -> None:
     Base.metadata.drop_all()
     PSE_Base.metadata.drop_all()
 
+    # Remove the settings stored with QSettings in the registry.
+    QSettings().clear()
 
-def delete_settings() -> None:
-    """Remove the settings stored in QSettings."""
-    settings = QSettings()
-    settings.clear()
+    if "style" in [mark.name for mark in item.iter_markers()]:
+        # Reset the stored style after a style test case.
+        style.CURRENT_STYLE = "Darcula"

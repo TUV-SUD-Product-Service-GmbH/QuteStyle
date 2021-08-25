@@ -1,6 +1,6 @@
 """Style handling for TSLStyleWindow."""
 import logging
-from typing import Dict
+from typing import Dict, Optional
 
 from PyQt5.QtCore import QSettings
 
@@ -9,6 +9,35 @@ log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 # Use this variable when referencing a default style so that adapting to a new
 # default style will only require changes in the lib.
 DEFAULT_STYLE = "Darcula"
+
+CURRENT_STYLE: Optional[str] = None
+
+
+def get_current_style() -> str:
+    """Return the currently set style."""
+    global CURRENT_STYLE  # pylint: disable=global-statement
+    if CURRENT_STYLE is None:
+        CURRENT_STYLE = QSettings().value("style", DEFAULT_STYLE)
+        log.debug("Loaded current style from registry: %s", CURRENT_STYLE)
+        if CURRENT_STYLE not in THEMES:
+            log.warning("Invalid style stored in registry: %s", CURRENT_STYLE)
+            # If an invalid style is set, revert to DEFAULT_STYLE
+            CURRENT_STYLE = DEFAULT_STYLE
+    return CURRENT_STYLE
+
+
+def set_current_style(style: str) -> None:
+    """
+    Set the current style
+
+    One should only use this method to change the style. This will correctly
+    set CURRENT_STYLE to be used as a lazy variable.
+    """
+    log.debug("Setting current style to %s", style)
+    global CURRENT_STYLE  # pylint: disable=global-statement
+    CURRENT_STYLE = style
+    QSettings().setValue("style", style)
+
 
 THEMES: Dict[str, Dict[str, str]] = {
     "Snow White": {
@@ -98,19 +127,13 @@ THEMES: Dict[str, Dict[str, str]] = {
 def get_style() -> str:
     """Return the current style sheet that is stored in QSettings."""
     # Use the Darcula style if not style is stored yet as default.
-    log.debug("Stored style: %s", QSettings().value("style"))
-    style = QSettings().value("style", DEFAULT_STYLE)
-    try:
-        return MAIN_STYLE.format(**THEMES[style])
-    except KeyError:
-        # In case a stored style was removed.
-        log.warning("Could not find style %s", style)
-        return MAIN_STYLE.format(**THEMES[DEFAULT_STYLE])
+    log.debug("Stored style: %s", get_current_style())
+    return MAIN_STYLE.format(**THEMES[get_current_style()])
 
 
 def get_color(name: str) -> str:
     """Return the color code for the given name."""
-    return THEMES[QSettings().value("style", DEFAULT_STYLE)][name]
+    return THEMES[get_current_style()][name]
 
 
 MAIN_STYLE = """

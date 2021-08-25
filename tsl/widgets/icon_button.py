@@ -138,7 +138,7 @@ class IconButton(QPushButton):
     def icon_paint(
         self,
         root_painter: QPainter,
-        image: str,
+        icon_path: str,
         color: str,
         rect: QRect = None,
     ) -> None:
@@ -148,7 +148,7 @@ class IconButton(QPushButton):
             # is sufficient, if showing also i.e. a text, a custom rect is
             # necessary.
             rect = self.rect()
-        icon = QPixmap(image)
+        icon = QPixmap(icon_path)
         painter = QPainter(icon)
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
