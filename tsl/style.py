@@ -354,20 +354,32 @@ QSlider::handle:vertical:pressed {{
 }}
 
 /* QSplitter */
-QSplitter::handle {{
-    background-color: {text_foreground};
+
+/* This activates the hover which isn't active by default */
+QSplitterHandle:hover {{
+}}
+
+/* QSplitter can only be correctly addressed by it's orientation property.
+Also, one must take care that the splitter in vertical direction is actually
+turned by 90 degrees, so you'll need to use i.e. width as height etc. */
+
+/* Horizontal QSplitter */
+QSplitter[orientation='1']::handle {{
     border: 1px solid transparent;
+    height: 1px;
+    background-color: {text_foreground};
 }}
-QSplitter::handle:horizontal {{
-    width:7px;
-    margin-left: 5px;
-    margin-right: 5px;
+QSplitter[orientation='1']::handle:hover {{
+    background-color: {context_color};
 }}
-QSplitter::handle:vertical {{
-    height:7px;
+
+/* Vertical QSplitter */
+QSplitter[orientation='2']::handle {{
+    border: 1px solid transparent;
+    height: 1px;
+    background-color: {text_foreground};
 }}
-QSplitterHandle:hover {{}}
-QSplitter::handle:hover {{
+QSplitter[orientation='2']::handle:hover {{
     background-color: {context_color};
 }}
 

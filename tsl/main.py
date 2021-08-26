@@ -2,15 +2,17 @@
 import logging
 import sys
 
-from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal
+from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
     QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
+    QPushButton,
     QSizePolicy,
     QSpacerItem,
+    QSplitter,
     QTableWidget,
     QVBoxLayout,
     QWidget,
@@ -94,11 +96,21 @@ class TestWidget(MainWidget):
         """Create a bew TestWidget."""
         super().__init__(parent)
         self.setStyleSheet("QFrame {\n" "	font-size: 16pt;\n" "}")
-        layout = QVBoxLayout(self)
-        empty_page_label = QLabel(self)
-        empty_page_label.setAlignment(Qt.AlignCenter)
-        empty_page_label.setText("hjuhuujuuu")
-        layout.addWidget(empty_page_label)
+        layout = QHBoxLayout(self)
+        self.splitter = QSplitter(Qt.Vertical, self)
+        self.splitter.addWidget(QLabel("hjuhuujuuu"))
+        button = QPushButton("Change orientation")
+        button.clicked.connect(self.on_change_orientation)
+        self.splitter.addWidget(button)
+        layout.addWidget(self.splitter)
+
+    @pyqtSlot(name="on_change_orientation")
+    def on_change_orientation(self) -> None:
+        """Change the orientation of the QSplitter."""
+        if self.splitter.orientation() == Qt.Horizontal:
+            self.splitter.setOrientation(Qt.Vertical)
+        else:
+            self.splitter.setOrientation(Qt.Horizontal)
 
 
 class InfoPage(MainWidget):
@@ -181,6 +193,7 @@ class StyledMainWindow(TSLStyledMainWindow):
         except KeyError:
             self._current_idx = 0
 
+    @pyqtSlot(name="on_switch_style")
     def on_switch_style(self) -> None:
         """Set the next available style."""
         self._current_idx += 1
