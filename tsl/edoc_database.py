@@ -2358,6 +2358,7 @@ class EdocPhase(Base):
         Integer, ForeignKey("V_PSEX_PROCESSPHASE.PRP_ID"), default=1
     )
     P_ID = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"))
+    P_ID_2 = Column(Integer, ForeignKey("V_PSEX_PROJECT.P_ID"))
     SO_NUMBER: Mapped[int] = Column(Integer, nullable=False, default=0)
     EP_TEXT_DE = Column(Unicode(length=500), default="")
     EP_TEXT_EN = Column(Unicode(length=500), default="")
@@ -2383,7 +2384,12 @@ class EdocPhase(Base):
     EP_PHASEALIAS = Column(Unicode(length=100))
 
     edoc: Edoc = relationship("Edoc", back_populates="phases", uselist=False)
-    project: Project = relationship("Project", uselist=False)
+    project: Project = relationship(
+        "Project", foreign_keys=[P_ID], uselist=False
+    )
+    importer_project: Project = relationship(
+        "Project", foreign_keys=[P_ID_2], uselist=False
+    )
     result: EdocResult = relationship(
         "EdocResult", foreign_keys=[ER_ID], uselist=False
     )
