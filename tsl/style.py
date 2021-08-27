@@ -175,25 +175,36 @@ QComboBox:disabled {{
 }}
 
 /* QHeaderView */
+QHeaderView{{
+    background-color: {bg_two};
+}}
 QHeaderView::section{{
     color: {text_foreground};
     background-color: {bg_two};
     max-width: 30px;
-    border: 1px solid transparent;
-    border-style: none;
-}}
-QHeaderView::section:horizontal
-{{
-    border-bottom: 1px solid {dark_three};
+    border: 0px;
     padding: 3px;
     padding-right: 10px;
 }}
-QHeaderView::section:vertical
-{{
+QHeaderView::section:horizontal{{
     border-right: 1px solid {dark_three};
+    border-bottom: 1px solid {dark_three};
+}}
+QHeaderView::section:horizontal:last{{
+    border-right: 0px;
+}}
+QHeaderView::section:vertical{{
+    border-bottom: 1px solid {dark_three};
+    border-right: 1px solid {dark_three};
+}}
+QHeaderView::section:vertical:last{{
+    border-bottom: 0px;
 }}
 QHeaderView::section:disabled{{
     color: {fg_disabled};
+}}
+QTableCornerButton::section {{
+    background-color: {bg_two};
 }}
 
 /* QLineEdit */
@@ -416,6 +427,15 @@ QTreeWidget {{
     alternate-background-color: {bg_one};
     padding: 10px;
     border-radius: 5px;
+}}
+#frozen_column_table_view {{
+    /* This QTableView must fix exactly at it's position over the real table */
+    padding: 0px;
+
+}}
+#frozen_column_table_view QHeaderView::section:horizontal:last{{
+    /* The last section of the frozen table's header isn't the real last one */
+    border-right: 1px solid {dark_three};
 }}
 QTreeView::item,
 QListView::item,
