@@ -3,21 +3,21 @@ import logging
 import sys
 
 from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
     QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
-    QPushButton,
     QSizePolicy,
     QSpacerItem,
-    QSplitter,
     QTableWidget,
     QVBoxLayout,
     QWidget,
 )
 
+from tsl.gen.ui_test_window import Ui_test_widget
 from tsl.init import SETTINGS, init
 from tsl.style import THEMES, get_current_style, get_style, set_current_style
 from tsl.tsl_main_gui import TSLStyledMainWindow
@@ -95,22 +95,19 @@ class TestWidget(MainWidget):
     def __init__(self, parent: QWidget = None) -> None:
         """Create a bew TestWidget."""
         super().__init__(parent)
-        self.setStyleSheet("QFrame {\n" "	font-size: 16pt;\n" "}")
-        layout = QHBoxLayout(self)
-        self.splitter = QSplitter(Qt.Vertical, self)
-        self.splitter.addWidget(QLabel("hjuhuujuuu"))
-        button = QPushButton("Change orientation")
-        button.clicked.connect(self.on_change_orientation)
-        self.splitter.addWidget(button)
-        layout.addWidget(self.splitter)
+        self._ui = Ui_test_widget()
+        self._ui.setupUi(self)
+        self._ui.pushButton_4.setIcon(QIcon(":/svg_icons/icon_heart.svg"))
+        self._ui.splitter_button.setText("Change orientation")
+        self._ui.splitter_button.clicked.connect(self.on_change_orientation)
 
     @pyqtSlot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
         """Change the orientation of the QSplitter."""
-        if self.splitter.orientation() == Qt.Horizontal:
-            self.splitter.setOrientation(Qt.Vertical)
+        if self._ui.splitter.orientation() == Qt.Horizontal:
+            self._ui.splitter.setOrientation(Qt.Vertical)
         else:
-            self.splitter.setOrientation(Qt.Horizontal)
+            self._ui.splitter.setOrientation(Qt.Horizontal)
 
 
 class InfoPage(MainWidget):

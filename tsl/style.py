@@ -392,6 +392,52 @@ QSplitter[orientation='2']::handle:hover {{
     background-color: {context_color};
 }}
 
+/* QTabWidget */
+/*
+QTabWidget lacks of proper qss background-color support.
+See:
+https://bugreports.qt.io/browse/QTBUG-33344
+https://bugreports.qt.io/browse/QTBUG-68642
+https://codereview.qt-project.org/c/qt/qtbase/+/230769/
+Because of not inheriting the values properly each
+widget of QTabWidget needs to be set manually.
+*/
+QTabWidget > QStackedWidget {{
+    background-color: {bg_three};
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}}
+QTabWidget > QStackedWidget > QWidget {{
+    background-color: {bg_three};
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}}
+ QTabWidget::pane {{
+    background-color: {bg_two};
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}}
+
+/* QTabBar */
+QTabBar::tab {{
+    background-color: {bg_two};
+    color: {text_foreground};
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 10px;
+}}
+QTabBar::tab:hover {{
+    background-color: {context_color};
+    color: {text_active};
+}}
+QTabBar::tab:selected {{
+    background-color: {bg_three};
+    color: {text_foreground};
+}}
+
 /* QTextEdit */
 QTextEdit {{
     color: {text_foreground};
