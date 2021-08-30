@@ -9,7 +9,14 @@ from PyQt5.QtCore import (  # type: ignore # for pyqtProperty
     pyqtProperty,
     pyqtSlot,
 )
-from PyQt5.QtGui import QColor, QFont, QFontMetrics, QPainter, QPaintEvent
+from PyQt5.QtGui import (
+    QColor,
+    QFont,
+    QFontMetrics,
+    QPainter,
+    QPaintEvent,
+    QPen,
+)
 from PyQt5.QtWidgets import QCheckBox, QSizePolicy, QWidget
 
 from tsl.style import get_color
@@ -83,6 +90,7 @@ class Toggle(QCheckBox):
 
         # Checking if a text is set is faster for cases with no text.
         if self.text():
+            painter.setPen(QPen(QColor(get_color("text_foreground"))))
             painter.setFont(Toggle.FONT)
             painter.drawText(
                 self._box_width + self._spacer,

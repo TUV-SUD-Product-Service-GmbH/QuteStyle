@@ -184,7 +184,6 @@ QHeaderView::section{{
     max-width: 30px;
     border: 0px;
     padding: 3px;
-    padding-right: 10px;
 }}
 QHeaderView::section:horizontal{{
     border-right: 1px solid {dark_three};
@@ -217,6 +216,7 @@ QLineEdit {{
     selection-color: {text_active};
     selection-background-color: {context_color};
     color: {text_foreground};
+    height: 22px;
 }}
 QLineEdit#column_line_edit {{
     background-color: {bg_one};
@@ -376,9 +376,8 @@ turned by 90 degrees, so you'll need to use i.e. width as height etc. */
 
 /* Horizontal QSplitter */
 QSplitter[orientation='1']::handle {{
-    border: 1px solid transparent;
-    height: 1px;
-    background-color: {text_foreground};
+    height: 2px;
+    background-color: {bg_three};
 }}
 QSplitter[orientation='1']::handle:hover {{
     background-color: {context_color};
@@ -386,9 +385,8 @@ QSplitter[orientation='1']::handle:hover {{
 
 /* Vertical QSplitter */
 QSplitter[orientation='2']::handle {{
-    border: 1px solid transparent;
-    height: 1px;
-    background-color: {text_foreground};
+    height: 2px;
+    background-color: {bg_three};
 }}
 QSplitter[orientation='2']::handle:hover {{
     background-color: {context_color};
@@ -412,8 +410,8 @@ QToolTip {{
     color:{text_foreground};
     padding-left: 10px;
     padding-right: 10px;
-     border: 0px solid transparent;
-     border-left: 3px solid {context_color};
+    border: 0px solid transparent;
+    border-left: 3px solid {context_color};
 }}
 
 /* QTreeView, QListView, QTableView, QTableWidget, QTreeWidget */
@@ -436,14 +434,6 @@ QTreeWidget {{
 #frozen_column_table_view QHeaderView::section:horizontal:last{{
     /* The last section of the frozen table's header isn't the real last one */
     border-right: 1px solid {dark_three};
-}}
-QTreeView::item,
-QListView::item,
-QTableView::item,
-QTableWidget::item,
-QTreeWidget::item{{
-    padding-left: 5px;
-    padding-right: 5px;
 }}
 QTreeView::item:hover,
 QListView::item:hover,
