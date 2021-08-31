@@ -146,15 +146,23 @@ class LeftMenu(QWidget):
         self._animation.setDuration(500)
         self._animation.start()
 
+    def _button(
+        self, widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget]]
+    ) -> LeftMenuButton:
+        """Return the button for the given widget class."""
+        for btn in self.findChildren(LeftMenuButton):
+            if btn.widget_class == widget_class:
+                return btn
+        raise ValueError(  # pragma: no cover
+            f"Could not find button for widget: {widget_class}"
+        )
+
     def set_button_active(
         self,
         widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget]],
         active: bool,
     ) -> None:
         """Set the button for the given widget active/inactive."""
-        for btn in self.findChildren(LeftMenuButton):
-            if btn.widget_class == widget_class:
-                btn.set_active(active)
-                btn.set_active_tab(active)
-                return
-        raise ValueError(f"Could not find button for widget: {widget_class}")
+        button = self._button(widget_class)
+        button.set_active(active)
+        button.set_active_tab(active)

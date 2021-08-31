@@ -1,6 +1,6 @@
 """TSLStyledMainWindow definition for custom Darcula style."""
 import logging
-from typing import List, Tuple, Type, cast
+from typing import List, Optional, Tuple, Type, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
@@ -52,6 +52,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     LEFT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]]
 
     MIN_SIZE: QSize = QSize(0, 0)
+
+    # Define the maximum width for the columns (left and right).
+    MAX_COLUMN_WIDTH = 240
 
     # Signal that is emitted when the window has shut down.
     shutdown_complete = pyqtSignal(name="shutdown_complete")
@@ -337,13 +340,35 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         else:
             self.showMaximized()
 
-    def left_column_is_visible(self) -> bool:
-        """Determine if left column is visible."""
-        return not self._left_column_frame.width() == 0
+    def _column_is_visible(self, column: QFrame) -> bool:
+        """Return if the given column is visible."""
+        return (
+            column.width() == self.MAX_COLUMN_WIDTH
+            or self._check_is_opening(column) is True
+        )
 
-    def right_column_is_visible(self) -> bool:
-        """Determine if right column is visible."""
-        return self._right_column_frame.width() != 0
+    def _check_is_opening(self, frame: QFrame) -> Optional[bool]:
+        """
+        Check if the given QFrame is currently opening or closing.
+
+        If the QFrame is opening, the method returns True, otherwise False.
+        If no animation is in progress, the method returns None
+        """
+        if self._group.state() == QParallelAnimationGroup.Running:
+            for idx in range(self._group.animationCount()):
+                animation = cast(
+                    QPropertyAnimation, self._group.animationAt(idx)
+                )
+                if animation.targetObject() is frame:
+                    log.debug("Found animation for %s", frame)
+                    opening = (
+                        cast(int, animation.endValue())
+                        == self.MAX_COLUMN_WIDTH
+                    )
+                    log.debug("Is currently opening: %s", opening)
+                    return opening
+        log.debug("There's no animation running for %s", frame)
+        return None
 
     @staticmethod
     def _create_slide_animation(
@@ -352,12 +377,13 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         """Create an animation that will open or close a QFrame."""
         animation = QPropertyAnimation(frame, b"minimumWidth")
         animation.setDuration(500)
-        if slide_out:
-            animation.setStartValue(0)
-            animation.setEndValue(240)
-        else:
-            animation.setStartValue(240)
-            animation.setEndValue(0)
+
+        # Always start at the current width for the case that the column is
+        # currently already animated and not fully closed/opened.
+        animation.setStartValue(frame.width())
+        animation.setEndValue(
+            TSLStyledMainWindow.MAX_COLUMN_WIDTH if slide_out else 0
+        )
         animation.setEasingCurve(QEasingCurve.InOutQuart)
         return animation
 
@@ -368,24 +394,16 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         This method will clear an ongoing animation (group), and create a new
         one based on the request parameters and state of the columns.
         """
+        assert left_open is False or right_open is False
         self._group.clear()
 
-        # Animate if left_open is not the current value (XOR):
-        # Open if closed and close if opened.
-        if left_open is not self.left_column_is_visible():
-            self._group.addAnimation(
-                self._create_slide_animation(
-                    self._left_column_frame, left_open
-                )
-            )
-
-        # Same logic as above.
-        if right_open is not self.right_column_is_visible():
-            self._group.addAnimation(
-                self._create_slide_animation(
-                    self._right_column_frame, right_open
-                )
-            )
+        # Create the two animations that that open/close the columns.
+        self._group.addAnimation(
+            self._create_slide_animation(self._left_column_frame, left_open)
+        )
+        self._group.addAnimation(
+            self._create_slide_animation(self._right_column_frame, right_open)
+        )
 
         self._group.start()
 
@@ -423,25 +441,49 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     @pyqtSlot(name="on_right_column")
     def on_right_column(self) -> None:
         """Handle a click on the button for the right column."""
-        show = not self.right_column_is_visible()
+        show = not self._column_is_visible(self._right_column_frame)
         self._title_bar.set_right_button_active(show)
         self._start_box_animation(False, show)
+
+        # If we close the left column, we also need to deactivate it's button.
+        self._left_menu.set_button_active(
+            self._left_column.current_widget(), False
+        )
 
     @pyqtSlot(type, name="on_left_column")
     def on_left_column(self, widget_class: Type[ColumnBaseWidget]) -> None:
         """Handle a click on the button for the left column."""
+        # If we open, the right column will close, if we're closing, the right
+        # column can't be open, so in each case we can set the right button
+        # inactive.
+        self._title_bar.set_right_button_active(False)
+
         self._left_menu.set_button_active(
             self._left_column.current_widget(), False
         )
         log.debug("Handling left column for %s", widget_class)
-        show = (
-            not self.left_column_is_visible()
-            or widget_class != self._left_column.current_widget()
-        )
-        log.debug("Showing column: %s", show)
-        self._left_column.set_column_widget(widget_class)
-        self._start_box_animation(show, False)
-        self._left_menu.set_button_active(widget_class, show)
+
+        # Check if switching the widget.
+        visible = self._column_is_visible(self._left_column_frame)
+        if widget_class != self._left_column.current_widget():
+
+            # Set the current widget for the left column to make it visible.
+            self._left_column.set_column_widget(widget_class)
+
+            # If the left column isn't visible, we start the animation.
+            if not visible:
+                self._start_box_animation(True, False)
+
+            # Finally set the button for the widget active.
+            self._left_menu.set_button_active(widget_class, True)
+
+        # If toggling the active widget.
+        else:
+            # Start animation for the opposite state.
+            self._start_box_animation(not visible, False)
+
+            # Set the button to the opposite state.
+            self._left_menu.set_button_active(widget_class, not visible)
 
     @pyqtSlot(name="on_close_left_column")
     def on_close_left_column(self) -> None:

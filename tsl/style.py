@@ -534,7 +534,7 @@ QFrame#title_bar_background {{
 
 QFrame#div {{
     background: {dark_four};
-    border-radius: 0
+    border-radius: 0;
 }}
 
 .QLabel {{
@@ -600,7 +600,8 @@ QLabel#title_label {{
 }}
 QLabel#about_toolbox {{
     font: 9pt "Segoe UI";
-    color: {text_foreground}
+    color: {text_foreground};
+}}
 QMessageBox{{
     background-color: {dark_four};
     border-left: 3px solid {context_color};

@@ -78,7 +78,7 @@ class IconButton(QPushButton):
         A button is active, when the widget which is shown by pressing on the
         button is visible (i.e. right or left widget).
         """
-        log.debug("Setting button %s active: %s.", self.objectName(), active)
+        log.debug("Setting button '%s' active: %s.", self.objectName(), active)
         self._is_active = active
         self.update()
 

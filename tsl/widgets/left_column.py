@@ -1,6 +1,6 @@
 """Widget that contains the widgets of the left column."""
 import logging
-from typing import Iterable, List, Tuple, Type, cast
+from typing import List, Tuple, Type, cast
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (
@@ -28,7 +28,7 @@ class LeftColumn(QWidget):
     def __init__(
         self,
         app_parent: QWidget,
-        widget_types: Iterable[Type[ColumnBaseWidget]],
+        widget_types: List[Type[ColumnBaseWidget]],
         parent: QWidget = None,
     ):
         """Create a new LeftColumn."""
@@ -55,10 +55,13 @@ class LeftColumn(QWidget):
             base_layout, widget_types
         )
 
+        # Set the first widget so that title text is set.
+        self.set_column_widget(widget_types[0])
+
     @staticmethod
     def create_content_frame(
         base_layout: QLayout,
-        widget_types: Iterable[Type[ColumnBaseWidget]],
+        widget_types: List[Type[ColumnBaseWidget]],
     ) -> Tuple[QStackedWidget, List[ColumnBaseWidget]]:
         """
         Create the content QFrame and add it to the given layout.
