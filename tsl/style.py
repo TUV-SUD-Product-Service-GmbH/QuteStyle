@@ -598,6 +598,9 @@ QLabel#title_label {{
     font: 10pt "Segoe UI";
     color: {text_foreground};
 }}
+QLabel#about_toolbox {{
+    font: 9pt "Segoe UI";
+    color: {text_foreground}
 QMessageBox{{
     background-color: {dark_four};
     border-left: 3px solid {context_color};
@@ -613,26 +616,24 @@ QPushButton{{
     border: 10px solid transparent;
     font: 600 9pt "Segoe UI";
 }}
-"""
-
-GENERAL_PUSH_BUTTON = """
-QPushButton {{
-    border: none;
-    padding-left: 15px;
-    padding-right: 15px;
-    color: {color};
-    border-radius: {radius};
-    background-color: {bg_one};
+QPushButton#info_widget_btn{{
+    background-color: {dark_one};
+    color: {text_foreground};
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 17px;
+    border: 10px solid transparent;
+    border-left: 3px solid {context_color};
+    font: 800 9pt "Segoe UI";
 }}
-QPushButton:hover {{
-    background-color: {bg_color_hover};
+QPushButton#info_widget_btn:hover {{
+    background-color: {dark_four};
 }}
-QPushButton:pressed {{
-    background-color: {bg_color_pressed};
+QPushButton#info_widget_btn:pressed {{
+    background-color: {dark_one};
 }}
-QPushButton:disabled{{
+QPushButton#info_widget_btn:disabled{{
     color: {fg_disabled};
     background-color: {bg_disabled};
 }}
-
-"""
+    """
