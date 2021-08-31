@@ -12,7 +12,10 @@ from tsl.init import check_ide
 
 log = logging.getLogger("tsl.updater")  # pylint: disable=invalid-name
 
-LAGER_PATH = r"\\DE001.itgr.net\PS\RF-UnitPSMUC\Lager"
+LAGER_PATHS = (
+    r"\\DE001.itgr.net\PS\RF-UnitPSMUC\Lager",
+    r"\\DE001.itgr.net\PS\RF-UnitPSFRA\Lager",
+)
 
 
 class Updater(QObject):
@@ -54,6 +57,14 @@ class Updater(QObject):
         self.update_available.emit(self._update_available)
         self._check_updater()
 
+    @staticmethod
+    def get_accessible_path() -> Optional[str]:
+        """Test if update path is readable and return it."""
+        for path in LAGER_PATHS:
+            if os.access(path, os.R_OK):
+                return path
+        return None
+
     def _check_for_update(self) -> bool:
         """
         Check if an update is available and start the updater if so.
@@ -68,9 +79,14 @@ class Updater(QObject):
         if check_ide():
             log.info("Application is run from IDE, not running update check.")
             return False
+        # abort update if no accessible path was found
+        path = self.get_accessible_path()
+        if not path:
+            log.error("Update path is not accessible!")
+            return False
 
         json_path = os.path.join(
-            LAGER_PATH, self._app_name, "TSL-UPDATE", "update.json"
+            path, self._app_name, "TSL-UPDATE", "update.json"
         )
 
         log.debug("Reading update.json from: %s", json_path)
@@ -97,15 +113,21 @@ class Updater(QObject):
     def _check_updater(self) -> None:
         """Check that the TSL App-Updater is installed and up to date."""
         log.info("Starting check of installation of TSL App-Updater")
-        json_file = os.path.join(LAGER_PATH, "TSL-Updater", "update.json")
-        install_path = os.path.join(expanduser("~"), "TSL", "Updater")
-        self._copy_worker = CopyWorker(install_path, json_file)
-        self._copy_worker.moveToThread(self._updater_thread)
-        self._updater_thread.started.connect(self._copy_worker.start_copy)
-        self._copy_worker.copy_finished.connect(self._updater_thread.quit)
-        self._updater_thread.finished.connect(self.check_finished)
-        self._updater_thread.start()
-        log.info("Copy worker started.")
+        path = self.get_accessible_path()
+        # abort update if no accessible path was found
+        if not path:
+            log.error("Update path is not accessible!")
+            self.check_finished()
+        else:
+            json_file = os.path.join(path, "TSL-Updater", "update.json")
+            install_path = os.path.join(expanduser("~"), "TSL", "Updater")
+            self._copy_worker = CopyWorker(install_path, json_file)
+            self._copy_worker.moveToThread(self._updater_thread)
+            self._updater_thread.started.connect(self._copy_worker.start_copy)
+            self._copy_worker.copy_finished.connect(self._updater_thread.quit)
+            self._updater_thread.finished.connect(self.check_finished)
+            self._updater_thread.start()
+            log.info("Copy worker started.")
 
     @pyqtSlot(name="check_finished")
     def check_finished(self) -> None:

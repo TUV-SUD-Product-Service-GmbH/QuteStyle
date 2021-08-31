@@ -4,14 +4,14 @@ import logging
 import os
 import subprocess
 import sys
-from typing import Optional
+from typing import Optional, cast
 
 from PyQt5.QtCore import QEvent, QObject, QSettings, Qt, QThread, pyqtSlot
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QProgressDialog, QWidget
 
 from tsl.edoc_database import get_user_group_name
-from tsl.updater import LAGER_PATH, Updater
+from tsl.updater import Updater
 from tsl.whats_new_window import WhatsNewWindow
 
 LOG_NAME = ".".join(["tsl", __name__])
@@ -238,7 +238,10 @@ class TSLMainWindow(QMainWindow):
                     r"/ROOT:" + os.path.abspath(sys.argv[0]),
                     r"/TEXTFILE:"
                     + os.path.join(
-                        LAGER_PATH, self._app_name, "TSL-Update", "update.json"
+                        cast(str, Updater.get_accessible_path()),
+                        self._app_name,
+                        "TSL-Update",
+                        "update.json",
                     ),
                 ]
             ):
