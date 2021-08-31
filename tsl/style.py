@@ -598,6 +598,21 @@ QLabel#title_label {{
     font: 10pt "Segoe UI";
     color: {text_foreground};
 }}
+QMessageBox{{
+    background-color: {dark_four};
+    border-left: 3px solid {context_color};
+    font: 9pt "Segoe UI";
+    text-color: {text_active};
+}}
+QPushButton{{
+    background-color: {context_color};
+    color: {text_active};
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 17px;
+    border: 10px solid transparent;
+    font: 600 9pt "Segoe UI";
+}}
 """
 
 GENERAL_PUSH_BUTTON = """
@@ -619,4 +634,5 @@ QPushButton:disabled{{
     color: {fg_disabled};
     background-color: {bg_disabled};
 }}
+
 """
