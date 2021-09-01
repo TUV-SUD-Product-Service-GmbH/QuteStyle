@@ -63,9 +63,10 @@ THEMES: Dict[str, Dict[str, str]] = {
         "text_active": "#8797BA",
         "white": "#f5f6f9",
         "pink": "#ff007f",
-        "green": "#00ff7f",
+        "green": "#15c72a",
         "red": "#ff5555",
-        "yellow": "#f1fa8c",
+        "yellow": "#fda600",
+        "grey": "#d3d3d3",
     },
     "Princess Pink": {
         "dark_one": "#282a36",
@@ -93,6 +94,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "green": "#00ff7f",
         "red": "#ff5555",
         "yellow": "#f1fa8c",
+        "grey": "#d3d3d3",
     },
     "Darcula": {
         "dark_one": "#1b1e23",
@@ -120,6 +122,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "green": "#00ff7f",
         "red": "#ff5555",
         "yellow": "#f1fa8c",
+        "grey": "#d3d3d3",
     },
 }
 
