@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QWidget
 
 from tsl.style import get_color
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
-from tsl.widgets.icon_button import BackgroundColors
+from tsl.widgets.icon_button import BackgroundColors, IconButton
 from tsl.widgets.icon_tooltip_button import IconTooltipButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -147,9 +147,13 @@ class LeftMenuButton(IconTooltipButton):
         self, event: QEvent
     ) -> None:
         """Change style on mouse entering the button area."""
-        if self.width() == 50 and self._tooltip.text() and not self._is_active:
+        if (
+            self.width() == LeftMenuButton.FIXED_HEIGHT
+            and self._tooltip.text()
+            and not self._is_active
+        ):
             self.move_tooltip()
-        super().enterEvent(event)
+        IconButton.enterEvent(self, event)
 
     def mousePressEvent(  # pylint: disable=invalid-name
         self, event: QMouseEvent
