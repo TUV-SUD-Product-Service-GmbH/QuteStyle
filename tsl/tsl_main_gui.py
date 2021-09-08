@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from tsl.edoc_database import get_user_group_name
 from tsl.resources_rc import qInitResources
 from tsl.style import get_style
 from tsl.update_window import TSLMainWindow
@@ -98,6 +99,8 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         self._background = BackgroundFrame(self)
         central_widget_layout.addWidget(self._background)
 
+        # Get widgets to set visible
+        self._visible_widgets = self.get_widgets_to_display()
         # Add the left menu.
         self._left_menu = self._add_left_menu(self._background.layout())
 
@@ -141,6 +144,15 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         # Activate the first widget to be visible by default.
         self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
 
+    def get_widgets_to_display(self) -> List[Type[MainWidget]]:
+        """Determine the widgets visible to the current user."""
+        visible_widgets = []
+        team = get_user_group_name()
+        for widget_class in self.MAIN_WIDGET_CLASSES:
+            if team in widget_class.GROUPS or not widget_class.GROUPS:
+                visible_widgets.append(widget_class)
+        return visible_widgets
+
     def _add_main_area(
         self, layout: QLayout
     ) -> Tuple[QFrame, ColumnBaseWidget, QStackedWidget]:
@@ -158,7 +170,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
         # Create the QStackedWidget that contains all the content widgets
         content = QStackedWidget()
-        for widget_class in self.MAIN_WIDGET_CLASSES:
+        for widget_class in self._visible_widgets:
             content.addWidget(widget_class())
         content_area_layout.addWidget(content)
 
@@ -264,7 +276,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         left_menu = LeftMenu(
             parent=left_menu_frame,
             app_parent=self.centralWidget(),
-            main_widgets=self.MAIN_WIDGET_CLASSES,
+            main_widgets=self._visible_widgets,
             left_column_widgets=self.LEFT_WIDGET_CLASSES,
         )
         left_menu_layout.addWidget(left_menu)
@@ -436,7 +448,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             if isinstance(widget, widget_class):
                 self._content.setCurrentWidget(widget)
                 return
-        raise ValueError(f"Could not find widget {widget_class}")
+        raise ValueError("Could not find widget {}".format(widget_class))
 
     @pyqtSlot(name="on_right_column")
     def on_right_column(self) -> None:

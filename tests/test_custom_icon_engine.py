@@ -7,7 +7,7 @@ from PyQt5.QtGui import QIcon, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
 from tests.test_update_window import create_new_tsl_main_window
-from tsl.style import get_color
+from tsl.style import DEFAULT_STYLE, get_color, set_current_style
 from tsl.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
 
@@ -16,9 +16,10 @@ def test_get_new_pixmap(  # pylint: disable=unused-argument
     qtbot: QtBot,
 ) -> None:
     """Test that correct pixmap is return when it was not stored before."""
+    set_current_style(DEFAULT_STYLE)
     store = PixmapStore.inst()
     new_pixmap = store.get_pixmap(
-        "tests/test_images/test_icon.svg", 16, "yellow"
+        "tests/test_images/test_icon.svg", 16, get_color("yellow")
     )
     # If the color code of "yellow" in default theme is changed,
     # change color of default_icon in svg
