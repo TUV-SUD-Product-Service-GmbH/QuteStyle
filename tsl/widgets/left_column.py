@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
 
 from tsl.widgets.base_widgets import ColumnBaseWidget
 from tsl.widgets.icon import Icon
-from tsl.widgets.title_button import TitleButton
+from tsl.widgets.left_column_close_button import LeftColumnCloseButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -116,7 +116,7 @@ class LeftColumn(QWidget):
         title_bg_layout.addWidget(title_label)
 
         # Add the button to close the column.
-        btn_close = TitleButton(
+        btn_close = LeftColumnCloseButton(
             app_parent,
             tooltip_text=self.tr("Schließen"),
             icon_path=":/svg_icons/icon_close.svg",

@@ -5,8 +5,7 @@ from typing import Tuple
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QWidget
 
-from tsl.style import get_color
-from tsl.widgets.icon_button import BackgroundColors
+from tsl.widgets.icon_button import BackgroundColorNames
 from tsl.widgets.icon_tooltip_button import IconTooltipButton
 
 log = logging.getLogger("tsl.title_button")  # pylint: disable=invalid-name
@@ -18,20 +17,24 @@ class TitleButton(IconTooltipButton):
     FIXED_WIDTH = 30
     FIXED_HEIGHT = 30
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
         parent: QWidget = None,
+        bgs: BackgroundColorNames = None,
     ) -> None:
         """Create a new TitleButton."""
-        bgs = BackgroundColors(
-            hovering=get_color("bg_three"),
-            no_hovering=get_color("bg_two"),
-            pressed=get_color("bg_one"),
-            released=get_color("bg_three"),
-        )
+
+        if bgs is None:
+            bgs = BackgroundColorNames(
+                hovering="bg_three",
+                background="bg_two",
+                pressed="bg_one",
+                released="bg_three",
+            )
+
         super().__init__(
             app_parent, tooltip_text, icon_path, bgs, parent=parent
         )

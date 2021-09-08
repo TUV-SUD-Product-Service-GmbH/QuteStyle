@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QWidget
 
 from tsl.style import get_color
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
-from tsl.widgets.icon_button import BackgroundColors, IconButton
+from tsl.widgets.icon_button import BackgroundColorNames, IconButton
 from tsl.widgets.icon_tooltip_button import IconTooltipButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -29,11 +29,11 @@ class LeftMenuButton(IconTooltipButton):
         widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget], None],
     ) -> None:
         """Create a new LeftMenuButton."""
-        bgs = BackgroundColors(
-            hovering=get_color("dark_three"),
-            no_hovering=get_color("dark_one"),
-            pressed=get_color("dark_four"),
-            released=get_color("dark_three"),
+        bgs = BackgroundColorNames(
+            hovering="dark_three",
+            background="dark_one",
+            pressed="dark_four",
+            released="dark_three",
         )
         super().__init__(app_parent, tooltip_text, icon_path, bgs, text)
 
@@ -81,7 +81,7 @@ class LeftMenuButton(IconTooltipButton):
         else:
             # If the button is neither active (i.e. left column is shown) nor
             # does it belong to the active tab, we draw the hover effect.
-            painter.setBrush(QColor(self._bg_color))
+            painter.setBrush(QColor(get_color(self._bg_color)))
             rect_inside = QRect(4, 5, self.width() - 8, self.height() - 10)
             painter.drawRoundedRect(rect_inside, 8, 8)
 
@@ -102,7 +102,7 @@ class LeftMenuButton(IconTooltipButton):
         if self._is_toggle_active:
             color = get_color("context_color")
         else:
-            color = self._icon_color
+            color = get_color(self._icon_color)
 
         # The height of the button defines the rectangle in which the icon is
         # painted, independent of the button's width.
@@ -118,8 +118,8 @@ class LeftMenuButton(IconTooltipButton):
         """
         self._is_active_tab = is_active
         if not is_active:
-            self._icon_color = get_color("icon_color")
-            self._bg_color = self._bgs["no_hovering"]
+            self._icon_color = "icon_color"
+            self._bg_color = self._bgs["background"]
 
         self.update()
 

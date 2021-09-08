@@ -18,11 +18,11 @@ from tsl.style import get_color
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class BackgroundColors(TypedDict):
+class BackgroundColorNames(TypedDict):
     """Defines background colors used by the button."""
 
     hovering: str
-    no_hovering: str
+    background: str
     pressed: str
     released: str
 
@@ -37,7 +37,7 @@ class IconButton(QPushButton):
         self,
         parent: QWidget = None,
         icon_path: str = ":/svg_icons/no_icon.svg",
-        bgs: BackgroundColors = None,
+        bgs: BackgroundColorNames = None,
         text: str = None,
     ) -> None:
         """Create a new IconButton."""
@@ -45,15 +45,15 @@ class IconButton(QPushButton):
             super().__init__(text=text, parent=parent)
         else:
             super().__init__(parent=parent)
-        if not bgs:
-            self._bgs = BackgroundColors(
-                hovering=get_color("dark_three"),
-                no_hovering=get_color("bg_one"),
-                pressed=get_color("dark_four"),
-                released=get_color("dark_three"),
-            )
-        else:
+        if bgs:
             self._bgs = bgs
+        else:
+            self._bgs = BackgroundColorNames(
+                hovering="dark_three",
+                background="bg_one",
+                pressed="dark_four",
+                released="dark_three",
+            )
 
         self._set_icon_path = icon_path
         # the pixmap must be moved to the pixmap store of baumg-mi
@@ -68,8 +68,8 @@ class IconButton(QPushButton):
 
         self._is_active: bool = False
 
-        self._bg_color = self._bgs["no_hovering"]
-        self._icon_color = get_color("icon_color")
+        self._bg_color = self._bgs["background"]
+        self._icon_color = "icon_color"
 
     def set_active(self, active: bool) -> None:
         """
@@ -90,12 +90,11 @@ class IconButton(QPushButton):
         paint.begin(self)
         paint.setRenderHint(QPainter.Antialiasing)
         paint.setPen(Qt.NoPen)
-        color = get_color("bg_one") if self._is_active else self._bg_color
-        paint.setBrush(QBrush(QColor(color)))
+        paint.setBrush(QBrush(QColor(get_color(self._bg_color))))
         paint.drawRoundedRect(self.rect(), 8, 8)
 
         if self.isEnabled():
-            color = self._icon_color
+            color = get_color(self._icon_color)
         else:
             color = get_color("fg_disabled")
         self.icon_paint(paint, color)
@@ -106,14 +105,14 @@ class IconButton(QPushButton):
         """Change style on mouse entering the button area."""
         if self.isEnabled() and not self._is_active:
             self._bg_color = self._bgs["hovering"]
-            self._icon_color = get_color("icon_hover")
+            self._icon_color = "icon_hover"
             self.update()
 
     def leaveEvent(self, _: QEvent) -> None:  # pylint: disable=invalid-name
         """Change style on mouse leaving the button area."""
         if not self._is_active:
-            self._bg_color = self._bgs["no_hovering"]
-            self._icon_color = get_color("icon_color")
+            self._bg_color = self._bgs["background"]
+            self._icon_color = "icon_color"
             self.update()
 
     def mousePressEvent(  # pylint: disable=invalid-name
@@ -122,7 +121,7 @@ class IconButton(QPushButton):
         """Event triggered on mouse button press."""
         if event.button() == Qt.LeftButton:
             self._bg_color = self._bgs["pressed"]
-            self._icon_color = get_color("icon_pressed")
+            self._icon_color = "icon_pressed"
             self.update()
             self.setFocus()
             self.clicked.emit()
@@ -133,7 +132,7 @@ class IconButton(QPushButton):
         """Event triggered on mouse button release."""
         if event.button() == Qt.LeftButton:
             self._bg_color = self._bgs["released"]
-            self._icon_color = get_color("icon_hover")
+            self._icon_color = "icon_hover"
             self.update()
             self.released.emit()
 

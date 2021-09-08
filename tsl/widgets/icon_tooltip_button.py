@@ -5,7 +5,7 @@ from typing import Tuple
 from PyQt5.QtCore import QEvent, QPoint
 from PyQt5.QtWidgets import QWidget
 
-from tsl.widgets.icon_button import BackgroundColors, IconButton
+from tsl.widgets.icon_button import BackgroundColorNames, IconButton
 from tsl.widgets.tooltip import ToolTip
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -19,7 +19,7 @@ class IconTooltipButton(IconButton):
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
-        bgs: BackgroundColors = None,
+        bgs: BackgroundColorNames = None,
         text: str = None,
         parent: QWidget = None,
     ) -> None:
