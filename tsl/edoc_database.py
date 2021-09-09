@@ -1979,7 +1979,7 @@ class Edoc(Base):
         "Staff", foreign_keys=[update_by], uselist=False
     )
     items: EdocModuleItem = relationship(
-        "EdocModuleItem", back_populates="edoc", uselist=False
+        "EdocModuleItem", back_populates="edoc", uselist=True
     )
     project: Project = relationship(
         "Project", back_populates="edoc", uselist=False
