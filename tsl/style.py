@@ -153,18 +153,18 @@ QComboBox:hover{{
     border: 2px solid {dark_three};
 }}
 QComboBox::drop-down {{
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
     width: 25px;
     border-left-width: 3px;
     border-left-color: {bg_one};
     border-left-style: solid;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
-
-    background-position: center;
-    background-repeat: no-repeat;
- }}
+}}
+QComboBox::down-arrow {{
+    image: url(":/svg_icons/down.svg");
+    width: 14px;
+    height: 14px;
+}}
 QComboBox QAbstractItemView {{
     color: {text_foreground};
     background-color: {dark_one};
