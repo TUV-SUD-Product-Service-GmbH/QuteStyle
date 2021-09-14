@@ -82,7 +82,8 @@ class WhatsNewWindow(QMainWindow):
             self._current_entry_idx,
             len(self._entries),
         )
-
+        if not self._entries:
+            self._display_no_entries()
         entry = self._entries[self._current_entry_idx]
 
         self.setWindowTitle(
@@ -99,3 +100,16 @@ class WhatsNewWindow(QMainWindow):
 
         next_disable = self._current_entry_idx == len(self._entries) - 1
         self._ui.next_button.setDisabled(next_disable)
+
+    def _display_no_entries(self) -> None:
+        """Display that no entries are available."""
+        no_entries: WhatsNewEntry = {
+            "entry_type": WhatsNewEntryType.FEATURE,
+            "title": "Keine Neuerungen",
+            "text": "<p>Es gibt keine Neuerungen.</p>",
+            "work_item_id": 51762,
+            "cl_text": "Es gibt keine Neuerungen.",
+            "user_groups": [],
+        }
+        self._entries.append(no_entries)
+        self._display_entry()
