@@ -219,7 +219,7 @@ QLineEdit {{
     selection-color: {text_active};
     selection-background-color: {context_color};
     color: {text_foreground};
-    height: 22px;
+    height: 30px;
 }}
 QLineEdit#column_line_edit {{
     background-color: {bg_one};
