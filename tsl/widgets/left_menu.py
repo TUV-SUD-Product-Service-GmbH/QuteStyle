@@ -139,7 +139,9 @@ class LeftMenu(QWidget):
         self._animation.setStartValue(self.width())
         closed = self.width() == 50
         self._animation.setEndValue(240 if closed else 50)
-        self._toggle_button.set_active_toggle(not closed)
+        # if closed, menu is expanding so set toggle active
+        # if not closed, menu is closing set toggle not active
+        self._toggle_button.set_active_toggle(closed)
         icon = LeftMenu.ICON_PATH_CLOSE if closed else LeftMenu.ICON_PATH_OPEN
         self._toggle_button.set_icon(icon)
         self._animation.setEasingCurve(QEasingCurve.InOutCubic)
