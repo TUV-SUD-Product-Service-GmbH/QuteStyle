@@ -192,6 +192,9 @@ QHeaderView::section:horizontal{{
     border-right: 1px solid {dark_three};
     border-bottom: 1px solid {dark_three};
 }}
+QHeaderView::section:horizontal:only-one{{
+    border-right: 0px;
+}}
 QHeaderView::section:horizontal:last{{
     border-right: 0px;
 }}
@@ -200,6 +203,9 @@ QHeaderView::section:vertical{{
     border-right: 1px solid {dark_three};
 }}
 QHeaderView::section:vertical:last{{
+    border-bottom: 0px;
+}}
+QHeaderView::section:vertical:only-one{{
     border-bottom: 0px;
 }}
 QHeaderView::section:disabled{{
