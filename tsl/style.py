@@ -64,8 +64,14 @@ THEMES: Dict[str, Dict[str, str]] = {
         "white": "#f5f6f9",
         "pink": "#ff007f",
         "green": "#15c72a",
+        "light_green": "#46ff5c",
+        "dark_green": "#0b6315",
         "red": "#ff5555",
+        "light_red": "#ffd4d4",
+        "dark_red": "#7f2a2a",
         "yellow": "#fda600",
+        "light_yellow": "#ffd27c",
+        "dark_yellow": "#7e5300",
         "grey": "#d3d3d3",
     },
     "Princess Pink": {
@@ -92,8 +98,14 @@ THEMES: Dict[str, Dict[str, str]] = {
         "white": "#f5f6f9",
         "pink": "#ff79c6",
         "green": "#00ff7f",
+        "light_green": "#7fffbf",
+        "dark_green": "#007f3f",
         "red": "#ff5555",
+        "light_red": "#ffd4d4",
+        "dark_red": "#7f2a2a",
         "yellow": "#f1fa8c",
+        "light_yellow": "#ffffff",
+        "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
     "Darcula": {
@@ -120,8 +132,14 @@ THEMES: Dict[str, Dict[str, str]] = {
         "white": "#f5f6f9",
         "pink": "#ff007f",
         "green": "#00ff7f",
+        "light_green": "#7fffbf",
+        "dark_green": "#007f3f",
         "red": "#ff5555",
+        "light_red": "#ffd4d4",
+        "dark_red": "#7f2a2a",
         "yellow": "#f1fa8c",
+        "light_yellow": "#ffffff",
+        "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
 }
@@ -626,6 +644,12 @@ QPushButton{{
     border: 10px solid transparent;
     font: 600 9pt "Segoe UI";
 }}
+QPushButton:hover {{
+    background-color: {context_hover};
+}}
+QPushButton:pressed {{
+    background-color: {context_pressed};
+}}
 QPushButton#info_widget_btn{{
     background-color: {dark_one};
     color: {text_foreground};
@@ -636,6 +660,27 @@ QPushButton#info_widget_btn{{
     border-left: 3px solid {context_color};
     font: 800 9pt "Segoe UI";
 }}
+
+QPushButton[cssClass="red"] {{ background-color: {red}; color: black;}}
+QPushButton[cssClass="red"]:hover {{ background-color: {light_red};
+color: black;}}
+QPushButton[cssClass="red"]:pressed {{ background-color: {dark_red};
+color: black;}}
+
+QPushButton[cssClass="green"] {{ background-color: {green};
+color: black;}}
+QPushButton[cssClass="green"]:hover {{ background-color: {light_green};
+color: black;}}
+QPushButton[cssClass="green"]:pressed {{ background-color: {dark_green};
+color: black;}}
+
+QPushButton[cssClass="yellow"] {{ background-color: {yellow};
+color: black;}}
+QPushButton[cssClass="yellow"]:hover {{ background-color: {light_yellow};
+color: black;}}
+QPushButton[cssClass="yellow"]:pressed {{ background-color: {dark_yellow};
+color: black;}}
+
 QPushButton#info_widget_btn:hover {{
     background-color: {dark_four};
 }}
