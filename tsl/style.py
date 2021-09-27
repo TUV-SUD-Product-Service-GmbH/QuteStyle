@@ -532,6 +532,11 @@ QTreeWidget:disabled {{
     color: {fg_disabled};
 }}
 
+QTableView::item QComboBox{{
+    border-radius: 0px;
+}}
+
+
 QFrame #_left_column_frame {{
     background-color: {bg_two};
 }}
