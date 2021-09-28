@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple, Type, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
+    QEvent,
     QParallelAnimationGroup,
     QPoint,
     QPropertyAnimation,
@@ -12,7 +13,12 @@ from PyQt5.QtCore import (
     pyqtSignal,
     pyqtSlot,
 )
-from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent
+from PyQt5.QtGui import (
+    QCloseEvent,
+    QMouseEvent,
+    QResizeEvent,
+    QWindowStateChangeEvent,
+)
 from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -316,34 +322,49 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             self.move(self.pos() + diff)
         self.last_move_pos = pos
 
-    def showNormal(self) -> None:  # pylint: disable=invalid-name
-        """
-        Override showNormal for custom handling of style.
-
-        This will add a margin for the contents of the main QLayout so that
-        a shadow and the border with round edges is visible. This also adds
-        the round borders on the main QFrame.
-
-        It will set the correct icon on the maximize button.
-        """
-        self.centralWidget().layout().setContentsMargins(10, 10, 10, 10)
-        self._background.set_stylesheet(border_radius=10, border_size=2)
-        self._title_bar.set_maximized(False)
-        super().showNormal()
-
-    def showMaximized(self) -> None:  # pylint: disable=invalid-name
-        """
-        Override showNormal for custom handling of style.
-
-        This removes the content margin so that the app fits exactly into the
-        screen. Also, this removed the round borders from the main QFrame.
-
-        It will set the correct icon on the maximize button.
-        """
-        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
-        self._background.set_stylesheet(border_radius=0, border_size=0)
-        self._title_bar.set_maximized(True)
-        super().showMaximized()
+    def changeEvent(  # pylint: disable=invalid-name
+        self, event: QEvent
+    ) -> None:
+        """Handle change events."""
+        super().changeEvent(event)
+        if event.type() == QEvent.WindowStateChange:
+            event = cast(QWindowStateChangeEvent, event)
+            log.debug(
+                "change event old state: %s, new state %s",
+                int(event.oldState()),
+                int(self.windowState()),
+            )
+            if (
+                event.oldState()
+                == Qt.WindowNoState  # this is the normal window state
+                or (
+                    # state when windows is restored from
+                    # minimized to maximized view
+                    int(event.oldState())
+                    & (Qt.WindowMinimized | Qt.WindowMaximized)
+                )
+            ) and self.windowState() == Qt.WindowMaximized:
+                # maximize window view
+                log.debug("window is maximized")
+                # This removes the content margin so that the app fits
+                # exactly into the screen. Also, this removes the round
+                # borders from the main QFrame.
+                self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
+                self._background.set_stylesheet(border_radius=0, border_size=0)
+                self._title_bar.set_maximized(True)
+            else:
+                # any other view but not maximized
+                log.debug("window is not maximized")
+                # This will add a margin for the contents of the main QLayout
+                # so that a shadow and the border with round edges is visible.
+                # This also adds the round borders on the main QFrame.
+                self.centralWidget().layout().setContentsMargins(
+                    10, 10, 10, 10
+                )
+                self._background.set_stylesheet(
+                    border_radius=10, border_size=2
+                )
+                self._title_bar.set_maximized(False)
 
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
