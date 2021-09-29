@@ -172,11 +172,18 @@ class StyledMainWindow(TSLStyledMainWindow):
         name: str,
         version: str,
         force_whats_new: bool = False,
+        registry_reset: bool = False,
         parent: QWidget = None,
     ) -> None:
         """Create a new StyledMainWindow."""
         super().__init__(
-            update, help_text, name, version, force_whats_new, parent
+            update,
+            help_text,
+            name,
+            version,
+            force_whats_new,
+            registry_reset,
+            parent,
         )
         self._left_column.widget(InfoWidget).switch_style.connect(
             self.on_switch_style

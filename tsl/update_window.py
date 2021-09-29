@@ -29,6 +29,7 @@ class TSLMainWindow(QMainWindow):
         name: str,
         version: str,
         force_whats_new: bool = False,
+        registry_reset: bool = False,
         parent: QWidget = None,
     ) -> None:
         """Create a new TSL main window."""
@@ -43,6 +44,9 @@ class TSLMainWindow(QMainWindow):
         self._updater_thread: Optional[QThread] = None
         self._force_whats_new: bool = force_whats_new
         self._whats_new_window: Optional[WhatsNewWindow] = None
+        if registry_reset:
+            log.debug("Resetting QSettings in Registry.")
+            QSettings().clear()
 
     def show(self) -> None:
         """Override show to start update just before."""

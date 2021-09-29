@@ -73,11 +73,18 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         name: str,
         version: str,
         force_whats_new: bool = False,
+        registry_reset: bool = False,
         parent: QWidget = None,
     ) -> None:
         """Create a new TSLStyledMainWindow."""
         super().__init__(
-            update, help_text, name, version, force_whats_new, parent
+            update,
+            help_text,
+            name,
+            version,
+            force_whats_new,
+            registry_reset,
+            parent,
         )
 
         # Load the TSL-Library ressource file.
