@@ -27,6 +27,7 @@ class LeftMenuButton(IconTooltipButton):
         tooltip_text: str,
         icon_path: str,
         widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget], None],
+        margin: float = 0.4,
     ) -> None:
         """Create a new LeftMenuButton."""
         bgs = BackgroundColorNames(
@@ -35,7 +36,9 @@ class LeftMenuButton(IconTooltipButton):
             pressed="dark_four",
             released="dark_three",
         )
-        super().__init__(app_parent, tooltip_text, icon_path, bgs, text)
+        super().__init__(
+            app_parent, tooltip_text, icon_path, bgs, text, margin
+        )
 
         # This can't be a class variable because it get's garbage collected
         # and the app crashes. It should be in the pixmap store of baumg-mi.

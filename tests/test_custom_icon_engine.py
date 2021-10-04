@@ -19,7 +19,7 @@ def test_get_new_pixmap(  # pylint: disable=unused-argument
     set_current_style(DEFAULT_STYLE)
     store = PixmapStore.inst()
     new_pixmap = store.get_pixmap(
-        "tests/test_images/test_icon.svg", 16, get_color("yellow")
+        "tests/test_images/test_icon.svg", 16, 16, get_color("yellow")
     )
     # If the color code of "yellow" in default theme is changed,
     # change color of default_icon in svg
@@ -39,10 +39,10 @@ def test_get_old_pixmap(  # pylint: disable=unused-argument
     """Test that already stored pixmap is returned when it was used before."""
     store = PixmapStore.inst()
     old_pixmap = store.get_pixmap(
-        "tests/test_images/test_icon.svg", 18, "yellow"
+        "tests/test_images/test_icon.svg", 18, 18, "yellow"
     )
     new_pixmap = store.get_pixmap(
-        "tests/test_images/test_icon.svg", 18, "yellow"
+        "tests/test_images/test_icon.svg", 18, 18, "yellow"
     )
     assert old_pixmap is new_pixmap
 
@@ -64,7 +64,7 @@ def test_custom_icon_engine_paint(
         assert new_rect == target
         store = PixmapStore.inst()
         new_pixmap = store.get_pixmap(
-            "tests/test_images/test_icon.svg", 16, get_color("yellow")
+            "tests/test_images/test_icon.svg", 16, 16, get_color("yellow")
         )
         assert new_pixmap == pixmap
         assert new_pixmap.rect() == source

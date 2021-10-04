@@ -3,17 +3,11 @@ import logging
 from typing import Optional, TypedDict
 
 from PyQt5.QtCore import QEvent, QRect, Qt
-from PyQt5.QtGui import (
-    QBrush,
-    QColor,
-    QMouseEvent,
-    QPainter,
-    QPaintEvent,
-    QPixmap,
-)
+from PyQt5.QtGui import QBrush, QColor, QMouseEvent, QPainter, QPaintEvent
 from PyQt5.QtWidgets import QPushButton, QWidget
 
 from tsl.style import get_color
+from tsl.widgets.custom_icon_engine import PixmapStore
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -33,12 +27,13 @@ class IconButton(QPushButton):
     FIXED_HEIGHT: Optional[int] = 36
     FIXED_WIDTH: Optional[int] = 36
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         parent: QWidget = None,
         icon_path: str = ":/svg_icons/no_icon.svg",
         bgs: BackgroundColorNames = None,
         text: str = None,
+        margin: float = 0.6,
     ) -> None:
         """Create a new IconButton."""
         if text:
@@ -56,8 +51,6 @@ class IconButton(QPushButton):
             )
 
         self._set_icon_path = icon_path
-        # the pixmap must be moved to the pixmap store of baumg-mi
-        self._icon = QPixmap(icon_path)
 
         if self.FIXED_WIDTH:
             self.setFixedWidth(self.FIXED_WIDTH)
@@ -70,6 +63,7 @@ class IconButton(QPushButton):
 
         self._bg_color = self._bgs["background"]
         self._icon_color = "icon_color"
+        self._margin = margin
 
     def set_active(self, active: bool) -> None:
         """
@@ -148,20 +142,31 @@ class IconButton(QPushButton):
             # is sufficient, if showing also i.e. a text, a custom rect is
             # necessary.
             rect = self.rect()
-        painter = QPainter(self._icon)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.fillRect(self._icon.rect(), QColor(color))
-        root_painter.drawPixmap(
-            int((rect.width() - self._icon.width()) / 2),
-            int((rect.height() - self._icon.height()) / 2),
-            self._icon,
+        # Define size of pixmap dependent on rect and devicePixelRatio
+        scale_factor = root_painter.device().devicePixelRatio()
+        width = int(rect.width() * self._margin * scale_factor)
+        height = int(rect.height() * self._margin * scale_factor)
+        # Get scaled pixmap from store
+        pixmap = PixmapStore.inst().get_pixmap(
+            self._set_icon_path, width, height, color
         )
-        painter.end()
+        # Set pixmap in the middle of rect with formula
+        # x = (rect.width - pixmap width)/2
+        # y = (rect.height - pixmap height)/2
+        # Define width/height of target rect dependent on scale_factor
+        root_painter.drawPixmap(
+            int((rect.width() - pixmap.width() / scale_factor) / 2),
+            int((rect.height() - pixmap.height() / scale_factor) / 2),
+            int(pixmap.width() / scale_factor),
+            int(pixmap.height() / scale_factor),
+            pixmap,
+        )
+        # For example rect = 50x50, scale_factor = 2, svg = 1x10
+        # --> width, height = 40, pixmap = 4x40, x = 23, y = 5,
+        # target rect = 2x20
 
     def set_icon(self, icon_path: str) -> None:
         """Set the icon to the given path."""
         log.debug("Setting active icon path to %s", icon_path)
         self._set_icon_path = icon_path
-        self._icon = QPixmap(icon_path)
         self.update()

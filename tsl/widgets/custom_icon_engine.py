@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 from PyQt5.QtCore import QRect, QSize, Qt
 from PyQt5.QtGui import QColor, QIcon, QIconEngine, QPainter, QPixmap
@@ -39,9 +39,9 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         radius = min(rect.width(), rect.height())
         rect.setSize(QSize(radius, radius))
         # Scale Icon (not rect) according to DevicePixelRatio
-        radius = int(radius * painter.device().devicePixelRatioF())
+        radius = radius * painter.device().devicePixelRatio()
         pixmap = store.get_pixmap(
-            self._path, radius, get_color(self._color_name)
+            self._path, radius, radius, get_color(self._color_name)
         )
         painter.drawPixmap(rect, pixmap, pixmap.rect())
 
@@ -55,15 +55,16 @@ class PixmapStore:
     """
 
     INST: Optional[PixmapStore] = None
-    # _pixmap[path][radius][color]
-    _pixmaps: Dict[str, Dict[int, Dict[str, QPixmap]]] = defaultdict(
-        lambda: defaultdict(dict)
-    )
+    # _pixmap[path][width, height][color]
+    _pixmaps: Dict[
+        str, Dict[Tuple[int, int], Dict[str, QPixmap]]
+    ] = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self) -> None:
         """Create a new DatabaseCache."""
         assert not PixmapStore.INST
 
+    # make sure correct class is called --> maybe privat or something
     @classmethod
     def inst(cls) -> PixmapStore:
         """Return the current instance of the PixmapStore."""
@@ -71,17 +72,21 @@ class PixmapStore:
             PixmapStore.INST = PixmapStore()
         return PixmapStore.INST
 
-    def get_pixmap(self, path: str, radius: int, color: str) -> QPixmap:
-        """Return the desired pixmap from the PixmapStore."""
+    def get_pixmap(
+        self, path: str, width: int, height: int, color: str
+    ) -> QPixmap:
+        """Return the pixmap with width and height from the PixmapStore."""
+        # The original AspectRatio will be kept
         try:
-            return self._pixmaps[path][radius][color]
+            return self._pixmaps[path][width, height][color]
         # Pixmap has not been created so far
         except KeyError:
             log.debug(
                 "Creating QPixmap for path '%s' "
-                "with radius '%s' and color '%s'",
+                "with width '%s', height '%s' and color '%s'",
                 path,
-                radius,
+                width,
+                height,
                 color,
             )
             # Editing the svg is slower than drawing the icon new
@@ -89,9 +94,10 @@ class PixmapStore:
             painter = QPainter(icon)
             painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
             painter.fillRect(icon.rect(), QColor(color))
-            pixmap = icon.scaled(
-                radius, radius, Qt.IgnoreAspectRatio, Qt.SmoothTransformation
-            )
             painter.end()
-            self._pixmaps[path][radius][color] = pixmap
+            # Scaling works best if svg has dimensions ~56x56
+            pixmap = icon.scaled(
+                width, height, Qt.KeepAspectRatio, Qt.SmoothTransformation
+            )
+            self._pixmaps[path][width, height][color] = pixmap
             return pixmap

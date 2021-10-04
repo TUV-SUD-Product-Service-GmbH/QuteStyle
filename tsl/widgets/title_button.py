@@ -24,6 +24,7 @@ class TitleButton(IconTooltipButton):
         icon_path: str,
         parent: QWidget = None,
         bgs: BackgroundColorNames = None,
+        margin: float = 0.5,
     ) -> None:
         """Create a new TitleButton."""
 
@@ -36,7 +37,12 @@ class TitleButton(IconTooltipButton):
             )
 
         super().__init__(
-            app_parent, tooltip_text, icon_path, bgs, parent=parent
+            app_parent,
+            tooltip_text,
+            icon_path,
+            bgs,
+            parent=parent,
+            margin=margin,
         )
 
     def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
