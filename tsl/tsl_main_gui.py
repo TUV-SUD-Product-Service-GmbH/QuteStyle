@@ -348,7 +348,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
                     # state when windows is restored from
                     # minimized to maximized view
                     int(event.oldState())
-                    & (Qt.WindowMinimized | Qt.WindowMaximized)
+                    & int(Qt.WindowMinimized | Qt.WindowMaximized)
                 )
             ) and self.windowState() == Qt.WindowMaximized:
                 # maximize window view
