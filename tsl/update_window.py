@@ -231,7 +231,7 @@ class TSLMainWindow(QMainWindow):
 
         if self._update_status is True:
             log.debug("Update is available.")
-            subprocess.Popen(  # pylint: disable=consider-using-with
+            with subprocess.Popen(
                 [
                     os.path.join(
                         os.path.expanduser("~"),
@@ -248,8 +248,8 @@ class TSLMainWindow(QMainWindow):
                         "update.json",
                     ),
                 ]
-            )
-            sys.exit()
+            ):
+                sys.exit()
         else:
             log.debug("No update is available.")
 
