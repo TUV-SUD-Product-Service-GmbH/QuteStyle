@@ -3,9 +3,11 @@ import logging
 import os
 from typing import Optional, Type
 
-from sqlalchemy import TypeDecorator, Unicode
+from pyodbc import Connection
+from sqlalchemy import TypeDecorator, Unicode, event
 from sqlalchemy.engine import Dialect, Engine, create_engine
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.pool import QueuePool, StaticPool
+from sqlalchemy.pool.base import _ConnectionFairy, _ConnectionRecord
 
 from tsl.init import check_ide
 from tsl.vault import Vault
@@ -58,13 +60,47 @@ def create_db_engine(
     # pre pool ping will ensure, that connection is reestablished if not alive
     # check_same_thread and poolclass are necessary so that unit test can use a
     # in memory sqlite database across different threads.
-    engine = create_engine(
-        "mssql+pyodbc:///?odbc_connect=" + conn_str,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-        pool_pre_ping=True,
-    )
+
+    # From SqlAlchemyDoc -> QueuePool is the default pooling implementation
+    # used for all Engine objects, unless the SQLite dialect is in use.
+
+    # use QueuePool for PROD. Handle parallel execution of sql requests.
+    # The pool holds a set of 5 connections which are shared across requests
+    # 5 is the default setting so keep this setting here
+    if env_name == "PROD":
+        print("Use engine with poolclass queue pool")
+        engine = create_engine(
+            "mssql+pyodbc:///?odbc_connect=" + conn_str,
+            connect_args={"check_same_thread": False},
+            poolclass=QueuePool,
+            pool_size=5,
+            max_overflow=0,
+            pool_pre_ping=True,
+        )
+        event.listen(engine, "checkout", receive_checkout)
+        event.listen(engine, "checkin", receive_checkin)
+    else:
+        print("Use engine with poolclass StaticPool")
+        engine = create_engine(
+            "mssql+pyodbc:///?odbc_connect=" + conn_str,
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+            pool_pre_ping=True,
+        )
+
     if check_ide():
         # only print for debug purposes in IDE!
         print("Created engine for {}: {}".format(app, engine))
     return engine
+
+
+def receive_checkout(
+    conn: Connection, _: _ConnectionRecord, __: _ConnectionFairy
+) -> None:
+    """Checkout a pooled connection."""
+    log.debug("Checkout pooled connection %s.", conn)
+
+
+def receive_checkin(conn: Connection, _: _ConnectionRecord) -> None:
+    """Checkin a pooled connection."""
+    log.debug("Checkin pool connection %s.", conn)
