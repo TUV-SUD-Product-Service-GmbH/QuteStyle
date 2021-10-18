@@ -1,9 +1,7 @@
 """Tests for CustomIconEngine and PixmapStore"""
-import filecmp
-
 from _pytest.monkeypatch import MonkeyPatch
-from PyQt5.QtCore import QRect
-from PyQt5.QtGui import QIcon, QPainter, QPixmap
+from PyQt5.QtCore import QRect, QSize
+from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
 from tests.test_update_window import create_new_tsl_main_window
@@ -21,15 +19,10 @@ def test_get_new_pixmap(  # pylint: disable=unused-argument
     new_pixmap = store.get_pixmap(
         "tests/test_images/test_icon.svg", 16, 16, get_color("yellow")
     )
-    # If the color code of "yellow" in default theme is changed,
-    # change color of default_icon in svg
-    default_pixmap = QPixmap("tests/test_images/default_icon.svg")
-    default_pixmap.save("tests/test_images/default_pixmap.ppm")
-    new_pixmap.save("tests/test_images/new_pixmap.ppm")
-    assert filecmp.cmp(
-        "tests/test_images/default_pixmap.ppm",
-        "tests/test_images/new_pixmap.ppm",
-    )
+    assert new_pixmap.size() == QSize(16, 16)
+    # due to transformation effects color of pixels is not correct everywhere
+    new_color = new_pixmap.toImage().pixel(9, 9)
+    assert new_color == QColor(get_color("yellow")).rgb()
 
 
 # qbot is necessary for QPixmap
