@@ -1,20 +1,25 @@
 """Test script to validate TSL style."""
 import logging
 import sys
+from typing import cast
 
 from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
     QApplication,
+    QCheckBox,
+    QDialogButtonBox,
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMenu,
     QSizePolicy,
     QSpacerItem,
     QTableWidget,
     QVBoxLayout,
     QWidget,
+    QWidgetAction,
 )
 
 from tsl.gen.ui_test_window import Ui_test_widget
@@ -97,6 +102,25 @@ class TestWidget(MainWidget):
         super().__init__(parent)
         self._ui = Ui_test_widget()
         self._ui.setupUi(self)
+        menu = QMenu(self._ui.pushButton_2)
+        all_checkbox = QCheckBox(self.tr("Alles auswählen"))
+        widget_action = QWidgetAction(menu)
+        widget_action.setDefaultWidget(all_checkbox)
+        menu.addAction(widget_action)
+        menu.addSeparator()
+        buttons = QDialogButtonBox(
+            cast(
+                QDialogButtonBox.StandardButtons,
+                QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            ),
+            Qt.Horizontal,
+            menu,
+        )
+        buttons.setCenterButtons(True)
+        widget_action = QWidgetAction(menu)
+        widget_action.setDefaultWidget(buttons)
+        menu.addAction(widget_action)
+        self._ui.pushButton_2.setMenu(menu)
         self._ui.pushButton_4.setIcon(QIcon(":/svg_icons/icon_heart.svg"))
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)

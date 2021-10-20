@@ -264,6 +264,30 @@ QLineEdit#column_line_edit:focus {{
     background-color: {bg_two};
 }}
 
+/* QMenu */
+QMenu{{
+    background-color: {dark_one};
+}}
+QMenu QCheckBox{{
+    color: {text_foreground};
+    border-radius: 17px;
+    border: 10px solid transparent;
+}}
+QMenu QCheckBox:hover {{
+    background-color: {context_hover};
+    color: {text_active};
+}}
+QMenu QCheckBox:pressed {{
+    background-color: {context_pressed};
+    color: {text_active};
+}}
+QMenu::separator {{
+    background: {bg_three};
+    height: 3px;
+    margin-left: 5px;
+    margin-right: 5px;
+}}
+
 /* QScrollBar */
 QScrollBar:horizontal {{
     border: none;
