@@ -2,8 +2,13 @@
 # pylint: disable=protected-access
 
 from _pytest.monkeypatch import MonkeyPatch
-from PyQt5.QtCore import QRect
-from PyQt5.QtGui import QGuiApplication, QPaintDevice, QPainter, QPixmap
+from PyQt5.QtGui import (
+    QColor,
+    QGuiApplication,
+    QPaintDevice,
+    QPainter,
+    QPixmap,
+)
 from pytestqt.qtbot import QtBot
 
 from tsl.style import THEMES, get_color, set_current_style
@@ -12,12 +17,7 @@ from tsl.widgets.icon import Icon
 from tsl.widgets.icon_button import IconButton
 
 
-def mock_ratio(_: QPaintDevice) -> float:
-    """Return mock pixelratio"""
-    return 2.0
-
-
-# qbot is necessary for QPixmap
+# qtbot is necessary for QPixmap
 def test_icon_button_paint(  # pylint: disable=unused-argument
     qtbot: QtBot, monkeypatch: MonkeyPatch
 ) -> None:
@@ -36,27 +36,26 @@ def test_icon_button_paint(  # pylint: disable=unused-argument
         pixmap: QPixmap,
     ) -> None:
         """Mock draw Pixmap method"""
-        assert pos_x == 13
-        assert pos_y == 8
-        assert width == 24
-        assert height == 24
+        assert pos_x == 7
+        assert pos_y == 7
+        assert width == 21
+        assert height == 21
         store = PixmapStore.inst()
         new_pixmap = store.get_pixmap(
-            "tests/test_images/test_icon.svg", 60, 48, get_color("icon_color")
+            "tests/test_images/test_icon.svg", 43, 43, get_color("icon_color")
         )
         assert new_pixmap == pixmap
 
     monkeypatch.setattr(QPainter, "drawPixmap", mock_draw)
-    monkeypatch.setattr(QPaintDevice, "devicePixelRatio", mock_ratio)
+    monkeypatch.setattr(QPaintDevice, "devicePixelRatio", lambda _: 2.0)
 
-    rect = QRect(0, 0, 50, 40)
-    icon_button.icon_paint(paint, get_color("icon_color"), rect)
+    icon_button._icon_paint(paint, QColor(get_color("icon_color")))
     paint.end()
 
 
 def test_set_icon(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
     """Test that pixmap of icon is set correctly"""
-    monkeypatch.setattr(QGuiApplication, "devicePixelRatio", mock_ratio)
+    monkeypatch.setattr(QGuiApplication, "devicePixelRatio", lambda _: 2.0)
     icon = Icon()
     qtbot.addWidget(icon)
     icon.set_icon("tests/test_images/test_icon.svg")

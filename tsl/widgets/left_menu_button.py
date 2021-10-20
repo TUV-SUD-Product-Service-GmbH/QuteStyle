@@ -95,22 +95,16 @@ class LeftMenuButton(IconTooltipButton):
                 text_color = get_color("text_active")
             else:
                 text_color = get_color("text_foreground")
-            painter.setPen(QColor(text_color))
-            painter.setFont(self.font())
-            rect_text = QRect(45, 0, self.width() - 50, self.height())
-            painter.drawText(rect_text, Qt.AlignVCenter, self.text())
+            self._text_paint(painter, QColor(text_color))
 
         # Draw the icon depending of the hover/click state. If the button is
-        # toggled (currently menu button), we always draw context_color.
+        # toggled (current menu button), we always draw context_color.
         if self._is_toggle_active:
             color = get_color("context_color")
         else:
             color = get_color(self._icon_color)
 
-        # The height of the button defines the rectangle in which the icon is
-        # painted, independent of the button's width.
-        paint_rect = QRect(0, 0, self.height(), self.height())
-        self.icon_paint(painter, color, paint_rect)
+        self._icon_paint(painter, QColor(color))
 
     def set_active_tab(self, is_active: bool) -> None:
         """

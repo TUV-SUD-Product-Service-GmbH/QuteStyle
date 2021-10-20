@@ -51,14 +51,29 @@ class Ui_test_widget(object):
         self.pushButton_2.setCheckable(True)
         self.pushButton_2.setObjectName("pushButton_2")
         self.verticalLayout_3.addWidget(self.pushButton_2)
-        self.pushButton_3 = QtWidgets.QPushButton(self.groupBox_2)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.pushButton_3 = IconButton(self.groupBox_2)
         self.pushButton_3.setFlat(False)
         self.pushButton_3.setObjectName("pushButton_3")
-        self.verticalLayout_3.addWidget(self.pushButton_3)
+        self.horizontalLayout_3.addWidget(self.pushButton_3)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Minimum,
+        )
+        self.horizontalLayout_3.addItem(spacerItem1)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
         self.pushButton_4 = IconButton(self.groupBox_2)
+        self.pushButton_4.setText("")
         self.pushButton_4.setDefault(False)
         self.pushButton_4.setObjectName("pushButton_4")
         self.verticalLayout_3.addWidget(self.pushButton_4)
+        self.pushButton_5 = IconButton(self.groupBox_2)
+        self.pushButton_5.setEnabled(False)
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.verticalLayout_3.addWidget(self.pushButton_5)
         self.gridLayout_2.addWidget(self.groupBox_2, 1, 1, 1, 1)
         self.groupBox_3 = QtWidgets.QGroupBox(test_widget)
         self.groupBox_3.setCheckable(False)
@@ -74,13 +89,13 @@ class Ui_test_widget(object):
         self.lineEdit.setEchoMode(QtWidgets.QLineEdit.Normal)
         self.lineEdit.setObjectName("lineEdit")
         self.gridLayout.addWidget(self.lineEdit, 0, 0, 1, 2)
-        spacerItem1 = QtWidgets.QSpacerItem(
+        spacerItem2 = QtWidgets.QSpacerItem(
             20,
             40,
             QtWidgets.QSizePolicy.Minimum,
             QtWidgets.QSizePolicy.Expanding,
         )
-        self.gridLayout.addItem(spacerItem1, 5, 0, 1, 2)
+        self.gridLayout.addItem(spacerItem2, 5, 0, 1, 2)
         self.dial = QtWidgets.QDial(self.groupBox_3)
         self.dial.setProperty("value", 30)
         self.dial.setObjectName("dial")
@@ -224,8 +239,8 @@ class Ui_test_widget(object):
         self.groupBox_2.setTitle(_translate("test_widget", "GroupBox"))
         self.pushButton.setText(_translate("test_widget", "PushButton"))
         self.pushButton_2.setText(_translate("test_widget", "PushButton"))
-        self.pushButton_3.setText(_translate("test_widget", "PushButton"))
-        self.pushButton_4.setText(_translate("test_widget", "PushButton"))
+        self.pushButton_3.setText(_translate("test_widget", "Test-Text"))
+        self.pushButton_5.setText(_translate("test_widget", "Disabled Button"))
         self.groupBox_3.setTitle(_translate("test_widget", "GroupBox"))
         self.lineEdit.setText(_translate("test_widget", "test"))
         self.groupBox.setTitle(_translate("test_widget", "GroupBox"))
@@ -239,7 +254,7 @@ class Ui_test_widget(object):
                 '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
-                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:6.5pt; font-weight:400; font-style:normal;\">\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                 '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>',
             )
         )

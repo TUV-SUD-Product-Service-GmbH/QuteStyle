@@ -91,6 +91,10 @@ class PixmapStore:
             )
             # Editing the svg is slower than drawing the icon new
             icon = QPixmap(path)
+            if icon.isNull():
+                raise ValueError(  # pylint: disable=raise-missing-from
+                    f"Could not load pixmap: {path}"
+                )
             painter = QPainter(icon)
             painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
             painter.fillRect(icon.rect(), QColor(color))
