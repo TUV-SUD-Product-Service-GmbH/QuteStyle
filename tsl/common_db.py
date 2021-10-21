@@ -67,8 +67,8 @@ def create_db_engine(
     # use QueuePool for PROD. Handle parallel execution of sql requests.
     # The pool holds a set of 5 connections which are shared across requests
     # 5 is the default setting so keep this setting here
-    if env_name == "PROD":
-        print("Use engine with poolclass queue pool")
+    if env == Vault.Environment.PROD:
+        print("Use engine with pool class QueuePool")
         engine = create_engine(
             "mssql+pyodbc:///?odbc_connect=" + conn_str,
             connect_args={"check_same_thread": False},
@@ -80,7 +80,7 @@ def create_db_engine(
         event.listen(engine, "checkout", receive_checkout)
         event.listen(engine, "checkin", receive_checkin)
     else:
-        print("Use engine with poolclass StaticPool")
+        print("Use engine with pool class StaticPool")
         engine = create_engine(
             "mssql+pyodbc:///?odbc_connect=" + conn_str,
             connect_args={"check_same_thread": False},
