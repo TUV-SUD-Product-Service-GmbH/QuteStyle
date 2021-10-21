@@ -119,7 +119,7 @@ class LeftColumn(QWidget):
         btn_close = LeftColumnCloseButton(
             app_parent,
             tooltip_text=self.tr("Schließen"),
-            icon_path=":/svg_icons/icon_close.svg",
+            icon_path=":/svg_icons/close.svg",
         )
         btn_close.clicked.connect(self.close_column)
         btn_close.setFixedSize(30, 30)

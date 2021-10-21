@@ -46,7 +46,7 @@ class RightWidget(ColumnBaseWidget):
         layout = QHBoxLayout()
 
         pse_info_button = IconButton(
-            self, icon_path=":/svg_icons/icon_clipboard.svg"
+            self, icon_path=":/svg_icons/clipboard.svg"
         )
         layout.addWidget(pse_info_button)
         rcolumn_spacer1 = QSpacerItem(
@@ -62,7 +62,7 @@ class RightWidget(ColumnBaseWidget):
 class SettingsWidget(ColumnBaseWidget):
     """Test ColumnBaseWidget."""
 
-    ICON = ":/svg_icons/icon_settings.svg"
+    ICON = ":/svg_icons/settings.svg"
     NAME = "Einstellungen"
 
     def __init__(self, parent: QWidget = None) -> None:
@@ -76,7 +76,7 @@ class SettingsWidget(ColumnBaseWidget):
 class InfoWidget(ColumnBaseWidget):
     """Test ColumnBaseWidget."""
 
-    ICON = ":/svg_icons/icon_info.svg"
+    ICON = ":/svg_icons/info.svg"
     NAME = "Info"
 
     switch_style = pyqtSignal(name="switch_style")
@@ -86,7 +86,7 @@ class InfoWidget(ColumnBaseWidget):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         layout.addWidget(QLabel("Switch style"))
-        button = IconButton(self, ":/svg_icons/icon_send.svg")
+        button = IconButton(self, ":/svg_icons/send.svg")
         layout.addWidget(button)
         button.clicked.connect(self.switch_style)
 
@@ -94,11 +94,11 @@ class InfoWidget(ColumnBaseWidget):
 class TestWidget(MainWidget):
     """Test Widget."""
 
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
     NAME = "Test-Widget"
 
     def __init__(self, parent: QWidget = None) -> None:
-        """Create a bew TestWidget."""
+        """Create a new TestWidget."""
         super().__init__(parent)
         self._ui = Ui_test_widget()
         self._ui.setupUi(self)
@@ -121,7 +121,7 @@ class TestWidget(MainWidget):
         widget_action.setDefaultWidget(buttons)
         menu.addAction(widget_action)
         self._ui.pushButton_2.setMenu(menu)
-        self._ui.pushButton_4.setIcon(QIcon(":/svg_icons/icon_heart.svg"))
+        self._ui.pushButton_4.setIcon(QIcon(":/svg_icons/heart_broken.svg"))
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)
 
@@ -137,7 +137,7 @@ class TestWidget(MainWidget):
 class InfoPage(MainWidget):
     """Test Widget."""
 
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
     NAME = "Information"
 
     def __init__(self, parent: QWidget = None) -> None:

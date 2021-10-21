@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   role="img"
+   viewBox="0 0 56 56"
+   version="1.1"
+   id="svg29265"
+   sodipodi:docname="qt.svg"
+   width="56"
+   height="56"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata29271">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Qt icon</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs29269" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1248"
+     inkscape:window-height="705"
+     id="namedview29267"
+     showgrid="false"
+     inkscape:zoom="4.9166667"
+     inkscape:cx="17.043821"
+     inkscape:cy="43.215862"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg29265" />
+  <title
+     id="title29261">Qt icon</title>
+  <path
+     d="M 50.617,7.255999 H 7.77 L 0,15.021333 V 48.5 H 48.232333 L 56,40.734667 V 7.255999 Z M 29.831667,42.811333 26.187,44.51 23.037,39.337 c -0.457333,0.133 -1.164333,0.21 -2.156,0.21 -3.684333,0 -6.260333,-0.991667 -7.711666,-2.977333 -1.451334,-1.983334 -2.174667,-5.133334 -2.174667,-9.410334 0,-4.293333 0.744333,-7.480666 2.214333,-9.562 1.47,-2.081333 4.027334,-3.129 7.672,-3.129 3.644667,0 6.202,1.029 7.653333,3.110334 1.47,2.060333 2.193334,5.25 2.193334,9.562 0,2.844333 -0.303334,5.133333 -0.896,6.871666 C 29.222667,35.767 28.247333,37.104 26.873,38.021 Z m 11.050666,-3.703 c -2.002,0 -3.376333,-0.457333 -4.120666,-1.376666 -0.746667,-0.914667 -1.127,-2.650667 -1.127,-5.208 v -8.246 H 32.923333 V 20.997 h 2.711334 v -5.152 h 3.836 v 5.149667 h 4.886 v 3.301666 h -4.886 v 7.807334 c 0,1.451333 0.116666,2.403333 0.326666,2.863 0.21,0.476 0.760667,0.707 1.621667,0.707 l 2.900333,-0.116667 0.170334,3.094 c -1.563334,0.303333 -2.767334,0.457333 -3.607334,0.457333 z M 20.862334,17.921667 c -2.216667,0 -3.742667,0.725666 -4.580334,2.193333 -0.821333,1.47 -1.241333,3.801 -1.241333,7.025667 0,3.206 0.401333,5.516 1.201667,6.890333 0.802666,1.374333 2.347333,2.081333 4.62,2.081333 2.270333,0 3.798666,-0.688333 4.599,-2.044 C 26.243,32.715 26.644333,30.405 26.644333,27.178 26.644333,23.934667 26.243,21.587333 25.424,20.117333 24.602667,18.647333 23.076667,17.924 20.862334,17.924 Z"
+     id="path29263"
+     inkscape:connector-curvature="0"
+     style="stroke-width:2.33333325" />
+</svg>

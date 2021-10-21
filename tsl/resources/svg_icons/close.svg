@@ -12,11 +12,11 @@
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg855"
+   sodipodi:docname="close.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata861">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs859" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -37,24 +37,24 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="933"
-     inkscape:window-height="480"
-     id="namedview30401"
+     inkscape:window-width="1288"
+     inkscape:window-height="741"
+     id="namedview857"
      showgrid="false"
      inkscape:zoom="4.2142857"
-     inkscape:cx="28"
-     inkscape:cy="28"
+     inkscape:cx="5.9892702"
+     inkscape:cy="-0.74314899"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
+     inkscape:current-layer="svg855" />
   <path
      d="M0 0h24v24H0V0z"
      fill="none"
-     id="path30395" />
+     id="path851" />
   <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
+     d="m 23.467577,0.55062571 c -0.709898,-0.70989761 -1.856655,-0.70989761 -2.566553,0 L 12,9.4334471 3.0989761,0.53242321 c -0.7098976,-0.70989761 -1.8566553,-0.70989761 -2.56655289,0 -0.70989761,0.70989759 -0.70989761,1.85665529 0,2.56655289 L 9.4334471,12 0.53242321,20.901024 c -0.70989761,0.709898 -0.70989761,1.856655 0,2.566553 0.70989759,0.709897 1.85665529,0.709897 2.56655289,0 L 12,14.566553 l 8.901024,8.901024 c 0.709898,0.709897 1.856655,0.709897 2.566553,0 0.709897,-0.709898 0.709897,-1.856655 0,-2.566553 L 14.566553,12 23.467577,3.0989761 c 0.691695,-0.6916951 0.691695,-1.8566553 0,-2.54835039 z"
+     id="path853"
      inkscape:connector-curvature="0"
-     style="stroke-width:1.20000005" />
+     style="stroke-width:1.82025027" />
 </svg>

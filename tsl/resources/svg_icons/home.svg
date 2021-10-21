@@ -12,11 +12,11 @@
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg17954"
+   sodipodi:docname="home.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata17960">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs17958" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -39,7 +39,7 @@
      inkscape:pageshadow="2"
      inkscape:window-width="933"
      inkscape:window-height="480"
-     id="namedview30401"
+     id="namedview17956"
      showgrid="false"
      inkscape:zoom="4.2142857"
      inkscape:cx="28"
@@ -47,14 +47,14 @@
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
+     inkscape:current-layer="svg17954" />
   <path
      d="M0 0h24v24H0V0z"
      fill="none"
-     id="path30395" />
+     id="path17950" />
   <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
+     d="m 9.3906491,21.230032 v -6.521687 h 5.2173499 v 6.521687 c 0,0.717386 0.586952,1.304338 1.304337,1.304338 h 3.913012 c 0.717386,0 1.304338,-0.586952 1.304338,-1.304338 v -9.130361 h 2.217373 c 0.599996,0 0.88695,-0.743473 0.430432,-1.134774 L 12.87323,1.1432362 c -0.495648,-0.44347475 -1.252164,-0.44347475 -1.747812,0 L 0.22115703,10.964897 c -0.44347472,0.391301 -0.16956386,1.134774 0.43043135,1.134774 H 2.868962 v 9.130361 c 0,0.717386 0.5869518,1.304338 1.3043374,1.304338 h 3.9130123 c 0.7173856,0 1.3043374,-0.586952 1.3043374,-1.304338 z"
+     id="path17952"
      inkscape:connector-curvature="0"
-     style="stroke-width:1.20000005" />
+     style="stroke-width:1.30433738" />
 </svg>

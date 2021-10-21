@@ -66,7 +66,7 @@ class TitleBar(QWidget):
         minimize_button = TitleButton(
             app_parent,
             tooltip_text=self.tr("Minimieren"),
-            icon_path=":/svg_icons/icon_minimize.svg",
+            icon_path=":/svg_icons/minimize.svg",
         )
         minimize_button.released.connect(self.minimize)
         bg_layout.addWidget(minimize_button)
@@ -75,7 +75,7 @@ class TitleBar(QWidget):
         self.maximize_button = TitleButton(
             app_parent,
             tooltip_text=self.tr("Maximieren"),
-            icon_path=":/svg_icons/icon_maximize.svg",
+            icon_path=":/svg_icons/fullscreen.svg",
         )
         self.maximize_button.released.connect(self.maximize)
         bg_layout.addWidget(self.maximize_button)
@@ -84,7 +84,7 @@ class TitleBar(QWidget):
         close_button = TitleButton(
             app_parent,
             tooltip_text=self.tr("Schließen"),
-            icon_path=":/svg_icons/icon_close.svg",
+            icon_path=":/svg_icons/close.svg",
         )
         close_button.released.connect(self.close_app)
         bg_layout.addWidget(close_button)
@@ -105,8 +105,8 @@ class TitleBar(QWidget):
 
     def set_maximized(self, maximized: bool) -> None:
         """Set the _background icon depending if the app is maximized."""
-        name = "restore" if maximized else "maximize"
-        self.maximize_button.set_icon(":/svg_icons/icon_{}.svg".format(name))
+        name = "fullscreen_exit" if maximized else "fullscreen"
+        self.maximize_button.set_icon(":/svg_icons/{}.svg".format(name))
 
     def set_right_button_active(self, active: bool) -> None:
         """Return the button to open/close the right column."""

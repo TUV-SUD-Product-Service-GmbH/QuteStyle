@@ -35,8 +35,8 @@ class LeftMenu(QWidget):
     top_button_clicked = pyqtSignal(type, name="top_button_clicked")
     bottom_button_clicked = pyqtSignal(type, name="bottom_button_clicked")
 
-    ICON_PATH_OPEN = ":/svg_icons/icon_menu.svg"
-    ICON_PATH_CLOSE = ":/svg_icons/icon_menu_close.svg"
+    ICON_PATH_OPEN = ":/svg_icons/menu.svg"
+    ICON_PATH_CLOSE = ":/svg_icons/arrow_back.svg"
 
     def __init__(
         self,

@@ -16,14 +16,14 @@ class MainTest(MainWidget):
     """Test widget for the Main content area."""
 
     NAME = "TestMainWidget"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
 
 
 class GroupTestRight(MainWidget):
     """Test widget for the Main content area."""
 
     NAME = "TestGroupWidgetRight"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
     GROUPS = ["RightTeam"]
 
 
@@ -31,7 +31,7 @@ class GroupTestWrong(MainWidget):
     """Test widget for the Main content area."""
 
     NAME = "TestGroupWidgetWrong"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
     GROUPS = ["WrongTeam"]
 
 
@@ -39,21 +39,21 @@ class RightColumn(ColumnBaseWidget):
     """Test widget for the right column frame."""
 
     NAME = "TestRightColumnWidget"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
 
 
 class UpperLeftColumn(ColumnBaseWidget):
     """Upper test widget for the left column frame."""
 
     NAME = "LeftUpperRightColumnWidget"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
 
 
 class LowerLeftColumn(ColumnBaseWidget):
     """Lower test widget for the left column frame."""
 
     NAME = "LeftLowerRightColumnWidget"
-    ICON = ":/svg_icons/icon_heart.svg"
+    ICON = ":/svg_icons/heart_broken.svg"
 
 
 class MainWindow(TSLStyledMainWindow):

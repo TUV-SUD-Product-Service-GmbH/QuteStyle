@@ -12,11 +12,11 @@
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg12100"
+   sodipodi:docname="close_circle.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata12106">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs12104" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -37,9 +37,9 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="933"
-     inkscape:window-height="480"
-     id="namedview30401"
+     inkscape:window-width="1308"
+     inkscape:window-height="802"
+     id="namedview12102"
      showgrid="false"
      inkscape:zoom="4.2142857"
      inkscape:cx="28"
@@ -47,14 +47,14 @@
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
+     inkscape:current-layer="svg12100" />
   <path
      d="M0 0h24v24H0V0z"
      fill="none"
-     id="path30395" />
+     id="path12096" />
   <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
+     d="M 14.268,8.04 12,10.308 9.732,8.04 C 9.264,7.572 8.508,7.572 8.04,8.04 7.572,8.508 7.572,9.264 8.04,9.732 L 10.308,12 8.04,14.268 c -0.468,0.468 -0.468,1.224 0,1.692 0.468,0.468 1.224,0.468 1.692,0 L 12,13.692 14.268,15.96 c 0.468,0.468 1.224,0.468 1.692,0 0.468,-0.468 0.468,-1.224 0,-1.692 L 13.692,12 15.96,9.732 c 0.468,-0.468 0.468,-1.224 0,-1.692 -0.468,-0.456 -1.236,-0.456 -1.692,0 z M 12,0 C 5.364,0 0,5.364 0,12 0,18.636 5.364,24 12,24 18.636,24 24,18.636 24,12 24,5.364 18.636,0 12,0 Z m 0,21.6 C 6.708,21.6 2.4,17.292 2.4,12 2.4,6.708 6.708,2.4 12,2.4 c 5.292,0 9.6,4.308 9.6,9.6 0,5.292 -4.308,9.6 -9.6,9.6 z"
+     id="path12098"
      inkscape:connector-curvature="0"
      style="stroke-width:1.20000005" />
 </svg>

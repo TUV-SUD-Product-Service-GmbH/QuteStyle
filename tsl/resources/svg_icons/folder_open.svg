@@ -12,11 +12,11 @@
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg16808"
+   sodipodi:docname="folder_open.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata16814">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs16812" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -39,7 +39,7 @@
      inkscape:pageshadow="2"
      inkscape:window-width="933"
      inkscape:window-height="480"
-     id="namedview30401"
+     id="namedview16810"
      showgrid="false"
      inkscape:zoom="4.2142857"
      inkscape:cx="28"
@@ -47,14 +47,14 @@
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
+     inkscape:current-layer="svg16808" />
   <path
      d="M0 0h24v24H0V0z"
      fill="none"
-     id="path30395" />
+     id="path16804" />
   <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
+     d="M 21.6,4.8 H 12 L 10.308,3.108 C 9.852,2.652 9.24,2.4 8.604,2.4 H 2.4 C 1.08,2.4 0.012,3.48 0.012,4.8 L 0,19.2 c 0,1.32 1.08,2.4 2.4,2.4 h 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 C 24,5.88 22.92,4.8 21.6,4.8 Z M 20.4,19.2 H 3.6 C 2.94,19.2 2.4,18.66 2.4,18 V 8.4 C 2.4,7.74 2.94,7.2 3.6,7.2 h 16.8 c 0.66,0 1.2,0.54 1.2,1.2 V 18 c 0,0.66 -0.54,1.2 -1.2,1.2 z"
+     id="path16806"
      inkscape:connector-curvature="0"
      style="stroke-width:1.20000005" />
 </svg>

@@ -7,16 +7,17 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   enable-background="new 0 0 24 24"
    height="56"
    viewBox="0 0 24 24"
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg27562"
+   sodipodi:docname="heart_broken.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata27568">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +28,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs27566" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -39,7 +40,7 @@
      inkscape:pageshadow="2"
      inkscape:window-width="933"
      inkscape:window-height="480"
-     id="namedview30401"
+     id="namedview27564"
      showgrid="false"
      inkscape:zoom="4.2142857"
      inkscape:cx="28"
@@ -47,14 +48,21 @@
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
-  <path
-     d="M0 0h24v24H0V0z"
-     fill="none"
-     id="path30395" />
-  <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
-     inkscape:connector-curvature="0"
-     style="stroke-width:1.20000005" />
+     inkscape:current-layer="svg27562" />
+  <g
+     id="g27556">
+    <rect
+       fill="none"
+       height="24"
+       width="24"
+       id="rect27554" />
+  </g>
+  <g
+     id="g27560"
+     transform="matrix(1.2,0,0,1.2,-2.4,-2.4)">
+    <path
+       d="M 16.5,3 C 15.54,3 14.6,3.25 13.77,3.69 L 12,9 h 3 l -3,10 1,-9 H 10 L 11.54,4.61 C 10.47,3.61 9.01,3 7.5,3 4.42,3 2,5.42 2,8.5 2,12.63 6.16,15.68 12,21 17.47,16.06 22,12.74 22,8.5 22,5.42 19.58,3 16.5,3 Z M 10.24,16.73 C 6.45,13.34 4,11 4,8.5 4,6.54 5.54,5 7.5,5 8.09,5 8.69,5.15 9.23,5.42 L 7.35,12 h 3.42 z M 15.13,15.53 17.69,7 H 14.78 L 15.39,5.18 C 15.75,5.06 16.13,5 16.5,5 18.46,5 20,6.54 20,8.5 c 0,2.21 -2.02,4.43 -4.87,7.03 z"
+       id="path27558"
+       inkscape:connector-curvature="0" />
+  </g>
 </svg>

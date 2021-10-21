@@ -12,11 +12,11 @@
    width="56"
    fill="#000000"
    version="1.1"
-   id="svg30399"
-   sodipodi:docname="document.svg"
+   id="svg25778"
+   sodipodi:docname="swap.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
-     id="metadata30405">
+     id="metadata25784">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -27,7 +27,7 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs30403" />
+     id="defs25782" />
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -39,22 +39,22 @@
      inkscape:pageshadow="2"
      inkscape:window-width="933"
      inkscape:window-height="480"
-     id="namedview30401"
+     id="namedview25780"
      showgrid="false"
-     inkscape:zoom="4.2142857"
-     inkscape:cx="28"
-     inkscape:cy="28"
+     inkscape:zoom="23.8396"
+     inkscape:cx="-0.90647939"
+     inkscape:cy="21.034254"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg30399" />
+     inkscape:current-layer="svg25778" />
   <path
      d="M0 0h24v24H0V0z"
      fill="none"
-     id="path30395" />
+     id="path25774" />
   <path
-     d="m 7.2,16.8 h 9.6 v 2.4 H 7.2 Z m 0,-4.8 h 9.6 v 2.4 H 7.2 Z M 14.4,0 H 4.8 C 3.48,0 2.4,1.08 2.4,2.4 v 19.2 c 0,1.32 1.068,2.4 2.388,2.4 H 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 Z m 4.8,21.6 H 4.8 V 2.4 h 8.4 v 6 h 6 z"
-     id="path30397"
+     d="m 3.9955616,11.806978 -3.79656641,3.810223 c -0.25947756,0.273134 -0.25947756,0.696492 0,0.969626 l 3.79656641,3.810224 c 0.4233581,0.437014 1.1608206,0.12291 1.1608206,-0.477985 v -2.458209 h 8.2076848 c 0.751119,0 1.365672,-0.614552 1.365672,-1.365671 0,-0.75112 -0.614553,-1.365672 -1.365672,-1.365672 H 5.1563822 v -2.444551 c 0,-0.614552 -0.7374625,-0.915 -1.1608206,-0.477985 z M 23.811453,7.4231726 20.014887,3.6129495 C 19.591529,3.1759346 18.854066,3.490039 18.854066,4.0909344 v 2.4445518 h -8.221342 c -0.7511188,0 -1.3656709,0.6145521 -1.3656709,1.3656713 0,0.7511193 0.6145521,1.3656714 1.3656709,1.3656714 h 8.207685 v 2.4445521 c 0,0.614552 0.737463,0.914999 1.160821,0.477985 l 3.796566,-3.8102235 c 0.273135,-0.2594775 0.273135,-0.6964924 0.01366,-0.9559699 z"
+     id="path25776"
      inkscape:connector-curvature="0"
-     style="stroke-width:1.20000005" />
+     style="stroke-width:1.3656714" />
 </svg>
