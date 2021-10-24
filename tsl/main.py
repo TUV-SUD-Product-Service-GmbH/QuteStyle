@@ -27,6 +27,7 @@ from tsl.init import SETTINGS, init
 from tsl.style import THEMES, get_current_style, get_style, set_current_style
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
+from tsl.widgets.color_manager import ColorManager
 from tsl.widgets.icon_button import IconButton
 from tsl.widgets.toggle import Toggle
 
@@ -184,7 +185,7 @@ class StyledMainWindow(TSLStyledMainWindow):
     """Test StyledMainWindow for validation of TSL Darcula Style."""
 
     MAIN_WIDGET_CLASSES = [InfoPage, TestWidget]
-    RIGHT_WIDGET_CLASS = RightWidget
+    RIGHT_WIDGET_CLASSES = [RightWidget, ColorManager]
     LEFT_WIDGET_CLASSES = [SettingsWidget, InfoWidget]
 
     MIN_SIZE = QSize(800, 600)

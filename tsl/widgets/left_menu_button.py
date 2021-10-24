@@ -1,6 +1,6 @@
 """Button for the LeftMenu."""
 import logging
-from typing import Optional, Tuple, Type, Union
+from typing import Tuple, Type, Union
 
 from PyQt5.QtCore import QEvent, QPoint, QRect, Qt
 from PyQt5.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
@@ -37,14 +37,18 @@ class LeftMenuButton(IconTooltipButton):
             released="dark_three",
         )
         super().__init__(
-            app_parent, tooltip_text, icon_path, bgs, text, margin
+            app_parent,
+            tooltip_text,
+            icon_path,
+            bgs,
+            text,
+            widget_class,
+            margin,
         )
 
         # This can't be a class variable because it get's garbage collected
         # and the app crashes. It should be in the pixmap store of baumg-mi.
         self.active_menu = QPixmap(":/svg_icons/active_menu.svg")
-
-        self._widget_class = widget_class
 
         self._is_active_tab = False
         self._is_toggle_active = False
@@ -53,13 +57,6 @@ class LeftMenuButton(IconTooltipButton):
         """Return a representation for the LeftMenuButton."""
         name = self.widget_class.__name__ if self.widget_class else None
         return f"<LeftMenuButton '{self.text()} {name}'>"
-
-    @property
-    def widget_class(
-        self,
-    ) -> Optional[Union[Type[ColumnBaseWidget], Type[MainWidget]]]:
-        """Return the widget class the button will trigger."""
-        return self._widget_class
 
     def paintEvent(self, _: QPaintEvent) -> None:
         """Handle a paint event for the MenuButton."""

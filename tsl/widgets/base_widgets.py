@@ -13,6 +13,7 @@ class ColumnBaseWidget(QWidget):
 
     ICON: str
     NAME: str
+    GROUPS: List[str] = []
 
 
 class MainWidget(QWidget):

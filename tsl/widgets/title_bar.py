@@ -1,18 +1,21 @@
 """Top bar with system buttons and extra menu."""
-from typing import Type, cast
+import logging
+from typing import List, Type, cast
 
-from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal
+from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
 
 from tsl.widgets.base_widgets import ColumnBaseWidget
 from tsl.widgets.title_button import TitleButton
 
+log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+
 
 class TitleBar(QWidget):
     """Top bar with system buttons and extra menu."""
 
-    right_button_clicked = pyqtSignal(name="right_button_clicked")
+    right_button_clicked = pyqtSignal(type, name="right_button_clicked")
     close_app = pyqtSignal(name="close_app")
     minimize = pyqtSignal(name="minimize")
     maximize = pyqtSignal(name="maximize")
@@ -22,7 +25,7 @@ class TitleBar(QWidget):
         self,
         parent: QWidget,
         app_parent: QWidget,
-        right_widget_class: Type[ColumnBaseWidget],
+        right_widget_classes: List[Type[ColumnBaseWidget]],
         name: str,
     ) -> None:
         """Create a new TitleBar."""
@@ -54,13 +57,15 @@ class TitleBar(QWidget):
         bg_layout.addWidget(self.title_label)
 
         # Button for the right column
-        self._right_column_button = TitleButton(
-            app_parent,
-            tooltip_text=right_widget_class.NAME,
-            icon_path=right_widget_class.ICON,
-        )
-        self._right_column_button.clicked.connect(self.right_button_clicked)
-        bg_layout.addWidget(self._right_column_button)
+        for widget_class in right_widget_classes:
+            right_column_button = TitleButton(
+                app_parent,
+                tooltip_text=widget_class.NAME,
+                icon_path=widget_class.ICON,
+                widget_class=widget_class,
+            )
+            right_column_button.clicked.connect(self.on_right_column_button)
+            bg_layout.addWidget(right_column_button)
 
         # Minimize Button
         minimize_button = TitleButton(
@@ -108,6 +113,27 @@ class TitleBar(QWidget):
         name = "fullscreen_exit" if maximized else "fullscreen"
         self.maximize_button.set_icon(":/svg_icons/{}.svg".format(name))
 
-    def set_right_button_active(self, active: bool) -> None:
-        """Return the button to open/close the right column."""
-        self._right_column_button.set_active(active)
+    @pyqtSlot(name="on_right_column_button")
+    def on_right_column_button(self) -> None:
+        """Handle a click on one of the buttons for left column widgets."""
+        widget_class = cast(TitleButton, self.sender()).widget_class
+        log.debug("Emitting right_button_clicked for class %s", widget_class)
+        self.right_button_clicked.emit(widget_class)
+
+    def set_button_active(
+        self,
+        widget_class: Type[ColumnBaseWidget],
+        active: bool,
+    ) -> None:
+        """Set the button for the given widget active/inactive."""
+        button = self._button(widget_class)
+        button.set_active(active)
+
+    def _button(self, widget_class: Type[ColumnBaseWidget]) -> TitleButton:
+        """Return the button for the given widget class."""
+        for btn in self.findChildren(TitleButton):
+            if btn.widget_class == widget_class:
+                return btn
+        raise ValueError(  # pragma: no cover
+            f"Could not find button for widget: {widget_class}"
+        )

@@ -1,17 +1,20 @@
 """IconButton that provides a tooltip."""
 import logging
-from typing import Tuple
+from typing import Generic, Optional, Tuple, Type, TypeVar
 
 from PyQt5.QtCore import QEvent, QPoint
 from PyQt5.QtWidgets import QWidget
 
+from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.icon_button import BackgroundColorNames, IconButton
 from tsl.widgets.tooltip import ToolTip
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
+_T = TypeVar("_T", ColumnBaseWidget, MainWidget)
 
-class IconTooltipButton(IconButton):
+
+class IconTooltipButton(IconButton, Generic[_T]):
     """IconButton that provides a tooltip."""
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -21,6 +24,7 @@ class IconTooltipButton(IconButton):
         icon_path: str,
         bgs: BackgroundColorNames = None,
         text: str = None,
+        widget_class: Type[_T] = None,
         margin: float = 0.4,
         parent: QWidget = None,
     ) -> None:
@@ -30,11 +34,28 @@ class IconTooltipButton(IconButton):
         # App is needed to show the tooltip outside of the button's rect.
         self._app_parent = app_parent
 
+        self._widget_class: Optional[Type[_T]] = widget_class
+
         self._tooltip = ToolTip(
             app_parent,
             tooltip_text,
         )
         self._tooltip.hide()
+
+    def __repr__(self) -> str:
+        """Return a str representation of the object."""
+        if self._widget_class:
+            class_name = self._widget_class.__name__
+        else:
+            class_name = "None"
+        return f"<{self.__class__.__name__} for widget {class_name}>"
+
+    @property
+    def widget_class(
+        self,
+    ) -> Optional[Type[_T]]:
+        """Return the widget class the button will trigger."""
+        return self._widget_class
 
     def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
         """Get the tooltip coordinates from the given position."""

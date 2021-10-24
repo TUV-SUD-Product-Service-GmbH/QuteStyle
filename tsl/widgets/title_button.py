@@ -1,10 +1,11 @@
 """Button on the custom TitleBar."""
 import logging
-from typing import Tuple
+from typing import Tuple, Type
 
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QWidget
 
+from tsl.widgets.base_widgets import ColumnBaseWidget
 from tsl.widgets.icon_button import BackgroundColorNames
 from tsl.widgets.icon_tooltip_button import IconTooltipButton
 
@@ -24,6 +25,7 @@ class TitleButton(IconTooltipButton):
         icon_path: str,
         parent: QWidget = None,
         bgs: BackgroundColorNames = None,
+        widget_class: Type[ColumnBaseWidget] = None,
         margin: float = 0.5,
     ) -> None:
         """Create a new TitleButton."""
@@ -42,6 +44,7 @@ class TitleButton(IconTooltipButton):
             icon_path,
             bgs,
             parent=parent,
+            widget_class=widget_class,
             margin=margin,
         )
 

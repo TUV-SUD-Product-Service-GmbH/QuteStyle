@@ -9,7 +9,7 @@ from tsl.style import DEFAULT_STYLE, get_color, set_current_style
 from tsl.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
 
-# qbot is necessary for QPixmap
+# qtbot is necessary for QPixmap
 def test_get_new_pixmap(  # pylint: disable=unused-argument
     qtbot: QtBot,
 ) -> None:
@@ -25,7 +25,7 @@ def test_get_new_pixmap(  # pylint: disable=unused-argument
     assert new_color == QColor(get_color("yellow")).rgb()
 
 
-# qbot is necessary for QPixmap
+# qtbot is necessary for QPixmap
 def test_get_old_pixmap(  # pylint: disable=unused-argument
     qtbot: QtBot,
 ) -> None:

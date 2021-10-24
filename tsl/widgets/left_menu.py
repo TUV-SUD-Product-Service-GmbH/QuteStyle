@@ -84,9 +84,11 @@ class LeftMenu(QWidget):
         self._bottom_layout.setSpacing(1)
         layout.addWidget(bottom_frame, 0, Qt.AlignBottom)
 
-        self._bottom_layout.addWidget(Div())
         self._add_main_widgets(main_widgets)
-        self._add_bottom_widgets(left_column_widgets)
+        log.debug("Handling left column widgets: %s", left_column_widgets)
+        if left_column_widgets:
+            self._bottom_layout.addWidget(Div())
+            self._add_bottom_widgets(left_column_widgets)
 
         self._animation = QPropertyAnimation(parent, b"minimumWidth")
 
@@ -129,7 +131,7 @@ class LeftMenu(QWidget):
     def on_main_page_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(LeftMenuButton, self.sender()).widget_class
-        log.debug("Emitting bottom_button_clicked for class %s", widget_class)
+        log.debug("Emitting top_button_clicked for class %s", widget_class)
         self.top_button_clicked.emit(widget_class)
 
     @pyqtSlot(name="toggle_animation")

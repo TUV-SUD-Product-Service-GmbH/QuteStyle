@@ -1,6 +1,6 @@
 """Widget that contains the widgets of the left column."""
 import logging
-from typing import List, Tuple, Type, cast
+from typing import List, Optional, Tuple, Type, cast
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (
@@ -34,6 +34,7 @@ class LeftColumn(QWidget):
         """Create a new LeftColumn."""
         super().__init__(parent)
         # Create all widgets that shall be displayed in the left column.
+        log.debug("Creating LeftColumn with widgets %s", widget_types)
         self._widgets = [widget_type() for widget_type in widget_types]
 
         # Create the main layout.
@@ -56,7 +57,8 @@ class LeftColumn(QWidget):
         )
 
         # Set the first widget so that title text is set.
-        self.set_column_widget(widget_types[0])
+        if widget_types:
+            self.set_column_widget(widget_types[0])
 
     @staticmethod
     def create_content_frame(
@@ -151,8 +153,10 @@ class LeftColumn(QWidget):
             f"Could not find widget {widget_type}"
         )
 
-    def current_widget(self) -> Type[ColumnBaseWidget]:
+    def current_widget_type(self) -> Optional[Type[ColumnBaseWidget]]:
         """Return the currently active widget class."""
-        return cast(
-            Type[ColumnBaseWidget], type(self._stacked_widget.currentWidget())
-        )
+        widget = self._stacked_widget.currentWidget()
+        if widget:
+            return cast(Type[ColumnBaseWidget], type(widget))
+        # Return None explicitly instead of <class NoneType>
+        return None

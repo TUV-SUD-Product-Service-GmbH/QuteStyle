@@ -1,6 +1,6 @@
 """TSLStyledMainWindow definition for custom Darcula style."""
 import logging
-from typing import List, Optional, Tuple, Type, cast
+from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
@@ -52,8 +52,8 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     # accessible from the main menu on the left side.
     MAIN_WIDGET_CLASSES: List[Type[MainWidget]]
 
-    # Widget that is shown in the right column.
-    RIGHT_WIDGET_CLASS: Type[ColumnBaseWidget]
+    # Widgets that are shown in the right column.
+    RIGHT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]]
 
     # Widgets that are shown in the left column.
     LEFT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]]
@@ -87,7 +87,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             parent,
         )
 
-        # Load the TSL-Library ressource file.
+        # Load the TSL-Library resource file.
         qInitResources()
 
         # Set the global stylesheet.
@@ -113,7 +113,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         central_widget_layout.addWidget(self._background)
 
         # Get widgets to set visible
-        self._visible_widgets = self.get_widgets_to_display()
+        self._visible_widgets = self.get_widgets_to_display(
+            self.MAIN_WIDGET_CLASSES
+        )
         # Add the left menu.
         self._left_menu = self._add_left_menu(self._background.layout())
 
@@ -157,18 +159,23 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         # Activate the first widget to be visible by default.
         self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
 
-    def get_widgets_to_display(self) -> List[Type[MainWidget]]:
+    WidgetT = TypeVar("WidgetT", MainWidget, ColumnBaseWidget)
+
+    @staticmethod
+    def get_widgets_to_display(
+        widgets: List[Type[Union[WidgetT]]],
+    ) -> List[Type[WidgetT]]:
         """Determine the widgets visible to the current user."""
         visible_widgets = []
         team = get_user_group_name()
-        for widget_class in self.MAIN_WIDGET_CLASSES:
+        for widget_class in widgets:
             if team in widget_class.GROUPS or not widget_class.GROUPS:
                 visible_widgets.append(widget_class)
         return visible_widgets
 
     def _add_main_area(
         self, layout: QLayout
-    ) -> Tuple[QFrame, ColumnBaseWidget, QStackedWidget]:
+    ) -> Tuple[QFrame, QStackedWidget, QStackedWidget]:
         """
         Add a Frame that contains the main content and the right column widget.
 
@@ -198,7 +205,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
     def add_right_column(
         self, layout: QLayout
-    ) -> Tuple[QFrame, ColumnBaseWidget]:
+    ) -> Tuple[QFrame, QStackedWidget]:
         """
         Create a frame containing the right column widget and return it.
 
@@ -212,7 +219,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         right_column_frame.setFixedWidth(0)
         content_area_right_layout = QVBoxLayout(right_column_frame)
         content_area_right_layout.setContentsMargins(5, 5, 5, 5)
-        right_content = self.RIGHT_WIDGET_CLASS()
+        right_content = QStackedWidget()
+        for widget in self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES):
+            right_content.addWidget(widget())
         content_area_right_layout.addWidget(right_content)
         layout.addWidget(right_column_frame)
         return right_column_frame, right_content
@@ -234,7 +243,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         title_bar = TitleBar(
             self,
             self.centralWidget(),
-            self.RIGHT_WIDGET_CLASS,
+            self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_name,
         )
         title_bar.close_app.connect(self.close)
@@ -262,7 +271,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
         left_column = LeftColumn(
             app_parent=self.centralWidget(),
-            widget_types=self.LEFT_WIDGET_CLASSES,
+            widget_types=self.get_widgets_to_display(self.LEFT_WIDGET_CLASSES),
             parent=left_column_frame,
         )
         left_column_layout.addWidget(left_column)
@@ -290,7 +299,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             parent=left_menu_frame,
             app_parent=self.centralWidget(),
             main_widgets=self._visible_widgets,
-            left_column_widgets=self.LEFT_WIDGET_CLASSES,
+            left_column_widgets=self.get_widgets_to_display(
+                self.LEFT_WIDGET_CLASSES
+            ),
         )
         left_menu_layout.addWidget(left_menu)
         layout.addWidget(left_menu_frame)
@@ -478,34 +489,73 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
                 return
         raise ValueError("Could not find widget {}".format(widget_class))
 
-    @pyqtSlot(name="on_right_column")
-    def on_right_column(self) -> None:
+    @pyqtSlot(type, name="on_right_column")
+    def on_right_column(self, widget_class: Type[ColumnBaseWidget]) -> None:
         """Handle a click on the button for the right column."""
-        show = not self._column_is_visible(self._right_column_frame)
-        self._title_bar.set_right_button_active(show)
-        self._start_box_animation(False, show)
+        right_widget_type = self.right_widget_type()
+        left_widget_type = self._left_column.current_widget_type()
 
-        # If we close the left column, we also need to deactivate it's button.
-        self._left_menu.set_button_active(
-            self._left_column.current_widget(), False
-        )
+        # Set both buttons inactive (either a new column will be visible or
+        # none)
+        if right_widget_type:
+            self._title_bar.set_button_active(right_widget_type, False)
+        if left_widget_type:
+            self._left_menu.set_button_active(left_widget_type, False)
+
+        log.debug("Handling right column for %s", widget_class)
+
+        # Check if switching the widget.
+        visible = self._column_is_visible(self._right_column_frame)
+        if widget_class != right_widget_type:
+
+            # Set the current widget for the right column to make it visible.
+            for idx in range(self._right_content.count()):
+                if isinstance(self._right_content.widget(idx), widget_class):
+                    self._right_content.setCurrentWidget(
+                        self._right_content.widget(idx)
+                    )
+
+            # If the right column isn't visible, we start the animation.
+            if not visible:
+                self._start_box_animation(False, True)
+
+            # Finally set the button for the widget active.
+            self._title_bar.set_button_active(widget_class, True)
+
+        # If toggling the active widget.
+        else:
+            # Start animation for the opposite state.
+            self._start_box_animation(False, not visible)
+
+            # Set the button to the opposite state.
+            self._title_bar.set_button_active(widget_class, not visible)
+
+    def right_widget_type(self) -> Optional[Type[ColumnBaseWidget]]:
+        """Return the type of the right widget."""
+        widget = self._right_content.currentWidget()
+        if widget:
+            return cast(Type[ColumnBaseWidget], type(widget))
+        # Return None explicitly instead of <class NoneType>
+        return None
 
     @pyqtSlot(type, name="on_left_column")
     def on_left_column(self, widget_class: Type[ColumnBaseWidget]) -> None:
         """Handle a click on the button for the left column."""
-        # If we open, the right column will close, if we're closing, the right
-        # column can't be open, so in each case we can set the right button
-        # inactive.
-        self._title_bar.set_right_button_active(False)
+        right_widget_type = self.right_widget_type()
+        left_widget_type = self._left_column.current_widget_type()
 
-        self._left_menu.set_button_active(
-            self._left_column.current_widget(), False
-        )
+        # Set both buttons inactive (either a new column will be visible or
+        # none)
+        if right_widget_type:
+            self._title_bar.set_button_active(right_widget_type, False)
+        if left_widget_type:
+            self._left_menu.set_button_active(left_widget_type, False)
+
         log.debug("Handling left column for %s", widget_class)
 
         # Check if switching the widget.
         visible = self._column_is_visible(self._left_column_frame)
-        if widget_class != self._left_column.current_widget():
+        if widget_class != left_widget_type:
 
             # Set the current widget for the left column to make it visible.
             self._left_column.set_column_widget(widget_class)
@@ -528,7 +578,10 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     @pyqtSlot(name="on_close_left_column")
     def on_close_left_column(self) -> None:
         """Handle a click on the button for the left column."""
-        widget_class = self._left_column.current_widget()
+        # if the column was opened before, a widget must be set.
+        widget_class = cast(
+            Type[ColumnBaseWidget], self._left_column.current_widget_type()
+        )
         self._left_menu.set_button_active(widget_class, False)
         self._start_box_animation(False, False)
 
