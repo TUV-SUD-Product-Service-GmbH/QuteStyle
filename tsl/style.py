@@ -237,7 +237,8 @@ QTableCornerButton::section {{
 }}
 
 /* QLineEdit */
-QLineEdit {{
+QLineEdit,
+QPlainTextEdit {{
     background-color: {bg_two};
     border-radius: 8px;
     border: 1px solid transparent;
@@ -258,7 +259,8 @@ QLineEdit#column_line_edit {{
     selection-background-color: {context_color};
     color: {text_foreground};
 }}
-QLineEdit:focus {{
+QLineEdit:focus,
+QPlainTextEdit:focus {{
     border: 1px solid {context_color};
     background-color: {bg_one};
 }}
