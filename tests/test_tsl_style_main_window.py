@@ -4,6 +4,9 @@ from typing import List, Type, TypeVar, Union
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QEvent, QPointF, Qt
+from PyQt5.QtGui import QMouseEvent
 from pytestqt.qtbot import QtBot
 
 from tsl import tsl_main_gui
@@ -137,7 +140,7 @@ def create_new_main_window(
         return "RightTeam"
 
     monkeypatch.setattr(tsl_main_gui, "get_user_group_name", mock_get_user)
-    widget = window_class(False, "", "", "1.0.0")
+    widget = window_class(False, "", "TestApp", "1.0.0")
     qtbot.addWidget(widget)
     widget.show()
     qtbot.waitUntil(widget.isVisible)
@@ -313,3 +316,119 @@ def test_display_column_widgets(
 
     assert window._right_content.widget(0).__class__ is ColumnVisible
     assert window._right_content.count() == 1
+
+
+def test_title_bar_text(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
+    """Test title bar text."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    assert window._title_bar.title_bar_text == "TestApp - TestMainWidget"
+    window._title_bar.title_bar_text = "Test - App"
+    assert window._title_bar.title_bar_text == "Test - App"
+
+
+def test_maximize_mode_setting_after_restart(
+    qtbot: QtBot, monkeypatch: MonkeyPatch
+) -> None:
+    """Test correct storage of maximize setting."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    window.showMaximized()
+    window.close()
+
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    assert window.isMaximized()
+
+    window.showNormal()
+    window.close()
+
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    assert not window.isMaximized()
+
+
+def test_maximize_mode(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
+    """Test maximize mode."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    window.showMaximized()
+
+    app = QtWidgets.QApplication.instance()
+    assert app
+    screen = app.primaryScreen()
+    rect = screen.availableGeometry()
+    print("Available Geometry: %d x %d" % (rect.width(), rect.height()))
+
+    assert window.isMaximized()
+    assert window._title_bar.maximize_button.tooltip_text == "Verkleinern"
+    assert window.width() == rect.width()
+    assert window.height() == rect.height()
+    for grip in window._grips:
+        assert not grip.isEnabled()
+
+    qtbot.mouseClick(window._title_bar.maximize_button, Qt.LeftButton)
+    assert not window.isMaximized()
+    assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
+    for grip in window._grips:
+        assert grip.isEnabled()
+
+    qtbot.mouseClick(window._title_bar.maximize_button, Qt.LeftButton)
+    assert window.isMaximized()
+
+    window.showFullScreen()
+    assert window.isFullScreen()
+    size = screen.size()
+    print("Screen size: %d x %d" % (rect.width(), rect.height()))
+    assert window.width() == size.width()
+    assert window.height() == size.height()
+
+    window.showNormal()
+    assert window.windowState() == Qt.WindowNoState
+    assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
+
+
+def test_maximize_event_handling(
+    qtbot: QtBot, monkeypatch: MonkeyPatch
+) -> None:
+    """Test maximize mode event handling."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    window.showNormal()
+    with qtbot.waitSignal(window._title_bar.maximize) as signal:
+        window._title_bar.eventFilter(
+            window._title_bar._title_label, QEvent(QEvent.MouseButtonDblClick)
+        )
+        assert signal.signal_triggered
+    assert window.isMaximized()
+
+    # try to send move event while mouse double click still not finished
+    with qtbot.waitSignal(
+        window._title_bar.move_window, timeout=1000, raising=False
+    ) as signal:
+        window._title_bar.eventFilter(
+            window._title_bar._title_label,
+            QMouseEvent(
+                QEvent.MouseMove,
+                QPointF(1, 1),
+                QPointF(1, 1),
+                Qt.LeftButton,
+                Qt.LeftButton,
+                Qt.KeyboardModifier(),
+            ),
+        )
+        assert not signal.signal_triggered
+
+    # complete mouse double click
+    window._title_bar.eventFilter(
+        window._title_bar._title_label, QEvent(QEvent.MouseButtonRelease)
+    )
+
+    # test that moving is now possible
+    with qtbot.waitSignal(window._title_bar.move_window) as signal:
+        window._title_bar.eventFilter(
+            window._title_bar._title_label,
+            QMouseEvent(
+                QEvent.MouseMove,
+                QPointF(1, 1),
+                QPointF(1, 1),
+                Qt.LeftButton,
+                Qt.LeftButton,
+                Qt.KeyboardModifier(),
+            ),
+        )
+        assert signal.signal_triggered

@@ -49,12 +49,12 @@ class TitleBar(QWidget):
 
         # Label with the application title text. eventFilter is used to enable
         # moving + min/maximizing of the app itself.
-        self.title_label = QLabel()
-        self.title_label.setObjectName("title_label")
-        self.title_label.setAlignment(Qt.AlignVCenter)
-        self.title_label.installEventFilter(self)
-        self.title_label.setText(name)
-        bg_layout.addWidget(self.title_label)
+        self._title_label = QLabel()
+        self._title_label.setObjectName("title_label")
+        self._title_label.setAlignment(Qt.AlignVCenter)
+        self._title_label.installEventFilter(self)
+        self._title_label.setText(name)
+        bg_layout.addWidget(self._title_label)
 
         # Button for the right column
         for widget_class in right_widget_classes:
@@ -94,17 +94,46 @@ class TitleBar(QWidget):
         close_button.released.connect(self.close_app)
         bg_layout.addWidget(close_button)
 
+        self._double_click_in_progress = False
+
+    @property
+    def title_bar_text(self) -> str:
+        """Get the title bar text."""
+        return self._title_label.text()
+
+    @title_bar_text.setter
+    def title_bar_text(self, text: str) -> None:
+        """Set the title bar text."""
+        self._title_label.setText(text)
+
     def eventFilter(  # pylint: disable=invalid-name
         self, obj: QObject, event: QEvent
     ) -> bool:
-        """Handle double click events."""
-        if obj is not self.title_label:
+        """
+        Handle mouse events.
+
+        MouseButtonDblClick is a combination of MousePress, MouseRelease
+        and MousePress. The final Mouse Release is not part of this event.
+        Thus it can happen that by executing a MouseButtonDblClick also a Mouse
+        MoveEvent is executed. The introduced _double_click_in_progress
+        variable blocks this situtation which could lead to e.g. a maximize
+        operation followed directly by a minimize operation.
+        """
+        if obj is not self._title_label:
             return False
+        if event.type() == QEvent.MouseButtonRelease:
+            log.debug("QEvent.MouseButtonRelease")
+            self._double_click_in_progress = False
+            return True
         if event.type() == QEvent.MouseButtonDblClick:
+            log.debug("QEvent.MouseButtonDblClick")
+            self._double_click_in_progress = True
             self.maximize.emit()
             return True
         if event.type() == QEvent.MouseMove:
-            self.move_window.emit(cast(QMouseEvent, event).globalPos())
+            log.debug("QEvent.MouseMove")
+            if not self._double_click_in_progress:
+                self.move_window.emit(cast(QMouseEvent, event).globalPos())
             return True
         return False
 
@@ -112,6 +141,10 @@ class TitleBar(QWidget):
         """Set the _background icon depending if the app is maximized."""
         name = "fullscreen_exit" if maximized else "fullscreen"
         self.maximize_button.set_icon(":/svg_icons/{}.svg".format(name))
+        if maximized:
+            self.maximize_button.tooltip_text = self.tr("Verkleinern")
+        else:
+            self.maximize_button.tooltip_text = self.tr("Maximieren")
 
     @pyqtSlot(name="on_right_column_button")
     def on_right_column_button(self) -> None:

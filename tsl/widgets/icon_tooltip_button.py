@@ -51,6 +51,16 @@ class IconTooltipButton(IconButton, Generic[_T]):
         return f"<{self.__class__.__name__} for widget {class_name}>"
 
     @property
+    def tooltip_text(self) -> str:
+        """Get the tooltip text."""
+        return self._tooltip.text()
+
+    @tooltip_text.setter
+    def tooltip_text(self, text: str) -> None:
+        """Set the tooltip text."""
+        self._tooltip.setText(text)
+
+    @property
     def widget_class(
         self,
     ) -> Optional[Type[_T]]:

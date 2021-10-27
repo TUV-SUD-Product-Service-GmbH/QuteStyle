@@ -4,7 +4,6 @@ from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
-    QEvent,
     QParallelAnimationGroup,
     QPoint,
     QPropertyAnimation,
@@ -13,12 +12,7 @@ from PyQt5.QtCore import (
     pyqtSignal,
     pyqtSlot,
 )
-from PyQt5.QtGui import (
-    QCloseEvent,
-    QMouseEvent,
-    QResizeEvent,
-    QWindowStateChangeEvent,
-)
+from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
 from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -28,8 +22,8 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from tsl.edoc_database import get_user_group_name
-from tsl.resources_rc import qInitResources
 from tsl.style import get_style
 from tsl.update_window import TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
@@ -86,9 +80,6 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             registry_reset,
             parent,
         )
-
-        # Load the TSL-Library resource file.
-        qInitResources()
 
         # Set the global stylesheet.
         self.set_style()
@@ -340,56 +331,73 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             self.move(self.pos() + diff)
         self.last_move_pos = pos
 
-    def changeEvent(  # pylint: disable=invalid-name
-        self, event: QEvent
-    ) -> None:
-        """Handle change events."""
-        super().changeEvent(event)
-        if event.type() == QEvent.WindowStateChange:
-            event = cast(QWindowStateChangeEvent, event)
-            log.debug(
-                "change event old state: %s, new state %s",
-                int(event.oldState()),
-                int(self.windowState()),
-            )
-            if (
-                event.oldState()
-                == Qt.WindowNoState  # this is the normal window state
-                or (
-                    # state when windows is restored from
-                    # minimized to maximized view
-                    int(event.oldState())
-                    & int(Qt.WindowMinimized | Qt.WindowMaximized)
-                )
-            ) and self.windowState() == Qt.WindowMaximized:
-                # maximize window view
-                log.debug("window is maximized")
-                # This removes the content margin so that the app fits
-                # exactly into the screen. Also, this removes the round
-                # borders from the main QFrame.
-                self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
-                self._background.set_stylesheet(border_radius=0, border_size=0)
-                self._title_bar.set_maximized(True)
-            else:
-                # any other view but not maximized
-                log.debug("window is not maximized")
-                # This will add a margin for the contents of the main QLayout
-                # so that a shadow and the border with round edges is visible.
-                # This also adds the round borders on the main QFrame.
-                self.centralWidget().layout().setContentsMargins(
-                    10, 10, 10, 10
-                )
-                self._background.set_stylesheet(
-                    border_radius=10, border_size=2
-                )
-                self._title_bar.set_maximized(False)
-
+    @pyqtSlot(name="maximize")
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
         if self.isMaximized():
             self.showNormal()
         else:
             self.showMaximized()
+
+    def showEvent(self, _: QShowEvent) -> None:  # pylint: disable=invalid-name
+        """Listen to QShowEvents to get initial window state."""
+        if self.isMaximized() or self.isFullScreen():
+            log.debug("Window started in maximized/fullscreen mode")
+            self._show_maximized_layout()
+        else:
+            self._show_normal_layout()
+
+    def showFullScreen(self) -> None:  # pylint: disable=invalid-name
+        """Overwrite showFullScreen."""
+        log.debug("Show window fullscreen")
+        self._show_maximized_layout()
+        super().showFullScreen()
+
+    def showMaximized(self) -> None:  # pylint: disable=invalid-name
+        """Overwrite showMaximized."""
+        log.debug("Show window maximized")
+        self._show_maximized_layout()
+        super().showMaximized()
+
+    def showNormal(self) -> None:  # pylint: disable=invalid-name
+        """Overwrite showNormal."""
+        log.debug("Show window normal")
+        self._show_normal_layout()
+        super().showNormal()
+
+    def _show_normal_layout(self) -> None:
+        """
+        Set the normal main window layout with rounded corners.
+
+        This will add a margin for the contents of the main QLayout
+        so that a shadow and the border with round edges is visible.
+        This also adds the round borders on the main QFrame.
+        """
+        log.debug("window is in normal mode")
+        self.centralWidget().layout().setContentsMargins(10, 10, 10, 10)
+        self._background.set_stylesheet(border_radius=10, border_size=2)
+        self._title_bar.set_maximized(False)
+
+        # enable size change in normal mode
+        for grip in self._grips:
+            grip.setEnabled(True)
+
+    def _show_maximized_layout(self) -> None:
+        """
+        Set the maximized main window layout without rounded corners.
+
+        This removes the content margin so that the app fits
+        exactly into the screen. Also, this removes the round
+        borders from the main QFrame.
+        """
+        log.debug("window is in maximized/fullscreen mode")
+        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
+        self._background.set_stylesheet(border_radius=0, border_size=0)
+        self._title_bar.set_maximized(True)
+
+        # size change is not possible in maximized mode
+        for grip in self._grips:
+            grip.setEnabled(False)
 
     def _column_is_visible(self, column: QFrame) -> bool:
         """Return if the given column is visible."""
@@ -486,6 +494,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             widget = self._content.widget(idx)
             if isinstance(widget, widget_class):
                 self._content.setCurrentWidget(widget)
+                self._title_bar.title_bar_text = (
+                    f"{self._app_name} - {widget.NAME}"
+                )
                 return
         raise ValueError("Could not find widget {}".format(widget_class))
 
