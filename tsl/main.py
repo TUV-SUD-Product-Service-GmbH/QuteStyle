@@ -1,9 +1,18 @@
 """Test script to validate TSL style."""
 import logging
 import sys
-from typing import cast
+from typing import Dict, List, cast
 
-from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import (
+    QCoreApplication,
+    QModelIndex,
+    QObject,
+    QSize,
+    QStringListModel,
+    Qt,
+    pyqtSignal,
+    pyqtSlot,
+)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
@@ -13,6 +22,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QListView,
     QMenu,
     QSizePolicy,
     QSpacerItem,
@@ -29,6 +39,7 @@ from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.color_manager import ColorManager
 from tsl.widgets.icon_button import IconButton
+from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 from tsl.widgets.toggle import Toggle
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -135,6 +146,67 @@ class TestWidget(MainWidget):
             self._ui.splitter.setOrientation(Qt.Horizontal)
 
 
+class Model(QStringListModel):
+    """Test model with check states."""
+
+    def __init__(self, data: List[str], parent: QObject = None) -> None:
+        """Create a new Model."""
+        self._check_states: Dict[str, Qt.CheckState] = {}
+        super().__init__(data, parent)
+
+    def data(
+        self, index: QModelIndex, role: int = Qt.DisplayRole
+    ) -> Qt.CheckState:
+        """Return data for the given role and index."""
+        if role == Qt.CheckStateRole:
+            return self._check_states[index.data()]
+        return super().data(index, role)  # type: ignore
+
+    def setData(  # pylint: disable=invalid-name
+        self, index: QModelIndex, value: Qt.CheckState, role: int = Qt.EditRole
+    ) -> bool:
+        """Set data for the given role and index."""
+        if role == Qt.CheckStateRole:
+            self._check_states[index.data()] = value
+            self.dataChanged.emit(index, index, [Qt.CheckStateRole])
+        return super().setData(index, value, role)
+
+    def flags(  # pylint: disable=no-self-use
+        self, _: QModelIndex
+    ) -> Qt.ItemFlags:
+        """Return the flags for the given index."""
+        return cast(
+            Qt.ItemFlags,
+            Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable,
+        )
+
+
+class ModelViewWidget(MainWidget):
+    """Test Widget for Model View tests."""
+
+    ICON = ":/svg_icons/heart_broken.svg"
+    NAME = "Test-Widget"
+
+    def __init__(self, parent: QWidget = None) -> None:
+        """Create a new TestWidget."""
+        super().__init__(parent)
+        layout = QHBoxLayout(self)
+        self._view = QListView()
+        layout.addWidget(self._view)
+        model = Model(["A", "B", "C"])
+
+        for row in range(model.rowCount()):
+            index = model.index(row)
+            model.setData(
+                index,
+                Qt.Checked if row % 2 else Qt.Unchecked,  # alternate value
+                Qt.CheckStateRole,
+            )
+        self._view.setModel(model)
+        delegate = StyledCheckboxDelegate()
+        self._view.setItemDelegateForColumn(0, delegate)
+
+
 class InfoPage(MainWidget):
     """Test Widget."""
 
@@ -184,7 +256,7 @@ class InfoPage(MainWidget):
 class StyledMainWindow(TSLStyledMainWindow):
     """Test StyledMainWindow for validation of TSL Darcula Style."""
 
-    MAIN_WIDGET_CLASSES = [InfoPage, TestWidget]
+    MAIN_WIDGET_CLASSES = [InfoPage, TestWidget, ModelViewWidget]
     RIGHT_WIDGET_CLASSES = [RightWidget, ColorManager]
     LEFT_WIDGET_CLASSES = [SettingsWidget, InfoWidget]
 
