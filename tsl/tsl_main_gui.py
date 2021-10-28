@@ -7,6 +7,7 @@ from PyQt5.QtCore import (
     QParallelAnimationGroup,
     QPoint,
     QPropertyAnimation,
+    QRect,
     QSize,
     Qt,
     pyqtSignal,
@@ -147,10 +148,18 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             CornerGrip(self, Qt.BottomRightCorner),
         ]
 
+        for grip in self._grips:
+            grip.window_geometry_changed.connect(self.window_geometry_changed)
+
         # Activate the first widget to be visible by default.
         self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
 
     WidgetT = TypeVar("WidgetT", MainWidget, ColumnBaseWidget)
+
+    @pyqtSlot(QRect, name="window_geometry_changed")
+    def window_geometry_changed(self, geometry: QRect) -> None:
+        """Handle change of window geometry by using the grips."""
+        self.setGeometry(geometry)
 
     @staticmethod
     def get_widgets_to_display(
