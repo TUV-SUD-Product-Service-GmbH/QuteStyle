@@ -74,7 +74,7 @@ class Toggle(QCheckBox):
 
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Override setText to calculate a new minimum width."""
-        self.setMaximumWidth(
+        self.setMinimumWidth(
             QFontMetrics(Toggle.FONT).horizontalAdvance(text)
             + self._box_width
             + self._spacer
