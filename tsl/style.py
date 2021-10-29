@@ -681,7 +681,7 @@ QLabel#welcome_label {{
 #completer_popup{{
     color: {foreground};
     background-color: {dark_one};
-    padding-left: 10px;
+    padding: 0px 0px 0px 10px;
     width: 25px;
   }}
 QFrame#title_bg_frame {{
