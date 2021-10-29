@@ -36,7 +36,7 @@ class Icon(QLabel):
 
         # Get pixmap from store
         pixmap = PixmapStore.inst().get_pixmap(
-            self._icon_path, radius, radius, get_color("icon_color")
+            self._icon_path, radius, radius, get_color("foreground")
         )
         # Set the scale_factor -> displayed pixmap fits into target
         pixmap.setDevicePixelRatio(scale_factor)

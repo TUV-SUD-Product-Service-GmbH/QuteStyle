@@ -55,7 +55,7 @@ class TSLMessageBox(QMessageBox):
 
         border_color = get_color("context_color")
         background_color = get_color("bg_one")
-        text_color = get_color("white")
+        text_color = get_color("foreground")
         self.setStyleSheet(
             stylesheet.format(
                 TSLMessageBox._radius,

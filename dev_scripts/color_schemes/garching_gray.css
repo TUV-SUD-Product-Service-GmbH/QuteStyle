@@ -1,0 +1,15 @@
+.theme_color {color:#aaa7bfff !important}
+
+.dark_one {color:#000 !important; background-color:#f4f4f4 !important}
+.dark_two {color:#000 !important; background-color:#dedede !important}
+.bg_one {color:#000 !important; background-color:#ffffff !important}
+.bg_two {color:#000 !important; background-color:#f7f7f7 !important}
+.bg_elements {color:#000 !important; background-color:#ededed !important}
+.bg_three {color:#000 !important; background-color:#e3e3e3ff !important}
+.bg_disabled {color:#000 !important; background-color:#e0e0e0 !important}
+.fg_disabled {color:#000 !important; background-color:#cfcfcf !important}
+.foreground {color:#fff !important; background-color:#404040 !important}
+.active {color:#fff !important; background-color:#101010 !important}
+.context_pressed {color:#000 !important; background-color:#9e9cb7 !important}
+.context_color {color:#000 !important; background-color:#aaa7bf !important}
+.context_hover {color:#000 !important; background-color:#bdbcc8 !important}

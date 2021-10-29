@@ -44,10 +44,10 @@ class IconButton(QPushButton):
             self._bgs = bgs
         else:
             self._bgs = BackgroundColorNames(
-                hovering="dark_three",
+                hovering="bg_elements",
                 background="bg_one",
-                pressed="dark_four",
-                released="dark_three",
+                pressed="dark_two",
+                released="bg_elements",
             )
 
         self._set_icon_path = icon_path
@@ -59,8 +59,8 @@ class IconButton(QPushButton):
         self._is_active: bool = False
 
         self._bg_color = self._bgs["background"]
-        self._icon_color = "icon_color"
-        self._text_color = "text_foreground"
+        self._icon_color = "foreground"
+        self._text_color = "foreground"
         self._margin = margin
 
     def _set_sizes(self) -> None:
@@ -109,7 +109,7 @@ class IconButton(QPushButton):
             text_color = get_color(self._text_color)
         else:
             color = get_color("fg_disabled")
-            text_color = get_color("text_disabled")
+            text_color = get_color("fg_disabled")
         self._icon_paint(painter, QColor(color))
         self._text_paint(painter, QColor(text_color))
         painter.end()
@@ -118,16 +118,16 @@ class IconButton(QPushButton):
         """Change style on mouse entering the button area."""
         if self.isEnabled() and not self._is_active:
             self._bg_color = self._bgs["hovering"]
-            self._icon_color = "icon_hover"
-            self._text_color = "text_active"
+            self._icon_color = "active"
+            self._text_color = "foreground"
             self.update()
 
     def leaveEvent(self, _: QEvent) -> None:  # pylint: disable=invalid-name
         """Change style on mouse leaving the button area."""
         if not self._is_active:
             self._bg_color = self._bgs["background"]
-            self._icon_color = "icon_color"
-            self._text_color = "text_foreground"
+            self._icon_color = "foreground"
+            self._text_color = "foreground"
             self.update()
 
     def mousePressEvent(  # pylint: disable=invalid-name
@@ -136,8 +136,8 @@ class IconButton(QPushButton):
         """Event triggered on mouse button press."""
         if event.button() == Qt.LeftButton:
             self._bg_color = self._bgs["pressed"]
-            self._icon_color = "icon_pressed"
-            self._text_color = "icon_pressed"
+            self._icon_color = "context_pressed"
+            self._text_color = "context_pressed"
             self.update()
             self.setFocus()
             self.clicked.emit()
@@ -148,8 +148,8 @@ class IconButton(QPushButton):
         """Event triggered on mouse button release."""
         if event.button() == Qt.LeftButton:
             self._bg_color = self._bgs["released"]
-            self._icon_color = "icon_hover"
-            self._text_color = "text_active"
+            self._icon_color = "active"
+            self._text_color = "foreground"
             self.update()
             self.released.emit()
 
@@ -222,9 +222,9 @@ class LightIconButton(IconButton):
         margin: float = 0.6,
     ) -> None:
         bgs = BackgroundColorNames(
-            hovering="dark_three",
+            hovering="bg_elements",
             background="bg_two",
-            pressed="dark_four",
-            released="dark_three",
+            pressed="dark_two",
+            released="bg_elements",
         )
         super().__init__(parent, icon_path, bgs, text, margin)

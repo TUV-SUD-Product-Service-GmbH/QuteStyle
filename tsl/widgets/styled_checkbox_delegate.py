@@ -44,7 +44,7 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
                 icon_path,
                 checkbox_rect.width(),
                 checkbox_rect.height(),
-                get_color("text_foreground"),
+                get_color("foreground"),
             ),
         )
 

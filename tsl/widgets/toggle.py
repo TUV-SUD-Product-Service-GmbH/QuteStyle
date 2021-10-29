@@ -90,7 +90,7 @@ class Toggle(QCheckBox):
 
         # Checking if a text is set is faster for cases with no text.
         if self.text():
-            painter.setPen(QPen(QColor(get_color("text_foreground"))))
+            painter.setPen(QPen(QColor(get_color("foreground"))))
             painter.setFont(Toggle.FONT)
             painter.drawText(
                 self._box_width + self._spacer,
@@ -104,11 +104,11 @@ class Toggle(QCheckBox):
             color = get_color("bg_disabled")
             fg_color = QColor(get_color("fg_disabled"))
         else:
-            fg_color = QColor(get_color("icon_color"))
+            fg_color = QColor(get_color("foreground"))
             if self.isChecked():
-                color = get_color("icon_pressed")
+                color = get_color("context_color")
             else:
-                color = get_color("dark_three")
+                color = get_color("dark_two")
 
         painter.setBrush(QColor(color))
 

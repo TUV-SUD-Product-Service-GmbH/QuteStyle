@@ -42,14 +42,14 @@ def test_icon_button_paint(  # pylint: disable=unused-argument
         assert height == 21
         store = PixmapStore.inst()
         new_pixmap = store.get_pixmap(
-            "tests/test_images/test_icon.svg", 43, 43, get_color("icon_color")
+            "tests/test_images/test_icon.svg", 43, 43, get_color("foreground")
         )
         assert new_pixmap == pixmap
 
     monkeypatch.setattr(QPainter, "drawPixmap", mock_draw)
     monkeypatch.setattr(QPaintDevice, "devicePixelRatio", lambda _: 2.0)
 
-    icon_button._icon_paint(paint, QColor(get_color("icon_color")))
+    icon_button._icon_paint(paint, QColor(get_color("foreground")))
     paint.end()
 
 

@@ -31,10 +31,10 @@ class LeftMenuButton(IconTooltipButton):
     ) -> None:
         """Create a new LeftMenuButton."""
         bgs = BackgroundColorNames(
-            hovering="dark_three",
+            hovering="bg_one",
             background="dark_one",
-            pressed="dark_four",
-            released="dark_three",
+            pressed="dark_two",
+            released="bg_one",
         )
         super().__init__(
             app_parent,
@@ -89,9 +89,9 @@ class LeftMenuButton(IconTooltipButton):
             # Draw the text. If the button is active or if the button
             # represents the active tab, we'll use color text_active (brighter)
             if self._is_active or self._is_active_tab:
-                text_color = get_color("text_active")
+                text_color = get_color("active")
             else:
-                text_color = get_color("text_foreground")
+                text_color = get_color("foreground")
             self._text_paint(painter, QColor(text_color))
 
         # Draw the icon depending of the hover/click state. If the button is
@@ -112,7 +112,7 @@ class LeftMenuButton(IconTooltipButton):
         """
         self._is_active_tab = is_active
         if not is_active:
-            self._icon_color = "icon_color"
+            self._icon_color = "foreground"
             self._bg_color = self._bgs["background"]
 
         self.update()

@@ -290,6 +290,8 @@ class StyledMainWindow(TSLStyledMainWindow):
                 "Snow White",
                 "Darcula",
                 "Princess Pink",
+                "Garching Gray",
+                "Ruby Red",
             ).index(get_current_style())
         except KeyError:
             self._current_idx = 0
@@ -298,7 +300,7 @@ class StyledMainWindow(TSLStyledMainWindow):
     def on_switch_style(self) -> None:
         """Set the next available style."""
         self._current_idx += 1
-        if self._current_idx == 3:
+        if self._current_idx == len(THEMES.keys()):
             self._current_idx = 0
         style_name = tuple(THEMES.keys())[self._current_idx]
         set_current_style(style_name)
