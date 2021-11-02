@@ -291,7 +291,6 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         """
         # add custom left menu bar
         left_menu_frame = QFrame()
-        left_menu_frame.setFixedWidth(56)  # 50 px and 3px margin on each side
         left_menu_layout = QHBoxLayout(left_menu_frame)
         left_menu_layout.setContentsMargins(3, 3, 3, 3)
         # add custom left menu
@@ -304,6 +303,11 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             ),
         )
         left_menu_layout.addWidget(left_menu)
+        left_menu_frame.setFixedWidth(
+            left_menu.minimumWidth()
+            + left_menu_layout.contentsMargins().left()
+            + left_menu_layout.contentsMargins().right()
+        )
         layout.addWidget(left_menu_frame)
         left_menu.bottom_button_clicked.connect(self.on_left_column)
         left_menu.top_button_clicked.connect(self.on_main_widget)

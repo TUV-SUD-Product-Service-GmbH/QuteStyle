@@ -90,6 +90,7 @@ class LeftMenu(QWidget):
             self._bottom_layout.addWidget(Div())
             self._add_bottom_widgets(left_column_widgets)
 
+        self.setMinimumWidth(50)
         self._animation = QPropertyAnimation(parent, b"minimumWidth")
 
     def _add_main_widgets(self, widgets: Iterable[Type[MainWidget]]) -> None:
@@ -136,11 +137,22 @@ class LeftMenu(QWidget):
 
     @pyqtSlot(name="toggle_animation")
     def toggle_animation(self) -> None:
-        """Toggle the animation (closing/opening the menu)."""
+        """
+        Toggle the animation (closing/opening the menu).
+
+        Animation is working with the minimum width of the parent widget.
+        """
+        parent_margin = (
+            self.parent().layout().contentsMargins().left()
+            + self.parent().layout().contentsMargins().right()
+        )
+        parent_width = self.parent().width()
         self._animation.stop()
-        self._animation.setStartValue(self.width())
-        closed = self.width() == 50
-        self._animation.setEndValue(240 if closed else 50)
+        closed = self.minimumWidth() + parent_margin == parent_width
+        self._animation.setStartValue(self.parent().width())
+        self._animation.setEndValue(
+            240 if closed else self.minimumWidth() + parent_margin
+        )
         # if closed, menu is expanding so set toggle active
         # if not closed, menu is closing set toggle not active
         self._toggle_button.set_active_toggle(closed)
