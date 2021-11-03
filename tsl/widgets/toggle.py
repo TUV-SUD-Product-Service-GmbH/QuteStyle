@@ -81,24 +81,18 @@ class Toggle(QCheckBox):
         )
         super().setText(text)
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, _: QPaintEvent
-    ) -> None:
-        """Draw toggle switch."""
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+    def _draw_text(self, painter: QPainter, offset: int) -> None:
+        """Draw Text."""
+        painter.setPen(QPen(QColor(get_color("foreground"))))
+        painter.setFont(Toggle.FONT)
+        painter.drawText(
+            offset,
+            int(self._box_height / 1.35),
+            self.text(),
+        )
 
-        # Checking if a text is set is faster for cases with no text.
-        if self.text():
-            painter.setPen(QPen(QColor(get_color("foreground"))))
-            painter.setFont(Toggle.FONT)
-            painter.drawText(
-                self._box_width + self._spacer,
-                int(self._box_height / 1.35),
-                self.text(),
-            )
-
-        # Draw Rectangle
+    def _draw_checkbox(self, painter: QPainter, offset: int) -> None:
+        """Draw the checkbox."""
         painter.setPen(Qt.NoPen)
         if not self.isEnabled():
             color = get_color("bg_disabled")
@@ -113,7 +107,7 @@ class Toggle(QCheckBox):
         painter.setBrush(QColor(color))
 
         painter.drawRoundedRect(
-            0,
+            offset,
             0,
             self._box_width,
             self._box_height,
@@ -121,5 +115,31 @@ class Toggle(QCheckBox):
             12,
         )
         painter.setBrush(fg_color)
-        painter.drawEllipse(self._position, 3, 16, 16)
+        painter.drawEllipse(self._position + offset, 3, 16, 16)
+
+    def paintEvent(  # pylint: disable=invalid-name
+        self, _: QPaintEvent
+    ) -> None:
+        """Draw toggle switch."""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Checking if a text is set is faster for cases with no text.
+        if self.layoutDirection() == Qt.LeftToRight:
+            self._draw_checkbox(painter, 0)
+            if self.text():
+                self._draw_text(painter, self._box_width + self._spacer)
+        if self.layoutDirection() == Qt.RightToLeft:
+            if self.text():
+                self._draw_text(painter, 0)
+                self._draw_checkbox(
+                    painter,
+                    QFontMetrics(Toggle.FONT).horizontalAdvance(self.text())
+                    + self._spacer,
+                )
+            else:
+                self._draw_checkbox(
+                    painter,
+                    self._box_width + self._box_width // 2,
+                )
         painter.end()

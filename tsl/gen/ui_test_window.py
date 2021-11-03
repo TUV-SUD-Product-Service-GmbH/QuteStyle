@@ -116,24 +116,60 @@ class Ui_test_widget(object):
         self.groupBox.setObjectName("groupBox")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.groupBox)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.radioButton = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton.setToolTipDuration(-10)
         self.radioButton.setChecked(True)
         self.radioButton.setObjectName("radioButton")
-        self.verticalLayout_4.addWidget(self.radioButton)
+        self.verticalLayout_5.addWidget(self.radioButton)
         self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton_2.setObjectName("radioButton_2")
-        self.verticalLayout_4.addWidget(self.radioButton_2)
+        self.verticalLayout_5.addWidget(self.radioButton_2)
         self.radioButton_3 = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton_3.setObjectName("radioButton_3")
-        self.verticalLayout_4.addWidget(self.radioButton_3)
+        self.verticalLayout_5.addWidget(self.radioButton_3)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.checkBox_3 = Toggle(self.groupBox)
+        self.checkBox_3.setObjectName("checkBox_3")
+        self.horizontalLayout_5.addWidget(self.checkBox_3)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Minimum,
+        )
+        self.horizontalLayout_5.addItem(spacerItem3)
+        self.checkBox_4 = Toggle(self.groupBox)
+        self.checkBox_4.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.checkBox_4.setObjectName("checkBox_4")
+        self.horizontalLayout_5.addWidget(self.checkBox_4)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.checkBox = Toggle(self.groupBox)
+        self.checkBox.setText("")
         self.checkBox.setCheckable(True)
         self.checkBox.setChecked(False)
         self.checkBox.setAutoExclusive(False)
         self.checkBox.setTristate(True)
         self.checkBox.setObjectName("checkBox")
-        self.verticalLayout_4.addWidget(self.checkBox)
+        self.horizontalLayout_4.addWidget(self.checkBox)
+        spacerItem4 = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Minimum,
+        )
+        self.horizontalLayout_4.addItem(spacerItem4)
+        self.checkBox_2 = Toggle(self.groupBox)
+        self.checkBox_2.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.checkBox_2.setText("")
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.horizontalLayout_4.addWidget(self.checkBox_2)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
+        self.verticalLayout_4.addLayout(self.verticalLayout_5)
         self.gridLayout_2.addWidget(self.groupBox, 1, 0, 1, 1)
         self.progressBar = QtWidgets.QProgressBar(test_widget)
         self.progressBar.setProperty("value", 30)
@@ -247,7 +283,8 @@ class Ui_test_widget(object):
         self.radioButton.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_2.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_3.setText(_translate("test_widget", "RadioButton"))
-        self.checkBox.setText(_translate("test_widget", "CheckBox"))
+        self.checkBox_3.setText(_translate("test_widget", "CheckBox"))
+        self.checkBox_4.setText(_translate("test_widget", "CheckBox"))
         self.textEdit.setHtml(
             _translate(
                 "test_widget",
