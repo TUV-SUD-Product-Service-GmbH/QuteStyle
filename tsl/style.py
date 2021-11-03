@@ -546,7 +546,7 @@ QTabBar::tab {{
     color: {foreground};
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    padding: 10px;
+    padding: 12px;
 }}
 QTabBar::tab:hover {{
     background-color: {context_color};
