@@ -121,7 +121,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
-    "Garching Gray": {
+    "Highbridge Gray": {
         "active": "#101010",
         "bg_disabled": "#e0e0e0",
         "bg_one": "#ffffff",
