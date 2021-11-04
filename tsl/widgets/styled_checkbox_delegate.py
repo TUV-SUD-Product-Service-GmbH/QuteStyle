@@ -17,6 +17,10 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
         index: QModelIndex,
     ) -> None:
         """Implement custom painting."""
+
+        if index.data(Qt.CheckStateRole) is None:
+            super().paint(painter, option, index)
+            return
         # Save the painter and restore it later as recommended in the doc:
         # https://doc.qt.io/qt-5/qstyleditemdelegate.html#paint
         painter.save()
@@ -47,18 +51,33 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
                 get_color("foreground"),
             ),
         )
+        checkbox_text = index.data()
+
+        counter = 1
+        while (
+            option.rect.width() - option.rect.height()
+        ) < painter.fontMetrics().width(checkbox_text):
+            checkbox_text = checkbox_text[:-counter]
+            counter += 1
+            if len(checkbox_text) == 0:
+                break
+
+        if checkbox_text < index.data() and len(checkbox_text) != 0:
+            checkbox_text += "..."
 
         # Calculate a rect for the text.
         text_rect = QRect(
             option.rect.x() + option.rect.height(),
             option.rect.y(),
+            option.rect.width()
+            - option.rect.height()
+            + painter.fontMetrics().width(checkbox_text),
             option.rect.height(),
-            option.rect.width() - option.rect.height(),
         )
 
         # Draw the text
         painter.drawText(
-            text_rect, Qt.AlignRight | Qt.AlignTop, index.data(Qt.DisplayRole)
+            text_rect, Qt.AlignLeft | Qt.AlignVCenter, checkbox_text
         )
 
         # Restore the original painter.
