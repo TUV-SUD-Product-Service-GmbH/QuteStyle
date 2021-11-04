@@ -212,7 +212,7 @@ QComboBox::drop-down {{
     border-bottom-right-radius: 3px;
 }}
 QComboBox::down-arrow {{
-    image: url(":/svg_icons/down.svg");
+    image: url(":/svg_icons/expand_more.svg");
     width: 14px;
     height: 14px;
 }}
@@ -322,6 +322,13 @@ QMenu::separator {{
     height: 3px;
     margin-left: 5px;
     margin-right: 5px;
+}}
+/* QScrollArea */
+QScrollArea {{
+    border: none;
+}}
+QWidget#scroll_widget {{
+    background: {dark_one};
 }}
 
 /* QScrollBar */
@@ -730,7 +737,7 @@ QMessageBox{{
     background-color: {dark_two};
     border-left: 3px solid {context_color};
     font: 9pt "Segoe UI";
-    text-color: {foreground};
+    color: {foreground};
 }}
 QPushButton{{
     background-color: {bg_elements};

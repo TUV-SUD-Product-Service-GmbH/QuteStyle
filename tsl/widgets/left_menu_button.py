@@ -74,7 +74,9 @@ class LeftMenuButton(IconTooltipButton):
             rect_blue = QRect(4, 5, 20, self.height() - 10)
             painter.drawRoundedRect(rect_blue, 8, 8)
             painter.setBrush(QColor(get_color("bg_one")))
-            rect_inside_active = QRect(7, 5, self.width(), self.height() - 10)
+            rect_inside_active = QRect(
+                7, 5, self.visible_width(), self.height() - 10
+            )
             painter.drawRoundedRect(rect_inside_active, 8, 8)
             self._paint_active_icon(painter)
 
@@ -82,10 +84,12 @@ class LeftMenuButton(IconTooltipButton):
             # If the button is neither active (i.e. left column is shown) nor
             # does it belong to the active tab, we draw the hover effect.
             painter.setBrush(QColor(get_color(self._bg_color)))
-            rect_inside = QRect(4, 5, self.width() - 8, self.height() - 10)
+            rect_inside = QRect(
+                4, 5, self.visible_width() - 8, self.height() - 10
+            )
             painter.drawRoundedRect(rect_inside, 8, 8)
 
-        if self.width() != self.height():
+        if self.visible_width() != self.height():
             # Draw the text. If the button is active or if the button
             # represents the active tab, we'll use color text_active (brighter)
             if self._is_active or self._is_active_tab:
@@ -134,7 +138,7 @@ class LeftMenuButton(IconTooltipButton):
         painter = QPainter(self.active_menu)
         painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
         painter.fillRect(self.active_menu.rect(), QColor(get_color("bg_one")))
-        root_painter.drawPixmap(self.width() - 5, 0, self.active_menu)
+        root_painter.drawPixmap(self.visible_width() - 5, 0, self.active_menu)
         painter.end()
 
     def enterEvent(  # pylint: disable=invalid-name
@@ -142,7 +146,7 @@ class LeftMenuButton(IconTooltipButton):
     ) -> None:
         """Change style on mouse entering the button area."""
         if (
-            self.width() == LeftMenuButton.FIXED_HEIGHT
+            self.visible_width() == LeftMenuButton.FIXED_HEIGHT
             and self._tooltip.text()
             and not self._is_active
         ):
@@ -158,6 +162,17 @@ class LeftMenuButton(IconTooltipButton):
 
     def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
         """Return the tooltip coords from the global position."""
-        pos_x = pos.x() + self.width() + 5
-        pos_y = pos.y() + (self.width() - self._tooltip.height()) // 2
+        pos_x = pos.x() + self.visible_width() + 5
+        pos_y = pos.y() + (self.visible_width() - self._tooltip.height()) // 2
         return pos_x, pos_y
+
+    def visible_width(self) -> int:
+        """
+        Returns the visible width of self.
+
+        If the LeftMenuButton is part of the ScrollArea, the button-width
+        is independent of the menu animation. Several methods of LeftMenuButton
+        depend on the visible width of the button and can use this method.
+        """
+
+        return self.visibleRegion().boundingRect().width()

@@ -9,7 +9,13 @@ from PyQt5.QtCore import (
     pyqtSignal,
     pyqtSlot,
 )
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QFrame,
+    QScrollArea,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
+)
 
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.div import Div
@@ -78,6 +84,13 @@ class LeftMenu(QWidget):
 
         self._top_layout.addWidget(Div())
 
+        self._setup_scroll_area(len(main_widgets))
+        # Set strech factor 1 to ensure that,
+        # if enough space is available, all widgets are displayed
+        layout.addWidget(self.scroll_area, 1)
+        # Add strech to ensure that scroll area is aligned below the Menubutton
+        layout.addStretch()
+
         bottom_frame = QFrame()
         self._bottom_layout = QVBoxLayout(bottom_frame)
         self._bottom_layout.setContentsMargins(0, 0, 0, 8)
@@ -104,7 +117,34 @@ class LeftMenu(QWidget):
                 widget_class=widget_class,
             )
             button.clicked.connect(self.on_main_page_button)
-            self._top_layout.addWidget(button)
+            self._middle_layout.addWidget(button)
+
+    def _setup_scroll_area(self, num_widgets: int) -> None:
+        """Create the ScrollArea with correct sizePolicies and margins."""
+        self.scroll_area = QScrollArea()
+        # Never show a scrollbar
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        # MaximumHeight depends on number of widgets:
+        # 50 px widget height + 1 px spacing
+        self.scroll_area.setMaximumHeight(51 * num_widgets)
+        # Horizontal Policy: MinimumExpaning --> widget text gets displayed
+        # Vertical Policy: Maximum --> is set to the number of visible widgets
+        self.scroll_area.setSizePolicy(
+            QSizePolicy.MinimumExpanding, QSizePolicy.Maximum
+        )
+
+        self.scroll_area.setWidgetResizable(True)
+        widget = QWidget(self.scroll_area)
+        # ObjectName to style the background in stylesheet
+        widget.setObjectName("scroll_widget")
+        self.scroll_area.setWidget(widget)
+        # the main widgets will be added later to middle_layout
+        self._middle_layout = QVBoxLayout()
+        self._middle_layout.setContentsMargins(0, 0, 0, 0)
+        self._middle_layout.setSpacing(1)
+        widget.setLayout(self._middle_layout)
 
     def _add_bottom_widgets(
         self, widgets: Iterable[Type[ColumnBaseWidget]]
