@@ -297,7 +297,15 @@ QLineEdit#column_line_edit:focus {{
 
 /* QMenu */
 QMenu{{
-    background-color: {bg_elements};
+    background-color: {bg_one};
+    color: {foreground};
+}}
+QMenu::item:disabled {{
+    color: {fg_disabled};
+}}
+QMenu::item:enabled:selected {{
+    color: {active};
+    background-color: {context_color};
 }}
 QMenu QCheckBox{{
     color: {foreground};
