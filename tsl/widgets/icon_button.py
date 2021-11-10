@@ -52,7 +52,7 @@ class IconButton(QPushButton):
 
         self._set_icon_path = icon_path
 
-        self._set_sizes()
+        self.set_sizes()
 
         self.setCursor(Qt.PointingHandCursor)
 
@@ -63,7 +63,7 @@ class IconButton(QPushButton):
         self._text_color = "foreground"
         self._margin = margin
 
-    def _set_sizes(self) -> None:
+    def set_sizes(self) -> None:
         """
         Set the size of the button.
 
@@ -79,7 +79,7 @@ class IconButton(QPushButton):
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Set the text on the button."""
         super().setText(text)
-        self._set_sizes()
+        self.set_sizes()
         self.update()
 
     def set_active(self, active: bool) -> None:

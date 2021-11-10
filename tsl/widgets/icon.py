@@ -13,12 +13,14 @@ from tsl.widgets.custom_icon_engine import PixmapStore
 class Icon(QLabel):
     """Icon that can be painted in any given color."""
 
-    def __init__(self) -> None:
+    def __init__(self, radius: int = 20) -> None:
         """Create a new Icon."""
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setAlignment(Qt.AlignCenter)
-        self.setFixedSize(30, 30)
+        # Radius needs to be set
+        self.radius = radius
+        self.setFixedSize(int(1.5 * radius), int(1.5 * radius))
         self._icon_path = ":/svg_icons/no_icon.svg"
 
     def set_icon(self, icon_path: str) -> None:
@@ -32,7 +34,7 @@ class Icon(QLabel):
         scale_factor = cast(
             QApplication, QGuiApplication.instance()
         ).devicePixelRatio()
-        radius = int(20 * scale_factor)
+        radius = int(self.radius * scale_factor)
 
         # Get pixmap from store
         pixmap = PixmapStore.inst().get_pixmap(

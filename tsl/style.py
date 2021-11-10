@@ -211,11 +211,6 @@ QComboBox::drop-down {{
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 }}
-QComboBox::down-arrow {{
-    image: url(":/svg_icons/expand_more.svg");
-    width: 14px;
-    height: 14px;
-}}
 QComboBox QAbstractItemView {{
     color: {foreground};
     background-color: {bg_elements};
@@ -684,13 +679,16 @@ QLabel#left_label {{
 QLabel#welcome_label {{
     font: 14pt "Segoe UI";
 }}
-/* Completer*/
+/* Completer */
 #completer_popup{{
-    color: {foreground};
-    background-color: {dark_one};
-    padding: 0px 0px 0px 10px;
-    width: 25px;
-  }}
+    border: 1px;
+    border-color: {context_pressed};
+    border-style: solid;
+}}
+QListView#completer_popup{{
+    padding: 0px 10px 0px 10px;
+}}
+
 QFrame#title_bg_frame {{
     background-color: {bg_one};
     border-radius: 8px;
