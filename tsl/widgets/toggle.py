@@ -25,7 +25,7 @@ from tsl.style import get_color
 class Toggle(QCheckBox):
     """Toggle button (custom checkbox)."""
 
-    FONT = QFont("Segoe UI", 9)
+    FONT = QFont("Segoe UI", 8)
 
     def __init__(self, parent: QWidget = None) -> None:
         """Create a new Toggle."""
@@ -74,7 +74,7 @@ class Toggle(QCheckBox):
 
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Override setText to calculate a new minimum width."""
-        self.setMinimumWidth(
+        self.setFixedWidth(
             QFontMetrics(Toggle.FONT).horizontalAdvance(text)
             + self._box_width
             + self._spacer
@@ -87,7 +87,7 @@ class Toggle(QCheckBox):
         painter.setFont(Toggle.FONT)
         painter.drawText(
             offset,
-            int(self._box_height / 1.35),
+            int(self._box_height / 1.4),
             self.text(),
         )
 
@@ -138,8 +138,5 @@ class Toggle(QCheckBox):
                     + self._spacer,
                 )
             else:
-                self._draw_checkbox(
-                    painter,
-                    self._box_width + self._box_width // 2,
-                )
+                self._draw_checkbox(painter, self._spacer)
         painter.end()

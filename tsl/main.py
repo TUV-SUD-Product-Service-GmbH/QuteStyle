@@ -13,7 +13,6 @@ from PyQt5.QtCore import (
     pyqtSignal,
     pyqtSlot,
 )
-from PyQt5.QtGui import QIcon
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
     QApplication,
@@ -133,7 +132,7 @@ class TestWidget(MainWidget):
         widget_action.setDefaultWidget(buttons)
         menu.addAction(widget_action)
         self._ui.pushButton_2.setMenu(menu)
-        self._ui.pushButton_4.setIcon(QIcon(":/svg_icons/heart_broken.svg"))
+        self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)
 
