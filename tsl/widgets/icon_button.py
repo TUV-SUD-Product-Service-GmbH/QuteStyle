@@ -45,7 +45,7 @@ class IconButton(QPushButton):
         else:
             self._bgs = BackgroundColorNames(
                 hovering="bg_elements",
-                background="bg_one",
+                background="transparent",
                 pressed="dark_two",
                 released="bg_elements",
             )
@@ -101,7 +101,10 @@ class IconButton(QPushButton):
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(QColor(get_color(self._bg_color))))
+        if self._bg_color == "transparent":
+            painter.setBrush(QBrush(QColor(self._bg_color)))
+        else:
+            painter.setBrush(QBrush(QColor(get_color(self._bg_color))))
         painter.drawRoundedRect(self.rect(), 8, 8)
 
         if self.isEnabled():
@@ -209,22 +212,3 @@ class IconButton(QPushButton):
         log.debug("Setting active icon path to %s", icon_path)
         self._set_icon_path = icon_path
         self.update()
-
-
-class LightIconButton(IconButton):
-    """IconButton on a lighter background (bg_two)."""
-
-    def __init__(  # pylint: disable=too-many-arguments
-        self,
-        parent: QWidget = None,
-        icon_path: str = ":/svg_icons/no_icon.svg",
-        text: str = None,
-        margin: float = 0.6,
-    ) -> None:
-        bgs = BackgroundColorNames(
-            hovering="bg_elements",
-            background="bg_two",
-            pressed="dark_two",
-            released="bg_elements",
-        )
-        super().__init__(parent, icon_path, bgs, text, margin)

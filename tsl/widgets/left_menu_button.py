@@ -83,6 +83,10 @@ class LeftMenuButton(IconTooltipButton):
         else:
             # If the button is neither active (i.e. left column is shown) nor
             # does it belong to the active tab, we draw the hover effect.
+            if self._bg_color == "transparent":
+                painter.setBrush(QColor(self._bg_color))
+            else:
+                painter.setBrush(QColor(get_color(self._bg_color)))
             painter.setBrush(QColor(get_color(self._bg_color)))
             rect_inside = QRect(
                 4, 5, self.visible_width() - 8, self.height() - 10
