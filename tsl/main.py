@@ -33,7 +33,13 @@ from PyQt5.QtWidgets import (
 
 from tsl.gen.ui_test_window import Ui_test_widget
 from tsl.init import SETTINGS, init
-from tsl.style import THEMES, get_current_style, get_style, set_current_style
+from tsl.style import (
+    THEMES,
+    Themes,
+    get_current_style,
+    get_style,
+    set_current_style,
+)
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.color_manager import ColorManager
@@ -286,11 +292,11 @@ class StyledMainWindow(TSLStyledMainWindow):
         )
         try:
             self._current_idx = (
-                "Snow White",
-                "Darcula",
-                "Princess Pink",
-                "Garching Gray",
-                "Ruby Red",
+                Themes.SNOW_WHITE,
+                Themes.DARCULA,
+                Themes.PRINCESS_PINK,
+                Themes.HIGHBRIDGE_GRAY,
+                Themes.RUBY_RED,
             ).index(get_current_style())
         except KeyError:
             self._current_idx = 0

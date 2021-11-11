@@ -11,7 +11,7 @@ from PyQt5.QtGui import (
 )
 from pytestqt.qtbot import QtBot
 
-from tsl.style import THEMES, get_color, set_current_style
+from tsl.style import THEMES, Themes, get_color, set_current_style
 from tsl.widgets.custom_icon_engine import PixmapStore
 from tsl.widgets.icon import Icon
 from tsl.widgets.icon_button import IconButton
@@ -64,7 +64,7 @@ def test_set_icon(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
     set_current_style(style)
     icon.set_icon("tests/test_images/test_icon.svg")
     icon._set_icon_pixmap()
-    set_current_style("Darcula")
+    set_current_style(Themes.DARCULA)
     assert icon.pixmap().height() == 40
     assert icon.pixmap().width() == 40
     # check that pixmap exists in two different colors

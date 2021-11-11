@@ -1,14 +1,26 @@
 """Style handling for TSLStyleWindow."""
 import logging
+from enum import Enum
 from typing import Dict, Optional
 
 from PyQt5.QtCore import QSettings
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
+
+class Themes(str, Enum):
+    """Available themes."""
+
+    DARCULA = "Darcula"
+    SNOW_WHITE = "Snow White"
+    PRINCESS_PINK = "Princess Pink"
+    HIGHBRIDGE_GRAY = "Highbridge Gray"
+    RUBY_RED = "Ruby Red"
+
+
 # Use this variable when referencing a default style so that adapting to a new
 # default style will only require changes in the lib.
-DEFAULT_STYLE = "Darcula"
+DEFAULT_STYLE = Themes.DARCULA
 
 CURRENT_STYLE: Optional[str] = None
 
@@ -39,8 +51,15 @@ def set_current_style(style: str) -> None:
     QSettings().setValue("style", style)
 
 
+THEMES_PREVIEW_IMAGES: Dict[str, str] = {
+    Themes.DARCULA: ":/png_icons/Darcula.png",
+    Themes.PRINCESS_PINK: ":/png_icons/PrincessPink.png",
+    Themes.SNOW_WHITE: ":/png_icons/SnowWhite.png",
+    Themes.HIGHBRIDGE_GRAY: ":/png_icons/HighBridgeGray.png",
+}
+
 THEMES: Dict[str, Dict[str, str]] = {
-    "Snow White": {
+    Themes.SNOW_WHITE: {
         "dark_one": "#b5c3dd",
         "dark_two": "#bfcde6",
         "bg_one": "#c9d7ef",
@@ -67,7 +86,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#7e5300",
         "grey": "#d3d3d3",
     },
-    "Princess Pink": {
+    Themes.PRINCESS_PINK: {
         "active": "#fffefe",
         "dark_one": "#282a36",
         "dark_two": "#363948",
@@ -94,7 +113,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
-    "Darcula": {
+    Themes.DARCULA: {
         "active": "#dce1ec",
         "dark_one": "#1b1e23",
         "dark_two": "#242830",
@@ -121,7 +140,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
-    "Highbridge Gray": {
+    Themes.HIGHBRIDGE_GRAY: {
         "active": "#101010",
         "bg_disabled": "#e0e0e0",
         "bg_one": "#ffffff",
@@ -148,7 +167,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "white": "#f5f6f9",
         "yellow": "#f1fa8c",
     },
-    "Ruby Red": {
+    Themes.RUBY_RED: {
         "dark_one": "#431e1e",
         "dark_two": "#4f2424",
         "bg_one": "#5f2d2d",

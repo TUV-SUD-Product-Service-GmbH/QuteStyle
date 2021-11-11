@@ -22,6 +22,8 @@ from tsl.pse_database import _fetch_user_id as _pse_fetch_user_id
 from tsl.pse_database import session_scope as pse_session_scope
 
 # pylint: disable=invalid-name
+from tsl.style import Themes
+
 log = logging.getLogger(".".join(["tsl", __name__]))
 # pylint: enable=invalid-name
 
@@ -99,4 +101,4 @@ def pytest_runtest_teardown(item: Function) -> None:
 
     if "style" in [mark.name for mark in item.iter_markers()]:
         # Reset the stored style after a style test case.
-        style.CURRENT_STYLE = "Darcula"
+        style.CURRENT_STYLE = Themes.DARCULA
