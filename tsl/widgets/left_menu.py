@@ -125,6 +125,7 @@ class LeftMenu(QWidget):
         # Never show a scrollbar
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setFixedWidth(240)
 
         # MaximumHeight depends on number of widgets:
         # 50 px widget height + 1 px spacing
