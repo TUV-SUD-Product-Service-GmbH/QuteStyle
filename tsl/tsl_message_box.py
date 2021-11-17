@@ -20,7 +20,7 @@ class TSLMessageBox(QMessageBox):
     _radius = 12
 
     def __init__(
-        self, parent: Optional[QWidget], title: str, text: str
+        self, parent: Optional[QWidget] = None, title: str = "", text: str = ""
     ) -> None:
         super().__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)

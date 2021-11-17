@@ -3,7 +3,8 @@ import logging
 from enum import Enum
 from typing import Dict, Optional
 
-from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QRect, QSettings, QSize
+from PyQt5.QtGui import QColor, QPainter, QPixmap
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -23,6 +24,64 @@ class Themes(str, Enum):
 DEFAULT_STYLE = Themes.DARCULA
 
 CURRENT_STYLE: Optional[str] = None
+
+
+def _create_theme_drawing(
+    icon_size: QSize, color_names: Dict[str, str]
+) -> QPixmap:
+    """Create theme drawing."""
+    pixmap = QPixmap(icon_size)
+    painter = QPainter(pixmap)
+    # draw background
+    painter.fillRect(
+        QRect(0, 0, pixmap.width(), pixmap.height()),
+        QColor(color_names["bg_one"]),
+    )
+    # draw menu
+    menu = QRect(0, 0, 20, pixmap.height())
+    painter.fillRect(menu, QColor(color_names["dark_one"]))
+    # draw menu icons
+    for i in range(0, 8):
+        y_pos = i * 20 + 5
+        if y_pos + 8 < menu.height():
+            painter.fillRect(
+                QRect(5, i * 20 + 5, 8, 8),
+                QColor(color_names["active"]),
+            )
+    # draw toolbar
+    toolbar = QRect(menu.width() + 5, 0, pixmap.width(), 15)
+    painter.fillRect(toolbar, QColor(color_names["bg_two"]))
+
+    # draw footer
+    footer = QRect(menu.width() + 5, pixmap.height() - 10, pixmap.width(), 10)
+    painter.fillRect(footer, QColor(color_names["bg_two"]))
+
+    # draw widget
+    widget = QRect(
+        menu.width() + 5,
+        toolbar.height() + 5,
+        pixmap.width() - (menu.width() + 5),
+        pixmap.height() - (toolbar.height() + footer.height() + 10),
+    )
+    painter.fillRect(widget, QColor(color_names["bg_two"]))
+
+    # draw widget data
+    for i in range(0, 6):
+        y_pos = i * 20 + 10
+        if y_pos + 5 < widget.height():
+            if i % 2:
+                width = widget.width() - 40
+                color = QColor(color_names["foreground"])
+            else:
+                width = widget.width() - 100
+                color = QColor(color_names["context_color"])
+
+            painter.fillRect(
+                QRect(widget.x() + 10, y_pos + widget.y(), width, 5),
+                color,
+            )
+    painter.end()
+    return pixmap
 
 
 def get_current_style() -> str:
@@ -50,13 +109,6 @@ def set_current_style(style: str) -> None:
     CURRENT_STYLE = style
     QSettings().setValue("style", style)
 
-
-THEMES_PREVIEW_IMAGES: Dict[str, str] = {
-    Themes.DARCULA: ":/png_icons/Darcula.png",
-    Themes.PRINCESS_PINK: ":/png_icons/PrincessPink.png",
-    Themes.SNOW_WHITE: ":/png_icons/SnowWhite.png",
-    Themes.HIGHBRIDGE_GRAY: ":/png_icons/HighBridgeGray.png",
-}
 
 THEMES: Dict[str, Dict[str, str]] = {
     Themes.SNOW_WHITE: {
@@ -352,6 +404,9 @@ QScrollArea {{
 QWidget#scroll_widget {{
     background: {dark_one};
 }}
+
+QWidget#style_selection_widget
+        {{ background-color:{bg_one}; }}
 
 /* QScrollBar */
 QScrollBar:horizontal {{
@@ -703,7 +758,7 @@ QLabel#left_label {{
     padding-left: 0px;
     padding-right: 10px;
 }}
-QLabel#welcome_label {{
+QLabel#heading_label {{
     font: 14pt "Segoe UI";
 }}
 /* Completer */

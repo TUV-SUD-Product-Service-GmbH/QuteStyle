@@ -18,9 +18,9 @@ from PyQt5.QtWidgets import (
     QApplication,
     QCheckBox,
     QDialogButtonBox,
-    QFrame,
     QHBoxLayout,
     QLabel,
+    QLayout,
     QListView,
     QMenu,
     QSizePolicy,
@@ -43,6 +43,7 @@ from tsl.style import (
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.color_manager import ColorManager
+from tsl.widgets.home_page import HomePage
 from tsl.widgets.icon_button import IconButton
 from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 from tsl.widgets.toggle import Toggle
@@ -212,50 +213,27 @@ class ModelViewWidget(MainWidget):
         self._view.setItemDelegateForColumn(0, delegate)
 
 
-class InfoPage(MainWidget):
-    """Test Widget."""
+class InfoPage(HomePage):
+    """Test Info Widget."""
 
-    ICON = ":/svg_icons/heart_broken.svg"
-    NAME = "Information"
+    APP_NAME = "TSL-TEST"
 
-    def __init__(self, parent: QWidget = None) -> None:
-        """Create a new InfoPage."""
-        super().__init__(parent)
-        self.setStyleSheet("font-size: 14pt")
-        self.setObjectName("home")
-        self.page_1_layout = QVBoxLayout(self)
-        self.page_1_layout.setContentsMargins(5, 5, 5, 5)
-        self.page_1_layout.setSpacing(5)
-        self.page_1_layout.setObjectName("page_1_layout")
-        self.welcome_base = QFrame(self)
-        self.welcome_base.setFrameShape(QFrame.NoFrame)
-        self.welcome_base.setFrameShadow(QFrame.Raised)
-        self.welcome_base.setObjectName("welcome_base")
-        self.center_page_layout = QVBoxLayout(self.welcome_base)
-        self.center_page_layout.setContentsMargins(0, 0, 0, 0)
-        self.center_page_layout.setSpacing(10)
-        self.center_page_layout.setObjectName("center_page_layout")
-        self.logo = QFrame(self.welcome_base)
-        self.logo.setFrameShape(QFrame.NoFrame)
-        self.logo.setFrameShadow(QFrame.Raised)
-        self.logo.setObjectName("logo")
-        self.logo_layout = QVBoxLayout(self.logo)
-        self.logo_layout.setContentsMargins(0, 0, 0, 0)
-        self.logo_layout.setSpacing(0)
-        self.logo_layout.setObjectName("logo_layout")
-        self.center_page_layout.addWidget(self.logo)
-        self.label = QLabel(self.welcome_base)
-        self.label.setAlignment(Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.center_page_layout.addWidget(self.label)
-        self.page_1_layout.addWidget(self.welcome_base, 0, Qt.AlignHCenter)
-
-        self.label.setText("Willkommen zur Toolbox")
-        self.logo_svg = QSvgWidget(":/svg_images/logo_toolbox.svg")
-        self.logo_svg.setMinimumSize(250, 250)
-        self.logo_layout.addWidget(
-            self.logo_svg, Qt.AlignCenter, Qt.AlignCenter
+    def _create_layout(self) -> QLayout:
+        """Custom layout setup."""
+        layout = QVBoxLayout()
+        label = QLabel(f"Willkommen zur {APP_NAME}")
+        logo_svg = QSvgWidget(":/svg_images/logo_toolbox.svg")
+        logo_svg.setMinimumSize(250, 250)
+        label.setObjectName("heading_label")
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+        layout.addWidget(label)
+        layout.addSpacing(40)
+        layout.addWidget(logo_svg)
+        layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Preferred, QSizePolicy.Expanding)
         )
+        return layout
 
 
 class StyledMainWindow(TSLStyledMainWindow):
@@ -290,6 +268,7 @@ class StyledMainWindow(TSLStyledMainWindow):
         self._left_column.widget(InfoWidget).switch_style.connect(
             self.on_switch_style
         )
+
         try:
             self._current_idx = (
                 Themes.SNOW_WHITE,

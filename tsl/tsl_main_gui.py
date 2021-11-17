@@ -25,12 +25,13 @@ from PyQt5.QtWidgets import (
 
 import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from tsl.edoc_database import get_user_group_name
-from tsl.style import get_style
+from tsl.style import get_style, set_current_style
 from tsl.update_window import TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
 from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.credit_bar import CreditBar
 from tsl.widgets.grips import CornerGrip, EdgeGrip
+from tsl.widgets.home_page import HomePage
 from tsl.widgets.left_column import LeftColumn
 from tsl.widgets.left_menu import LeftMenu
 from tsl.widgets.title_bar import TitleBar
@@ -108,11 +109,12 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         self._visible_widgets = self.get_widgets_to_display(
             self.MAIN_WIDGET_CLASSES
         )
+
         # Add the left menu.
         self._left_menu = self._add_left_menu(self._background.layout())
 
         # Add the left column.
-        self._left_column_frame, self._left_column = self.add_left_column(
+        self._left_column_frame, self._left_column = self._add_left_column(
             self._background.layout()
         )
 
@@ -151,15 +153,28 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
 
-        # Activate the first widget to be visible by default.
-        self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
+        homepage = self.get_main_widget(HomePage)
+        if homepage:
+            homepage.change_theme.connect(self.on_change_theme)
 
-    WidgetT = TypeVar("WidgetT", MainWidget, ColumnBaseWidget)
+        # Activate the first widget to be visible by default.
+        if self.MAIN_WIDGET_CLASSES:
+            self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
+
+    MainWidgetT = TypeVar("MainWidgetT", bound=MainWidget)
+
+    def get_main_widget(
+        self, widget: Type[MainWidgetT]
+    ) -> Optional[MainWidgetT]:
+        """Get main widget from content."""
+        return self._content.findChild(widget)
 
     @pyqtSlot(QRect, name="window_geometry_changed")
     def window_geometry_changed(self, geometry: QRect) -> None:
         """Handle change of window geometry by using the grips."""
         self.setGeometry(geometry)
+
+    WidgetT = TypeVar("WidgetT", MainWidget, ColumnBaseWidget)
 
     @staticmethod
     def get_widgets_to_display(
@@ -198,12 +213,12 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         layout.addWidget(content_area_frame)
 
         # Create and add the right column QFrame to the given layout.
-        right_column_frame, right_content = self.add_right_column(
+        right_column_frame, right_content = self._add_right_column(
             content_area_layout
         )
         return right_column_frame, right_content, content
 
-    def add_right_column(
+    def _add_right_column(
         self, layout: QLayout
     ) -> Tuple[QFrame, QStackedWidget]:
         """
@@ -254,7 +269,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         title_bar.right_button_clicked.connect(self.on_right_column)
         return title_bar
 
-    def add_left_column(self, layout: QLayout) -> Tuple[QFrame, LeftColumn]:
+    def _add_left_column(self, layout: QLayout) -> Tuple[QFrame, LeftColumn]:
         """
         Add a QFrame and the LeftColumn to the given QLayout.
 
@@ -642,3 +657,10 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
                     for idx in range(self._content.count())
                 ],
             )
+
+    @pyqtSlot(str, name="on_change_theme")
+    def on_change_theme(self, theme: str) -> None:
+        """Change the theme to the theme with the given name."""
+        set_current_style(theme)
+        self.setStyleSheet(get_style())
+        self.update()
