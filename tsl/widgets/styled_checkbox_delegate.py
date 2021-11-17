@@ -1,14 +1,92 @@
 """Delegate for altering appearance of a checkbox in a view."""
-from PyQt5.QtCore import QModelIndex, QRect, Qt
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem
+from collections import defaultdict
+from typing import Dict
+
+from PyQt5.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QFontMetrics,
+    QPainter,
+    QPaintEvent,
+    QStaticText,
+)
+from PyQt5.QtWidgets import (
+    QCheckBox,
+    QStyle,
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
+    QWidget,
+)
 
 from tsl.style import get_color
 from tsl.widgets.custom_icon_engine import PixmapStore
 
 
+def get_icon_path(state: Qt.CheckState) -> str:
+    """Get icon path depending on state."""
+    if state == Qt.Checked:
+        path = ":/svg_icons/checkbox_checked.svg"
+    elif state == Qt.PartiallyChecked:
+        path = ":/svg_icons/checkbox_indeterminate.svg"
+    else:
+        path = ":/svg_icons/checkbox_unchecked.svg"
+    return path
+
+
+def get_state_color(state: QStyle.StateFlag) -> str:
+    """Get disabled/enabled color depending on state."""
+    if state & QStyle.State_Selected or state & QStyle.State_MouseOver:
+        return get_color("active")
+    if state & QStyle.State_Enabled:
+        return get_color("foreground")
+    return get_color("fg_disabled")
+
+
+def draw_checkbox(
+    painter: QPainter, rect: QRect, path: str, color: str
+) -> None:
+    """Draws checkbox."""
+
+    scale = painter.device().devicePixelRatio()
+    store = PixmapStore.inst()
+    painter.drawPixmap(
+        rect,
+        store.get_pixmap(
+            path,
+            scale * rect.width(),
+            scale * rect.height(),
+            color,
+        ),
+    )
+
+
 class StyledCheckboxDelegate(QStyledItemDelegate):
     """Delegate for altering appearance of a checkbox in a view."""
+
+    _text_sizes: Dict[str, Dict[int, QStaticText]] = defaultdict(dict)
+
+    def truncate_text(
+        self,
+        font_metrics: QFontMetrics,
+        text: str,
+        width: int,
+    ) -> QStaticText:
+        """
+        Truncate a text so that if fits into the text_rect.
+        This function uses memoization based on the given text and width.
+        """
+        try:
+            return self._text_sizes[text][width]
+        except KeyError:
+            elided_text = font_metrics.elidedText(text, Qt.ElideRight, width)
+            self._text_sizes[text][width] = QStaticText(elided_text)
+            # Activate AggressiveCaching (better performance, more memory)
+            self._text_sizes[text][width].setTextFormat(Qt.PlainText)
+            self._text_sizes[text][width].setPerformanceHint(
+                QStaticText.AggressiveCaching
+            )
+            return self._text_sizes[text][width]
 
     def paint(  # pylint: disable=no-self-use
         self,
@@ -25,6 +103,32 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
         # https://doc.qt.io/qt-5/qstyleditemdelegate.html#paint
         painter.save()
 
+        # Check if we need to paint a background.
+        if (
+            option.state & QStyle.State_Selected  # type: ignore
+            or option.state & QStyle.State_MouseOver  # type: ignore
+        ):
+            # Get the background color depending on the two cases:
+            color = get_color(
+                "context_pressed"
+                if option.state & QStyle.State_Selected  # type: ignore
+                else "context_color"
+            )
+            # Save the pen, since we draw the background with a brush
+            pen = painter.pen()
+            # Set the text color for hovered or selected items.
+            pen.setColor(QColor(get_color("active")))
+            painter.setBrush(QBrush(QColor(color)))
+            painter.setPen(Qt.NoPen)
+            painter.drawRect(option.rect)
+            painter.setPen(pen)
+            painter.setBrush(Qt.NoBrush)
+
+        # If there is not enough space for the checkbox nothing is shown
+        # This prevents the overlap of checkboxes with neighbouring columns
+        if option.rect.width() < option.rect.height():
+            return
+
         # Calculate a simple rect for the checkbox that is the max size square
         # from the rectangle we paint in.
         checkbox_rect = QRect(option.rect)
@@ -32,53 +136,114 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
         checkbox_rect.setWidth(checkbox_rect.height())
 
         # Paint icon depending on CheckState.
-        if index.data(Qt.CheckStateRole) == Qt.Checked:
-            icon_path = ":/svg_icons/checkbox_checked.svg"
+        icon_path = get_icon_path(index.data(Qt.CheckStateRole))
 
-        elif index.data(Qt.CheckStateRole) == Qt.PartiallyChecked:
-            icon_path = ":/svg_icons/checkbox_indeterminate.svg"
+        # Set color depending on state
+        color = get_state_color(option.state)  # type: ignore
 
-        else:
-            icon_path = ":/svg_icons/checkbox_unchecked.svg"
-
-        store = PixmapStore.inst()
-        painter.drawPixmap(
-            checkbox_rect,
-            store.get_pixmap(
-                icon_path,
-                checkbox_rect.width(),
-                checkbox_rect.height(),
-                get_color("foreground"),
-            ),
-        )
-        checkbox_text = index.data()
-
-        counter = 1
-        while (
-            option.rect.width() - option.rect.height()
-        ) < painter.fontMetrics().width(checkbox_text):
-            checkbox_text = checkbox_text[:-counter]
-            counter += 1
-            if len(checkbox_text) == 0:
-                break
-
-        if checkbox_text < index.data() and len(checkbox_text) != 0:
-            checkbox_text += "..."
+        # Draw CheckBox Icon
+        draw_checkbox(painter, checkbox_rect, icon_path, color)
 
         # Calculate a rect for the text.
         text_rect = QRect(
-            option.rect.x() + option.rect.height(),
+            option.rect.x() + checkbox_rect.width(),
             option.rect.y(),
-            option.rect.width()
-            - option.rect.height()
-            + painter.fontMetrics().width(checkbox_text),
-            option.rect.height(),
+            option.rect.width() - checkbox_rect.width(),
+            checkbox_rect.height(),
+        )
+        elided_text = self.truncate_text(
+            option.fontMetrics, index.data(), text_rect.width()
         )
 
         # Draw the text
-        painter.drawText(
-            text_rect, Qt.AlignLeft | Qt.AlignVCenter, checkbox_text
+        painter.drawStaticText(text_rect.x(), text_rect.y(), elided_text)
+
+        painter.restore()
+
+
+class StyledCheckBox(QCheckBox):
+    """Styled Version of CheckBox."""
+
+    SPACER = 4
+    _text_sizes: Dict[int, QStaticText] = defaultdict()
+
+    def __init__(self, parent: QWidget = None):
+        """Initialize Checkbox with static text."""
+        super().__init__(parent)
+        self._text = QStaticText()
+
+    def setText(self, text: str) -> None:  # pylint: disable=invalid-name
+        """Save text as static text."""
+        self._text.setText(text)
+        self._text.setPerformanceHint(QStaticText.AggressiveCaching)
+        self._text.setTextFormat(Qt.PlainText)
+        super().setText(text)
+
+    def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
+        """Compute size Hint."""
+        width = int(
+            self.iconSize().width() + self.SPACER + self._text.size().width()
+        )
+        height = int(self.iconSize().height())
+        return QSize(width, height)
+
+    def truncate_text(
+        self, font_metrics: QFontMetrics, width: int
+    ) -> QStaticText:
+        """
+        Truncate a text so that if fits into the text_rect.
+        This function uses memoization based on the given text and width.
+        """
+        try:
+            return self._text_sizes[width]
+        except KeyError:
+            elided_text = font_metrics.elidedText(
+                self._text.text(), Qt.ElideRight, width
+            )
+            self._text_sizes[width] = QStaticText(elided_text)
+            self._text_sizes[width].prepare()
+            # Activate AggressiveCaching (better performance, more memory)
+            self._text_sizes[width].setTextFormat(Qt.PlainText)
+            self._text_sizes[width].setPerformanceHint(
+                QStaticText.AggressiveCaching
+            )
+            return self._text_sizes[width]
+
+    def paintEvent(  # pylint: disable=invalid-name, unused-argument
+        self, event: QPaintEvent
+    ) -> None:
+        """Implement custom painting."""
+
+        painter = QPainter(self)
+        # Define rect for CheckBox Icon
+        checkbox_rect = QRect(
+            QPoint(self.rect().x(), self.rect().y()), self.iconSize()
         )
 
-        # Restore the original painter.
-        painter.restore()
+        # Paint icon depending on CheckState.
+        icon_path = get_icon_path(self.checkState())
+
+        # Set color depending on state
+        color = get_state_color(
+            QStyle.State_Enabled if self.isEnabled() else QStyle.State_None
+        )
+        painter.setPen(QColor(color))
+
+        # Draw CheckBox Icon
+        draw_checkbox(painter, checkbox_rect, icon_path, color)
+
+        # Calculate a rect for the text.
+        text_rect = QRect(
+            checkbox_rect.width() + self.SPACER,
+            0,
+            self.width() - self.SPACER - checkbox_rect.width(),
+            self.height(),
+        )
+
+        # Shorten text, if if cannot be fully displayed
+        elided_text = self.truncate_text(self.fontMetrics(), text_rect.width())
+
+        # Draw the text
+        painter.drawStaticText(text_rect.x(), text_rect.y(), elided_text)
+
+        painter.end()

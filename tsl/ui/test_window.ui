@@ -56,7 +56,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="disable_widgets">
+      <widget class="StyledCheckBox" name="disable_widgets">
        <property name="text">
         <string>Disable Widgets</string>
        </property>
@@ -528,6 +528,11 @@ p, li { white-space: pre-wrap; }
    <class>Toggle</class>
    <extends>QCheckBox</extends>
    <header location="global">tsl.widgets.toggle</header>
+  </customwidget>
+  <customwidget>
+   <class>StyledCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">tsl.widgets.styled_checkbox_delegate</header>
   </customwidget>
  </customwidgets>
  <resources/>

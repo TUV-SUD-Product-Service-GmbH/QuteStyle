@@ -35,7 +35,7 @@ class Ui_test_widget(object):
             QtWidgets.QSizePolicy.Minimum,
         )
         self.horizontalLayout.addItem(spacerItem)
-        self.disable_widgets = QtWidgets.QCheckBox(test_widget)
+        self.disable_widgets = StyledCheckBox(test_widget)
         self.disable_widgets.setChecked(False)
         self.disable_widgets.setObjectName("disable_widgets")
         self.horizontalLayout.addWidget(self.disable_widgets)
@@ -361,4 +361,5 @@ class Ui_test_widget(object):
 
 
 from tsl.widgets.icon_button import IconButton
+from tsl.widgets.styled_checkbox_delegate import StyledCheckBox
 from tsl.widgets.toggle import Toggle
