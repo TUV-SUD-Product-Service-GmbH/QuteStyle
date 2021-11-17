@@ -230,7 +230,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         right column (as defined in TslMainGui.RIGHT_WIDGET_CLASS).
         """
         right_column_frame = QFrame()
-        right_column_frame.setObjectName("bg_frame")
+        right_column_frame.setObjectName("bg_two_frame")
         right_column_frame.setFixedWidth(0)
         content_area_right_layout = QVBoxLayout(right_column_frame)
         content_area_right_layout.setContentsMargins(5, 5, 5, 5)

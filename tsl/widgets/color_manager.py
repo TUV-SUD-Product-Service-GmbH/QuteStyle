@@ -86,12 +86,12 @@ class ColorManager(ColumnBaseWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         scroll_area = QScrollArea(self)
-        scroll_area.setObjectName("bg_frame")
+        scroll_area.setObjectName("bg_two_frame")
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         layout.addWidget(scroll_area)
 
         frame = QWidget()
-        frame.setObjectName("bg_frame")
+        frame.setObjectName("bg_two_frame")
         grid_layout = QGridLayout(frame)
         assert frame.layout() is grid_layout
         scroll_area.setWidget(frame)

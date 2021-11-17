@@ -6,27 +6,20 @@ from PyQt5.QtWidgets import (
     QLabel,
     QSizePolicy,
     QSpacerItem,
-    QWidget,
 )
 
 
-class CreditBar(QWidget):
+class CreditBar(QFrame):
     """Credit bar with copyright text on the left and version on the right."""
 
     def __init__(self, version: str) -> None:
         """Create a new CreditBar."""
         super().__init__()
+        self.setObjectName("bg_two_frame")
 
         self.setFixedHeight(26)
 
-        widget_layout = QHBoxLayout(self)
-        widget_layout.setContentsMargins(0, 0, 0, 0)
-
-        bg_frame = QFrame()
-        bg_frame.setObjectName("bg_frame")
-        widget_layout.addWidget(bg_frame)
-
-        bg_layout = QHBoxLayout(bg_frame)
+        bg_layout = QHBoxLayout(self)
         bg_layout.setContentsMargins(0, 0, 0, 0)
 
         copyright_label = QLabel("By: Technical Support Local")

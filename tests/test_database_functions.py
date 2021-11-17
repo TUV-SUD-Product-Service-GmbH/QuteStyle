@@ -61,6 +61,7 @@ def test_copy_filters_only_with_pe() -> None:
             )
 
 
+@pytest.mark.edoc_db
 def test_insert_package_into_nav_without_pe() -> None:
     """Test that inserting a Package works with the stored procedure."""
     package_id = create_test_package()

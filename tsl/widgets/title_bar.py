@@ -4,15 +4,16 @@ from typing import List, Type, cast
 
 from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
+from tsl.vault import Vault
 from tsl.widgets.base_widgets import ColumnBaseWidget
 from tsl.widgets.title_button import TitleButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class TitleBar(QWidget):
+class TitleBar(QFrame):
     """Top bar with system buttons and extra menu."""
 
     right_button_clicked = pyqtSignal(type, name="right_button_clicked")
@@ -30,20 +31,12 @@ class TitleBar(QWidget):
     ) -> None:
         """Create a new TitleBar."""
         super().__init__(parent)
+        self.setObjectName("bg_two_frame")
 
         # Fix the height of the TitleBar to 40 pixels.
         self.setFixedHeight(40)
 
-        # Create a main layout.
-        title_bar_layout = QVBoxLayout(self)
-        title_bar_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Create a background QFrame and a layout for the TitleBar's elements
-        # and add it to the main layout.
-        title_bar_background = QFrame()
-        title_bar_background.setObjectName("title_bar_background")
-        title_bar_layout.addWidget(title_bar_background)
-        bg_layout = QHBoxLayout(title_bar_background)
+        bg_layout = QHBoxLayout(self)
         bg_layout.setContentsMargins(10, 0, 5, 0)
         bg_layout.setSpacing(0)
 
@@ -55,6 +48,21 @@ class TitleBar(QWidget):
         self._title_label.installEventFilter(self)
         self._title_label.setText(name)
         bg_layout.addWidget(self._title_label)
+
+        # Label to inform developer and tester that the cps test database
+        # is used
+        envs = Vault.CREATED_DATABASES
+        log.debug("Envs used: %s", envs)
+        if any(env != Vault.Environment.PROD for env in envs.values()):
+            log.debug("Usage of test databases detected: %s", envs)
+            text = " | ".join(
+                f"{app.name}: {env.name}" for app, env in envs.items()
+            )
+            db_label = QLabel(text)
+            db_label.setObjectName("db_label")
+            db_label.setAlignment(Qt.AlignVCenter)
+            db_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            bg_layout.addWidget(db_label)
 
         # Button for the right column
         for widget_class in right_widget_classes:
@@ -116,7 +124,7 @@ class TitleBar(QWidget):
         and MousePress. The final Mouse Release is not part of this event.
         Thus it can happen that by executing a MouseButtonDblClick also a Mouse
         MoveEvent is executed. The introduced _double_click_in_progress
-        variable blocks this situtation which could lead to e.g. a maximize
+        variable blocks this situation which could lead to e.g. a maximize
         operation followed directly by a minimize operation.
         """
         if obj is not self._title_label:

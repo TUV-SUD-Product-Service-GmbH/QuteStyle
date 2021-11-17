@@ -730,14 +730,15 @@ QFrame {{
     color: {foreground};
     font: 9pt 'Segoe UI';
 }}
-QFrame#title_bar_background {{
+/* Used for Frames, and other space covering widgets like title bar,
+credit bar and widgets in the right column (mostly QFrame) */
+#bg_two_frame {{
     background-color: {bg_two};
     border-radius: 8px;
 }}
-
-#bg_frame {{ /* background for the CreditBar */
+QFrame#title_bg_frame {{
+    background-color: {bg_one};
     border-radius: 8px;
-    background-color: {bg_two};
 }}
 
 QFrame#div {{
@@ -761,6 +762,10 @@ QLabel#left_label {{
 QLabel#heading_label {{
     font: 14pt "Segoe UI";
 }}
+QLabel#db_label {{
+    color: red;
+    font-weight: bold;
+}}
 /* Completer */
 #completer_popup{{
     border: 1px;
@@ -769,11 +774,6 @@ QLabel#heading_label {{
 }}
 QListView#completer_popup{{
     padding: 0px 10px 0px 10px;
-}}
-
-QFrame#title_bg_frame {{
-    background-color: {bg_one};
-    border-radius: 8px;
 }}
 
 /* Background around the LeftMenu */

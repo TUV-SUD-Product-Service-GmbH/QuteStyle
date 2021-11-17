@@ -5,6 +5,7 @@ from tsl.helper import get_process_path, get_project_path
 from tsl.pse_database import Process, Project, session_scope
 
 
+@pytest.mark.pse_db
 def test_check_project_path() -> None:
     """Test getting a project path works as expected."""
     with session_scope() as session:
@@ -34,12 +35,14 @@ def test_check_project_path() -> None:
     )
 
 
+@pytest.mark.pse_db
 def test_check_project_path_fail() -> None:
     """Test getting a project path works as expected."""
     with pytest.raises(ValueError):
         get_project_path(1234567)
 
 
+@pytest.mark.pse_db
 def test_check_process_path() -> None:
     """Test getting a project path works as expected."""
     with session_scope() as session:
@@ -50,6 +53,7 @@ def test_check_process_path() -> None:
     )
 
 
+@pytest.mark.pse_db
 def test_check_process_path_fail() -> None:
     """Test getting a project path works as expected."""
     with pytest.raises(ValueError):

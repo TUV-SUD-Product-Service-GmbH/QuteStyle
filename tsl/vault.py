@@ -11,6 +11,7 @@ import logging
 import os
 import urllib.parse
 from enum import Enum
+from typing import Dict
 
 from tsl.init import check_ide
 
@@ -35,6 +36,8 @@ class Vault:
         CHEMUP = 2
         LABMONITOR = 3
         TOOLBOX = 4
+
+    CREATED_DATABASES: Dict[Application, Environment] = {}
 
     @staticmethod
     def local_conn_str() -> str:  # pragma: no cover
@@ -62,6 +65,10 @@ class Vault:
     @staticmethod
     def return_conn_str(app: Application, env: Environment) -> str:
         """Return the connection string for the app and environment."""
+        log.debug("Getting db connection for app %s on env %s", app, env)
+        # All connection strings should be requested only once per lifecycle.
+        assert app not in Vault.CREATED_DATABASES
+        Vault.CREATED_DATABASES[app] = env
         appn = app.name
 
         driver = os.getenv(
