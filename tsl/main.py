@@ -245,6 +245,8 @@ class StyledMainWindow(TSLStyledMainWindow):
 
     MIN_SIZE = QSize(800, 600)
 
+    LOGO = ":/svg_images/logo_toolbox.svg"
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         update: bool,

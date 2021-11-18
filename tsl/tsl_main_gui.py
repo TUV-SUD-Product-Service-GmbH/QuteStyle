@@ -59,6 +59,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     # Define the maximum width for the columns (left and right).
     MAX_COLUMN_WIDTH = 240
 
+    # Logo of the Application
+    LOGO: str = ":/svg_icons/no_icon.svg"
+
     # Signal that is emitted when the window has shut down.
     shutdown_complete = pyqtSignal(name="shutdown_complete")
 
@@ -260,6 +263,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             self.centralWidget(),
             self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_name,
+            self.LOGO,
         )
         title_bar.close_app.connect(self.close)
         title_bar.minimize.connect(self.showMinimized)

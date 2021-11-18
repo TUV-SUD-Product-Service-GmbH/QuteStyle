@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from tsl.vault import Vault
 from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.icon import Icon
 from tsl.widgets.title_button import TitleButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -22,12 +23,13 @@ class TitleBar(QFrame):
     maximize = pyqtSignal(name="maximize")
     move_window = pyqtSignal(QPoint, name="move")
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         parent: QWidget,
         app_parent: QWidget,
         right_widget_classes: List[Type[ColumnBaseWidget]],
         name: str,
+        logo: str,
     ) -> None:
         """Create a new TitleBar."""
         super().__init__(parent)
@@ -40,14 +42,24 @@ class TitleBar(QFrame):
         bg_layout.setContentsMargins(10, 0, 5, 0)
         bg_layout.setSpacing(0)
 
-        # Label with the application title text. eventFilter is used to enable
-        # moving + min/maximizing of the app itself.
+        # Icon with ToolBox logo
+        self._icon = Icon(int(self.height() * 0.5), None)
+        self._icon.set_icon(logo)
+        self._icon.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self._icon.setAlignment(Qt.AlignVCenter)
+        bg_layout.addWidget(self._icon)
+
+        # Label with the application title text.
         self._title_label = QLabel()
         self._title_label.setObjectName("title_label")
         self._title_label.setAlignment(Qt.AlignVCenter)
-        self._title_label.installEventFilter(self)
         self._title_label.setText(name)
         bg_layout.addWidget(self._title_label)
+
+        # eventFilter is used to enable
+        # moving + min/maximizing of the app itself.
+        self._icon.installEventFilter(self)
+        self._title_label.installEventFilter(self)
 
         # Label to inform developer and tester that the cps test database
         # is used
@@ -127,7 +139,7 @@ class TitleBar(QFrame):
         variable blocks this situation which could lead to e.g. a maximize
         operation followed directly by a minimize operation.
         """
-        if obj is not self._title_label:
+        if obj is not self._title_label and not self._icon:
             return False
         if event.type() == QEvent.MouseButtonRelease:
             log.debug("QEvent.MouseButtonRelease")

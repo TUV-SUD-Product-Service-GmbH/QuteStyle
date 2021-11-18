@@ -27,7 +27,9 @@ def test_db_label(
     Vault.CREATED_DATABASES = db_cache
     parent = QWidget()
     qtbot.addWidget(parent)
-    title_bar = TitleBar(parent, parent, [], "Test")
+    title_bar = TitleBar(
+        parent, parent, [], "Test", ":/svg_images/logo_toolbox.svg"
+    )
     qtbot.addWidget(title_bar)
     parent.show()
     qtbot.waitUntil(parent.isVisible)

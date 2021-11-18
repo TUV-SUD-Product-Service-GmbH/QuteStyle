@@ -1,5 +1,5 @@
 """Icon that can be painted in any given color."""
-from typing import cast
+from typing import Union, cast
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
@@ -13,7 +13,9 @@ from tsl.widgets.custom_icon_engine import PixmapStore
 class Icon(QLabel):
     """Icon that can be painted in any given color."""
 
-    def __init__(self, radius: int = 20) -> None:
+    def __init__(
+        self, radius: int = 20, color_name: Union[str, None] = "foreground"
+    ) -> None:
         """Create a new Icon."""
         super().__init__()
         self.setContentsMargins(0, 0, 0, 0)
@@ -22,6 +24,7 @@ class Icon(QLabel):
         self.radius = radius
         self.setFixedSize(int(1.5 * radius), int(1.5 * radius))
         self._icon_path = ":/svg_icons/no_icon.svg"
+        self._color_name = color_name
 
     def set_icon(self, icon_path: str) -> None:
         """Set the given icon path."""
@@ -37,9 +40,14 @@ class Icon(QLabel):
         radius = int(self.radius * scale_factor)
 
         # Get pixmap from store
-        pixmap = PixmapStore.inst().get_pixmap(
-            self._icon_path, radius, radius, get_color("foreground")
-        )
+        if self._color_name:
+            pixmap = PixmapStore.inst().get_pixmap(
+                self._icon_path, radius, radius, get_color(self._color_name)
+            )
+        else:
+            pixmap = PixmapStore.inst().get_pixmap(
+                self._icon_path, radius, radius
+            )
         # Set the scale_factor -> displayed pixmap fits into target
         pixmap.setDevicePixelRatio(scale_factor)
         self.setPixmap(pixmap)

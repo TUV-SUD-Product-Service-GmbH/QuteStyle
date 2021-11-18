@@ -57,7 +57,7 @@ class PixmapStore:
     INST: Optional[PixmapStore] = None
     # _pixmap[path][width, height][color]
     _pixmaps: Dict[
-        str, Dict[Tuple[int, int], Dict[str, QPixmap]]
+        str, Dict[Tuple[int, int], Dict[Optional[str], QPixmap]]
     ] = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self) -> None:
@@ -73,9 +73,14 @@ class PixmapStore:
         return PixmapStore.INST
 
     def get_pixmap(
-        self, path: str, width: int, height: int, color: str
+        self, path: str, width: int, height: int, color: str = None
     ) -> QPixmap:
-        """Return the pixmap with width and height from the PixmapStore."""
+        """
+        Return the pixmap with width and height from the PixmapStore.
+
+        The color is optional, if no color is given,
+        the icon will keep its original colors.
+        """
         # The original AspectRatio will be kept
         try:
             return self._pixmaps[path][width, height][color]
@@ -97,7 +102,8 @@ class PixmapStore:
                 )
             painter = QPainter(icon)
             painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
-            painter.fillRect(icon.rect(), QColor(color))
+            if color:
+                painter.fillRect(icon.rect(), QColor(color))
             painter.end()
             # Scaling works best if svg has dimensions ~56x56
             pixmap = icon.scaled(
