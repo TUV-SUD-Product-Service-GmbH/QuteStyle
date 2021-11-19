@@ -1,5 +1,6 @@
 """Top bar with system buttons and extra menu."""
 import logging
+import os
 from typing import List, Type, cast
 
 from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal, pyqtSlot
@@ -65,10 +66,18 @@ class TitleBar(QFrame):
         # is used
         envs = Vault.CREATED_DATABASES
         log.debug("Envs used: %s", envs)
-        if any(env != Vault.Environment.PROD for env in envs.values()):
-            log.debug("Usage of test databases detected: %s", envs)
-            text = " | ".join(
-                f"{app.name}: {env.name}" for app, env in envs.items()
+        pse = os.getenv("PSE_FOLDER")
+        if any(env != Vault.Environment.PROD for env in envs.values()) or pse:
+            log.debug(
+                "Usage of test databases detected: %s; PSE-Folder: %s",
+                envs,
+                pse,
+            )
+            text = (
+                " | ".join(
+                    f"{app.name}: {env.name}" for app, env in envs.items()
+                )
+                + f" | PSE-FOLDER-FAKE: {bool(pse)}"
             )
             db_label = QLabel(text)
             db_label.setObjectName("db_label")
