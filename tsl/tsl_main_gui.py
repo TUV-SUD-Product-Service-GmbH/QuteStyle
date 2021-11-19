@@ -44,6 +44,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 ):
     """TSLStyledMainWindow definition for custom Darcula style."""
 
+    # As default styled version does not show the WhatsNewWindow.
+    WHATS_NEW = False
+
     # Widgets that will be shown in the center content and which are
     # accessible from the main menu on the left side.
     MAIN_WIDGET_CLASSES: List[Type[MainWidget]]

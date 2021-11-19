@@ -18,10 +18,12 @@ LOG_NAME = ".".join(["tsl", __name__])
 log = logging.getLogger(LOG_NAME)  # pylint: disable=invalid-name
 
 
+# pylint: disable=too-many-instance-attributes, too-many-arguments
 class TSLMainWindow(QMainWindow):
     """Main window class for TSL applications."""
 
-    # pylint: disable=too-many-instance-attributes, too-many-arguments
+    WHATS_NEW = True
+
     def __init__(
         self,
         update: bool,
@@ -73,7 +75,7 @@ class TSLMainWindow(QMainWindow):
         last_run = QSettings().value("last_run", (0, 0, 0))
         log.debug("Last run showed details for version %s", last_run)
         current_ver = tuple(int(num) for num in self._version.split("."))
-        if last_run < current_ver or self._force_whats_new:
+        if last_run < current_ver or self._force_whats_new and self.WHATS_NEW:
             log.debug("Current version newer than last run %s", self._version)
             # if we force whats new display, we show the error message, even if
             # nothing is visible.
@@ -83,6 +85,8 @@ class TSLMainWindow(QMainWindow):
     @pyqtSlot(name="on_display_whats_new")
     def on_whats_new(self) -> None:
         """Display the WhatsNewWindow."""
+        # Slot shall not be called when WhatsNew is disabled.
+        assert self.WHATS_NEW
         self._display_whats_new(False)
 
     def _display_whats_new(self, silent: bool = True) -> None:
