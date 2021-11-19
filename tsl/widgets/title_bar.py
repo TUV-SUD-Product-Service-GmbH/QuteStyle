@@ -142,16 +142,13 @@ class TitleBar(QFrame):
         if obj is not self._title_label and not self._icon:
             return False
         if event.type() == QEvent.MouseButtonRelease:
-            log.debug("QEvent.MouseButtonRelease")
             self._double_click_in_progress = False
             return True
         if event.type() == QEvent.MouseButtonDblClick:
-            log.debug("QEvent.MouseButtonDblClick")
             self._double_click_in_progress = True
             self.maximize.emit()
             return True
         if event.type() == QEvent.MouseMove:
-            log.debug("QEvent.MouseMove")
             if not self._double_click_in_progress:
                 self.move_window.emit(cast(QMouseEvent, event).globalPos())
             return True

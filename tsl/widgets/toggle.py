@@ -1,10 +1,12 @@
 """Toggle button (custom checkbox)."""
+import logging
 from typing import Union
 
 from PyQt5.QtCore import (  # type: ignore # for pyqtProperty
     QEasingCurve,
     QPoint,
     QPropertyAnimation,
+    QSize,
     Qt,
     pyqtProperty,
     pyqtSlot,
@@ -13,6 +15,7 @@ from PyQt5.QtGui import (
     QColor,
     QFont,
     QFontMetrics,
+    QMoveEvent,
     QPainter,
     QPaintEvent,
     QPen,
@@ -20,30 +23,79 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QCheckBox, QSizePolicy, QWidget
 
 from tsl.style import get_color
+from tsl.widgets.text_truncator import TextTruncator
+
+log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class Toggle(QCheckBox):
+class Toggle(QCheckBox, TextTruncator):
     """Toggle button (custom checkbox)."""
 
-    FONT = QFont("Segoe UI", 8)
+    _FONT = QFont("Segoe UI", 8)
+
+    # This is the offset with which the circle is shown on both sides.
+    _CIRCLE_OFFSET = 3
+
+    # Size of the circle.
+    _CIRCLE_SIZE = 16
+
+    # Width of the Box, Height is based on the circle.
+    _BOX_WIDTH = 40
+
+    # Spacer between the text and the toggle box.
+    _SPACER = 5
+
+    # Duration of the animation.
+    _ANIM_DURATION = 500
 
     def __init__(self, parent: QWidget = None) -> None:
         """Create a new Toggle."""
         super().__init__(parent)
 
-        self._box_width = 40
-        self._box_height = 22
-        self._spacer = 5
-        self.setMinimumSize(self._box_width, self._box_height)
-        self.setMaximumWidth(100)
+        # Minimum width is the BOX_WIDTH, the height can be calculated
+        height = Toggle._CIRCLE_SIZE + (2 * Toggle._CIRCLE_OFFSET)
+
+        # We're at least as wide as the toggle box is. Nevertheless we want to
+        # be as wide as the size hint to show the full text. Height is fixed.
+        self.setMinimumWidth(Toggle._BOX_WIDTH)
+        self.setFixedHeight(height)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
         self.setCursor(Qt.PointingHandCursor)
 
-        self._position = 3
+        self._position = Toggle._CIRCLE_OFFSET
+
         self._animation = QPropertyAnimation(self, b"position")
         self._animation.setEasingCurve(QEasingCurve.OutBounce)
-        self._animation.setDuration(500)
+        self._animation.setDuration(Toggle._ANIM_DURATION)
         self.stateChanged.connect(self.setup_animation)
+
+        # Set the font metrics for text length calculation.
+        self._font_metrics: QFontMetrics = QFontMetrics(Toggle._FONT)
+
+        # Store the preferred text width to calculate the size hint.
+        self._preferred_width = 0
+
+        # Remember the screen we're on.
+        self.current_screen = self.screen()
+
+    def moveEvent(  # pylint: disable=invalid-name
+        self, event: QMoveEvent
+    ) -> None:
+        """
+        Detect a screen change when moving the Toggle.
+
+        When a screen change is detected, the preferred text size is
+        recalculated and stored.
+        """
+        if self.current_screen != self.screen():
+            log.debug("Current screen has changed, updating geometry.")
+            self.current_screen = self.screen()
+            self._preferred_width = self._font_metrics.horizontalAdvance(
+                self.text()
+            )
+            self.updateGeometry()
+        return super().moveEvent(event)
 
     @pyqtProperty(float)
     def position(self) -> float:
@@ -61,9 +113,14 @@ class Toggle(QCheckBox):
         """Initiate _animation of inner circle."""
         self._animation.stop()
         if value != Qt.Unchecked:
-            self._animation.setEndValue(self._box_width / 2)
+            # Calculate the x-position from the right.
+            end = (
+                Toggle._BOX_WIDTH - Toggle._CIRCLE_OFFSET - Toggle._CIRCLE_SIZE
+            )
         else:
-            self._animation.setEndValue(4)
+            # Move the circle back to its initial position
+            end = Toggle._CIRCLE_OFFSET
+        self._animation.setEndValue(end)
         self._animation.start()
 
     def hitButton(  # pylint: disable=invalid-name
@@ -72,24 +129,38 @@ class Toggle(QCheckBox):
         """States if checkbox was hit."""
         return self.contentsRect().contains(pos)
 
+    def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
+        """Return the size hint."""
+        factor = self.screen().logicalDotsPerInchX() / 96.0
+        width = (
+            int(self._preferred_width * factor)
+            + Toggle._BOX_WIDTH
+            + Toggle._SPACER
+        )
+        log.debug(
+            "Width in size hint for Toggle: %s with factor %s", width, factor
+        )
+        return QSize(width, self.height())
+
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Override setText to calculate a new minimum width."""
-        self.setFixedWidth(
-            QFontMetrics(Toggle.FONT).horizontalAdvance(text)
-            + self._box_width
-            + self._spacer
+        self._preferred_width = self._font_metrics.horizontalAdvance(
+            self.text()
         )
         super().setText(text)
 
-    def _draw_text(self, painter: QPainter, offset: int) -> None:
+    def _draw_text(self, painter: QPainter, offset: int, width: int) -> None:
         """Draw Text."""
-        painter.setPen(QPen(QColor(get_color("foreground"))))
-        painter.setFont(Toggle.FONT)
-        painter.drawText(
-            offset,
-            int(self._box_height / 1.4),
-            self.text(),
-        )
+        if self.isEnabled():
+            color = QColor(get_color("foreground"))
+        else:
+            color = QColor(get_color("fg_disabled"))
+
+        painter.setPen(QPen(color))
+        painter.setFont(Toggle._FONT)
+        text = self.truncate_text(self.text(), width, self._font_metrics)
+        y_pos = (self.height() - text.size().height()) / 2
+        painter.drawStaticText(offset, int(y_pos), text)
 
     def _draw_checkbox(self, painter: QPainter, offset: int) -> None:
         """Draw the checkbox."""
@@ -106,16 +177,22 @@ class Toggle(QCheckBox):
 
         painter.setBrush(QColor(color))
 
+        height = self.height()
         painter.drawRoundedRect(
             offset,
             0,
-            self._box_width,
-            self._box_height,
+            Toggle._BOX_WIDTH,
+            height,
             12,
             12,
         )
         painter.setBrush(fg_color)
-        painter.drawEllipse(self._position + offset, 3, 16, 16)
+        painter.drawEllipse(
+            self._position + offset,
+            Toggle._CIRCLE_OFFSET,
+            Toggle._CIRCLE_SIZE,
+            Toggle._CIRCLE_SIZE,
+        )
 
     def paintEvent(  # pylint: disable=invalid-name
         self, _: QPaintEvent
@@ -124,19 +201,16 @@ class Toggle(QCheckBox):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        # Checking if a text is set is faster for cases with no text.
-        if self.layoutDirection() == Qt.LeftToRight:
+        if not self.text():
             self._draw_checkbox(painter, 0)
-            if self.text():
-                self._draw_text(painter, self._box_width + self._spacer)
-        if self.layoutDirection() == Qt.RightToLeft:
-            if self.text():
-                self._draw_text(painter, 0)
-                self._draw_checkbox(
-                    painter,
-                    QFontMetrics(Toggle.FONT).horizontalAdvance(self.text())
-                    + self._spacer,
+        else:
+            text_width = self.width() - Toggle._BOX_WIDTH - Toggle._SPACER
+            if self.layoutDirection() == Qt.LeftToRight:
+                self._draw_checkbox(painter, 0)
+                self._draw_text(
+                    painter, Toggle._BOX_WIDTH + Toggle._SPACER, text_width
                 )
-            else:
-                self._draw_checkbox(painter, self._spacer)
+            else:  # Qt.RightToLeft:
+                self._draw_text(painter, 0, text_width)
+                self._draw_checkbox(painter, text_width)
         painter.end()

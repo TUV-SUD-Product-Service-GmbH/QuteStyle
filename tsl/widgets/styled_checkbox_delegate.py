@@ -1,16 +1,7 @@
 """Delegate for altering appearance of a checkbox in a view."""
-from collections import defaultdict
-from typing import Dict
 
 from PyQt5.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
-from PyQt5.QtGui import (
-    QBrush,
-    QColor,
-    QFontMetrics,
-    QPainter,
-    QPaintEvent,
-    QStaticText,
-)
+from PyQt5.QtGui import QBrush, QColor, QPainter, QPaintEvent, QStaticText
 from PyQt5.QtWidgets import (
     QCheckBox,
     QStyle,
@@ -21,6 +12,7 @@ from PyQt5.QtWidgets import (
 
 from tsl.style import get_color
 from tsl.widgets.custom_icon_engine import PixmapStore
+from tsl.widgets.text_truncator import TextTruncator
 
 
 def get_icon_path(state: Qt.CheckState) -> str:
@@ -61,32 +53,8 @@ def draw_checkbox(
     )
 
 
-class StyledCheckboxDelegate(QStyledItemDelegate):
+class StyledCheckboxDelegate(QStyledItemDelegate, TextTruncator):
     """Delegate for altering appearance of a checkbox in a view."""
-
-    _text_sizes: Dict[str, Dict[int, QStaticText]] = defaultdict(dict)
-
-    def truncate_text(
-        self,
-        font_metrics: QFontMetrics,
-        text: str,
-        width: int,
-    ) -> QStaticText:
-        """
-        Truncate a text so that if fits into the text_rect.
-        This function uses memoization based on the given text and width.
-        """
-        try:
-            return self._text_sizes[text][width]
-        except KeyError:
-            elided_text = font_metrics.elidedText(text, Qt.ElideRight, width)
-            self._text_sizes[text][width] = QStaticText(elided_text)
-            # Activate AggressiveCaching (better performance, more memory)
-            self._text_sizes[text][width].setTextFormat(Qt.PlainText)
-            self._text_sizes[text][width].setPerformanceHint(
-                QStaticText.AggressiveCaching
-            )
-            return self._text_sizes[text][width]
 
     def paint(  # pylint: disable=no-self-use
         self,
@@ -152,7 +120,7 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
             checkbox_rect.height(),
         )
         elided_text = self.truncate_text(
-            option.fontMetrics, index.data(), text_rect.width()
+            index.data(), text_rect.width(), option.fontMetrics
         )
 
         # Draw the text
@@ -161,22 +129,21 @@ class StyledCheckboxDelegate(QStyledItemDelegate):
         painter.restore()
 
 
-class StyledCheckBox(QCheckBox):
+class StyledCheckBox(QCheckBox, TextTruncator):
     """Styled Version of CheckBox."""
 
     SPACER = 4
-    _text_sizes: Dict[int, QStaticText] = defaultdict()
 
     def __init__(self, parent: QWidget = None):
         """Initialize Checkbox with static text."""
         super().__init__(parent)
         self._text = QStaticText()
+        self._text.setPerformanceHint(QStaticText.AggressiveCaching)
+        self._text.setTextFormat(Qt.PlainText)
 
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Save text as static text."""
         self._text.setText(text)
-        self._text.setPerformanceHint(QStaticText.AggressiveCaching)
-        self._text.setTextFormat(Qt.PlainText)
         super().setText(text)
 
     def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
@@ -186,28 +153,6 @@ class StyledCheckBox(QCheckBox):
         )
         height = int(self.iconSize().height())
         return QSize(width, height)
-
-    def truncate_text(
-        self, font_metrics: QFontMetrics, width: int
-    ) -> QStaticText:
-        """
-        Truncate a text so that if fits into the text_rect.
-        This function uses memoization based on the given text and width.
-        """
-        try:
-            return self._text_sizes[width]
-        except KeyError:
-            elided_text = font_metrics.elidedText(
-                self._text.text(), Qt.ElideRight, width
-            )
-            self._text_sizes[width] = QStaticText(elided_text)
-            self._text_sizes[width].prepare()
-            # Activate AggressiveCaching (better performance, more memory)
-            self._text_sizes[width].setTextFormat(Qt.PlainText)
-            self._text_sizes[width].setPerformanceHint(
-                QStaticText.AggressiveCaching
-            )
-            return self._text_sizes[width]
 
     def paintEvent(  # pylint: disable=invalid-name, unused-argument
         self, event: QPaintEvent
@@ -241,7 +186,9 @@ class StyledCheckBox(QCheckBox):
         )
 
         # Shorten text, if if cannot be fully displayed
-        elided_text = self.truncate_text(self.fontMetrics(), text_rect.width())
+        elided_text = self.truncate_text(
+            self._text.text(), text_rect.width(), self.fontMetrics()
+        )
 
         # Draw the text
         painter.drawStaticText(text_rect.x(), text_rect.y(), elided_text)
