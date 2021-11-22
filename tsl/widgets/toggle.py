@@ -144,9 +144,7 @@ class Toggle(QCheckBox, TextTruncator):
 
     def setText(self, text: str) -> None:  # pylint: disable=invalid-name
         """Override setText to calculate a new minimum width."""
-        self._preferred_width = self._font_metrics.horizontalAdvance(
-            self.text()
-        )
+        self._preferred_width = self._font_metrics.horizontalAdvance(text)
         super().setText(text)
 
     def _draw_text(self, painter: QPainter, offset: int, width: int) -> None:
@@ -204,13 +202,31 @@ class Toggle(QCheckBox, TextTruncator):
         if not self.text():
             self._draw_checkbox(painter, 0)
         else:
-            text_width = self.width() - Toggle._BOX_WIDTH - Toggle._SPACER
+            # Use the available space. If more space is available, use the
+            # calculated preferred text width.
+            text_width = min(
+                self.width() - Toggle._BOX_WIDTH - Toggle._SPACER,
+                self._preferred_width,
+            )
+
             if self.layoutDirection() == Qt.LeftToRight:
                 self._draw_checkbox(painter, 0)
                 self._draw_text(
                     painter, Toggle._BOX_WIDTH + Toggle._SPACER, text_width
                 )
             else:  # Qt.RightToLeft:
-                self._draw_text(painter, 0, text_width)
-                self._draw_checkbox(painter, text_width)
+                # Calculate the offset for the case that more space is
+                # available than needed for the text. Otherwise (the calc is
+                # negative) we use 0 and crop the text in _draw_text.
+                offset = max(
+                    self.width()
+                    - Toggle._BOX_WIDTH
+                    - Toggle._SPACER
+                    - self._preferred_width,
+                    0,
+                )
+                self._draw_text(painter, offset, text_width)
+                self._draw_checkbox(
+                    painter, offset + Toggle._SPACER + text_width
+                )
         painter.end()
