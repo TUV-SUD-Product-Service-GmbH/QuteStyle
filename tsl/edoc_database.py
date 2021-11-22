@@ -31,13 +31,14 @@ from sqlalchemy import (
     Unicode,
     text,
 )
-from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY
+from sqlalchemy.dialects.mssql import BIT, IMAGE, MONEY, UNIQUEIDENTIFIER
 from sqlalchemy.orm import (
     Mapped,
     Session,
     backref,
     declarative_base,
     deferred,
+    joinedload,
     load_only,
     relationship,
     sessionmaker,
@@ -59,8 +60,6 @@ Base.metadata.bind = ENGINE
 AdminSession = sessionmaker(bind=ENGINE)  # pylint: disable=invalid-name
 
 USER_ID: Optional[int] = None
-TEAM_UUID: Optional[str] = None
-TEAM_ID: Optional[int] = None
 TEAM_NAME: Optional[str] = None
 
 
@@ -73,57 +72,35 @@ def get_user_id() -> int:
     return cast(int, USER_ID)
 
 
-def get_user_group_id() -> int:
+def get_user_group_name() -> Optional[str]:
     """Get the database id for the current users team."""
-    global TEAM_UUID
-    global TEAM_ID
-    if TEAM_UUID is None:
-        _fetch_user_id()
-    if TEAM_ID is None:
-        _fetch_team()
-    return cast(int, TEAM_ID)
-
-
-def get_user_group_name() -> str:
-    """Get the database id for the current users team."""
-    global TEAM_UUID
     global TEAM_NAME
-    if TEAM_UUID is None:
+    if TEAM_NAME is None:
         _fetch_user_id()
-    if TEAM_ID is None:
-        _fetch_team()
-    return str(TEAM_NAME)
+    return TEAM_NAME
 
 
 def _fetch_user_id() -> None:
     """Fetch and set the user id from the database."""
     global USER_ID
-    global TEAM_UUID
+    global TEAM_NAME
     with session_scope(False) as session:
         username = os.getlogin()
         log.debug("Getting database id for user %s", username)
         user = (
             session.query(Staff)
             .filter_by(ST_WINDOWSID=username)
-            .options(load_only(Staff.ST_ID, Staff.ST_TEAM))
+            .options(
+                load_only(Staff.ST_ID, Staff.ST_TEAM),
+                joinedload(Staff.team).options(load_only(Team.HR_SHORT)),
+            )
             .one()
         )
         USER_ID = user.ST_ID
-        TEAM_UUID = user.ST_TEAM
-
-
-def _fetch_team() -> None:
-    """Fetch and set the user id from the database."""
-    global TEAM_UUID
-    global TEAM_ID
-    global TEAM_NAME
-    with session_scope(False) as session:
-        log.debug("Getting team name and id for uuid %s", TEAM_UUID)
-        team = (
-            session.query(TeamSublocation).filter_by(ST_TEAM=TEAM_UUID).one()
-        )
-        TEAM_ID = team.ST_ID
-        TEAM_NAME = team.ST_SURNAME
+        if user.ST_TEAM and user.team:
+            TEAM_NAME = user.team.HR_SHORT
+        else:
+            log.error("Could not get Team for ST_TEAM: %s", user.ST_TEAM)
 
 
 # pylint: enable=global-statement
@@ -3566,10 +3543,9 @@ class Staff(Base):
     ST_FAX = Column(Unicode(length=40))
     ST_EMAIL = Column(Unicode(length=80))
     ST_WINDOWSID = Column(Unicode(length=32))
-    # the team is a UUID as follows: "319F6D8C-2094-40E9-A543-3975DE4B9A75"
-    # in the MSSQL this is defined as UNIQUEIDENTIFIER. setting it as str since
-    # we cannot use UNIQUEIDENTIFIER on sqlite
-    ST_TEAM = Column(Unicode(length=36))
+    ST_TEAM: Mapped[Optional[str]] = Column(
+        UNIQUEIDENTIFIER, ForeignKey("V_PSEX_HIERARCHY.HR_ID")
+    )
     ST_TYPE: Mapped[int] = Column(Integer, nullable=False)
     ST_LOCATION = Column(Unicode(length=50))
     ST_UNIT = Column(Unicode(length=12))
@@ -3588,6 +3564,10 @@ class Staff(Base):
             full_name += ", "
             full_name += self.ST_FORENAME
         return full_name
+
+    team: Optional[Team] = relationship(
+        "Team", uselist=False, back_populates="users"
+    )
 
 
 class StatisticModule(Base):
@@ -3707,10 +3687,27 @@ class Team(Base):
 
     __tablename__ = "V_PSEX_HIERARCHY"
 
-    HR_ID: Mapped[int] = Column(Integer, primary_key=True)
-    HR_SHORT = Column(Unicode(length=21))
+    HR_ID: Mapped[str] = Column(UNIQUEIDENTIFIER, primary_key=True)
+    HR_SHORT: Mapped[str] = Column(Unicode(20))
     HR_NEW_ID: Mapped[int] = Column(Integer, nullable=False)
-    ST_ID = Column(Integer)
+    ST_ID: Mapped[int] = Column(Integer)
+
+    HR_TYPE: Mapped[str] = Column(Unicode(50))
+    HR_PARENT: Mapped[str] = Column(UNIQUEIDENTIFIER)
+    HR_LOCATION: Mapped[str] = Column(Unicode(40))
+    HR_PREFIX: Mapped[str] = Column(Unicode(20))
+    HR_ACTIVE: Mapped[bool] = Column(BIT, nullable=False)
+    HR_CURRENT: Mapped[bool] = Column(BIT)
+    HR_EMAIL: Mapped[str] = Column(String(80, "SQL_Latin1_General_CP1_CI_AS"))
+    CC_ID: Mapped[str] = Column(String(10, "SQL_Latin1_General_CP1_CI_AS"))
+
+    users: List[Staff] = relationship(
+        Staff, uselist=True, back_populates="team"
+    )
+
+    sub_locations: List[TeamSublocation] = relationship(
+        "TeamSublocation", uselist=True, back_populates="team"
+    )
 
 
 class TeamSublocation(Base):
@@ -3720,13 +3717,17 @@ class TeamSublocation(Base):
 
     ST_ID: Mapped[int] = Column(Integer, primary_key=True)
     ST_SURNAME: Mapped[str] = Column(Unicode(length=60), nullable=False)
-    ST_TEAM = Column(Unicode(length=36))
+    ST_TEAM = Column(UNIQUEIDENTIFIER, ForeignKey("V_PSEX_HIERARCHY.HR_ID"))
     Sublocation = Column(Unicode(length=6))  # is always NULL as of 16.10.2020
 
     @property
     def name(self) -> Optional[str]:
         """Return the name of the team."""
         return self.ST_SURNAME
+
+    team: Team = relationship(
+        "Team", uselist=False, back_populates="sub_locations"
+    )
 
 
 class TemplateScope(Base):
