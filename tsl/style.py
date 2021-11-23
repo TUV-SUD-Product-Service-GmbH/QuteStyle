@@ -766,6 +766,9 @@ QLabel#db_label {{
     color: red;
     font-weight: bold;
 }}
+QLabel:disabled {{
+    color: {fg_disabled};
+}}
 /* Completer */
 #completer_popup{{
     border: 1px;
