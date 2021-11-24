@@ -346,6 +346,16 @@ QPlainTextEdit {{
     color: {foreground};
     height: 30px;
 }}
+QLineEdit:read-only, QPlainTextEdit:read-only{{
+    background-color: {bg_disabled};
+    color: {fg_disabled};
+}}
+QLineEdit:read-only:focus,
+QPlainTextEdit:read-only:focus {{
+    border: 1px solid {bg_disabled};
+    background-color: {bg_disabled};
+}}
+
 QLineEdit#column_line_edit {{
     background-color: {bg_elements};
     border-radius: 8px;
