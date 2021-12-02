@@ -4,10 +4,12 @@ from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
+    QLocale,
     QParallelAnimationGroup,
     QPoint,
     QPropertyAnimation,
     QRect,
+    QSettings,
     QSize,
     Qt,
     pyqtSignal,
@@ -37,6 +39,14 @@ from tsl.widgets.left_menu import LeftMenu
 from tsl.widgets.title_bar import TitleBar
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+
+
+def get_app_language() -> str:
+    """Get the currently set language to use for the ui."""
+    sys_lang = QLocale().system().name()[:2]
+    lang = QSettings().value("lang", sys_lang)
+    assert isinstance(lang, str)
+    return lang
 
 
 class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
@@ -88,6 +98,8 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             registry_reset,
             parent,
         )
+
+        self._app_name = name
 
         # Set the global stylesheet.
         self.set_style()
@@ -159,10 +171,6 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
 
-        homepage = self.get_main_widget(HomePage)
-        if homepage:
-            homepage.change_theme.connect(self.on_change_theme)
-
         # Activate the first widget to be visible by default.
         if self.MAIN_WIDGET_CLASSES:
             self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
@@ -212,7 +220,15 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         # Create the QStackedWidget that contains all the content widgets
         content = QStackedWidget()
         for widget_class in self._visible_widgets:
-            content.addWidget(widget_class())
+            if issubclass(widget_class, HomePage):
+                widget = widget_class(
+                    (self._app_name, self.LOGO, get_app_language().lower()),
+                    self._visible_widgets,
+                )
+                content.addWidget(widget)
+                widget.change_theme.connect(self.on_change_theme)
+            else:
+                content.addWidget(widget_class())
         content_area_layout.addWidget(content)
 
         # Add the QFrame to the given layout.

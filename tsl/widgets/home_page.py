@@ -1,8 +1,21 @@
 """HomePage for TSL Apps."""
-from typing import Callable, cast
+import pickle
+from enum import IntEnum
+from typing import Callable, Dict, List, Tuple, Type, cast
 
-from PyQt5.QtCore import QSettings, QSize, Qt, pyqtSignal
+from PyQt5.QtCore import (
+    QEasingCurve,
+    QFile,
+    QIODevice,
+    QPropertyAnimation,
+    QSettings,
+    QSize,
+    Qt,
+    pyqtSignal,
+    pyqtSlot,
+)
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import (
     QGridLayout,
     QLabel,
@@ -11,12 +24,55 @@ from PyQt5.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSpacerItem,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
-from tsl.style import THEMES, _create_theme_drawing
+from tsl.dev.dev_functions import WidgetLogInfo
+from tsl.style import THEMES, _create_theme_drawing, log
 from tsl.widgets.base_widgets import MainWidget
+from tsl.widgets.icon import Icon
+
+
+class WidgetType(IntEnum):
+    """Definition of WidgetType."""
+
+    HOMEPAGE = 0
+    VERSION_HISTORY = 1
+    STYLE_WIDGET = 2
+
+
+class StackedWidget(QStackedWidget):
+    """Stacked widget for homepage."""
+
+    def __init__(self, parent: QWidget = None) -> None:
+        """Create a new StackedWidget."""
+        super().__init__(parent)
+        self._animation_running = False
+        self._animation = QPropertyAnimation(self, b"size")
+        self._animation.setDuration(400)
+        self._animation.setEasingCurve(QEasingCurve.OutQuad)
+        self._animation.finished.connect(  # type: ignore
+            self.on_animation_finished
+        )
+
+    def set_current_index(self, index: int) -> None:
+        """Set page index."""
+        if self._animation_running:
+            return
+        super().setCurrentIndex(index)
+        self._animation.setStartValue(QSize(self.currentWidget().width(), 0))
+        self._animation.setEndValue(
+            QSize(self.currentWidget().width(), self.currentWidget().height())
+        )
+        self._animation.start()
+        self._animation_running = True
+
+    @pyqtSlot(name="on_animation_finished")
+    def on_animation_finished(self) -> None:
+        """Animation finished."""
+        self._animation_running = False
 
 
 class HomePage(MainWidget):
@@ -24,23 +80,48 @@ class HomePage(MainWidget):
 
     ICON = ":/svg_icons/home.svg"
     NAME = "Information"
-    APP_NAME = "App"
 
     change_theme = pyqtSignal(str, name="change_theme")
 
-    def __init__(self, parent: QWidget = None) -> None:
-        """Create a new HomePage."""
+    def __init__(
+        self,
+        app_info: Tuple[str, str, str],
+        visible_widgets: List[Type[MainWidget]],
+        parent: QWidget = None,
+    ) -> None:
         super().__init__(parent)
-
+        self._visible_widgets: List[Type[MainWidget]] = visible_widgets
+        self._app_name, self._app_logo, self._app_lang = app_info
+        self._widget_stack = StackedWidget()
+        self.setLayout(self._create_layout(self._create_welcome_widget()))
         if self._check_show_theme_selection_widget():
-            # Show style selection
-            self._add_style_selection()
-        else:
-            self.setLayout(self._create_layout())
+            self._widget_stack.set_current_index(WidgetType.STYLE_WIDGET)
 
-    def _create_layout(self) -> QLayout:
-        """Add custom layout."""
-        raise NotImplementedError("Subclasses must implement this method.")
+    def _create_welcome_widget(self) -> QWidget:
+        """Add custom widget to as homepage."""
+        widget = QWidget()
+        layout = QGridLayout(widget)
+        layout.setVerticalSpacing(100)
+        widget.setLayout(layout)
+        layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
+
+        label = QLabel("Willkommen zur " + self._app_name)
+        label.setObjectName("heading_label")
+        layout.addWidget(label, 1, 0)
+        layout.setAlignment(label, Qt.AlignCenter)
+
+        logo_svg = QSvgWidget(self._app_logo)
+        logo_svg.setFixedSize(QSize(200, 200))
+        layout.addWidget(logo_svg, 2, 0)
+        layout.setAlignment(logo_svg, Qt.AlignCenter)
+
+        layout.addItem(
+            QSpacerItem(3, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )
+
+        return widget
 
     @staticmethod
     def _check_show_theme_selection_widget() -> bool:
@@ -56,13 +137,208 @@ class HomePage(MainWidget):
         QSettings().setValue("CustomThemeSelectionActive", False)
         return show_selection
 
-    def _add_style_selection(self) -> None:
-        """Add style selection."""
-        vert_box_layout = QVBoxLayout(self)
-        vert_box_layout.setSpacing(20)
-        self.setLayout(vert_box_layout)
+    def _create_layout(self, welcome_widget: QWidget) -> QLayout:
+        """Create layout."""
+        self._widget_stack.addWidget(welcome_widget)
+        self._widget_stack.addWidget(self._create_version_history_widget())
+        self._widget_stack.addWidget(self._create_style_selection_widget())
 
-        label = QLabel(f"Willkommen zur {self.APP_NAME}")
+        homepage_btn = QPushButton(self.tr("Homepage"))
+        version_history_btn = QPushButton(self.tr("Versionshistorie"))
+        stylesheet_btn = QPushButton(self.tr("Auswahl Style"))
+
+        homepage_btn.clicked.connect(
+            lambda: self._widget_stack.set_current_index(WidgetType.HOMEPAGE)
+        )
+        version_history_btn.clicked.connect(
+            lambda: self._widget_stack.set_current_index(
+                WidgetType.VERSION_HISTORY
+            )
+        )
+        stylesheet_btn.clicked.connect(
+            lambda: self._widget_stack.set_current_index(
+                WidgetType.STYLE_WIDGET
+            )
+        )
+
+        layout = QGridLayout(self)
+        layout.addWidget(self._widget_stack, 0, 0, 1, 3)
+        layout.addWidget(homepage_btn, 1, 0)
+        layout.addWidget(version_history_btn, 1, 1)
+        layout.addWidget(stylesheet_btn, 1, 2)
+        return layout
+
+    def _create_version_history_widget(self) -> QWidget:
+        """Create the version history."""
+        resource_path = ":/change_log_data.pickle"
+        resource_file = QFile(resource_path)
+        change_log_data: Dict[str, Dict[str, WidgetLogInfo]] = {}
+        if resource_file.open(QIODevice.ReadOnly):
+            pickle_data = resource_file.readAll()
+            change_log_data = pickle.loads(pickle_data.data())
+            resource_file.close()
+        else:
+            log.debug("No changelog data found! %s", resource_path)
+
+        widget = QWidget()
+        vert_box_layout = QVBoxLayout(widget)
+        widget.setLayout(vert_box_layout)
+        label = QLabel(self.tr("Versionshistorie"))
+        label.setObjectName("heading_label")
+        label.setContentsMargins(0, 0, 0, 10)
+        vert_box_layout.addWidget(label)
+        vert_box_layout.setAlignment(label, Qt.AlignCenter)
+
+        scroll_area = QScrollArea()
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        vert_box_layout.addWidget(scroll_area)
+        scroll_area.setWidgetResizable(True)
+        central_widget = QWidget()
+        central_widget.setObjectName("style_selection_widget")
+
+        grid = QGridLayout()
+        grid.setHorizontalSpacing(0)
+        grid.setVerticalSpacing(20)
+        central_widget.setLayout(grid)
+        scroll_area.setWidget(central_widget)
+        self.fill_version_info(grid, change_log_data, self._visible_widgets)
+        return widget
+
+    def fill_version_info(
+        self,
+        grid_layout: QGridLayout,
+        change_log_data: Dict,
+        visible_widgets: List[Type[MainWidget]],
+    ) -> None:
+        """Setup version grid from change_log_data."""
+        log.debug("Fill version grid")
+        # get the sorted version keys in descending order. Newest version first
+        if not change_log_data:
+            log.debug("No changelog data found")
+            label = QLabel(self.tr("Keine Einträge vorhanden"))
+            label.setObjectName("heading1_label")
+            label.setMinimumHeight(30)
+            grid_layout.addWidget(label, 0, 1)
+            grid_layout.setAlignment(label, Qt.AlignCenter)
+            return
+
+        grid_layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            0,
+            3,
+        )
+        grid_layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            0,
+            0,
+        )
+
+        row = 0
+        for version, log_data_dict in change_log_data.items():
+            label = QLabel(f"V {version}")
+            label.setObjectName("heading1_label")
+            label.setMinimumHeight(30)
+            grid_layout.addWidget(label, row, 1, 1, 2)
+            row += 1
+
+            # handle version specific logs
+            entries_available: bool = False
+            if self._app_name in log_data_dict:
+                # handle general app logs
+                w_icon = self._app_logo
+                w_name = self._app_name
+                entries_available = True
+                row = self._add_item_to_grid(
+                    grid_layout,
+                    row,
+                    (w_name, w_icon),
+                    [
+                        dict[self._app_lang]
+                        for dict in log_data_dict[self._app_name]
+                    ],
+                )
+
+            # handle widget specific logs
+            for widget in visible_widgets:
+                if widget.__name__ not in log_data_dict:
+                    # widget not present anymore. Ignore
+                    continue
+                w_icon = widget.ICON
+                w_name = widget.NAME
+                entries_available = True
+                row = self._add_item_to_grid(
+                    grid_layout,
+                    row,
+                    (w_name, w_icon),
+                    [
+                        dict[self._app_lang]
+                        for dict in log_data_dict[widget.__name__]
+                    ],
+                )
+
+            if not entries_available:
+                label = QLabel(
+                    self.tr(
+                        "Keine relevanten Änderungen für Ihre "
+                        "Benutzergruppe vorhanden."
+                    )
+                )
+                label.setMinimumHeight(30)
+                grid_layout.addWidget(label, row, 2)
+                row += 1
+
+        grid_layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding),
+            row,
+            0,
+            -1,
+            0,
+        )
+
+    def _add_item_to_grid(
+        self,
+        grid_layout: QGridLayout,
+        row: int,
+        widget_info: Tuple[str, str],
+        text_items: List[str],
+    ) -> int:
+        """add changelog item to grid."""
+        widget_name, widget_icon = widget_info
+        if widget_name == self._app_name:
+            # load as svg icon
+            svg_widget = QSvgWidget(widget_icon)
+            svg_widget.setFixedSize(QSize(18, 18))
+            grid_layout.addWidget(svg_widget, row, 1)
+        else:
+            icon = Icon(radius=18)
+            icon.set_icon(widget_icon)
+            grid_layout.addWidget(icon, row, 1)
+
+        label = QLabel(widget_name)
+        label.setObjectName("heading2_label")
+        label.setMinimumHeight(30)
+        grid_layout.addWidget(label, row, 2)
+        row += 1
+        for text in text_items:
+            label = QLabel(text)
+            label.setWordWrap(True)
+            label.setMinimumHeight(30)
+            label.setMinimumWidth(700)
+            label.setMaximumWidth(1000)
+            grid_layout.addWidget(label, row, 2)
+            row += 1
+        return row
+
+    def _create_style_selection_widget(  # pylint: disable=too-many-locals
+        self,
+    ) -> QWidget:
+        """Add style selection."""
+        widget = QWidget()
+        vert_box_layout = QVBoxLayout()
+        vert_box_layout.setSpacing(20)
+        widget.setLayout(vert_box_layout)
+
+        label = QLabel(f"Willkommen zur {self._app_name}")
         label.setObjectName("heading_label")
         label.setContentsMargins(0, 0, 0, 20)
         vert_box_layout.addWidget(label)
@@ -147,3 +423,5 @@ class HomePage(MainWidget):
             -1,
             0,
         )
+
+        return widget

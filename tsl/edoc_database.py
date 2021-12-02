@@ -3419,7 +3419,7 @@ class Project(Base):
     )
     kind_of_test: KindOfTest = relationship("KindOfTest", uselist=False)
     sub_orders: SubOrder = relationship(
-        "SubOrder", back_populates="project", uselist=False
+        "SubOrder", back_populates="project", uselist=True
     )
     edoc: Edoc = relationship("Edoc", back_populates="project", uselist=False)
 

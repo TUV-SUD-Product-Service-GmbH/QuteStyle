@@ -202,7 +202,7 @@ class Project(Base):
         "Staff", foreign_keys=[P_UPDATEBY], uselist=False
     )
     sub_orders: SubOrder = relationship(
-        "SubOrder", back_populates="project", uselist=False
+        "SubOrder", back_populates="project", uselist=True
     )
     project_failure_rel: List[ProjectFailureRel] = relationship(
         "ProjectFailureRel", back_populates="project", uselist=True

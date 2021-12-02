@@ -779,6 +779,19 @@ QLabel#db_label {{
 QLabel:disabled {{
     color: {fg_disabled};
 }}
+QLabel#heading_label {{
+    font: 14pt "Segoe UI";
+}}
+QLabel#heading1_label {{
+    font: 12pt "Segoe UI";
+    background: {dark_one};
+    border-radius: 8px;
+}}
+QLabel#heading2_label {{
+    font: 10pt "Segoe UI";
+    background: {bg_two};
+    border-radius: 8px;
+}}
 /* Completer */
 #completer_popup{{
     border: 1px;
