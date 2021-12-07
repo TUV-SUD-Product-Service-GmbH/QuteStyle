@@ -61,8 +61,9 @@ class StackedWidget(QStackedWidget):
 
     def set_current_index(self, index: int, animate: bool = True) -> None:
         """Set page index."""
-        if self._animation_running:
+        if self._animation_running or index == self.currentIndex():
             # if index is changed during animation skip and revert to old index
+            # if selection is current selection do not start animation
             self.widget_selected.emit(self.currentIndex())
             return
         super().setCurrentIndex(index)
