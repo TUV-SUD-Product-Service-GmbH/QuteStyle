@@ -46,6 +46,8 @@ class WidgetType(IntEnum):
 class StackedWidget(QStackedWidget):
     """Stacked widget for homepage."""
 
+    widget_selected = pyqtSignal(int, name="widget_selected")
+
     def __init__(self, parent: QWidget = None) -> None:
         """Create a new StackedWidget."""
         super().__init__(parent)
@@ -57,17 +59,25 @@ class StackedWidget(QStackedWidget):
             self.on_animation_finished
         )
 
-    def set_current_index(self, index: int) -> None:
+    def set_current_index(self, index: int, animate: bool = True) -> None:
         """Set page index."""
         if self._animation_running:
+            # if index is changed during animation skip and revert to old index
+            self.widget_selected.emit(self.currentIndex())
             return
         super().setCurrentIndex(index)
-        self._animation.setStartValue(QSize(self.currentWidget().width(), 0))
-        self._animation.setEndValue(
-            QSize(self.currentWidget().width(), self.currentWidget().height())
-        )
-        self._animation.start()
-        self._animation_running = True
+        self.widget_selected.emit(index)
+        if animate:
+            self._animation.setStartValue(
+                QSize(self.currentWidget().width(), 0)
+            )
+            self._animation.setEndValue(
+                QSize(
+                    self.currentWidget().width(), self.currentWidget().height()
+                )
+            )
+            self._animation.start()
+            self._animation_running = True
 
     @pyqtSlot(name="on_animation_finished")
     def on_animation_finished(self) -> None:
@@ -93,9 +103,14 @@ class HomePage(MainWidget):
         self._visible_widgets: List[Type[MainWidget]] = visible_widgets
         self._app_name, self._app_logo, self._app_lang = app_info
         self._widget_stack = StackedWidget()
+        self._select_buttons: Dict[int, QPushButton] = {}
         self.setLayout(self._create_layout(self._create_welcome_widget()))
         if self._check_show_theme_selection_widget():
-            self._widget_stack.set_current_index(WidgetType.STYLE_WIDGET)
+            self._widget_stack.set_current_index(
+                WidgetType.STYLE_WIDGET, False
+            )
+        else:
+            self._widget_stack.set_current_index(WidgetType.HOMEPAGE, False)
 
     def _create_welcome_widget(self) -> QWidget:
         """Add custom widget to as homepage."""
@@ -142,10 +157,20 @@ class HomePage(MainWidget):
         self._widget_stack.addWidget(welcome_widget)
         self._widget_stack.addWidget(self._create_version_history_widget())
         self._widget_stack.addWidget(self._create_style_selection_widget())
+        self._widget_stack.widget_selected.connect(self.on_index_changed)
 
         homepage_btn = QPushButton(self.tr("Homepage"))
+        homepage_btn.setCheckable(True)
+        homepage_btn.setAutoExclusive(True)
+        self._select_buttons[WidgetType.HOMEPAGE] = homepage_btn
         version_history_btn = QPushButton(self.tr("Versionshistorie"))
+        version_history_btn.setCheckable(True)
+        version_history_btn.setAutoExclusive(True)
+        self._select_buttons[WidgetType.VERSION_HISTORY] = version_history_btn
         stylesheet_btn = QPushButton(self.tr("Auswahl Style"))
+        stylesheet_btn.setCheckable(True)
+        stylesheet_btn.setAutoExclusive(True)
+        self._select_buttons[WidgetType.STYLE_WIDGET] = stylesheet_btn
 
         homepage_btn.clicked.connect(
             lambda: self._widget_stack.set_current_index(WidgetType.HOMEPAGE)
@@ -160,13 +185,21 @@ class HomePage(MainWidget):
                 WidgetType.STYLE_WIDGET
             )
         )
-
         layout = QGridLayout(self)
         layout.addWidget(self._widget_stack, 0, 0, 1, 3)
         layout.addWidget(homepage_btn, 1, 0)
         layout.addWidget(version_history_btn, 1, 1)
         layout.addWidget(stylesheet_btn, 1, 2)
         return layout
+
+    @pyqtSlot(int, name="on_index_changed")
+    def on_index_changed(self, index: int) -> None:
+        """
+        On index changed.
+
+        Set the correct button if a stacked widget is selected.
+        """
+        self._select_buttons[index].setChecked(True)
 
     def _create_version_history_widget(self) -> QWidget:
         """Create the version history."""

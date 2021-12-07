@@ -871,6 +871,9 @@ QPushButton:hover {{
 QPushButton:pressed {{
     background-color: {context_pressed};
 }}
+QPushButton:checked {{
+    background-color: {context_pressed};
+}}
 QPushButton#info_widget_btn{{
     background-color: {dark_one};
     color: {foreground};
