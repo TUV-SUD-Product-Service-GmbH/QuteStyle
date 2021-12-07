@@ -47,6 +47,8 @@ class TestWidget(MainWidget):
         widget_action = QWidgetAction(menu)
         widget_action.setDefaultWidget(buttons)
         menu.addAction(widget_action)
+        self._ui.disable_widgets.clicked.connect(self.on_widgets_disabled)
+        self._ui.comboBox_2.setProperty("cssClass", "transparent")
         self._ui.pushButton_2.setMenu(menu)
         self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
@@ -59,6 +61,17 @@ class TestWidget(MainWidget):
             self._ui.splitter.setOrientation(Qt.Vertical)
         else:
             self._ui.splitter.setOrientation(Qt.Horizontal)
+
+    @pyqtSlot(name="on_widgets_disabled")
+    def on_widgets_disabled(self) -> None:
+        """Disable all widgets."""
+        if self._ui.disable_widgets.isChecked():
+            for child in self.children():
+                if child.objectName() != "disable_widgets":
+                    child.setEnabled(False)
+        else:
+            for child in self.children():
+                child.setEnabled(True)
 
 
 class Model(QStringListModel):

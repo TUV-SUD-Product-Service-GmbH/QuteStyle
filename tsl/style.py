@@ -293,6 +293,17 @@ QComboBox:disabled {{
     background-color: {bg_disabled};
     border: {bg_disabled};
 }}
+QComboBox[cssClass="transparent"] {{
+    background-color: transparent;
+}}
+QComboBox::drop-down[cssClass="transparent"] {{
+    border-left-color: transparent;
+}}
+QComboBox:disabled[cssClass="transparent"] {{
+    color: {fg_disabled};
+    background-color: transparent;
+    border: {bg_disabled};
+}}
 
 /* QHeaderView */
 QHeaderView{{
