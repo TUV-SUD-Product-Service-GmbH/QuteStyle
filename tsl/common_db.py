@@ -1,4 +1,6 @@
 """Common db stuff."""
+from __future__ import annotations
+
 import logging
 import os
 from typing import Optional, Type
@@ -15,7 +17,7 @@ from tsl.vault import Vault
 log = logging.getLogger("tsl.common_db")  # pylint: disable=invalid-name
 
 
-class NullUnicode(TypeDecorator):  # pylint: disable=abstract-method
+class NullUnicode(TypeDecorator[str]):  # pylint: disable=abstract-method
     """
     Handles NULL values for strings like empty strings.
 
@@ -38,16 +40,12 @@ class NullUnicode(TypeDecorator):  # pylint: disable=abstract-method
 
 
 def create_db_engine(
-    app: Vault.Application, env: Vault.Environment = None
+    app: Vault.Application, env: Vault.Environment | None = None
 ) -> Engine:
     """Create a database engine for the given application."""
     if check_ide():
         # only print for debug purposes in IDE!
-        print(
-            "Creating Engine for Application: {} with Environment {}".format(
-                app, env
-            )
-        )
+        print(f"Creating Engine for Application: {app} with Environment {env}")
     if not env:
         env_name = os.getenv(
             f"{app.name}_ENV", "DEV" if check_ide() else "PROD"
@@ -90,7 +88,7 @@ def create_db_engine(
 
     if check_ide():
         # only print for debug purposes in IDE!
-        print("Created engine for {}: {}".format(app, engine))
+        print(f"Created engine for {app}: {engine}")
     return engine
 
 

@@ -1,4 +1,6 @@
 """Updater object for updating TSL Apps."""
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -37,7 +39,9 @@ class Updater(QObject):
     update_available = pyqtSignal(bool, name="update_available")
     updater_checked = pyqtSignal(name="updater_checked")
 
-    def __init__(self, app_name: str, version: str, parent: QObject = None):
+    def __init__(
+        self, app_name: str, version: str, parent: QObject | None = None
+    ):
         """Init the Updater."""
         super().__init__(parent)
 

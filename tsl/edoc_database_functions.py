@@ -55,7 +55,7 @@ def _sp_insert_package_with_filter(
     return cast(int, new_package.NP_ID)
 
 
-def execute_stored_procedure(  # type: ignore
+def execute_stored_procedure(
     session: Session, procedure: str, args: Sequence[Any]
 ) -> None:
     """Execute a stored procedure on the database."""

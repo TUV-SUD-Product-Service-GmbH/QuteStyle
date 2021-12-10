@@ -1,5 +1,6 @@
 """Tests for the TSLStyledMainWindow."""
 # pylint: disable=protected-access
+import logging
 from typing import List, Type, TypeVar, Union
 
 import pytest
@@ -11,9 +12,11 @@ from pytestqt.qtbot import QtBot
 
 from tsl import tsl_main_gui
 from tsl.tsl_main_gui import TSLStyledMainWindow
-from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
+from tsl.widgets.base_widgets import BaseWidget, MainWidget
 from tsl.widgets.left_menu_button import LeftMenuButton
 from tsl.widgets.title_button import TitleButton
+
+log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
 
 # Store the constant for easier access
 COL_W = TSLStyledMainWindow.MAX_COLUMN_WIDTH
@@ -42,21 +45,21 @@ class MainInvisible(MainWidget):
     GROUPS = ["WrongTeam"]
 
 
-class RightColumn(ColumnBaseWidget):
+class RightColumn(BaseWidget):
     """Test widget for the right column frame."""
 
     NAME = "TestRightColumnWidget"
     ICON = ":/svg_icons/heart_broken.svg"
 
 
-class SecondRightColumn(ColumnBaseWidget):
+class SecondRightColumn(BaseWidget):
     """Test widget for the right column frame."""
 
     NAME = "TestSecondRightColumnWidget"
     ICON = ":/svg_icons/heart_broken.svg"
 
 
-class ColumnVisible(ColumnBaseWidget):
+class ColumnVisible(BaseWidget):
     """Column widget that is visible."""
 
     NAME = "ColumnVisible"
@@ -64,7 +67,7 @@ class ColumnVisible(ColumnBaseWidget):
     GROUPS = ["RightTeam"]
 
 
-class ColumnInvisible(ColumnBaseWidget):
+class ColumnInvisible(BaseWidget):
     """Column widget that is invisible."""
 
     NAME = "ColumnInvisible"
@@ -72,14 +75,14 @@ class ColumnInvisible(ColumnBaseWidget):
     GROUPS = ["WrongTeam"]
 
 
-class UpperLeftColumn(ColumnBaseWidget):
+class UpperLeftColumn(BaseWidget):
     """Upper test widget for the left column frame."""
 
     NAME = "LeftUpperRightColumnWidget"
     ICON = ":/svg_icons/heart_broken.svg"
 
 
-class LowerLeftColumn(ColumnBaseWidget):
+class LowerLeftColumn(BaseWidget):
     """Lower test widget for the left column frame."""
 
     NAME = "LeftLowerRightColumnWidget"
@@ -107,14 +110,14 @@ class LeftColumnEmptyWindow(TSLStyledMainWindow):
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
     RIGHT_WIDGET_CLASSES = [RightColumn, SecondRightColumn]
-    LEFT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]] = []
+    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
 
 
 class RightColumnEmptyWindow(TSLStyledMainWindow):
     """TSLStyledMainWindow without right column widgets."""
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
-    RIGHT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]] = []
+    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
     LEFT_WIDGET_CLASSES = [UpperLeftColumn, LowerLeftColumn]
 
 
@@ -122,8 +125,8 @@ class EmptyWindow(TSLStyledMainWindow):
     """TSLStyledMainWindow without any column widgets."""
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
-    RIGHT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]] = []
-    LEFT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]] = []
+    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
+    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
 
 
 WindowT = TypeVar("WindowT", bound=TSLStyledMainWindow)
@@ -353,7 +356,7 @@ def test_maximize_mode(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
     assert app
     screen = app.primaryScreen()
     rect = screen.availableGeometry()
-    print("Available Geometry: %d x %d" % (rect.width(), rect.height()))
+    log.debug("Available Geometry: %d x %d", rect.width(), rect.height())
 
     assert window.isMaximized()
     assert window._title_bar.maximize_button.tooltip_text == "Verkleinern"
@@ -374,12 +377,12 @@ def test_maximize_mode(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
     window.showFullScreen()
     assert window.isFullScreen()
     size = screen.size()
-    print("Screen size: %d x %d" % (rect.width(), rect.height()))
+    log.debug("Screen size: %d x %d", rect.width(), rect.height())
     assert window.width() == size.width()
     assert window.height() == size.height()
 
     window.showNormal()
-    assert window.windowState() == Qt.WindowNoState
+    assert window.windowState() == Qt.WindowNoState  # type: ignore
     assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
 
 

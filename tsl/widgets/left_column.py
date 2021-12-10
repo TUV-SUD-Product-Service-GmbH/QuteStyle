@@ -1,4 +1,6 @@
 """Widget that contains the widgets of the left column."""
+from __future__ import annotations
+
 import logging
 from typing import List, Optional, Tuple, Type, cast
 
@@ -13,7 +15,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.icon import Icon
 from tsl.widgets.left_column_close_button import LeftColumnCloseButton
 
@@ -28,8 +30,8 @@ class LeftColumn(QWidget):
     def __init__(
         self,
         app_parent: QWidget,
-        widget_types: List[Type[ColumnBaseWidget]],
-        parent: QWidget = None,
+        widget_types: List[Type[BaseWidget]],
+        parent: QWidget | None = None,
     ):
         """Create a new LeftColumn."""
         super().__init__(parent)
@@ -63,8 +65,8 @@ class LeftColumn(QWidget):
     @staticmethod
     def create_content_frame(
         base_layout: QLayout,
-        widget_types: List[Type[ColumnBaseWidget]],
-    ) -> Tuple[QStackedWidget, List[ColumnBaseWidget]]:
+        widget_types: List[Type[BaseWidget]],
+    ) -> Tuple[QStackedWidget, List[BaseWidget]]:
         """
         Create the content QFrame and add it to the given layout.
 
@@ -136,7 +138,7 @@ class LeftColumn(QWidget):
         # Return Icon and title QLabel
         return icon, title_label
 
-    def set_column_widget(self, widget_type: Type[ColumnBaseWidget]) -> None:
+    def set_column_widget(self, widget_type: Type[BaseWidget]) -> None:
         """Set left column pages."""
         log.debug("Setting current widget to: %s", widget_type)
         widget = self.widget(widget_type)
@@ -144,7 +146,7 @@ class LeftColumn(QWidget):
         self._title_label.setText(widget.NAME)
         self._icon.set_icon(widget.ICON)
 
-    def widget(self, widget_type: Type[ColumnBaseWidget]) -> ColumnBaseWidget:
+    def widget(self, widget_type: Type[BaseWidget]) -> BaseWidget:
         """Get the widget of the given type."""
         for widget in self._widgets:
             if isinstance(widget, widget_type):
@@ -153,10 +155,10 @@ class LeftColumn(QWidget):
             f"Could not find widget {widget_type}"
         )
 
-    def current_widget_type(self) -> Optional[Type[ColumnBaseWidget]]:
+    def current_widget_type(self) -> Optional[Type[BaseWidget]]:
         """Return the currently active widget class."""
         widget = self._stacked_widget.currentWidget()
         if widget:
-            return cast(Type[ColumnBaseWidget], type(widget))
+            return cast(Type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None

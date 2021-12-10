@@ -8,7 +8,7 @@ from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from tsl.vault import Vault
-from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.icon import Icon
 from tsl.widgets.title_button import TitleButton
 
@@ -28,7 +28,7 @@ class TitleBar(QFrame):
         self,
         parent: QWidget,
         app_parent: QWidget,
-        right_widget_classes: List[Type[ColumnBaseWidget]],
+        right_widget_classes: List[Type[BaseWidget]],
         name: str,
         logo: str,
     ) -> None:
@@ -166,7 +166,7 @@ class TitleBar(QFrame):
     def set_maximized(self, maximized: bool) -> None:
         """Set the _background icon depending if the app is maximized."""
         name = "fullscreen_exit" if maximized else "fullscreen"
-        self.maximize_button.set_icon(":/svg_icons/{}.svg".format(name))
+        self.maximize_button.set_icon(f":/svg_icons/{name}.svg")
         if maximized:
             self.maximize_button.tooltip_text = self.tr("Verkleinern")
         else:
@@ -181,14 +181,14 @@ class TitleBar(QFrame):
 
     def set_button_active(
         self,
-        widget_class: Type[ColumnBaseWidget],
+        widget_class: Type[BaseWidget],
         active: bool,
     ) -> None:
         """Set the button for the given widget active/inactive."""
         button = self._button(widget_class)
         button.set_active(active)
 
-    def _button(self, widget_class: Type[ColumnBaseWidget]) -> TitleButton:
+    def _button(self, widget_class: Type[BaseWidget]) -> TitleButton:
         """Return the button for the given widget class."""
         for btn in self.findChildren(TitleButton):
             if btn.widget_class == widget_class:

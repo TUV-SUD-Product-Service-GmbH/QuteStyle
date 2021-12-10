@@ -1,18 +1,20 @@
 """Button on the custom TitleBar."""
+from __future__ import annotations
+
 import logging
 from typing import Tuple, Type
 
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QWidget
 
-from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.icon_button import BackgroundColorNames
 from tsl.widgets.icon_tooltip_button import IconTooltipButton
 
 log = logging.getLogger("tsl.title_button")  # pylint: disable=invalid-name
 
 
-class TitleButton(IconTooltipButton):
+class TitleButton(IconTooltipButton[BaseWidget]):
     """Button on the custom TitleBar (LeftColumnButton with other colors)."""
 
     FIXED_WIDTH = 30
@@ -23,9 +25,9 @@ class TitleButton(IconTooltipButton):
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
-        parent: QWidget = None,
-        bgs: BackgroundColorNames = None,
-        widget_class: Type[ColumnBaseWidget] = None,
+        parent: QWidget | None = None,
+        bgs: BackgroundColorNames | None = None,
+        widget_class: Type[BaseWidget] | None = None,
         margin: float = 0.5,
     ) -> None:
         """Create a new TitleButton."""

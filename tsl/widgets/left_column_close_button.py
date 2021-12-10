@@ -1,4 +1,6 @@
 """Close Button on the left Menu."""
+from __future__ import annotations
+
 from PyQt5.QtWidgets import QWidget
 
 from tsl.widgets.icon_button import BackgroundColorNames
@@ -13,7 +15,7 @@ class LeftColumnCloseButton(TitleButton):
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """LeftMenuCloseButton"""
         bgs = BackgroundColorNames(

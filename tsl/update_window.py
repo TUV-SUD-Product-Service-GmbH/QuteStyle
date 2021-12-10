@@ -1,4 +1,6 @@
 """Main window class for TSL applications."""
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -32,7 +34,7 @@ class TSLMainWindow(QMainWindow):
         version: str,
         force_whats_new: bool = False,
         registry_reset: bool = False,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """Create a new TSL main window."""
         super().__init__(parent)

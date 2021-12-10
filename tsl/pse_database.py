@@ -1,4 +1,5 @@
 """Database connection and models for the PSE database."""
+# pylint: disable=duplicate-code
 from __future__ import annotations
 
 import errno
@@ -65,7 +66,6 @@ def _fetch_user_id() -> None:
 
 def get_user_id() -> int:
     """Get the database id for the current user."""
-    global USER_ID
     if USER_ID is None:
         _fetch_user_id()
     return cast(int, USER_ID)

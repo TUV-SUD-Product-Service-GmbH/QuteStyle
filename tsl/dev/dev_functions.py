@@ -51,7 +51,7 @@ def compile_ui_files(src_folders: List[str]) -> None:
     """
     for folder in src_folders:
         for file in os.listdir(folder):
-            print("Converting file {}".format(file))
+            print(f"Converting file {file}")
             new_file = "ui_" + file.replace(".ui", "") + ".py"
             with open(
                 os.path.join(folder, file), "r", encoding="utf-8"

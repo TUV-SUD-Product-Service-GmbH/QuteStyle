@@ -100,7 +100,7 @@ def excepthook(
                 log.critical(line_splitted)
     log.critical("%s %s", cls, exception)
     try:
-        error_message_box("{}: {}".format(cls, exception), traceback_text)
+        error_message_box(f"{cls, exception}", traceback_text)
     except ImportError:
         log.warning("Not showing error message since PyQt is not installed.")
 

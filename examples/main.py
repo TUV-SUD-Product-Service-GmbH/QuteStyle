@@ -1,4 +1,6 @@
 """Test script to validate TSL style."""
+from __future__ import annotations
+
 import importlib
 import logging
 import os
@@ -27,7 +29,7 @@ from tsl.style import (
     set_current_style,
 )
 from tsl.tsl_main_gui import TSLStyledMainWindow
-from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.color_manager import ColorManager
 from tsl.widgets.home_page import HomePage
 from tsl.widgets.icon_button import IconButton
@@ -36,13 +38,13 @@ from tsl.widgets.toggle import Toggle
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class RightWidget(ColumnBaseWidget):
+class RightWidget(BaseWidget):
     """Test ColumnBaseWidget."""
 
     ICON = ":/svg_icons/icon_PSE.svg"
     NAME = "PSE Informationen"
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new RightWidget."""
         super().__init__(parent)
 
@@ -62,13 +64,13 @@ class RightWidget(ColumnBaseWidget):
         self.setLayout(layout)
 
 
-class SettingsWidget(ColumnBaseWidget):
+class SettingsWidget(BaseWidget):
     """Test ColumnBaseWidget."""
 
     ICON = ":/svg_icons/settings.svg"
     NAME = "Einstellungen"
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new SettingsWidget."""
         super().__init__(parent)
         layout = QVBoxLayout(self)
@@ -76,7 +78,7 @@ class SettingsWidget(ColumnBaseWidget):
         layout.addWidget(QTableWidget())
 
 
-class InfoWidget(ColumnBaseWidget):
+class InfoWidget(BaseWidget):
     """Test ColumnBaseWidget."""
 
     ICON = ":/svg_icons/info.svg"
@@ -84,7 +86,7 @@ class InfoWidget(ColumnBaseWidget):
 
     switch_style = pyqtSignal(name="switch_style")
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new SettingsWidget."""
         super().__init__(parent)
         layout = QHBoxLayout(self)
@@ -113,7 +115,7 @@ class StyledMainWindow(TSLStyledMainWindow):
         version: str,
         force_whats_new: bool = False,
         registry_reset: bool = False,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """Create a new StyledMainWindow."""
         super().__init__(

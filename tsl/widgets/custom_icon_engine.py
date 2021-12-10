@@ -73,7 +73,7 @@ class PixmapStore:
         return PixmapStore.INST
 
     def get_pixmap(
-        self, path: str, width: int, height: int, color: str = None
+        self, path: str, width: int, height: int, color: str | None = None
     ) -> QPixmap:
         """
         Return the pixmap with width and height from the PixmapStore.

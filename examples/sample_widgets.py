@@ -1,4 +1,6 @@
 """Sample widgets."""
+from __future__ import annotations
+
 from typing import Dict, List, cast
 
 from PyQt5.QtCore import QModelIndex, QObject, QStringListModel, Qt, pyqtSlot
@@ -24,7 +26,7 @@ class TestWidget(MainWidget):
     NAME = "Test-Widget"
     GROUPS: List[str] = ["PS-CPS-TSL-G"]
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new TestWidget."""
         super().__init__(parent)
         self._ui = Ui_test_widget()
@@ -77,7 +79,7 @@ class TestWidget(MainWidget):
 class Model(QStringListModel):
     """Test model with check states."""
 
-    def __init__(self, data: List[str], parent: QObject = None) -> None:
+    def __init__(self, data: List[str], parent: QObject | None = None) -> None:
         """Create a new Model."""
         self._check_states: Dict[str, Qt.CheckState] = {}
         super().__init__(data, parent)
@@ -115,7 +117,7 @@ class ModelViewWidget(MainWidget):
     ICON = ":/svg_icons/heart_broken.svg"
     NAME = "Test-Widget"
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new TestWidget."""
         super().__init__(parent)
         layout = QHBoxLayout(self)

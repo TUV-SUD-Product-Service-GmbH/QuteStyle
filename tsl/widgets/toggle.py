@@ -1,4 +1,6 @@
 """Toggle button (custom checkbox)."""
+from __future__ import annotations
+
 import logging
 from typing import Union
 
@@ -48,7 +50,7 @@ class Toggle(QCheckBox, TextTruncator):
     # Duration of the animation.
     _ANIM_DURATION = 500
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new Toggle."""
         super().__init__(parent)
 

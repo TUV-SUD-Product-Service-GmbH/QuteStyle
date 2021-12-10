@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/pycqa/isort
-    rev: 5.9.3
+    rev: 5.10.1
     hooks:
       - id: isort
         name: isort (python)
         args: [ "--profile", "black", "-l 79" ]
 
   - repo: https://github.com/psf/black
-    rev: 21.7b0
+    rev: 21.12b0
     hooks:
       - id: black
         args: [ --safe, --quiet, -l 79 ]
@@ -47,13 +47,12 @@ repos:
         entry: pylint
         language: system
         types: [ python ]
-        exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*|resources_rc.py"
 
   # flake8
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+  - repo: https://github.com/pycqa/flake8
+    rev: '4.0.1'
     hooks:
-      - id: flake8
+    -   id: flake8
         exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*|resources_rc.py"
         args: # arguments to configure flake8
           - "--max-line-length=79"

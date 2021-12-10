@@ -1,4 +1,6 @@
 """Base widget definitions."""
+from __future__ import annotations
+
 import logging
 from typing import List, Optional
 
@@ -8,7 +10,7 @@ from PyQt5.QtWidgets import QWidget
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class ColumnBaseWidget(QWidget):
+class BaseWidget(QWidget):
     """Base class for a widget that is displayed in the right section."""
 
     ICON: str
@@ -16,16 +18,12 @@ class ColumnBaseWidget(QWidget):
     GROUPS: List[str] = []
 
 
-class MainWidget(QWidget):
+class MainWidget(BaseWidget):
     """Base class for a widget that is display in the main section."""
-
-    ICON: str
-    NAME: str
-    GROUPS: List[str] = []
 
     shutdown_completed = pyqtSignal(QWidget, name="shutdown_completed")
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Init the BaseWidget for a Widget in TSL-Toolbox."""
         self._thread: Optional[QThread] = None
         super().__init__(parent)

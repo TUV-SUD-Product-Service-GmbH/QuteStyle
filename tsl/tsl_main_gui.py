@@ -1,4 +1,6 @@
 """TSLStyledMainWindow definition for custom Darcula style."""
+from __future__ import annotations
+
 import logging
 from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
 
@@ -30,7 +32,7 @@ from tsl.edoc_database import get_user_group_name
 from tsl.style import get_style, set_current_style
 from tsl.update_window import TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
-from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
+from tsl.widgets.base_widgets import BaseWidget, MainWidget
 from tsl.widgets.credit_bar import CreditBar
 from tsl.widgets.grips import CornerGrip, EdgeGrip
 from tsl.widgets.home_page import HomePage
@@ -62,10 +64,10 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     MAIN_WIDGET_CLASSES: List[Type[MainWidget]]
 
     # Widgets that are shown in the right column.
-    RIGHT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]]
+    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]]
 
     # Widgets that are shown in the left column.
-    LEFT_WIDGET_CLASSES: List[Type[ColumnBaseWidget]]
+    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]]
 
     MIN_SIZE: QSize = QSize(0, 0)
 
@@ -86,7 +88,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         version: str,
         force_whats_new: bool = False,
         registry_reset: bool = False,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """Create a new TSLStyledMainWindow."""
         super().__init__(
@@ -188,7 +190,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         """Handle change of window geometry by using the grips."""
         self.setGeometry(geometry)
 
-    WidgetT = TypeVar("WidgetT", MainWidget, ColumnBaseWidget)
+    WidgetT = TypeVar("WidgetT", MainWidget, BaseWidget)
 
     @staticmethod
     def get_widgets_to_display(
@@ -549,10 +551,10 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
                     f"{self._app_name} - {widget.NAME}"
                 )
                 return
-        raise ValueError("Could not find widget {}".format(widget_class))
+        raise ValueError("Could not find widget {widget_class}")
 
     @pyqtSlot(type, name="on_right_column")
-    def on_right_column(self, widget_class: Type[ColumnBaseWidget]) -> None:
+    def on_right_column(self, widget_class: Type[BaseWidget]) -> None:
         """Handle a click on the button for the right column."""
         right_widget_type = self.right_widget_type()
         left_widget_type = self._left_column.current_widget_type()
@@ -592,16 +594,16 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             # Set the button to the opposite state.
             self._title_bar.set_button_active(widget_class, not visible)
 
-    def right_widget_type(self) -> Optional[Type[ColumnBaseWidget]]:
+    def right_widget_type(self) -> Optional[Type[BaseWidget]]:
         """Return the type of the right widget."""
         widget = self._right_content.currentWidget()
         if widget:
-            return cast(Type[ColumnBaseWidget], type(widget))
+            return cast(Type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None
 
     @pyqtSlot(type, name="on_left_column")
-    def on_left_column(self, widget_class: Type[ColumnBaseWidget]) -> None:
+    def on_left_column(self, widget_class: Type[BaseWidget]) -> None:
         """Handle a click on the button for the left column."""
         right_widget_type = self.right_widget_type()
         left_widget_type = self._left_column.current_widget_type()
@@ -642,7 +644,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         """Handle a click on the button for the left column."""
         # if the column was opened before, a widget must be set.
         widget_class = cast(
-            Type[ColumnBaseWidget], self._left_column.current_widget_type()
+            Type[BaseWidget], self._left_column.current_widget_type()
         )
         self._left_menu.set_button_active(widget_class, False)
         self._start_box_animation(False, False)

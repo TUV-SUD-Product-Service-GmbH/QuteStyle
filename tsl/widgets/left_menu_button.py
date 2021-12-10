@@ -1,20 +1,23 @@
 """Button for the LeftMenu."""
+from __future__ import annotations
+
 import logging
-from typing import Tuple, Type, Union
+from typing import Generic, Tuple, Type
 
 from PyQt5.QtCore import QEvent, QPoint, QRect, Qt
 from PyQt5.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
 from PyQt5.QtWidgets import QWidget
 
 from tsl.style import get_color
-from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
 from tsl.widgets.icon_button import BackgroundColorNames, IconButton
-from tsl.widgets.icon_tooltip_button import IconTooltipButton
+from tsl.widgets.icon_tooltip_button import BaseWidgetType, IconTooltipButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class LeftMenuButton(IconTooltipButton):
+class LeftMenuButton(
+    IconTooltipButton[BaseWidgetType], Generic[BaseWidgetType]
+):
     """Button for the LeftMenu."""
 
     FIXED_WIDTH = None
@@ -26,7 +29,7 @@ class LeftMenuButton(IconTooltipButton):
         text: str,
         tooltip_text: str,
         icon_path: str,
-        widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget], None],
+        widget_class: Type[BaseWidgetType] | None,
         margin: float = 0.4,
     ) -> None:
         """Create a new LeftMenuButton."""

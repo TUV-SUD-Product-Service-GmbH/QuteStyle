@@ -113,9 +113,7 @@ def generic_copy_test_with_sp(
     package_id = create_test_package()
     new_nav_id = create_test_navigation()
 
-    def mock_sp(  # type: ignore
-        _: Session, procedure: str, args: Sequence[Any]
-    ) -> None:
+    def mock_sp(_: Session, procedure: str, args: Sequence[Any]) -> None:
         if copy_filter:
             assert procedure == "SP_NAV_INSERT_PACKAGE_WITH_FILTER"
         else:

@@ -1,4 +1,6 @@
 """Entry defining a software change for the WhatsNewWindow."""
+from __future__ import annotations
+
 import logging
 from enum import IntEnum
 from typing import List, TypedDict
@@ -38,7 +40,7 @@ class WhatsNewWindow(QMainWindow):
         self,
         entries: List[WhatsNewEntry],
         version: str,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """Set up the WhatsNewWindow."""
         super().__init__(parent)

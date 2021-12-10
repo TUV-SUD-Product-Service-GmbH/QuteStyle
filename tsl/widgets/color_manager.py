@@ -1,4 +1,6 @@
 """ColorManager for live editing of colors."""
+from __future__ import annotations
+
 import json
 import logging
 from typing import Dict
@@ -16,7 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 from tsl.style import MAIN_STYLE, THEMES, get_current_style
-from tsl.widgets.base_widgets import ColumnBaseWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.icon_button import IconButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -34,7 +36,9 @@ class ColorWidget(QWidget):
 
     color_changed = pyqtSignal(name="color_changed")
 
-    def __init__(self, key: str, color: str, parent: QWidget = None) -> None:
+    def __init__(
+        self, key: str, color: str, parent: QWidget | None = None
+    ) -> None:
         """Create a new Color Widget."""
         super().__init__(parent)
         self.key = key
@@ -73,14 +77,14 @@ class ColorWidget(QWidget):
             self.color_changed.emit()
 
 
-class ColorManager(ColumnBaseWidget):
+class ColorManager(BaseWidget):
     """ColorManager for live editing of colors."""
 
     ICON = ":/svg_icons/palette.svg"
     NAME = "Color Manager"
     GROUPS = ["PS-CPS-TSL-G"]
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new ColorManager."""
         super().__init__(parent)
         layout = QHBoxLayout(self)

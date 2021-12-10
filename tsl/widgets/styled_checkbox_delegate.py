@@ -1,4 +1,5 @@
 """Delegate for altering appearance of a checkbox in a view."""
+from __future__ import annotations
 
 from PyQt5.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
 from PyQt5.QtGui import QBrush, QColor, QPainter, QPaintEvent, QStaticText
@@ -134,7 +135,7 @@ class StyledCheckBox(QCheckBox, TextTruncator):
 
     SPACER = 4
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, parent: QWidget | None = None):
         """Initialize Checkbox with static text."""
         super().__init__(parent)
         self._text = QStaticText()

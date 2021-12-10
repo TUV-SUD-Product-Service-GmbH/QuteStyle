@@ -26,7 +26,7 @@ class TSLMessageBox(QMessageBox):
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setMinimumSize(300, 300)
         self.setWindowTitle(title)
-        self.setText("<h3>{}</h3>\n{}".format(title, text))
+        self.setText(f"<h3>{title}</h3>\n{text}")
 
         # Here come the styling bits...First need the frameless window flag
         # hint

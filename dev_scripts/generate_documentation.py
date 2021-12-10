@@ -7,7 +7,7 @@ You will need to provide valid confluence credentials as environment variables
 
 import json
 import os
-from typing import Dict, Tuple, Type, cast
+from typing import Any, Tuple, Type
 from xml.etree import ElementTree
 
 import requests
@@ -296,19 +296,19 @@ def get_foreign_model_name(att: InstrumentedAttribute) -> str:
     return parent_name
 
 
-def get_page_ancestors(auth: Tuple[str, str], pageid: str) -> Dict:
+def get_page_ancestors(auth: Tuple[str, str], pageid: str) -> Any:
     """Get basic page information plus the ancestors property."""
     url = f"{BASE_URL}/{pageid}?expand=ancestors"
     response = requests.get(url, auth=auth)
     response.raise_for_status()
-    return cast(Dict, response.json()["ancestors"])
+    return response.json()["ancestors"]
 
 
-def get_page_info(auth: Tuple[str, str], pageid: str) -> Dict:
+def get_page_info(auth: Tuple[str, str], pageid: str) -> Any:
     """Get the page info for a specific page."""
     response = requests.get(f"{BASE_URL}/{pageid}", auth=auth)
     response.raise_for_status()
-    return cast(Dict, response.json())
+    return response.json()
 
 
 def write_data(auth: Tuple[str, str], html: str, pageid: str) -> None:

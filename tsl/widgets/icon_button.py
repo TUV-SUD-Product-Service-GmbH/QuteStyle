@@ -1,4 +1,6 @@
 """Simple button showing an icon."""
+from __future__ import annotations
+
 import logging
 from typing import Optional, TypedDict
 
@@ -29,10 +31,10 @@ class IconButton(QPushButton):
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
         icon_path: str = ":/svg_icons/no_icon.svg",
-        bgs: BackgroundColorNames = None,
-        text: str = None,
+        bgs: BackgroundColorNames | None = None,
+        text: str | None = None,
         margin: float = 0.6,
     ) -> None:
         """Create a new IconButton."""

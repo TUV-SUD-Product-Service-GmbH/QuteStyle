@@ -1,4 +1,6 @@
 """TextTruncator is a widget that is able to truncate and store texts."""
+from __future__ import annotations
+
 from collections import defaultdict
 from typing import Dict, Optional
 
@@ -23,7 +25,7 @@ class TextTruncator:  # pylint: disable=too-few-public-methods
         self,
         text: str,
         width: int,
-        font_metrics: QFontMetrics = None,
+        font_metrics: QFontMetrics | None = None,
     ) -> QStaticText:
         """
         Truncate a text so that if fits into the text_rect.

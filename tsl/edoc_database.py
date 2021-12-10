@@ -66,7 +66,6 @@ TEAM_NAME: Optional[str] = None
 # pylint: disable=global-statement
 def get_user_id() -> int:
     """Get the database id for the current user."""
-    global USER_ID
     if USER_ID is None:
         _fetch_user_id()
     return cast(int, USER_ID)
@@ -74,7 +73,6 @@ def get_user_id() -> int:
 
 def get_user_group_name() -> Optional[str]:
     """Get the database id for the current users team."""
-    global TEAM_NAME
     if TEAM_NAME is None:
         _fetch_user_id()
     return TEAM_NAME
@@ -2304,7 +2302,7 @@ class EdocModule(Base):
         "Staff", foreign_keys=[update_by], uselist=False
     )
 
-    @validates(
+    @validates(  # type: ignore
         "EM_NAME",
         "EM_LETTER",
         "EM_FILTER_LEVEL",

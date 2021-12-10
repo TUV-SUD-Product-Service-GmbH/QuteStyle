@@ -1,20 +1,22 @@
 """IconButton that provides a tooltip."""
+from __future__ import annotations
+
 import logging
 from typing import Generic, Optional, Tuple, Type, TypeVar
 
 from PyQt5.QtCore import QEvent, QPoint
 from PyQt5.QtWidgets import QWidget
 
-from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
+from tsl.widgets.base_widgets import BaseWidget
 from tsl.widgets.icon_button import BackgroundColorNames, IconButton
 from tsl.widgets.tooltip import ToolTip
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
-_T = TypeVar("_T", ColumnBaseWidget, MainWidget)
+BaseWidgetType = TypeVar("BaseWidgetType", bound=Optional[BaseWidget])
 
 
-class IconTooltipButton(IconButton, Generic[_T]):
+class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
     """IconButton that provides a tooltip."""
 
     def __init__(  # pylint: disable=too-many-arguments
@@ -22,19 +24,19 @@ class IconTooltipButton(IconButton, Generic[_T]):
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
-        bgs: BackgroundColorNames = None,
-        text: str = None,
-        widget_class: Type[_T] = None,
+        bgs: BackgroundColorNames | None = None,
+        text: str | None = None,
+        widget_class: Type[BaseWidgetType] | None = None,
         margin: float = 0.4,
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         """Create a new IconTooltipButton."""
         super().__init__(parent, icon_path, bgs, text, margin)
 
-        # App is needed to show the tooltip outside of the button's rect.
+        # App is needed to show the tooltip outside the button's rect.
         self._app_parent = app_parent
 
-        self._widget_class: Optional[Type[_T]] = widget_class
+        self._widget_class: Optional[Type[BaseWidgetType]] = widget_class
 
         self._tooltip = ToolTip(
             app_parent,
@@ -63,7 +65,7 @@ class IconTooltipButton(IconButton, Generic[_T]):
     @property
     def widget_class(
         self,
-    ) -> Optional[Type[_T]]:
+    ) -> Optional[Type[BaseWidgetType]]:
         """Return the widget class the button will trigger."""
         return self._widget_class
 

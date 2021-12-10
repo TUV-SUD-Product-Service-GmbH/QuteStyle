@@ -1,4 +1,6 @@
 """HomePage for TSL Apps."""
+from __future__ import annotations
+
 import pickle
 from enum import IntEnum
 from typing import Callable, Dict, List, Tuple, Type, cast
@@ -29,7 +31,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from tsl.dev.dev_functions import WidgetLogInfo
 from tsl.style import THEMES, _create_theme_drawing, log
 from tsl.widgets.base_widgets import MainWidget
 from tsl.widgets.icon import Icon
@@ -48,7 +49,7 @@ class StackedWidget(QStackedWidget):
 
     widget_selected = pyqtSignal(int, name="widget_selected")
 
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new StackedWidget."""
         super().__init__(parent)
         self._animation_running = False
@@ -98,7 +99,7 @@ class HomePage(MainWidget):
         self,
         app_info: Tuple[str, str, str],
         visible_widgets: List[Type[MainWidget]],
-        parent: QWidget = None,
+        parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self._visible_widgets: List[Type[MainWidget]] = visible_widgets
@@ -206,7 +207,7 @@ class HomePage(MainWidget):
         """Create the version history."""
         resource_path = ":/change_log_data.pickle"
         resource_file = QFile(resource_path)
-        change_log_data: Dict[str, Dict[str, WidgetLogInfo]] = {}
+        change_log_data: Dict[str, Dict[str, List[Dict[str, str]]]] = {}
         if resource_file.open(QIODevice.ReadOnly):
             pickle_data = resource_file.readAll()
             change_log_data = pickle.loads(pickle_data.data())
@@ -241,7 +242,7 @@ class HomePage(MainWidget):
     def fill_version_info(
         self,
         grid_layout: QGridLayout,
-        change_log_data: Dict,
+        change_log_data: Dict[str, Dict[str, List[Dict[str, str]]]],
         visible_widgets: List[Type[MainWidget]],
     ) -> None:
         """Setup version grid from change_log_data."""

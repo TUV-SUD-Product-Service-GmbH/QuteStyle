@@ -1,6 +1,6 @@
 """Left Menu containing the widget selection."""
 import logging
-from typing import Iterable, List, Type, TypedDict, Union, cast
+from typing import Any, Iterable, List, Type, TypedDict, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
@@ -17,8 +17,9 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from tsl.widgets.base_widgets import ColumnBaseWidget, MainWidget
+from tsl.widgets.base_widgets import BaseWidget, MainWidget
 from tsl.widgets.div import Div
+from tsl.widgets.icon_tooltip_button import BaseWidgetType
 from tsl.widgets.left_menu_button import LeftMenuButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
@@ -49,7 +50,7 @@ class LeftMenu(QWidget):
         parent: QWidget,
         app_parent: QWidget,
         main_widgets: List[Type[MainWidget]],
-        left_column_widgets: List[Type[ColumnBaseWidget]],
+        left_column_widgets: List[Type[BaseWidget]],
     ) -> None:
         """Create a new LeftMenu."""
         super().__init__()
@@ -72,7 +73,7 @@ class LeftMenu(QWidget):
         self._top_layout.setSpacing(1)
         layout.addWidget(top_frame, 0, Qt.AlignTop)
 
-        self._toggle_button = LeftMenuButton(
+        self._toggle_button: LeftMenuButton[None] = LeftMenuButton(
             app_parent,
             text=self.tr("Menü ausblenden"),
             tooltip_text=self.tr("Menü einblenden"),
@@ -147,9 +148,7 @@ class LeftMenu(QWidget):
         self._middle_layout.setSpacing(1)
         widget.setLayout(self._middle_layout)
 
-    def _add_bottom_widgets(
-        self, widgets: Iterable[Type[ColumnBaseWidget]]
-    ) -> None:
+    def _add_bottom_widgets(self, widgets: Iterable[Type[BaseWidget]]) -> None:
         """Create the widgets and add them to the column."""
         for widget_class in widgets:
             button = LeftMenuButton(
@@ -165,14 +164,14 @@ class LeftMenu(QWidget):
     @pyqtSlot(name="on_left_column_button")
     def on_left_column_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
-        widget_class = cast(LeftMenuButton, self.sender()).widget_class
+        widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting bottom_button_clicked for class %s", widget_class)
         self.bottom_button_clicked.emit(widget_class)
 
     @pyqtSlot(name="on_main_page_button")
     def on_main_page_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
-        widget_class = cast(LeftMenuButton, self.sender()).widget_class
+        widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting top_button_clicked for class %s", widget_class)
         self.top_button_clicked.emit(widget_class)
 
@@ -204,8 +203,8 @@ class LeftMenu(QWidget):
         self._animation.start()
 
     def _button(
-        self, widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget]]
-    ) -> LeftMenuButton:
+        self, widget_class: Type[BaseWidgetType]
+    ) -> LeftMenuButton[BaseWidgetType]:
         """Return the button for the given widget class."""
         for btn in self.findChildren(LeftMenuButton):
             if btn.widget_class == widget_class:
@@ -216,7 +215,7 @@ class LeftMenu(QWidget):
 
     def set_button_active(
         self,
-        widget_class: Union[Type[ColumnBaseWidget], Type[MainWidget]],
+        widget_class: Type[BaseWidgetType],
         active: bool,
     ) -> None:
         """Set the button for the given widget active/inactive."""

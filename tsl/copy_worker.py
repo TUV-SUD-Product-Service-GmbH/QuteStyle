@@ -1,4 +1,6 @@
 """Definition for CopyWorker to Update TSL apps."""
+from __future__ import annotations
+
 import filecmp
 import hashlib
 import json
@@ -22,7 +24,9 @@ class CopyWorker(QObject):
     copy_finished = pyqtSignal(name="copy_finished")
     status_changed = pyqtSignal(str, name="status_changed")
 
-    def __init__(self, path: str, file: str, parent: QObject = None) -> None:
+    def __init__(
+        self, path: str, file: str, parent: QObject | None = None
+    ) -> None:
         """
         Create a new CopyWorker.
 
