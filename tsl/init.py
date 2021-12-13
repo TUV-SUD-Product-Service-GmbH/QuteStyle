@@ -25,7 +25,7 @@ import sys
 import traceback
 import winreg
 from types import TracebackType
-from typing import Type, TypedDict
+from typing import Type, TypedDict, TypeVar
 
 from PyQt5.QtCore import (
     QMessageLogContext,
@@ -86,9 +86,11 @@ def edit_registry_keys(app_name: str) -> None:
         )
         winreg.CloseKey(registry_key)
 
+ExceptionT = TypeVar("ExceptionT", bound=BaseException)
+
 
 def excepthook(
-    cls: Type[BaseException], exception: BaseException, trace: TracebackType
+    cls: Type[ExceptionT], exception: ExceptionT, trace: TracebackType
 ) -> None:
     """Override the system except hook to catch PyQt exceptions."""
     log.critical("Critical error occurred:")
@@ -100,7 +102,7 @@ def excepthook(
                 log.critical(line_splitted)
     log.critical("%s %s", cls, exception)
     try:
-        error_message_box(f"{cls, exception}", traceback_text)
+        error_message_box(f"{cls}: {exception}", traceback_text)
     except ImportError:
         log.warning("Not showing error message since PyQt is not installed.")
 
