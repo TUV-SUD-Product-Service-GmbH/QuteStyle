@@ -645,17 +645,41 @@ class CustomerAddress(Base):
         "formatted an Integer as a 4 character string.",
     )
     CA_NAME: Mapped[str] = Column(
-        Unicode(165), nullable=False, doc="Name of the company"
+        NullUnicode(length=165), nullable=False, doc="Name of the company"
     )
     CA_NAME_SHORT: Mapped[str] = Column(
-        Unicode(60), nullable=False, doc="Short name of the company"
+        NullUnicode(length=60), nullable=False, doc="Short name of the company"
     )
-    CA_NAME1 = Column(Unicode(40), doc="Additional name field")
-    CA_NAME2 = Column(Unicode(40), doc="Additional name field")
-    CA_NAME3 = Column(Unicode(40), doc="Additional name field")
-    CA_NAME4 = Column(Unicode(40), doc="Additional name field")
-    CA_CITY = Column(Unicode(40), doc="City")
-    CA_DISTRICT = Column(Unicode(50), doc="District")
+    CA_NAME1 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional name field",
+    )
+    CA_NAME2 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional name field",
+    )
+    CA_NAME3 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional name field",
+    )
+    CA_NAME4 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional name field",
+    )
+    CA_CITY = Column(
+        NullUnicode(length=40), nullable=False, default="", doc="City"
+    )
+    CA_DISTRICT = Column(
+        NullUnicode(length=50), nullable=False, default="", doc="District"
+    )
     CA_COUNTRY = Column(
         String(3, "SQL_Latin1_General_CP1_CI_AS"),
         doc="Country code i.e. 'DE'. Is also used for states "
@@ -688,30 +712,80 @@ class CustomerAddress(Base):
         String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post code"
     )
     CA_CO_POSTCODE = Column(
-        Unicode(50), doc="UNKOWN: Maybe additional post code"
+        NullUnicode(length=50),
+        nullable=False,
+        default="",
+        doc="UNKOWN: Maybe additional post code",
     )
-    CA_STREET = Column(Unicode(100), doc="Street name")
-    CA_STREET1 = Column(Unicode(60), doc="Additional street name")
+    CA_STREET = Column(
+        NullUnicode(length=100), nullable=False, default="", doc="Street name"
+    )
+    CA_STREET1 = Column(
+        NullUnicode(length=60),
+        nullable=False,
+        default="",
+        doc="Additional street name",
+    )
     CA_PO_BOX = Column(
         String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box name"
     )
-    CA_PO_BOX_LOC = Column(Unicode(40), doc="Post box location")
+    CA_PO_BOX_LOC = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Post box location",
+    )
     CA_PO_BOX_REG = Column(
         String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box region"
     )
     CA_PO_BOX_CTY = Column(
         String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box city"
     )
-    CA_HOUSE_NUM1 = Column(Unicode(10), doc="House number")
-    CA_HOUSE_NUM2 = Column(Unicode(10), doc="Additional house number")
-    CA_HOUSE_NUM3 = Column(Unicode(10), doc="Additional house number")
-    CA_STR_SUPPL1 = Column(Unicode(40), doc="Supplier street name")
-    CA_STR_SUPPL2 = Column(Unicode(40), doc="Additional supplier street name")
-    CA_STR_SUPPL3 = Column(Unicode(40), doc="Additional supplier street name")
-    CA_LOCATION = Column(Unicode(40), doc="Location name")
-    CA_BUILDING = Column(Unicode(20), doc="Building name")
-    CA_FLOOR = Column(Unicode(10), doc="Floor number")
-    CA_ROOMNUMBER = Column(Unicode(10), doc="Room number")
+    CA_HOUSE_NUM1 = Column(
+        NullUnicode(length=10), nullable=False, default="", doc="House number"
+    )
+    CA_HOUSE_NUM2 = Column(
+        NullUnicode(length=10),
+        nullable=False,
+        default="",
+        doc="Additional house number",
+    )
+    CA_HOUSE_NUM3 = Column(
+        NullUnicode(length=10),
+        nullable=False,
+        default="",
+        doc="Additional house number",
+    )
+    CA_STR_SUPPL1 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Supplier street name",
+    )
+    CA_STR_SUPPL2 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional supplier street name",
+    )
+    CA_STR_SUPPL3 = Column(
+        NullUnicode(length=40),
+        nullable=False,
+        default="",
+        doc="Additional supplier street name",
+    )
+    CA_LOCATION = Column(
+        NullUnicode(length=40), nullable=False, default="", doc="Location name"
+    )
+    CA_BUILDING = Column(
+        NullUnicode(length=20), nullable=False, default="", doc="Building name"
+    )
+    CA_FLOOR = Column(
+        NullUnicode(length=10), nullable=False, default="", doc="Floor number"
+    )
+    CA_ROOMNUMBER = Column(
+        NullUnicode(length=10), nullable=False, default="", doc="Room number"
+    )
     CA_PHONE1 = Column(
         String(60, "SQL_Latin1_General_CP1_CI_AS"),
         doc="Additional phone number",
@@ -719,18 +793,15 @@ class CustomerAddress(Base):
     CA_FAX1 = Column(
         String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Additional fax number"
     )
-    CA_COMMENT = Column(Unicode(2000), doc="Free text comment field")
-    RUN_ID = Column(Integer, doc="UNKNOWN")
-
-    reg: Mapped[datetime] = Column(
-        "CA_CREATED",
-        DateTime,
+    CA_COMMENT = Column(
+        NullUnicode(length=2000),
         nullable=False,
-        server_default=text("(getdate())"),
+        default="",
+        doc="Free text comment field",
     )
-    update: Mapped[datetime] = Column(
-        "CA_UPDATED", DateTime, nullable=False, onupdate=datetime.utcnow
-    )
+    RUN_ID = Column(Integer, doc="UNKNOWN")
+    CA_CREATED: Mapped[datetime] = Column(DateTime, nullable=False)
+    CA_UPDATED: Mapped[datetime] = Column(DateTime, nullable=False)
 
     customer: Customer = relationship(
         "Customer", back_populates="address", uselist=False
@@ -746,14 +817,35 @@ class CustomerContact(Base):
 
     CUC_ID: Mapped[int] = Column(Integer, primary_key=True)
     CU_ID = Column(Integer, ForeignKey("V_PSEX_CUSTOMER.CU_ID"))
-    CUC_FORENAME = Column(Unicode(35), doc="First name.")
-    CUC_SURNAME = Column(Unicode(35), doc="Last name.")
-    CUC_PHONE = Column(Unicode(50), doc="Phone number.")
-    CUC_MOBILE = Column(Unicode(50), doc="Mobile phone number.")
-    CUC_FAX = Column(Unicode(50), doc="Fax number")
-    CUC_MAIL = Column(Unicode(255), doc="Mail address")
-    CUC_SCOPE = Column(
-        Unicode(60), doc="Scope of the contact, i.e. 'Geschäftsführer'"
+    CUC_FORENAME: Mapped[str] = Column(
+        NullUnicode(length=35), nullable=False, default="", doc="First name."
+    )
+    CUC_SURNAME: Mapped[str] = Column(
+        NullUnicode(length=35), nullable=False, default="", doc="Last name."
+    )
+    CUC_PHONE: Mapped[str] = Column(
+        NullUnicode(length=50), nullable=False, default="", doc="Phone number."
+    )
+    CUC_MOBILE: Mapped[str] = Column(
+        NullUnicode(length=50),
+        nullable=False,
+        default="",
+        doc="Mobile phone number.",
+    )
+    CUC_FAX: Mapped[str] = Column(
+        NullUnicode(length=50), nullable=False, default="", doc="Fax number"
+    )
+    CUC_MAIL: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default="", doc="Mail address"
+    )
+    CUC_SCOPE: Mapped[str] = Column(
+        NullUnicode(length=60),
+        nullable=False,
+        default="",
+        doc="Scope of the contact, i.e. 'Geschäftsführer'",
+    )
+    ANRED: Mapped[str] = Column(
+        NullUnicode(length=30), nullable=False, default=""
     )
 
     customer: Customer = relationship(
@@ -2421,6 +2513,38 @@ class EdocResult(Base):
     )
 
 
+class FailureMd(Base):
+    """FailureMd table model."""
+
+    __tablename__ = "V_PSEX_FAILURE_MD"
+
+    FAIL_ID: Mapped[int] = Column(Integer, primary_key=True)
+    MD_ID: Mapped[int] = Column(Integer, nullable=False)
+    FAIL_KEY: Mapped[str] = Column(Unicode(16), nullable=False)
+    FAIL_TEXT_EN: Mapped[str] = Column(
+        NullUnicode(length=150), nullable=False, default=""
+    )
+    FAIL_TEXT_DE: Mapped[str] = Column(
+        NullUnicode(length=150), nullable=False, default=""
+    )
+    FAIL_TEXT_FR: Mapped[str] = Column(
+        NullUnicode(length=150), nullable=False, default=""
+    )
+    FAIL_EXAMPLE_EN: Mapped[str] = Column(
+        NullUnicode(length=500), nullable=False, default=""
+    )
+    FAIL_EXAMPLE_DE: Mapped[str] = Column(
+        NullUnicode(length=500), nullable=False, default=""
+    )
+    FAIL_EXAMPLE_FR: Mapped[str] = Column(
+        NullUnicode(length=500), nullable=False, default=""
+    )
+    Created: Mapped[datetime] = Column(DateTime, nullable=False)
+    CreatedBy = Column(Integer)
+    Updated = Column(DateTime)
+    UpdatedBy = Column(Integer)
+
+
 class Header(Base):
     """Header for a Module."""
 
@@ -2468,6 +2592,19 @@ class KindOfTest(Base):
     KOT_NAME_FR = Column(Unicode(length=256))
     WORKING_CLUSTER = Column(Unicode(length=36))
     HR_SHORT = Column(Unicode(length=20))
+
+
+class Kst(Base):
+    """Kst table model."""
+
+    __tablename__ = "V_PSEX_KST"
+
+    CC_ID: Mapped[str] = Column(Unicode(10), primary_key=True)
+    CC_NAME = Column(Unicode(16))
+    CC_BOOKINGAREA = Column(Unicode(4))
+    CC_TYPE = Column(Integer)
+    KTEXT = Column(Unicode(256))
+    LTEXT = Column(Unicode(256))
 
 
 class ModuleParameter(Base):
@@ -3242,7 +3379,8 @@ class Process(Base):
     PC_UPDATEBY_TEAM = Column(Integer)  # todo: check if this is a link
     PC_REGDATE = Column(DateTime)
     PC_CREATEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    PC_DISABLED = Column(Boolean)
+    PC_DISABLED = Column(Boolean, nullable=False)
+    PC_IAN = Column(Unicode(length=256))
     PC_KEY2 = Column(Unicode(length=16))
     PC_KEY3 = Column(Unicode(length=16))
 
@@ -3320,7 +3458,9 @@ class Project(Base):
     __tablename__ = "V_PSEX_PROJECT"
 
     P_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
-    P_FOLDER = Column(Unicode(length=256))
+    P_FOLDER: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
     P_PRODUCT: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
@@ -3375,14 +3515,18 @@ class Project(Base):
     P_CUR_ID = Column(Unicode(length=3))
     P_CURRENCYRATE = Column(Numeric(precision=18, scale=0))
     P_REGBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
-    P_REGDATE = Column(DateTime)
+    P_REGDATE: Mapped[datetime] = Column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
     SAP_QUOTATION_NUMBER = Column(Unicode(length=10))
     P_PROJECTFOLDERCREATED = Column(Boolean)
     BR_ID = Column(Unicode(length=36))
     P_TEAM_ID = Column(Unicode(length=36))
     P_AUDIT_DATE = Column(DateTime)
     P_PROCESSPHASE = Column(Integer)
-    P_IAN = Column(Unicode(length=256))
+    P_IAN: Mapped[str] = Column(
+        NullUnicode(length=256), nullable=False, default=""
+    )
     P_TOKEN = Column(Unicode(length=60))
     CATEGORY_ID: Mapped[int] = Column(Integer, nullable=False)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
@@ -3397,14 +3541,17 @@ class Project(Base):
     customer_contact: CustomerContact = relationship(
         "CustomerContact", uselist=False
     )
-    ordering_party_address: Customer = relationship(
+    ordering_party: Customer = relationship(
         "Customer", foreign_keys=[P_CUSTOMER_A], uselist=False
     )
-    manufacturer_address: Customer = relationship(
+    manufacturer: Customer = relationship(
         "Customer", foreign_keys=[P_CUSTOMER_B], uselist=False
     )
     process: Process = relationship(
         "Process", back_populates="projects", uselist=False
+    )
+    project_failure_rel: List[ProjectFailureRel] = relationship(
+        "ProjectFailureRel", back_populates="project", uselist=True
     )
     project_manager: Staff = relationship(
         "Staff", foreign_keys=[P_PROJECTMANAGER], uselist=False
@@ -3426,6 +3573,26 @@ class Project(Base):
         """Return the full path to the project folder of the Project."""
         assert self.P_FOLDER is not None
         return os.path.join(PATH, self.P_FOLDER)
+
+
+class ProjectFailureRel(Base):
+    """ProjectFailureRel table model."""
+
+    __tablename__ = "V_PSEX_PROJECT_FAILURE_REL"
+
+    ID: Mapped[int] = Column(Integer, primary_key=True)
+    P_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_PROJECT.P_ID"), nullable=False
+    )
+    SO_NUMBER = Column(Integer)
+    FAIL_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_FAILURE_MD.FAIL_ID"), nullable=False
+    )
+
+    failure_md: FailureMd = relationship("FailureMd")
+    project: Project = relationship(
+        "Project", back_populates="project_failure_rel"
+    )
 
 
 class ProofElement(Base):
@@ -3652,6 +3819,7 @@ class SubOrder(Base):
     KPI = Column(Boolean)
     S_KPI_NUMBER = Column(Integer)
     REPORT_SENT = Column(DateTime)
+    PLAN_EXTERNAL = Column(DECIMAL(18, 2))
 
     project: Project = relationship(
         "Project", back_populates="sub_orders", uselist=False
@@ -3681,7 +3849,7 @@ class SubOrder(Base):
 
 
 class Team(Base):
-    """Staff table model."""
+    """Hierarchy table model."""
 
     __tablename__ = "V_PSEX_HIERARCHY"
 
@@ -3689,7 +3857,6 @@ class Team(Base):
     HR_SHORT: Mapped[str] = Column(Unicode(20))
     HR_NEW_ID: Mapped[int] = Column(Integer, nullable=False)
     ST_ID: Mapped[int] = Column(Integer)
-
     HR_TYPE: Mapped[str] = Column(Unicode(50))
     HR_PARENT: Mapped[str] = Column(UNIQUEIDENTIFIER)
     HR_LOCATION: Mapped[str] = Column(Unicode(40))
@@ -3697,12 +3864,12 @@ class Team(Base):
     HR_ACTIVE: Mapped[bool] = Column(BIT, nullable=False)
     HR_CURRENT: Mapped[bool] = Column(BIT)
     HR_EMAIL: Mapped[str] = Column(String(80, "SQL_Latin1_General_CP1_CI_AS"))
-    CC_ID: Mapped[str] = Column(String(10, "SQL_Latin1_General_CP1_CI_AS"))
+    CC_ID = Column(Unicode(10), ForeignKey("V_PSEX_KST.CC_ID"))
 
+    kst: Kst = relationship("Kst", uselist=False)
     users: List[Staff] = relationship(
         Staff, uselist=True, back_populates="team"
     )
-
     sub_locations: List[TeamSublocation] = relationship(
         "TeamSublocation", uselist=True, back_populates="team"
     )
@@ -3726,6 +3893,59 @@ class TeamSublocation(Base):
     team: Team = relationship(
         "Team", uselist=False, back_populates="sub_locations"
     )
+
+
+class Template(Base):
+    """
+    TemplateData table model.
+
+    If the template represents an eDoc DefaultModule, the TP_FILENAME can be
+    empty. In this case, the DM_ID must exist. Nevertheless it is possible
+    to have a DM_ID and a TP_FILENAME at the same time.
+    """
+
+    __tablename__ = "V_PSEX_TEMPLATE"
+
+    TP_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
+    MD_ID: Mapped[int] = Column(Integer, nullable=False)
+    TPST_ID: Mapped[int] = Column(Integer, nullable=False)
+    TPT_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_TYPE.TPT_ID"), nullable=False
+    )
+    TPSC_ID: Mapped[int] = Column(
+        Integer, ForeignKey("V_PSEX_TEMPLATE_SCOPE.TPSC_ID"), nullable=False
+    )
+    TPF_ID: Mapped[int] = Column(Integer, nullable=False)
+    TP_NAME_D = Column(Unicode(length=255))
+    TP_NAME_E = Column(Unicode(length=256))
+    TP_TIME_HOURS = Column(Float(53))
+    TP_TIME_DAYS = Column(Float(53))
+    TP_COSTS = Column(DECIMAL(18, 2))
+    TP_TESTPERSON_REQUIRED = Column(Boolean, nullable=False)
+    TP_NAME_E = Column(Unicode(255))
+    TP_NAME_F = Column(Unicode(255))
+    TP_COMMENT = Column(Unicode(length=255))
+    TP_VERSION = Column(Integer)
+    TP_LANGUAGE = Column(Unicode(length=255))
+    TP_CLEARINGDATE = Column(DateTime)
+    TP_CLEARINGBY = Column(Integer)
+    TP_FILENAME = Column(Unicode(length=255))
+    TP_REGDATE = Column(DateTime)
+    TP_REGBY = Column(Integer)
+    TP_UPDATE = Column(DateTime)
+    TP_UPDATEBY = Column(Integer)
+    TP_ISGLOBAL = Column(Boolean)
+    TP_DISABLED: Mapped[bool] = Column(Boolean, nullable=False)
+    TP_TRANSFER_STATUS = Column(Unicode(length=50))
+    TP_ORIGINATING_SERVERID = Column(Integer)
+    TP_ROOT_TEMPLATE_ID = Column(Integer)
+    TP_UTC = Column(DateTime)
+    TP_WORKINGCLUSTER = Column(UNIQUEIDENTIFIER)
+    DM_ID = Column(Integer)
+    TP_OLD_TP = Column(Integer)
+
+    temp_scope: TemplateScope = relationship("TemplateScope", uselist=False)
+    temp_type: TemplateType = relationship("TemplateType", uselist=False)
 
 
 class TemplateScope(Base):

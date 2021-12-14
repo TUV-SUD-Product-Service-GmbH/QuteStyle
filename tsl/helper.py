@@ -1,7 +1,9 @@
 """TSL Library - helper: useful functions for TSL tools."""
+import errno
 import logging
 import os
-from typing import cast
+from typing import Optional, cast
+from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
 
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice
 from PyQt5.QtGui import QPixmap
@@ -69,3 +71,19 @@ def get_process_path(process_id: int) -> str:
         ) from no_result_found
     finally:
         session.close()
+
+
+def get_selected_psex_id() -> Optional[int]:
+    """Get the id of the currently selected project in PSExplorer."""
+    key = OpenKey(HKEY_CURRENT_USER, r"Software\TUV\PSExplorer", 0, KEY_READ)
+    try:
+        project_id = QueryValueEx(key, "SelectedProjectId")[0]
+        log.debug("Selected PSEX-ID is %s", project_id)
+        return int(project_id) if project_id else None
+    except OSError as error:
+        if error.errno == errno.ENOENT:
+            log.debug("Key does not exist.")
+            return None
+        raise
+    finally:
+        key.Close()
