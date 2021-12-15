@@ -650,34 +650,34 @@ class CustomerAddress(Base):
     CA_NAME_SHORT: Mapped[str] = Column(
         NullUnicode(length=60), nullable=False, doc="Short name of the company"
     )
-    CA_NAME1 = Column(
+    CA_NAME1: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional name field",
     )
-    CA_NAME2 = Column(
+    CA_NAME2: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional name field",
     )
-    CA_NAME3 = Column(
+    CA_NAME3: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional name field",
     )
-    CA_NAME4 = Column(
+    CA_NAME4: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional name field",
     )
-    CA_CITY = Column(
+    CA_CITY: Mapped[str] = Column(
         NullUnicode(length=40), nullable=False, default="", doc="City"
     )
-    CA_DISTRICT = Column(
+    CA_DISTRICT: Mapped[str] = Column(
         NullUnicode(length=50), nullable=False, default="", doc="District"
     )
     CA_COUNTRY = Column(
@@ -711,16 +711,16 @@ class CustomerAddress(Base):
     CA_PO_POSTCODE = Column(
         String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post code"
     )
-    CA_CO_POSTCODE = Column(
+    CA_CO_POSTCODE: Mapped[str] = Column(
         NullUnicode(length=50),
         nullable=False,
         default="",
         doc="UNKOWN: Maybe additional post code",
     )
-    CA_STREET = Column(
+    CA_STREET: Mapped[str] = Column(
         NullUnicode(length=100), nullable=False, default="", doc="Street name"
     )
-    CA_STREET1 = Column(
+    CA_STREET1: Mapped[str] = Column(
         NullUnicode(length=60),
         nullable=False,
         default="",
@@ -729,7 +729,7 @@ class CustomerAddress(Base):
     CA_PO_BOX = Column(
         String(10, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box name"
     )
-    CA_PO_BOX_LOC = Column(
+    CA_PO_BOX_LOC: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
@@ -741,49 +741,49 @@ class CustomerAddress(Base):
     CA_PO_BOX_CTY = Column(
         String(3, "SQL_Latin1_General_CP1_CI_AS"), doc="Post box city"
     )
-    CA_HOUSE_NUM1 = Column(
+    CA_HOUSE_NUM1: Mapped[str] = Column(
         NullUnicode(length=10), nullable=False, default="", doc="House number"
     )
-    CA_HOUSE_NUM2 = Column(
+    CA_HOUSE_NUM2: Mapped[str] = Column(
         NullUnicode(length=10),
         nullable=False,
         default="",
         doc="Additional house number",
     )
-    CA_HOUSE_NUM3 = Column(
+    CA_HOUSE_NUM3: Mapped[str] = Column(
         NullUnicode(length=10),
         nullable=False,
         default="",
         doc="Additional house number",
     )
-    CA_STR_SUPPL1 = Column(
+    CA_STR_SUPPL1: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Supplier street name",
     )
-    CA_STR_SUPPL2 = Column(
+    CA_STR_SUPPL2: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional supplier street name",
     )
-    CA_STR_SUPPL3 = Column(
+    CA_STR_SUPPL3: Mapped[str] = Column(
         NullUnicode(length=40),
         nullable=False,
         default="",
         doc="Additional supplier street name",
     )
-    CA_LOCATION = Column(
+    CA_LOCATION: Mapped[str] = Column(
         NullUnicode(length=40), nullable=False, default="", doc="Location name"
     )
-    CA_BUILDING = Column(
+    CA_BUILDING: Mapped[str] = Column(
         NullUnicode(length=20), nullable=False, default="", doc="Building name"
     )
-    CA_FLOOR = Column(
+    CA_FLOOR: Mapped[str] = Column(
         NullUnicode(length=10), nullable=False, default="", doc="Floor number"
     )
-    CA_ROOMNUMBER = Column(
+    CA_ROOMNUMBER: Mapped[str] = Column(
         NullUnicode(length=10), nullable=False, default="", doc="Room number"
     )
     CA_PHONE1 = Column(
@@ -793,7 +793,7 @@ class CustomerAddress(Base):
     CA_FAX1 = Column(
         String(60, "SQL_Latin1_General_CP1_CI_AS"), doc="Additional fax number"
     )
-    CA_COMMENT = Column(
+    CA_COMMENT: Mapped[str] = Column(
         NullUnicode(length=2000),
         nullable=False,
         default="",
@@ -3363,13 +3363,23 @@ class Process(Base):
     __tablename__ = "V_PSEX_PROCESS"
 
     PC_ID: Mapped[int] = Column(Integer, primary_key=True, nullable=False)
-    PC_PATH = Column(Unicode(length=50))
+    PC_PATH: Mapped[str] = Column(
+        NullUnicode(length=50), nullable=False, default=""
+    )
     PC_WC_ID = Column(Unicode(length=36))
     PC_CLIENT = Column(Integer)  # todo: check if this is a link to Customer
-    PC_PRODUCT = Column(Unicode(length=255))
-    PC_MODEL = Column(Unicode(length=255))
-    PC_NAME = Column(Unicode(length=255))
-    PC_ORDERTEXT = Column(Unicode(length=255))
+    PC_PRODUCT: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PC_MODEL: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PC_NAME: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PC_ORDERTEXT: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
     PC_PROJECTMANAGER = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     PC_LOTSIZE = Column(Integer)  # todo: check if this is a link
     PC_STATUS = Column(Integer)  # todo: check if this is a link
@@ -3380,9 +3390,15 @@ class Process(Base):
     PC_REGDATE = Column(DateTime)
     PC_CREATEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     PC_DISABLED = Column(Boolean, nullable=False)
-    PC_IAN = Column(Unicode(length=256))
-    PC_KEY2 = Column(Unicode(length=16))
-    PC_KEY3 = Column(Unicode(length=16))
+    PC_IAN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PC_KEY2: Mapped[str] = Column(
+        NullUnicode(length=16), nullable=False, default=""
+    )
+    PC_KEY3: Mapped[str] = Column(
+        NullUnicode(length=16), nullable=False, default=""
+    )
 
     projects: List[Project] = relationship(
         "Project", back_populates="process", uselist=True
@@ -3401,18 +3417,36 @@ class ProcessPhase(Base):
     __tablename__ = "V_PSEX_PROCESSPHASE"
 
     PRP_ID: Mapped[int] = Column(Integer, primary_key=True)
-    PRP_NAME_DE = Column(Unicode(length=256))
-    PRP_NAME_EN = Column(Unicode(length=256))
-    PRP_NAME_FR = Column(Unicode(length=256))
-    PRP_SHORT_DE = Column(Unicode(length=256))
-    PRP_SHORT_EN = Column(Unicode(length=256))
-    PRP_SHORT_FR = Column(Unicode(length=256))
+    PRP_NAME_DE: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_NAME_EN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_NAME_FR: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_SHORT_DE: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_SHORT_EN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_SHORT_FR: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
     PRP_SORT = Column(Integer)
     PRP_SHOW_IN_PSEX = Column(Boolean)
     PRP_EDOC_ACTIVE = Column(Boolean)
-    PRP_EDOC_NAME_DE = Column(Unicode(length=256))
-    PRP_EDOC_NAME_EN = Column(Unicode(length=256))
-    PRP_EDOC_NAME_FR = Column(Unicode(length=256))
+    PRP_EDOC_NAME_DE: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_EDOC_NAME_EN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    PRP_EDOC_NAME_FR: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
     PRP_EDOC_SHORT_DE: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
@@ -3436,9 +3470,15 @@ class Product(Base):
     HRP_LEFT = Column(Integer)
     HRP_RIGHT = Column(Integer)
     HRP_INDENT = Column(Integer)
-    HRP_NAME_DE = Column(Unicode(length=255))
-    HRP_NAME_EN = Column(Unicode(length=255))
-    HRP_NAME_FR = Column(Unicode(length=255))
+    HRP_NAME_DE: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    HRP_NAME_EN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    HRP_NAME_FR: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
     update = Column("HRP_UPDATE", DateTime, onupdate=datetime.utcnow)
     update_by = Column(
         "HRP_UPDATEBY",
@@ -3482,8 +3522,12 @@ class Project(Base):
     P_ORDERTEXT = Column(Unicode(length=2048))
     P_PROJECTINFO = Column(Unicode(length=4000))
     P_IS_QUOTATION = Column(Boolean)
-    P_ZARA_NUMBER = Column(Unicode(length=11))
-    P_NAME = Column(Unicode(length=31))
+    P_ZARA_NUMBER: Mapped[str] = Column(
+        NullUnicode(length=11), nullable=False, default=""
+    )
+    P_NAME: Mapped[str] = Column(
+        NullUnicode(length=31), nullable=False, default=""
+    )
     SC_ID = Column(Unicode(length=7))
     P_PROJECTMANAGER = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
     P_HANDLEDBY = Column(Integer, ForeignKey("V_PSEX_STAFF.ST_ID"))
@@ -3527,13 +3571,17 @@ class Project(Base):
     P_IAN: Mapped[str] = Column(
         NullUnicode(length=256), nullable=False, default=""
     )
-    P_TOKEN = Column(Unicode(length=60))
+    P_TOKEN: Mapped[str] = Column(
+        NullUnicode(length=60), nullable=False, default=""
+    )
     CATEGORY_ID: Mapped[int] = Column(Integer, nullable=False)
     E_ID = Column(Integer, ForeignKey("EDOC.E_ID"))
     P_CONTACT_CUC_ID = Column(
         Integer, ForeignKey("V_PSEX_CUSTOMER_CONTACT.CUC_ID")
     )
-    P_REMARK = Column(Unicode(length=1024))
+    P_REMARK: Mapped[str] = Column(
+        NullUnicode(length=1024), nullable=False, default=""
+    )
     BATCH_NUMBER = Column(Unicode(length=16))
     P_RETEST: Mapped[int] = Column(Integer, nullable=False)
     P_RETEST_OF = Column(Integer)
@@ -3606,8 +3654,12 @@ class ProofElement(Base):
     )
     NPEP_TYPE = Column(Integer)
     NPR_ID = Column(Integer)
-    NPEP_TEXT_DE = Column(Unicode(length=255))
-    NPEP_TEXT_EN = Column(Unicode(length=255))
+    NPEP_TEXT_DE: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
+    NPEP_TEXT_EN: Mapped[str] = Column(
+        NullUnicode(length=255), nullable=False, default=""
+    )
     reg = Column("NPEP_REG", DateTime, default=datetime.utcnow)
     reg_by = Column(
         "NPEP_REGBY",
@@ -3697,16 +3749,26 @@ class Staff(Base):
     __tablename__ = "V_PSEX_STAFF"
 
     ST_ID: Mapped[int] = Column(Integer, primary_key=True)
-    ST_SURNAME: Mapped[str] = Column(Unicode(length=60), nullable=False)
+    ST_SURNAME: Mapped[str] = Column(
+        NullUnicode(length=60), nullable=False, default=""
+    )
     # ST_FORENAME is nullable in database, but never actually NULL
-    ST_FORENAME: Mapped[str] = Column(Unicode(length=50), nullable=False)
+    ST_FORENAME: Mapped[str] = Column(
+        NullUnicode(length=50), nullable=False, default=""
+    )
     ST_COSTID = Column(Unicode(length=10))
     ST_ACTIVE: Mapped[bool] = Column(Boolean, nullable=False)
     ST_NUMBER = Column(Unicode(length=8))
     ST_SHORT = Column(Unicode(length=3))
-    ST_PHONE = Column(Unicode(length=40))
-    ST_FAX = Column(Unicode(length=40))
-    ST_EMAIL = Column(Unicode(length=80))
+    ST_PHONE: Mapped[str] = Column(
+        NullUnicode(length=40), nullable=False, default=""
+    )
+    ST_FAX: Mapped[str] = Column(
+        NullUnicode(length=40), nullable=False, default=""
+    )
+    ST_EMAIL: Mapped[str] = Column(
+        NullUnicode(length=80), nullable=False, default=""
+    )
     ST_WINDOWSID = Column(Unicode(length=32))
     ST_TEAM: Mapped[Optional[str]] = Column(
         UNIQUEIDENTIFIER, ForeignKey("V_PSEX_HIERARCHY.HR_ID")
