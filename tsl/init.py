@@ -24,6 +24,7 @@ import os
 import sys
 import traceback
 import winreg
+from pathlib import Path
 from types import TracebackType
 from typing import Type, TypedDict, TypeVar
 
@@ -59,8 +60,7 @@ SETTINGS = SettingsDict(
 def check_ide() -> bool:
     """Check if the application is run from the IDE."""
     log.info("Checking if running from IDE")
-    app_path = os.path.abspath(sys.argv[0])
-    return not os.path.split(app_path)[1].endswith(".exe")
+    return Path(sys.argv[0]).suffix != ".exe"
 
 
 def edit_registry_keys(app_name: str) -> None:
@@ -71,10 +71,8 @@ def edit_registry_keys(app_name: str) -> None:
 
     log.info("Updating registry keys for %s", app_name)
     data = {
-        os.path.join("Software", app_name): os.path.abspath(sys.argv[0]),
-        os.path.join("Software", "TÜV SÜD", app_name): os.path.split(
-            os.path.abspath(sys.argv[0])
-        )[0],
+        f"Software/{app_name}": Path(sys.argv[0]),
+        f"Software/TÜV SÜD/{app_name}": Path(sys.argv[0]).parent,
     }
     for key, value in data.items():
         winreg.CreateKey(winreg.HKEY_CURRENT_USER, key)
@@ -82,7 +80,7 @@ def edit_registry_keys(app_name: str) -> None:
             winreg.HKEY_CURRENT_USER, key, 0, winreg.KEY_WRITE
         )
         winreg.SetValueEx(
-            registry_key, "ApplicationPath", 0, winreg.REG_SZ, value
+            registry_key, "ApplicationPath", 0, winreg.REG_SZ, str(value)
         )
         winreg.CloseKey(registry_key)
 

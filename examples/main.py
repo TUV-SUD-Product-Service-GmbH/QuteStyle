@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import importlib
 import logging
-import os
 import sys
+from pathlib import Path
 
 from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import (
@@ -156,12 +156,8 @@ class StyledMainWindow(TSLStyledMainWindow):
 
 def create_new_changelog_resource_file(app_name: str) -> None:
     """Create the changelog resource file and import it."""
-    root_folder = os.getcwd().replace("examples", "")
-    generate_changelog_resource_file(
-        app_name,
-        "test_changelog",
-        os.path.join(root_folder, "examples"),
-    )
+    path = Path.cwd().parent / "examples"
+    generate_changelog_resource_file(app_name, path / "test_changelog", path)
 
     importlib.import_module("examples.resources_cl")
 

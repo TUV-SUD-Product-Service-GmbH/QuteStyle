@@ -1,7 +1,7 @@
 """TSL Library - helper: useful functions for TSL tools."""
 import errno
 import logging
-import os
+from pathlib import Path
 from typing import Optional, cast
 from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
 
@@ -10,7 +10,6 @@ from PyQt5.QtGui import QPixmap
 from sqlalchemy.orm.exc import NoResultFound
 
 from tsl.pse_database import AdminSession, Process, Project
-from tsl.variables import PATH
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
@@ -34,19 +33,19 @@ def decode_pixmap(pixmap_string: str) -> QPixmap:
     return qpixmap
 
 
-def get_project_path(project_id: int) -> str:
+def get_project_path(project_id: int) -> Path:
     """Search for the project folder based on an id."""
     log.info("Searching correct path for project id %s", project_id)
     session = AdminSession()
     try:
-        project = (
+        project: Project = (
             session.query(Project)
             .filter(Project.P_ID == project_id)
             .filter(Project.P_WC_ID == "BB8E7738-0ACB-423C-8626-18AA3355B8FF")
             .one()
         )
         log.debug("Got project: %s", project)
-        return os.path.join(PATH, project.P_FOLDER)
+        return project.project_folder
     except NoResultFound as no_result_found:
         raise ValueError(
             f"No path found for project id {project_id}"
@@ -55,16 +54,16 @@ def get_project_path(project_id: int) -> str:
         session.close()
 
 
-def get_process_path(process_id: int) -> str:
+def get_process_path(process_id: int) -> Path:
     """Search for the process folder based on an id."""
     log.info("Searching correct path for process id %s", process_id)
     session = AdminSession()
     try:
-        process = (
+        process: Process = (
             session.query(Process).filter(Process.PC_ID == process_id).one()
         )
         log.debug("Got process: %s", process)
-        return os.path.join(PATH, "PSEX", process.PC_PATH)
+        return process.process_archive
     except NoResultFound as no_result_found:
         raise ValueError(
             f"No path found for process id {process_id}"

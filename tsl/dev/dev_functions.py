@@ -1,13 +1,15 @@
 """Development functions."""
+from __future__ import annotations
+
 import json
-import ntpath
-import os
 import pickle
 import re
 import subprocess
 import sys
 import xml.etree.cElementTree as ET
-from typing import Dict, Iterable, List
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Tuple
 
 import pyodbc
 from PyQt5 import uic  # pylint: disable=wrong-import-order
@@ -30,19 +32,17 @@ def add_edoc_procedures() -> None:
     print("Connection: " + edoc_conn_str)
     connection = pyodbc.connect(edoc_conn_str, autocommit=True)
     cursor = connection.cursor()
-    proc_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "test_procedures"
-    )
-    for file in os.listdir(proc_path):
-        with open(os.path.join(proc_path, file), encoding="utf-8") as fhandle:
+    proc_path = Path(__file__).parent / "test_procedures"
+    for file in proc_path.iterdir():
+        with file.open(encoding="utf-8") as fhandle:
             escaped_sql = fhandle.read()
-            print("Creating procedure " + file.replace(".sql", ""))
+            print("Creating procedure " + file.stem)
             cursor.execute(escaped_sql)
 
     connection.close()
 
 
-def compile_ui_files(src_folders: List[str]) -> None:
+def compile_ui_files(src_folders: List[Path]) -> None:
     """
     Compile the ui files.
 
@@ -50,14 +50,11 @@ def compile_ui_files(src_folders: List[str]) -> None:
     files to gen folder.
     """
     for folder in src_folders:
-        for file in os.listdir(folder):
+        for file in folder.iterdir():
             print(f"Converting file {file}")
-            new_file = "ui_" + file.replace(".ui", "") + ".py"
-            with open(
-                os.path.join(folder, file), "r", encoding="utf-8"
-            ) as source:
-                with open(
-                    os.path.join(os.path.dirname(folder), "gen", new_file),
+            with file.open("r", encoding="utf-8") as source:
+                new_file = file.parent.parent / "gen" / f"ui_{file.stem}.py"
+                with new_file.open(
                     "w",
                     encoding="utf-8",
                 ) as target:
@@ -65,9 +62,9 @@ def compile_ui_files(src_folders: List[str]) -> None:
         # run black after ui files are created
         subprocess.run(
             [
-                os.path.join(ntpath.split(sys.executable)[0], "black"),
+                Path(sys.executable).parent / "black",
                 "-l79",
-                os.path.join(os.path.dirname(folder), "gen"),
+                folder.parent / "gen",
             ],
             check=False,
         )
@@ -106,17 +103,13 @@ def create_test_dbs(dbs: Iterable[str]) -> None:
     conn.close()
 
 
-def get_sorted_version_directories(changelog_path: str) -> List[str]:
+def get_sorted_version_directories(changelog_path: Path) -> List[Path]:
     """Get all version directories and return them sorted as list."""
-    directories = [
-        name
-        for name in os.listdir(changelog_path)
-        if os.path.isdir(os.path.join(changelog_path, name))
-    ]
+    directories = [item for item in changelog_path.iterdir() if item.is_dir()]
     sorted_directories = sorted(
         directories,
         reverse=True,
-        key=lambda x: tuple(map(int, x.split("."))),
+        key=lambda x: tuple(map(int, x.name.split("."))),
     )
     return sorted_directories
 
@@ -126,75 +119,79 @@ def get_sorted_version_directories(changelog_path: str) -> List[str]:
 WidgetLogInfo = Dict[str, List[Dict[str, str]]]
 
 
+def list_dd() -> Dict[Any, List[Any]]:
+    """
+    Module level method to allow pickling of defaultdict.
+
+    See: https://stackoverflow.com/questions/16439301/cant-pickle-defaultdict
+    """
+    return defaultdict(list)
+
+
 def get_change_log_data(
     app_name: str,
-    change_log_path: str,
+    change_log_path: Path,
 ) -> Dict[str, WidgetLogInfo]:
     """Read in all the changelog data per version."""
     print("Get changelog data")
-    change_log_data: Dict[str, WidgetLogInfo] = {}
+    change_log_data: Dict[str, WidgetLogInfo] = defaultdict(list_dd)
     sorted_directories = get_sorted_version_directories(change_log_path)
     for version in sorted_directories:
-        path = os.path.join(change_log_path, version)
-        for file in os.listdir(path):
-            if not file.endswith(".json"):
-                continue
-            with open(os.path.join(path, file), encoding="utf-8") as handle:
-                entry = json.loads(handle.read())
-            if isinstance(entry, List):
-                # old changelog data was stored as list. Do not add to logs
-                continue
+        for file in version.glob("*.json"):
             try:
-                text = entry["text"]
-                widget = entry["widget"]
-            except KeyError as error:
-                # in case entry is not available an exception is thrown
-                print("Entry in log not found: " + os.path.join(path, file))
-                raise KeyError from error
+                widget, texts = _parse_change_log(file)
+            except NotImplementedError:
+                continue
+            change_log_data[version.name][widget or app_name].append(texts)
+    return dict(change_log_data)
 
-            if not widget:
-                # in case widget is empty it is handled as a
-                # general app log data
-                widget = app_name
-            try:
-                text_en = entry["text_en"] or text
-            except KeyError:
-                # use german text in case english text is not
-                # available
-                text_en = text
-            if version not in change_log_data:
-                change_log_data[version] = {}
-            try:
-                change_log_data[version][widget].append(
-                    {"de": text, "en": text_en}
-                )
-            except KeyError:
-                change_log_data[version][widget] = [
-                    {"de": text, "en": text_en}
-                ]
-    return change_log_data
+
+def _parse_change_log(file: Path) -> Tuple[str, Dict[str, str]]:
+    """Parse the widget name and the change log texts from a JSON file."""
+    with file.open(encoding="utf-8") as handle:
+        entry = json.loads(handle.read())
+    if isinstance(entry, List):
+        # old changelog data was stored as list. Do not add to logs
+        raise NotImplementedError(
+            "Parsing of old changelogs isn't implemnentd"
+        )
+    text = _parse_str(entry, "text")
+    widget = _parse_str(entry, "widget")
+    text_en = _parse_str(entry, "text_en")
+
+    return widget, {"de": text, "en": text_en}
+
+
+def _parse_str(entry: Dict[Any, Any], key: str) -> str:
+    """Parse the text for the given key from the entry (dict from JSON)."""
+    try:
+        text = entry[key]
+        assert isinstance(text, str)
+    except KeyError as error:
+        # in case entry is not available an exception is thrown
+        print(f"Entry in log not found: {key}")
+        raise KeyError from error
+    except AssertionError as error:
+        print(f"Entry has invalid type: {key}")
+        raise KeyError from error
+    return text
 
 
 def _create_resource_file(  # pylint: disable=too-many-locals
-    resource_file_path: str,
-    change_log_rel_path: str,
+    resource_file_path: Path,
+    change_log_path: Path,
     change_log_data: Dict[str, WidgetLogInfo],
 ) -> None:
     """Create the resource file from data."""
     print("Creating new resources.qrc")
-    resource_file = os.path.join(resource_file_path, "resources.qrc")
-    resource_py = os.path.join(resource_file_path, "resources_cl.py")
-    try:
-        os.remove(resource_file)
-    except FileNotFoundError:
-        pass
+    resource_file = resource_file_path / "resources.qrc"
+    resource_py = resource_file_path / "resources_cl.py"
+    resource_file.unlink(True)
 
     # Store the changelog data (serialize)
     print("Store the changelog data ")
-    change_log_data_path = os.path.join(
-        resource_file_path, "change_log_data.pickle"
-    )
-    with open(change_log_data_path, "wb") as handle:
+    change_log_data_path = resource_file_path / "change_log_data.pickle"
+    with change_log_data_path.open("wb") as handle:
         pickle.dump(change_log_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     rcc = ET.Element("RCC")
     qrc = ET.SubElement(rcc, "qresource")
@@ -212,8 +209,9 @@ def _create_resource_file(  # pylint: disable=too-many-locals
                 added_images.update(list(images))
 
     for image in added_images:
-        ET.SubElement(qrc, "file", {"alias": image}).text = os.path.join(
-            change_log_rel_path, image
+        image_path = Path(change_log_path).joinpath(image)
+        ET.SubElement(qrc, "file", {"alias": image}).text = str(
+            image_path.relative_to(Path.cwd()).as_posix()
         )
     tree = ET.ElementTree(rcc)
     tree.write(resource_file)
@@ -222,28 +220,23 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     assert subprocess.call(f"PyRCC5 -o {resource_py} {resource_file}") == 0
 
     print("Deleting resources.qrc")
-    os.remove(resource_file)
+    resource_file.unlink()
     print("Delete dict data")
-    os.remove(change_log_data_path)
+    change_log_data_path.unlink()
 
 
 def generate_changelog_resource_file(
     app_name: str,
-    change_log_rel_path: str,
-    resource_file_path: str,
+    change_log_path: Path,
+    resource_file_path: Path,
 ) -> None:
     """
     Generate changelog resource file.
 
     app_name: Name of the application
-    change_log_rel_path: relative path from resource_file_path to changelog
-    path
+    change_log_path: changelog path
     resource_file_path: path where the resource file should be stored
     """
     print("Generate changelog resource file")
-    change_log_data = get_change_log_data(
-        app_name, os.path.join(resource_file_path, change_log_rel_path)
-    )
-    _create_resource_file(
-        resource_file_path, change_log_rel_path, change_log_data
-    )
+    change_log_data = get_change_log_data(app_name, change_log_path)
+    _create_resource_file(resource_file_path, change_log_path, change_log_data)

@@ -1,6 +1,7 @@
 """Configuration for ChemUp unit tests with pytest."""
 import logging
 import os
+from pathlib import Path
 
 from _pytest.config import Config
 from _pytest.python import Function
@@ -16,7 +17,7 @@ log = logging.getLogger(  # pylint: disable=invalid-name
     ".".join(["tsl", __name__])
 )
 
-TFPATH = os.path.join("tests", "test_files")
+TFPATH = Path("tests") / "test_files"
 
 
 def pytest_configure(config: Config) -> None:

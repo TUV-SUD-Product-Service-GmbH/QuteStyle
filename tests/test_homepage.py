@@ -1,6 +1,6 @@
 """Tests for homepage."""
 import importlib
-import os
+from pathlib import Path
 from typing import Type, cast
 
 import pytest
@@ -30,11 +30,10 @@ def create_new_main_window(
     """Create and show a new TSLMainWindow."""
 
     # create the resource file
-    root_folder = os.getcwd().replace("tests", "")
     generate_changelog_resource_file(
         APP_NAME,
-        "test_changelog",
-        os.path.join(root_folder, "examples"),
+        Path.cwd() / "examples" / "test_changelog",
+        Path.cwd() / "examples",
     )
     importlib.import_module("examples.resources_cl")
 
@@ -65,10 +64,9 @@ def test_changelog_data(  # pylint: disable=too-many-locals
     because the user has no rights. See group setting.
     """
     # get the changelog data
-    root_folder = os.getcwd().replace("tests", "")
     change_log_data = get_change_log_data(
         APP_NAME,
-        os.path.join(root_folder, "tests", "../examples/test_changelog"),
+        Path.cwd() / "examples" / "test_changelog",
     )
 
     window = create_new_main_window(

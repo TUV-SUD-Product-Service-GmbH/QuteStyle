@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
 from enum import IntEnum
+from pathlib import Path
 from typing import Dict, Iterator, List, Optional, cast
 
 from sqlalchemy import (
@@ -3405,10 +3406,10 @@ class Process(Base):
     )
 
     @property
-    def process_archive(self) -> str:
+    def process_archive(self) -> Path:
         """Return the full path to the process archive of the Process."""
         assert self.PC_PATH is not None
-        return os.path.join(PATH, "PSEX", self.PC_PATH)
+        return PATH / "PSEX" / self.PC_PATH
 
 
 class ProcessPhase(Base):
@@ -3617,10 +3618,10 @@ class Project(Base):
     edoc: Edoc = relationship("Edoc", back_populates="project", uselist=False)
 
     @property
-    def project_folder(self) -> str:
+    def project_folder(self) -> Path:
         """Return the full path to the project folder of the Project."""
         assert self.P_FOLDER is not None
-        return os.path.join(PATH, self.P_FOLDER)
+        return PATH / self.P_FOLDER
 
 
 class ProjectFailureRel(Base):

@@ -1,6 +1,7 @@
 """Variables for TSL Lib."""
 import os
 from enum import IntEnum
+from pathlib import Path
 
 PSE_STORAGE_PATH = r"\\DE001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS\PSEX"
 
@@ -165,7 +166,7 @@ class ClearingState(IntEnum):
 
 # use PSE_PATH environment variable to change the path (i.e. for testing)
 PATH = (
-    r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS"
+    Path(r"\\de001.itgr.net\PS\RF-UnitCentralPS_PSE\CPS")
     if os.getenv("PSE_FOLDER") != "1"
-    else "pse_test"
+    else Path("pse_test")
 )

@@ -3,41 +3,37 @@
 import os
 import subprocess
 import xml.etree.cElementTree as ET
+from pathlib import Path
 
 if __name__ == "__main__":
 
-    try:
-        os.remove("../tsl/resources/resources.qrc")
+    if Path.cwd().stem == "dev_scripts":
+        os.chdir(Path.cwd().parent)
 
-    except FileNotFoundError:
-        pass
+    ROOT = Path.cwd() / "tsl"
+    RCS = ROOT / "resources"
+    QRC_FILE = RCS / "resources.qrc"
+    DIRS = list(RCS.iterdir())
 
-    DIR_NAME = "resources"
-    ROOT = os.getcwd().replace("dev_scripts", "tsl")
-    RCS = os.path.join(ROOT, DIR_NAME)
-    DIRS = os.listdir(RCS)
+    QRC_FILE.unlink(missing_ok=True)
 
     print("Creating new resources.qrc")
 
     RCC = ET.Element("RCC")
     QRC = ET.SubElement(RCC, "qresource")
     for folder in DIRS:
-        folder_path = os.path.join(RCS, folder)
-        files = os.listdir(folder_path)
-        for file in files:
-            ET.SubElement(QRC, "file").text = os.path.join(folder, file)
+        for file in folder.iterdir():
+            relative_path = file.relative_to(RCS).as_posix()
+            ET.SubElement(QRC, "file").text = str(relative_path)
 
     TREE = ET.ElementTree(RCC)
-    TREE.write("../tsl/resources/resources.qrc")
+    TREE.write(QRC_FILE)
 
     print("Generating resource_rc.py with new resources.qrc")
     assert (
-        subprocess.call(
-            "PyRCC5 -o ../tsl/resources_rc.py "
-            "../tsl/resources/resources.qrc"
-        )
+        subprocess.call(["PyRCC5", "-o", ROOT / "resources_rc.py", QRC_FILE])
         == 0
     )
 
     print("Deleting resources.qrc")
-    os.remove("../tsl/resources/resources.qrc")
+    QRC_FILE.unlink(missing_ok=False)

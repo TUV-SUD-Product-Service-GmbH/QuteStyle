@@ -7,6 +7,7 @@ import logging
 import os
 from contextlib import contextmanager
 from datetime import datetime
+from pathlib import Path
 from typing import Iterator, List, Optional, cast
 from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
 
@@ -105,10 +106,10 @@ class Process(Base):
     )
 
     @property
-    def process_archive(self) -> str:
+    def process_archive(self) -> Path:
         """Return the full path to the process archive of the Process."""
         assert self.PC_PATH
-        return os.path.join(PATH, "PSEX", self.PC_PATH)
+        return PATH / "PSEX" / self.PC_PATH
 
 
 class ProcessPhase(Base):
@@ -209,10 +210,10 @@ class Project(Base):
     )
 
     @property
-    def project_folder(self) -> str:
+    def project_folder(self) -> Path:
         """Return the full path to the project folder of the Project."""
         assert self.P_FOLDER
-        return os.path.join(PATH, self.P_FOLDER)
+        return PATH / self.P_FOLDER
 
 
 class Customer(Base):
