@@ -12,7 +12,7 @@ from __future__ import annotations
 import contextlib
 import logging
 from types import ModuleType
-from typing import Any, Dict, Generator, List, Tuple, Type
+from typing import Any, Dict, Generator, List, Tuple, Type, overload
 
 from _pytest.monkeypatch import MonkeyPatch
 from PyQt5.QtWidgets import QMessageBox, QWidget
@@ -45,10 +45,31 @@ def _mp_message_dialog(
     return _mp_call(monkeypatch, QMessageBox, method, return_value)
 
 
+@overload
+@contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: Type[Any] | ModuleType,
     method: str,
+    return_value: Any = ...,
+) -> CallList:
+    ...
+
+
+@overload
+@contextlib.contextmanager
+def _mp_call(
+    monkeypatch: MonkeyPatch,
+    mock_class: str,
+    method: Any = ...,  # return value in this case
+) -> CallList:
+    ...
+
+
+def _mp_call(
+    monkeypatch: MonkeyPatch,
+    mock_class: Type[Any] | ModuleType | str,
+    method: str | Any = None,
     return_value: Any = None,
 ) -> CallList:
     """
@@ -62,11 +83,17 @@ def _mp_call(
     def func_call(*a: Any, **k: Any) -> Any:
         """Mock the function call."""
         calls.append((a, k))
-        if isinstance(return_value, BaseException):
-            raise return_value
+        if isinstance(return_value, Exception):
+            # bug in pylint https://www.logilab.org/ticket/3207
+            raise return_value  # pylint: disable-msg=raising-bad-type
         return return_value
 
-    monkeypatch.setattr(mock_class, method, func_call)
+    if isinstance(mock_class, str):
+        assert return_value is None
+        return_value = method
+        monkeypatch.setattr(mock_class, func_call)
+    else:
+        monkeypatch.setattr(mock_class, method, func_call)
     return calls
 
 
@@ -106,23 +133,24 @@ def check_call(  # pylint: disable=too-many-arguments
     mock_class: Type[Any] | ModuleType,
     method: str,
     return_value: Any = None,
-    call_args: Tuple[Any, ...] | None = None,
-    call_kwargs: Dict[str, Any] | None = None,
-    called: bool = True,
+    call_args_list: List[Tuple[Any, ...]] | None = None,
+    call_kwargs_list: List[Dict[str, Any]] | None = None,
+    call_count: int = 1,
 ) -> Generator[CallList, None, None]:
     """
     Context manager for mocking and checking a call to a method.
 
-    If called is True, and call_args and call_kwargs are given, the context
-    manager will check that the call to the mocked method was done with those
-    arguments. Also, it will assert that the mock was called exactly once.
+    If called is greater 0, and call_args and call_kwargs are given, the
+    context manager will check that the call to the mocked method was done with
+    those arguments. Also, it will assert that the mock was called exactly
+    once.
 
     If called is False, it will assert that the mock was not called.
 
     If a return_value is given, the mock will return this value.
     """
-    assert (call_args is not None and call_kwargs is not None) or (
-        call_args is None and call_kwargs is None
+    assert (call_args_list is not None and call_kwargs_list is not None) or (
+        call_args_list is None and call_kwargs_list is None
     ), (
         "call_args and call_kwargs must be None or have a value "
         "(list/dict if empty)"
@@ -130,13 +158,58 @@ def check_call(  # pylint: disable=too-many-arguments
     monkeypatch = MonkeyPatch()
     calls = _mp_call(monkeypatch, mock_class, method, return_value)
     yield calls
-    if not called:
-        assert not calls
-    else:
-        assert (
-            len(calls) == 1
-        ), f"Calls to {method}: {len(calls)}"  # only called once
-        if call_args or call_kwargs:
-            assert call_args == calls[0][0]
-            assert call_kwargs == calls[0][1]
+    m_name = f"{mock_class.__name__}.{method}"
+    assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)
     monkeypatch.undo()
+
+
+# Duplicate the code because overloading is a mess due to this bug:
+# https://github.com/python/mypy/issues/11373
+@contextlib.contextmanager
+def check_call_str(  # pylint: disable=too-many-arguments
+    mock_class: str,
+    return_value: Any = None,
+    call_args_list: List[Tuple[Any, ...]] | None = None,
+    call_kwargs_list: List[Dict[str, Any]] | None = None,
+    call_count: int = 1,
+) -> Generator[CallList, None, None]:
+    """
+    Context manager for mocking and checking a call to a method.
+
+    See `check_call` documentation.
+    """
+    assert (call_args_list is not None and call_kwargs_list is not None) or (
+        call_args_list is None and call_kwargs_list is None
+    ), (
+        "call_args and call_kwargs must be None or have a value "
+        "(list/dict if empty)"
+    )
+    monkeypatch = MonkeyPatch()
+    calls = _mp_call(monkeypatch, mock_class, return_value)
+    yield calls
+    m_name = mock_class
+    assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)
+    monkeypatch.undo()
+
+
+def assert_calls(
+    call_count: int,
+    call_args_list: List[Tuple[Any, ...]] | None,
+    call_kwargs_list: List[Dict[str, Any]] | None,
+    calls: CallList,
+    m_name: str,
+) -> None:
+    """Check that the calls made to the mocked function are correct."""
+    if call_count != -1:
+        assert (
+            len(calls) == call_count
+        ), f"Expected {call_count} calls to {m_name} but got: {len(calls)}"
+    if call_args_list and call_kwargs_list:
+        for idx, call_args in enumerate(call_args_list):
+            assert (
+                call_args == calls[idx][0]
+            ), f"Args to {m_name}: {call_args} expected: {call_args}"
+        for idx, call_kwargs in enumerate(call_kwargs_list):
+            assert (
+                call_kwargs == calls[idx][1]
+            ), f"Kwargs to {m_name}: {call_kwargs} expected: {call_kwargs}"
