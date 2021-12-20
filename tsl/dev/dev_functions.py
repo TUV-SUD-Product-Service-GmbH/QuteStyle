@@ -153,7 +153,7 @@ def _parse_change_log(file: Path) -> Tuple[str, Dict[str, str]]:
     if isinstance(entry, List):
         # old changelog data was stored as list. Do not add to logs
         raise NotImplementedError(
-            "Parsing of old changelogs isn't implemnentd"
+            "Parsing of old changelogs isn't implemented"
         )
     text = _parse_str(entry, "text")
     widget = _parse_str(entry, "widget")

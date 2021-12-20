@@ -27,13 +27,13 @@ def _check_mp_dialog(
 ) -> None:
     """Check that the monkey patched QMessageBox was correctly called."""
     log.debug("Calllist: %s", calls)
-    assert len(calls) == 1  # only called once
+    assert len(calls) == 1, f"Calls to QMessageBox: {len(calls)}, expected: 1"
     call_args = calls[0][0]  # arguments of the first and only call
     call_kwargs = calls[0][1]  # kw arguments of the first and only call
     assert call_kwargs == {}  # no kwargs were given
     assert call_args[0] == parent  # parent is set correctly
-    assert call_args[1] == title  # check correct title
-    assert call_args[2] == text  # check correct text
+    assert call_args[1] == title, f"Title is '{call_args[1]}'"
+    assert call_args[2] == text, f"Text is '{call_args[2]}'"
 
 
 def _mp_message_dialog(
@@ -51,12 +51,19 @@ def _mp_call(
     method: str,
     return_value: Any = None,
 ) -> CallList:
-    """Mock a method in a class and record the calls to it."""
+    """
+    Mock a method in a class and record the calls to it.
+
+    If the given return_value is an Exception, it will be raised. If not, the
+    value will be returned from the mocked function/method.
+    """
     calls: CallList = []
 
     def func_call(*a: Any, **k: Any) -> Any:
         """Mock the function call."""
         calls.append((a, k))
+        if isinstance(return_value, BaseException):
+            raise return_value
         return return_value
 
     monkeypatch.setattr(mock_class, method, func_call)
