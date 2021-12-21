@@ -12,9 +12,10 @@ from __future__ import annotations
 import contextlib
 import logging
 from types import ModuleType
-from typing import Any, Dict, Generator, List, Tuple, Type, overload
+from typing import Any, Callable, Dict, Generator, List, Tuple, Type, overload
 
 from _pytest.monkeypatch import MonkeyPatch
+from mypy_extensions import KwArg, VarArg
 from PyQt5.QtWidgets import QMessageBox, QWidget
 
 log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
@@ -42,7 +43,7 @@ def _mp_message_dialog(
     return_value: QMessageBox.StandardButton | None = None,
 ) -> CallList:
     """Mock a QMessageDialog and return a list with the call's arguments."""
-    return _mp_call(monkeypatch, QMessageBox, method, return_value)
+    return _mp_call(monkeypatch, QMessageBox, method, return_value, False)
 
 
 @overload
@@ -51,7 +52,8 @@ def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: Type[Any] | ModuleType,
     method: str,
-    return_value: Any = ...,
+    return_value: Any,
+    as_property: bool,
 ) -> CallList:
     ...
 
@@ -61,7 +63,8 @@ def _mp_call(
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: str,
-    method: Any = ...,  # return value in this case
+    method: Any,  # return value in this case
+    return_value: bool,  # as_property in this case
 ) -> CallList:
     ...
 
@@ -69,8 +72,9 @@ def _mp_call(
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: Type[Any] | ModuleType | str,
-    method: str | Any = None,
-    return_value: Any = None,
+    method: str | Any,
+    return_value: Any,
+    as_property: bool = False,
 ) -> CallList:
     """
     Mock a method in a class and record the calls to it.
@@ -88,12 +92,20 @@ def _mp_call(
             raise return_value  # pylint: disable-msg=raising-bad-type
         return return_value
 
+    # first case handles class + method, second one mock as str
+    if as_property or (isinstance(mock_class, str) is None and return_value):
+        callback: Callable[
+            [VarArg(Any), KwArg(Any)], Any
+        ] | property = property(func_call)
+    else:
+        callback = func_call
+
     if isinstance(mock_class, str):
         assert return_value is None
         return_value = method
-        monkeypatch.setattr(mock_class, func_call)
+        monkeypatch.setattr(mock_class, callback)
     else:
-        monkeypatch.setattr(mock_class, method, func_call)
+        monkeypatch.setattr(mock_class, method, callback)
     return calls
 
 
@@ -136,6 +148,7 @@ def check_call(  # pylint: disable=too-many-arguments
     call_args_list: List[Tuple[Any, ...]] | None = None,
     call_kwargs_list: List[Dict[str, Any]] | None = None,
     call_count: int = 1,
+    as_property: bool = False,
 ) -> Generator[CallList, None, None]:
     """
     Context manager for mocking and checking a call to a method.
@@ -156,7 +169,9 @@ def check_call(  # pylint: disable=too-many-arguments
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(monkeypatch, mock_class, method, return_value)
+    calls = _mp_call(
+        monkeypatch, mock_class, method, return_value, as_property
+    )
     yield calls
     m_name = f"{mock_class.__name__}.{method}"
     assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)
@@ -172,6 +187,7 @@ def check_call_str(  # pylint: disable=too-many-arguments
     call_args_list: List[Tuple[Any, ...]] | None = None,
     call_kwargs_list: List[Dict[str, Any]] | None = None,
     call_count: int = 1,
+    as_property: bool = True,
 ) -> Generator[CallList, None, None]:
     """
     Context manager for mocking and checking a call to a method.
@@ -185,7 +201,7 @@ def check_call_str(  # pylint: disable=too-many-arguments
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(monkeypatch, mock_class, return_value)
+    calls = _mp_call(monkeypatch, mock_class, return_value, as_property)
     yield calls
     m_name = mock_class
     assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)
