@@ -429,6 +429,19 @@ QWidget#scroll_widget {{
 QWidget#style_selection_widget
         {{ background-color:{bg_one}; }}
 
+/* QProgressBar */
+QProgressBar {{
+    background-color: {bg_elements};
+    color: {foreground};
+    border-style: none;
+    border-radius: 10px;
+    text-align: center;
+}}
+QProgressBar::chunk {{
+    background-color: {context_color};
+    border-radius: 10px;
+}}
+
 /* QScrollBar */
 QScrollBar:horizontal {{
     border: none;

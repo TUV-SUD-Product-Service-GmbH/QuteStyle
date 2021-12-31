@@ -55,6 +55,9 @@ class TestWidget(MainWidget):
         self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)
+        self._ui.horizontalSlider.valueChanged.connect(
+            self._ui.progressBar.setValue
+        )
 
     @pyqtSlot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
