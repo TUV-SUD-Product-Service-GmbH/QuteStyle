@@ -20,7 +20,8 @@ from PyQt5.QtWidgets import QMessageBox, QWidget
 
 log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
 
-CallList = List[Tuple[Tuple[Any, ...], Dict[str, Any]]]
+Call = Tuple[Tuple[Any, ...], Dict[str, Any]]
+CallList = List[Call]
 
 
 def _check_mp_dialog(
@@ -93,7 +94,7 @@ def _mp_call(
         return return_value
 
     # first case handles class + method, second one mock as str
-    if as_property or (isinstance(mock_class, str) is None and return_value):
+    if as_property or (isinstance(mock_class, str) and return_value):
         callback: Callable[
             [VarArg(Any), KwArg(Any)], Any
         ] | property = property(func_call)
@@ -101,7 +102,6 @@ def _mp_call(
         callback = func_call
 
     if isinstance(mock_class, str):
-        assert return_value is None
         return_value = method
         monkeypatch.setattr(mock_class, callback)
     else:
@@ -187,7 +187,7 @@ def check_call_str(  # pylint: disable=too-many-arguments
     call_args_list: List[Tuple[Any, ...]] | None = None,
     call_kwargs_list: List[Dict[str, Any]] | None = None,
     call_count: int = 1,
-    as_property: bool = True,
+    as_property: bool = False,
 ) -> Generator[CallList, None, None]:
     """
     Context manager for mocking and checking a call to a method.

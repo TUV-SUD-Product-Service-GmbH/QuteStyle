@@ -84,7 +84,7 @@ class TSLMainWindow(QMainWindow):
             self._display_whats_new(not self._force_whats_new)
             QSettings().setValue("last_run", current_ver)
 
-    @pyqtSlot(name="on_display_whats_new")
+    @pyqtSlot(name="on_whats_new")
     def on_whats_new(self) -> None:
         """Display the WhatsNewWindow."""
         # Slot shall not be called when WhatsNew is disabled.
