@@ -211,7 +211,7 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     for image in added_images:
         image_path = Path(change_log_path).joinpath(image)
         ET.SubElement(qrc, "file", {"alias": image}).text = str(
-            image_path.relative_to(Path.cwd()).as_posix()
+            image_path.relative_to(resource_file_path)
         )
     tree = ET.ElementTree(rcc)
     tree.write(resource_file)
