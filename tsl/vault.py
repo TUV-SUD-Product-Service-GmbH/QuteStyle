@@ -118,17 +118,17 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
                 Vault.Environment.TEST: "chemup-test.database.windows.net",
-                Vault.Environment.PROD: "ASQL0050",
+                Vault.Environment.PROD: "ASQL0050.itgr.net",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
-                Vault.Environment.TEST: "sdegbma07043",
-                Vault.Environment.PROD: "sdegbma07043",
+                Vault.Environment.TEST: "sdegbma07043.itgr.net",
+                Vault.Environment.PROD: "sdegbma07043.itgr.net",
             },
             Vault.Application.TOOLBOX: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
                 Vault.Environment.TEST: "chemup-test.database.windows.net",
-                Vault.Environment.PROD: "ASQL0040",
+                Vault.Environment.PROD: "ASQL0040.itgr.net",
             },
         }[app][env]
         if env != Vault.Environment.DEV:
