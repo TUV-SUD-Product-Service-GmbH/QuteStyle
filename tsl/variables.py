@@ -170,3 +170,9 @@ PATH = (
     if os.getenv("PSE_FOLDER") != "1"
     else Path("pse_test")
 )
+
+ARCHIVE_PATH = (
+    Path(r"\\de001.itgr.net\PS\RF-ArchivePS_PSE\PROD")
+    if os.getenv("PSE_FOLDER") != "1"
+    else Path("pse_archive")
+)

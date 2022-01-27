@@ -32,7 +32,7 @@ class Vault:
         """Enumeration for the different applications."""
 
         EDOC = 0
-        PSE = 1  # currently not used, but PSE and EDOC will be separated.
+        PSE = 1  # currently, not used, but PSE and EDOC will be separated.
         CHEMUP = 2
         LABMONITOR = 3
         TOOLBOX = 4
@@ -118,7 +118,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
                 Vault.Environment.TEST: "chemup-test.database.windows.net",
-                Vault.Environment.PROD: "ASQL0050.itgr.net",
+                Vault.Environment.PROD: "sdemuca07127.de001.itgr.net",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
@@ -152,7 +152,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: "chemup",
-                Vault.Environment.PROD: "ps_chemup",
+                Vault.Environment.PROD: "Chemup_Writer",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: "",
@@ -183,7 +183,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: r"Zu8LU3fAriFz6x59",
-                Vault.Environment.PROD: "u6()D#[[$8G2v5b-",
+                Vault.Environment.PROD: "m0Zd029yokTx2rsd",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: "",
@@ -214,7 +214,7 @@ class Vault:
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "chemup_test_db",
                 Vault.Environment.TEST: "chemup_test_db",
-                Vault.Environment.PROD: "PS_ChemUp",
+                Vault.Environment.PROD: "chemup",
             },
             Vault.Application.LABMONITOR: {
                 Vault.Environment.DEV: "ldp_server_test",

@@ -48,7 +48,7 @@ from sqlalchemy.orm import (
 from sqlalchemy.sql.schema import ForeignKey
 
 from tsl.common_db import NullUnicode, create_db_engine
-from tsl.variables import PATH, ClearingState
+from tsl.variables import ARCHIVE_PATH, PATH, ClearingState
 from tsl.vault import Vault
 
 log = logging.getLogger("tsl.edoc_database")  # pylint: disable=invalid-name
@@ -3622,6 +3622,12 @@ class Project(Base):
         """Return the full path to the project folder of the Project."""
         assert self.P_FOLDER is not None
         return PATH / self.P_FOLDER
+
+    @property
+    def archive_folder(self) -> Path:
+        """Return the full path to the archive folder of the Project."""
+        assert self.P_FOLDER is not None
+        return ARCHIVE_PATH / self.P_FOLDER
 
 
 class ProjectFailureRel(Base):
