@@ -37,32 +37,6 @@ def pytest_runtest_setup(item: Function) -> None:
 
     # raise an exception if the database path isn't configured correctly
     # see https://pswiki.tuev-sued.com/display/TSL/Unit-Tests
-    if "pse_db" in [mark.name for mark in item.iter_markers()]:
-        # pylint: disable=import-outside-toplevel
-        from tsl.pse_database import ENGINE as PSE_ENGINE
-        from tsl.pse_database import Base as PSE_Base
-        from tsl.pse_database import Staff as PseStaff
-        from tsl.pse_database import _fetch_user_id as _pse_fetch_user_id
-        from tsl.pse_database import session_scope as pse_session_scope
-
-        # pylint: enable=import-outside-toplevel
-
-        assert os.getenv("PSE_ENV") == "DEV"
-        assert "test_db" in PSE_ENGINE.url.query["odbc_connect"]
-        PSE_Base.metadata.drop_all()
-        PSE_Base.metadata.create_all()
-
-        with pse_session_scope() as session:
-            user = PseStaff(
-                ST_WINDOWSID=os.getlogin(),
-                ST_SURNAME="TSL-Toolbox",
-                ST_ACTIVE=True,
-                ST_TYPE=1,
-                ST_SKILLGROUP="00000000",
-                ST_FORENAME="Klaus",
-            )
-            session.add(user)
-        _pse_fetch_user_id()
 
     if "edoc_db" in [mark.name for mark in item.iter_markers()]:
         # pylint: disable=import-outside-toplevel

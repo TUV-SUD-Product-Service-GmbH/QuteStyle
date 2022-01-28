@@ -3,11 +3,11 @@ from pathlib import Path
 
 import pytest
 
+from tsl.edoc_database import Process, Project, session_scope
 from tsl.helper import get_process_path, get_project_path
-from tsl.pse_database import Process, Project, session_scope
 
 
-@pytest.mark.pse_db
+@pytest.mark.edoc_db
 def test_check_project_path() -> None:
     """Test getting a project path works as expected."""
     with session_scope() as session:
@@ -16,7 +16,9 @@ def test_check_project_path() -> None:
                 P_ID=1234575,
                 P_FOLDER=r"Projects\2018\1234575",
                 P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
-                P_DISABLED=False,
+                P_RETEST=False,
+                MD_ID=1,
+                CATEGORY_ID=1,
             )
         )
         session.add(
@@ -24,7 +26,9 @@ def test_check_project_path() -> None:
                 P_ID=1504436,
                 P_FOLDER=r"Projects\2020\1504436",
                 P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
-                P_DISABLED=False,
+                P_RETEST=False,
+                MD_ID=1,
+                CATEGORY_ID=1,
             )
         )
     assert get_project_path(1234575) == Path(
@@ -37,25 +41,29 @@ def test_check_project_path() -> None:
     )
 
 
-@pytest.mark.pse_db
+@pytest.mark.edoc_db
 def test_check_project_path_fail() -> None:
     """Test getting a project path works as expected."""
     with pytest.raises(ValueError):
         get_project_path(1234567)
 
 
-@pytest.mark.pse_db
+@pytest.mark.edoc_db
 def test_check_process_path() -> None:
     """Test getting a project path works as expected."""
     with session_scope() as session:
-        session.add(Process(PC_ID=20000, PC_PATH=r"Prozesse\2015\20000"))
+        session.add(
+            Process(
+                PC_ID=20000, PC_PATH=r"Prozesse\2015\20000", PC_DISABLED=False
+            )
+        )
     assert get_process_path(20000) == Path(
         r"\\de001.itgr.net\PS\RF-UnitCentralPS_"
         r"PSE\CPS\PSEX\Prozesse\2015\20000"
     )
 
 
-@pytest.mark.pse_db
+@pytest.mark.edoc_db
 def test_check_process_path_fail() -> None:
     """Test getting a project path works as expected."""
     with pytest.raises(ValueError):

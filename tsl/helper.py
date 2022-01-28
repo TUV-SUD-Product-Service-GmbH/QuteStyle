@@ -9,7 +9,7 @@ from PyQt5.QtCore import QBuffer, QByteArray, QIODevice
 from PyQt5.QtGui import QPixmap
 from sqlalchemy.orm.exc import NoResultFound
 
-from tsl.pse_database import AdminSession, Process, Project
+from tsl.edoc_database import AdminSession, Process, Project
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 

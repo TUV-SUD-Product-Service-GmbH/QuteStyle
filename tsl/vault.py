@@ -32,10 +32,9 @@ class Vault:
         """Enumeration for the different applications."""
 
         EDOC = 0
-        PSE = 1  # currently, not used, but PSE and EDOC will be separated.
-        CHEMUP = 2
-        LABMONITOR = 3
-        TOOLBOX = 4
+        CHEMUP = 1
+        LABMONITOR = 2
+        TOOLBOX = 3
 
     CREATED_DATABASES: Dict[Application, Environment] = {}
 
@@ -87,10 +86,7 @@ class Vault:
         else:
             conn_str += "Trusted_Connection=yes;"
         conn_str += f"Database={name};"
-        if (
-            app in (Vault.Application.EDOC, Vault.Application.PSE)
-            and env != Vault.Environment.DEV
-        ):
+        if app == Vault.Application.EDOC and env != Vault.Environment.DEV:
             conn_str += "MultiSubnetFailover=yes;"
         if env != Vault.Environment.DEV:
             conn_str += "Encrypt=yes;TrustServerCertificate=yes"
@@ -106,11 +102,6 @@ class Vault:
             return r"(localdb)\mssqllocaldb;"
         server = {
             Vault.Application.EDOC: {
-                Vault.Environment.DEV: r"localhost\SQLEXPRESS",
-                Vault.Environment.TEST: "10.40.172.122",
-                Vault.Environment.PROD: "psexplorerhost.muc.de.itgr.net",
-            },
-            Vault.Application.PSE: {
                 Vault.Environment.DEV: r"localhost\SQLEXPRESS",
                 Vault.Environment.TEST: "10.40.172.122",
                 Vault.Environment.PROD: "psexplorerhost.muc.de.itgr.net",
@@ -144,11 +135,6 @@ class Vault:
                 Vault.Environment.TEST: "lv_edoc",
                 Vault.Environment.PROD: "lv_edoc",
             },
-            Vault.Application.PSE: {
-                Vault.Environment.DEV: "",
-                Vault.Environment.TEST: "lv_edoc",
-                Vault.Environment.PROD: "lv_edoc",
-            },
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: "chemup",
@@ -171,11 +157,6 @@ class Vault:
         """Return the default password for the app in the environment."""
         return {
             Vault.Application.EDOC: {
-                Vault.Environment.DEV: "",
-                Vault.Environment.TEST: "hooters",
-                Vault.Environment.PROD: "hooters",
-            },
-            Vault.Application.PSE: {
                 Vault.Environment.DEV: "",
                 Vault.Environment.TEST: "hooters",
                 Vault.Environment.PROD: "hooters",
@@ -205,11 +186,6 @@ class Vault:
                 Vault.Environment.DEV: "edoc_test_db",
                 Vault.Environment.TEST: "EDOC",
                 Vault.Environment.PROD: "EDOC",
-            },
-            Vault.Application.PSE: {
-                Vault.Environment.DEV: "pse_test_db",
-                Vault.Environment.TEST: "PSExplorer",
-                Vault.Environment.PROD: "PSExplorer",
             },
             Vault.Application.CHEMUP: {
                 Vault.Environment.DEV: "chemup_test_db",
