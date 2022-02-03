@@ -50,7 +50,7 @@ class TestWidget(MainWidget):
         widget_action.setDefaultWidget(buttons)
         menu.addAction(widget_action)
         self._ui.disable_widgets.clicked.connect(self.on_widgets_disabled)
-        self._ui.comboBox_2.setProperty("cssClass", "transparent")
+        self._ui.transparent_combobox.setProperty("cssClass", "transparent")
         self._ui.pushButton_2.setMenu(menu)
         self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
