@@ -17,4 +17,4 @@ class TestComboBox(CheckableComboBox[int]):
         # Set the data for nine test items
         for idx in range(1, 10):
             text = f"New Item {idx}"
-            self.addItem(text, idx)
+            self.addItem(text, idx, ":/svg_icons/delete_forever.svg")

@@ -219,14 +219,26 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
 
     def _get_text(self) -> str:
         """Return the text that is shown at the top of the combobox."""
-        texts = []
-        for idx in range(self.model().rowCount()):
-            if self.model().item(idx).checkState() == Qt.Checked:
-                texts.append(str(self.model().item(idx).data()))
-        return ", ".join(texts) or self._default_text
+        texts = [
+            str(self.model().item(idx).data())
+            for idx in range(self.model().rowCount())
+            if self.model().item(idx).checkState() == Qt.Checked
+        ]
+
+        text = ", ".join(texts)
+        # set to no index otherwise the state icon is displayed from
+        # the first item in the combo box text which is selected by default
+        self.setCurrentIndex(-1)
+        if not text:
+            text = self._default_text
+        return text
 
     def addItem(  # type: ignore  # pylint: disable=invalid-name
-        self, text: str, data: ItemData | None = None
+        self,
+        text: str,
+        data: ItemData | None = None,
+        icon_path: str | None = None,
+        icon_color: str | None = None,
     ) -> None:
         """Add an Item to the Combobox."""
         item = QStandardItem(text)
@@ -235,17 +247,19 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             Qt.ItemIsEnabled | Qt.ItemIsUserCheckable  # type: ignore
         )
         item.setData(Qt.Unchecked, Qt.CheckStateRole)
+        item.setData(icon_path, Qt.DecorationRole)
+        item.setData(icon_color, Qt.ForegroundRole)
         self.model().appendRow(item)
         self.update_text()
 
     @property
     def item_ids(self) -> List[ItemData]:
         """Return the list of ids checked by the user."""
-        res = []
-        for i in range(self.model().rowCount()):
-            if self.model().item(i).checkState() == Qt.Checked:
-                res.append(self.model().item(i).data())
-        return res
+        return [
+            self.model().item(i).data()
+            for i in range(self.model().rowCount())
+            if self.model().item(i).checkState() == Qt.Checked
+        ]
 
     @item_ids.setter
     def item_ids(self, item_ids: List[ItemData]) -> None:

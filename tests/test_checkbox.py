@@ -13,7 +13,7 @@ from tsl.widgets.styled_combobox import CheckableComboBox, TooManyItemsError
 @pytest.fixture(scope="function", name="cb_items")
 def fixture_cb_items(combobox: CheckableComboBox[int]) -> None:
     """Create several test items."""
-    for idx in range(0, randint(3, 10)):
+    for idx in range(randint(3, 10)):
         text = f"New Item {idx}"
         combobox.addItem(text, idx)
 
@@ -52,13 +52,12 @@ def test_text(
         combobox.item_ids = items
         if not items:
             assert combobox.currentText() == "No selection"
+        elif mode:
+            assert combobox.currentText() == str(items[-1])
         else:
-            if mode:
-                assert combobox.currentText() == str(items[-1])
-            else:
-                assert combobox.currentText() == ", ".join(
-                    [str(item) for item in items]
-                )
+            assert combobox.currentText() == ", ".join(
+                [str(item) for item in items]
+            )
     assert not exceptions
 
 
