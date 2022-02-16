@@ -47,7 +47,6 @@ class TitleBar(QFrame):
         self._icon = Icon(int(self.height() * 0.5), None)
         self._icon.set_icon(logo)
         self._icon.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        self._icon.setAlignment(Qt.AlignVCenter)
         bg_layout.addWidget(self._icon)
 
         # Label with the application title text.

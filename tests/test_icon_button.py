@@ -2,18 +2,11 @@
 # pylint: disable=protected-access
 
 from _pytest.monkeypatch import MonkeyPatch
-from PyQt5.QtGui import (
-    QColor,
-    QGuiApplication,
-    QPaintDevice,
-    QPainter,
-    QPixmap,
-)
+from PyQt5.QtGui import QColor, QPaintDevice, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
-from tsl.style import THEMES, Themes, get_color, set_current_style
+from tsl.style import get_color
 from tsl.widgets.custom_icon_engine import PixmapStore
-from tsl.widgets.icon import Icon
 from tsl.widgets.icon_button import IconButton
 
 
@@ -51,29 +44,3 @@ def test_icon_button_paint(  # pylint: disable=unused-argument
 
     icon_button._icon_paint(paint, QColor(get_color("foreground")))
     paint.end()
-
-
-def test_set_icon(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
-    """Test that pixmap of icon is set correctly"""
-    monkeypatch.setattr(QGuiApplication, "devicePixelRatio", lambda _: 2.0)
-    icon = Icon()
-    qtbot.addWidget(icon)
-    icon.set_icon("tests/test_images/test_icon.svg")
-    icon._set_icon_pixmap()
-    style = list(THEMES.keys())[0]
-    set_current_style(style)
-    icon.set_icon("tests/test_images/test_icon.svg")
-    icon._set_icon_pixmap()
-    set_current_style(Themes.DARCULA)
-    assert icon.pixmap().height() == 40
-    assert icon.pixmap().width() == 40
-    # check that pixmap exists in two different colors
-
-    assert (
-        len(
-            PixmapStore.inst()._pixmaps["tests/test_images/test_icon.svg"][
-                40, 40
-            ]
-        )
-        == 2
-    )
