@@ -53,7 +53,7 @@ class TestIconBasic:
 
 
 def test_set_icon(icon: Icon, icon_path: str) -> None:
-    """Test that pixmap of icon is set correctly"""
+    """Test that pixmap of icon is set correctly."""
     with check_call(Icon, "update"):
         icon.set_icon(icon_path)
     assert icon._icon_path == icon_path

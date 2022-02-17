@@ -53,7 +53,6 @@ def set_background_color(
 
 def draw_pixmap(painter: QPainter, rect: QRect, path: str, color: str) -> None:
     """Draws pixmap."""
-
     scale = painter.device().devicePixelRatio()
     store = PixmapStore.inst()
     painter.drawPixmap(
@@ -77,7 +76,6 @@ class StyledCheckboxDelegate(QStyledItemDelegate, TextTruncator):
         index: QModelIndex,
     ) -> None:
         """Implement custom painting."""
-
         if index.data(Qt.CheckStateRole) is None:
             super().paint(painter, option, index)
             return
@@ -185,7 +183,6 @@ class StyledCheckBox(QCheckBox, TextTruncator):
         self, event: QPaintEvent
     ) -> None:
         """Implement custom painting."""
-
         painter = QPainter(self)
         # Define rect for CheckBox Icon
         checkbox_rect = QRect(

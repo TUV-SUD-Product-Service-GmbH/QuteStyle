@@ -31,7 +31,6 @@ class TitleButton(IconTooltipButton[BaseWidget]):
         margin: float = 0.5,
     ) -> None:
         """Create a new TitleButton."""
-
         if bgs is None:
             bgs = BackgroundColorNames(
                 hovering="bg_three",

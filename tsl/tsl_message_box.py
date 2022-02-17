@@ -22,6 +22,7 @@ class TSLMessageBox(QMessageBox):
     def __init__(
         self, parent: Optional[QWidget] = None, title: str = "", text: str = ""
     ) -> None:
+        """Init function."""
         super().__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setMinimumSize(300, 300)

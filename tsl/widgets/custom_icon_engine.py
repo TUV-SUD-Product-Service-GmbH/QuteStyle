@@ -23,6 +23,7 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
     """
 
     def __init__(self, path: str, color: str):
+        """Init function."""
         super().__init__()
         self._path = path
         self._color_name = color
@@ -48,7 +49,7 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         _: QIcon.Mode,
         __: QIcon.State,
     ) -> None:
-        """Override method of QIconEngine"""
+        """Override method of QIconEngine."""
         store = PixmapStore.inst()
         radius = min(rect.width(), rect.height())
         rect.setSize(QSize(radius, radius))

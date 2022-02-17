@@ -101,6 +101,7 @@ class HomePage(MainWidget):
         visible_widgets: List[Type[MainWidget]],
         parent: QWidget | None = None,
     ) -> None:
+        """Init Homepage."""
         super().__init__(parent)
         self._visible_widgets: List[Type[MainWidget]] = visible_widgets
         self._app_name, self._app_logo, self._app_lang = app_info
@@ -245,7 +246,7 @@ class HomePage(MainWidget):
         change_log_data: Dict[str, Dict[str, List[Dict[str, str]]]],
         visible_widgets: List[Type[MainWidget]],
     ) -> None:
-        """Setup version grid from change_log_data."""
+        """Set up version grid from change_log_data."""
         log.debug("Fill version grid")
         # get the sorted version keys in descending order. Newest version first
         if not change_log_data:
@@ -337,7 +338,7 @@ class HomePage(MainWidget):
         widget_info: Tuple[str, str],
         text_items: List[str],
     ) -> int:
-        """add changelog item to grid."""
+        """Add changelog item to grid."""
         widget_name, widget_icon = widget_info
         if widget_name == self._app_name:
             # load as svg icon

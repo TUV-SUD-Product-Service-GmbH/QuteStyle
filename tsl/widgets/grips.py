@@ -35,7 +35,7 @@ class CornerGrip(QSizeGrip):
         self, _: QMouseEvent
     ) -> None:
         """
-        Overriding the mousePressEvent
+        Override the mousePressEvent.
 
         This is required to be overriden in this class
         otherwise the mouse move event is

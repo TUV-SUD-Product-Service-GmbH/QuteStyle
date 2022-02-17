@@ -121,7 +121,7 @@ WidgetLogInfo = Dict[str, List[Dict[str, str]]]
 
 def list_dd() -> Dict[Any, List[Any]]:
     """
-    Module level method to allow pickling of defaultdict.
+    Implement module level method to allow pickling of defaultdict.
 
     See: https://stackoverflow.com/questions/16439301/cant-pickle-defaultdict
     """

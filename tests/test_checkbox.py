@@ -1,4 +1,4 @@
-"""Tests for StyledComboBox and CheckableComboBox"""
+"""Tests for StyledComboBox and CheckableComboBox."""
 from random import randint
 from typing import List
 

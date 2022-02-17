@@ -1,4 +1,4 @@
-"""Tests for CustomIconEngine and PixmapStore"""
+"""Tests for CustomIconEngine and PixmapStore."""
 from _pytest.monkeypatch import MonkeyPatch
 from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
@@ -52,7 +52,7 @@ def test_custom_icon_engine_paint(
     def mock_draw(
         _: QPainter, target: QRect, pixmap: QPixmap, source: QRect
     ) -> None:
-        """Mock draw Pixmap method"""
+        """Mock draw Pixmap method."""
         new_rect = QRect(0, 0, 16, 16)
         assert new_rect == target
         store = PixmapStore.inst()

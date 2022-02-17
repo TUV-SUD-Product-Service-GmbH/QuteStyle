@@ -1,4 +1,4 @@
-"""Tests for IconButton and Icon"""
+"""Tests for IconButton and Icon."""
 # pylint: disable=protected-access
 
 from _pytest.monkeypatch import MonkeyPatch
@@ -28,7 +28,7 @@ def test_icon_button_paint(  # pylint: disable=unused-argument
         height: int,
         pixmap: QPixmap,
     ) -> None:
-        """Mock draw Pixmap method"""
+        """Mock draw Pixmap method."""
         assert pos_x == 7
         assert pos_y == 7
         assert width == 21

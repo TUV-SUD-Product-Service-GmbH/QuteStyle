@@ -175,11 +175,10 @@ class LeftMenuButton(
 
     def visible_width(self) -> int:
         """
-        Returns the visible width of self.
+        Return the visible width of self.
 
         If the LeftMenuButton is part of the ScrollArea, the button-width
         is independent of the menu animation. Several methods of LeftMenuButton
         depend on the visible width of the button and can use this method.
         """
-
         return self.visibleRegion().boundingRect().width()

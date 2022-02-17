@@ -28,9 +28,7 @@ def create_new_main_window(
     window_class: Type[WindowT],
 ) -> WindowT:
     """Create and show a new TSLMainWindow."""
-
-    # create the resource file
-    generate_changelog_resource_file(
+    generate_changelog_resource_file(  # create the resource file
         APP_NAME,
         Path.cwd() / "examples" / "test_changelog",
         Path.cwd() / "examples",

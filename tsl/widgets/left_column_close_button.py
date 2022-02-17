@@ -17,7 +17,7 @@ class LeftColumnCloseButton(TitleButton):
         icon_path: str,
         parent: QWidget | None = None,
     ) -> None:
-        """LeftMenuCloseButton"""
+        """Init LeftMenuCloseButton."""
         bgs = BackgroundColorNames(
             hovering="bg_two",
             background="bg_one",

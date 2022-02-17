@@ -99,7 +99,7 @@ def get_current_style() -> str:
 
 def set_current_style(style: str) -> None:
     """
-    Set the current style
+    Set the current style.
 
     One should only use this method to change the style. This will correctly
     set CURRENT_STYLE to be used as a lazy variable.
