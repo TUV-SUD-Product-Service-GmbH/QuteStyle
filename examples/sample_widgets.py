@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Dict, List, cast
 
 from PyQt5.QtCore import QModelIndex, QObject, QStringListModel, Qt, pyqtSlot
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
@@ -16,6 +17,7 @@ from PyQt5.QtWidgets import (
 
 from tsl.gen.ui_test_window import Ui_test_widget
 from tsl.widgets.base_widgets import MainWidget
+from tsl.widgets.custom_icon_engine import CustomIconEngine
 from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 
 
@@ -52,6 +54,11 @@ class TestWidget(MainWidget):
         self._ui.disable_widgets.clicked.connect(self.on_widgets_disabled)
         self._ui.transparent_combobox.setProperty("cssClass", "transparent")
         self._ui.pushButton_2.setMenu(menu)
+        self._ui.pushButton_2.setIcon(
+            QIcon(
+                CustomIconEngine(":/svg_icons/heart_broken.svg", "foreground")
+            )
+        )
         self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)

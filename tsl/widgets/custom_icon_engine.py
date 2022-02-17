@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 from typing import Dict, Optional, Tuple
 
-from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5.QtGui import QColor, QIcon, QIconEngine, QPainter, QPixmap
 
 from tsl.style import get_color
@@ -26,6 +26,20 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         super().__init__()
         self._path = path
         self._color_name = color
+
+    def pixmap(
+        self, size: QSize, mode: QIcon.Mode, state: QIcon.State
+    ) -> QPixmap:
+        """
+        The reimplemented paint() is often called via the pixmap().
+        Because the default painter in pixmap() has no alpha channel,
+        the painter's pixmap must be set transparent to display icons with
+        transparent backgrounds.
+        """
+        pixmap = QPixmap(size)
+        pixmap.fill(Qt.transparent)
+        self.paint(QPainter(pixmap), QRect(QPoint(0, 0), size), mode, state)
+        return pixmap
 
     def paint(
         self,
