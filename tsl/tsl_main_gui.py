@@ -550,6 +550,11 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
                 self._title_bar.title_bar_text = (
                     f"{self._app_name} - {widget.NAME}"
                 )
+                # show the individual settings widgets per main widget
+                if self._column_is_visible(self._left_column_frame):
+                    self._left_column.handle_settings_display(
+                        widget.settings_widget, widget.ICON
+                    )
                 return
         raise ValueError("Could not find widget {widget_class}")
 
@@ -638,6 +643,11 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
             # Set the button to the opposite state.
             self._left_menu.set_button_active(widget_class, not visible)
+
+        self._left_column.handle_settings_display(
+            cast(MainWidget, self._content.currentWidget()).settings_widget,
+            self._content.currentWidget().ICON,
+        )
 
     @pyqtSlot(name="on_close_left_column")
     def on_close_left_column(self) -> None:

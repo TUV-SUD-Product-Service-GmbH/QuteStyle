@@ -32,6 +32,8 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         self, size: QSize, mode: QIcon.Mode, state: QIcon.State
     ) -> QPixmap:
         """
+        Override method of QIconEngine.
+
         The reimplemented paint() is often called via the pixmap().
         Because the default painter in pixmap() has no alpha channel,
         the painter's pixmap must be set transparent to display icons with

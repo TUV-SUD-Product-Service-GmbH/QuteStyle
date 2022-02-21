@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from tsl.widgets.base_widgets import BaseWidget
+from tsl.widgets.base_widgets import BaseWidget, SettingsBaseWidget
 from tsl.widgets.icon import Icon
 from tsl.widgets.left_column_close_button import LeftColumnCloseButton
 
@@ -137,6 +137,27 @@ class LeftColumn(QWidget):
 
         # Return Icon and title QLabel
         return icon, title_label
+
+    def handle_settings_display(
+        self, settings_widget: None | QWidget, icon: str
+    ) -> None:
+        """Handle the display of the settings widget."""
+        current_type = self.current_widget_type()
+        assert current_type is not None
+        current_widget = self.widget(current_type)
+        # Check if settings are displayed
+        if issubclass(current_type, SettingsBaseWidget):
+
+            # Clear settings
+            current_widget.clear_widget()
+
+            # Set general settings icon
+            self._icon.set_icon(current_widget.ICON)
+
+            # If specific settings, add widget and set specific Icon
+            if settings_widget:
+                current_widget.add_widget(settings_widget)
+                self._icon.set_icon(icon)
 
     def set_column_widget(self, widget_type: Type[BaseWidget]) -> None:
         """Set left column pages."""

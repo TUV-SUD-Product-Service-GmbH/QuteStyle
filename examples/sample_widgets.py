@@ -9,8 +9,12 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
     QHBoxLayout,
+    QLabel,
     QListView,
     QMenu,
+    QSizePolicy,
+    QSpacerItem,
+    QVBoxLayout,
     QWidget,
     QWidgetAction,
 )
@@ -132,6 +136,7 @@ class ModelViewWidget(MainWidget):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         self._view = QListView()
+        self._settings_widget: None | QWidget = None
         layout.addWidget(self._view)
         model = Model(["A", "B", "C"])
 
@@ -145,3 +150,21 @@ class ModelViewWidget(MainWidget):
         self._view.setModel(model)
         delegate = StyledCheckboxDelegate()
         self._view.setItemDelegateForColumn(0, delegate)
+
+    @property
+    def settings_widget(self) -> QWidget:
+        """Return ModelViewWidget specific settings."""
+        if not self._settings_widget:
+            self._settings_widget = QWidget()
+            QVBoxLayout(self._settings_widget)
+            self._settings_widget.layout().addWidget(
+                QLabel(f"Settings {self.NAME}", self)
+            )
+            self._settings_widget.layout().addWidget(QCheckBox("Activate 1"))
+            self._settings_widget.layout().addWidget(QCheckBox("Activate 2"))
+            self._settings_widget.layout().addWidget(QCheckBox("Activate 2"))
+            self._settings_widget.layout().addWidget(QLabel("...", self))
+            self._settings_widget.layout().addItem(
+                QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)
+            )
+        return self._settings_widget

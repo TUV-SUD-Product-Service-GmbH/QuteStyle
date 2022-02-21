@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import (
     QLabel,
     QSizePolicy,
     QSpacerItem,
-    QTableWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -29,7 +28,7 @@ from tsl.style import (
     set_current_style,
 )
 from tsl.tsl_main_gui import TSLStyledMainWindow
-from tsl.widgets.base_widgets import BaseWidget
+from tsl.widgets.base_widgets import BaseWidget, SettingsBaseWidget
 from tsl.widgets.color_manager import ColorManager
 from tsl.widgets.home_page import HomePage
 from tsl.widgets.icon_button import IconButton
@@ -64,18 +63,19 @@ class RightWidget(BaseWidget):
         self.setLayout(layout)
 
 
-class SettingsWidget(BaseWidget):
-    """Test ColumnBaseWidget."""
-
-    ICON = ":/svg_icons/settings.svg"
-    NAME = "Einstellungen"
+class SettingsWidget(SettingsBaseWidget):
+    """Test SettingsWidget."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new SettingsWidget."""
         super().__init__(parent)
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Dies ist ein Text-Text \n" * 10))
-        layout.addWidget(QTableWidget())
+        self.setLayout(layout)
+        self.layout().addWidget(QLabel("Global settings"))
+        self.layout().addItem(
+            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        )
+        self._set_global_widget(self)
 
 
 class InfoWidget(BaseWidget):
