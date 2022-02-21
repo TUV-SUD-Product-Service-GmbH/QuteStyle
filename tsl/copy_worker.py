@@ -5,10 +5,8 @@ import filecmp
 import hashlib
 import json
 import logging
-import ntpath
-import os
 import shutil
-import time
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from PyQt5.QtCore import QEventLoop, QObject, QTimer, pyqtSignal, pyqtSlot
@@ -25,32 +23,35 @@ class CopyWorker(QObject):
     status_changed = pyqtSignal(str, name="status_changed")
 
     def __init__(
-        self, path: str, file: str, parent: QObject | None = None
+        self,
+        destination_path: Path,
+        source_path: Path,
+        parent: QObject | None = None,
     ) -> None:
         """
         Create a new CopyWorker.
 
-        The given path is the path into which the application will be
-        installed.
-
-        The file is the former txt file. You can use any path you want as we
-        will look for the update.json anyway.
+        The given destination_path is the path into which the application will
+        be installed.
+        source_path is checked for update.json which provides the information
+        which files to copy.
         """
         super().__init__(parent)
-        self._path = path
-        self._exe_path = ""
-        self._source = ntpath.split(file)[0]
-        self._app_name = ""
-        self._hashes: Dict[str, str]
-        log.debug("Path: %s", self._path)
-        log.debug("Source: %s", self._source)
-
-        self._file_list: List[Tuple[str, str]] = []
+        self._source_path = source_path
+        self._destination_path = destination_path
+        self._app_name: str | None = None
+        # stores the source files and related hash
+        self._src_files: Dict[Path, str] = {}
+        # stores the source and destination files
+        self._file_list: List[Tuple[Path, Path]] = []
+        log.debug("Destination Path: %s", self._destination_path)
+        log.debug("Source Path: %s", self._source_path)
 
     @property
-    def exe_path(self) -> str:
+    def exe_path(self) -> Path:
         """Return the executable path of the app."""
-        return os.path.join(self._path, self._app_name)
+        assert self._app_name
+        return self._destination_path / self._app_name
 
     @pyqtSlot(name="start_copy")
     def start_copy(  # pylint: disable=too-many-branches
@@ -58,17 +59,20 @@ class CopyWorker(QObject):
     ) -> None:
         """Start to copy the files from the def file to the destination."""
         self.status_changed.emit("Checking TSL definition file of update.")
-        log.debug(
-            "Checking file: %s", os.path.join(self._source, "update.json")
-        )
-        if os.path.exists(os.path.join(self._source, "update.json")):
+        update_file = self._source_path / "update.json"
+        log.debug("Checking file: %s", update_file)
+        if update_file.exists():
             self.status_changed.emit("Reading TSL definition file.")
             self._parse_json()
         else:
             self.status_changed.emit("update_failed")
+            if not self._source_path.exists():
+                log.debug("Source path does not exist: %s", self._source_path)
+            else:
+                log.debug("update.json file missing in %s", self._source_path)
             return
         self.status_changed.emit(
-            "Removing obsolete files from " "installation folder."
+            "Removing obsolete files from installation folder."
         )
         self._remove_files()
         self._remove_empty_folders()
@@ -76,65 +80,60 @@ class CopyWorker(QObject):
         self._reduce_file_list()
         self.status_changed.emit("Copying files...")
 
-        for idx, file in enumerate(self._file_list):
-            src, dst = file
-            self.current_file.emit(dst)
+        for idx, (src, dst) in enumerate(self._file_list):
+            self.current_file.emit(str(dst))
             log.debug("Coping from %s to %s", src, dst)
             try:
-                folder = ntpath.split(dst)[0]
-                log.debug("Trying to create folder %s", folder)
-                os.makedirs(folder)
+                log.debug("Trying to create folder %s", dst.parent)
+                dst.parent.mkdir(parents=True)
             except FileExistsError:
                 log.debug("Folder does already exist")
-            try_count = 30
-            while try_count:
-                try:
-                    self.copy_file(dst, src)
-                    break
-                except PermissionError:
-                    log.warning(
-                        "Received permission error copying file to %s", dst
-                    )
-                    try_count -= 1
-                    time.sleep(5)
-            else:
-                log.debug("The updated failed")
+            try:
+                self.copy_file(dst, src)
+            except PermissionError:
+                log.debug("Permission denied for destination: %s", dst)
                 self.status_changed.emit("Update failed.")
+                break
             self.files_copied.emit(idx + 1, len(self._file_list))
-        self.files_copied.emit(100, 100)
+        self.files_copied.emit(len(self._file_list), len(self._file_list))
         self.copy_finished.emit()
         self.status_changed.emit("Update complete.")
 
     @staticmethod
-    def copy_file(dst: str, src: str) -> None:
+    def copy_file(dst: Path, src: Path, retries_num: int = 30) -> None:
         """Copy a file from dst to src."""
-        count = 30
-        while count > 0:
+        while retries_num > 0:
             try:
                 shutil.copy(src, dst)
-                count = 0
+                break
             except PermissionError:
                 log.warning(
-                    "Could not copy to  %s due to PermissionError", dst
+                    "Could not copy %s to %s due to PermissionError. Retry",
+                    dst,
+                    src,
                 )
                 # sleep 1 second in an event loop
                 loop = QEventLoop()
                 QTimer.singleShot(1000, loop.quit)
                 loop.exec()
-                count -= 1
+                retries_num -= 1
+
+        if retries_num == 0:
+            msg = f"Failed copy {src} to {dst} due to PermissionError"
+            log.warning(msg)
+            raise PermissionError(msg)
 
     def _remove_files(self) -> None:
         """Remove files from the path that aren't needed anymore."""
         log.debug("Deleting obsolete files")
-        for root, _, files in os.walk(self._path):
-            for file in files:
-                full_path = os.path.join(root, file)
+        for file in self._destination_path.rglob("*"):
+            if file.is_file():
                 if not any(
-                    full_path == dst_path for _, dst_path in self._file_list
+                    file == dst_path for _, dst_path in self._file_list
                 ):
                     log.debug("Removing file %s", file)
                     try:
-                        os.remove(full_path)
+                        file.unlink()
                     except PermissionError:
                         log.debug("Cannot delete file because locked.")
         log.debug("Deletion of obsolete files finished")
@@ -144,43 +143,33 @@ class CopyWorker(QObject):
         found = True
         while found:
             found = False
-            for root, dirs, _ in os.walk(self._path):
-                for folder in dirs:
-                    if not os.listdir(os.path.join(root, folder)):
-                        log.debug("Removing folder %s", folder)
+            for directory in self._destination_path.rglob("*"):
+                if directory.is_dir():
+                    try:
+                        directory.rmdir()
                         found = True
-                        try:
-                            shutil.rmtree(os.path.join(root, folder))
-                        except PermissionError:
-                            log.debug("Cannot delete file because locked.")
+                    except (PermissionError, OSError):
+                        log.debug("Cannot delete file because locked.")
 
     def _generate_file_list(self) -> None:
         """Generate the list of files to be copied."""
         log.debug("Generating file list")
-        for root, _, files in os.walk(self._source):
-            log.debug(files)
-            for file in files:
-                src_path = os.path.join(root, file)
-                dst_path = src_path.replace(self._source, self._path)
-                self._file_list.append((src_path, dst_path))
-
-        log.debug("Finished generating file list: %s", str(self._file_list))
+        for src_file in self._source_path.rglob("*"):
+            if src_file.is_file():
+                rel_file_path = src_file.relative_to(self._source_path)
+                dst_file = self._destination_path / rel_file_path
+                self._file_list.append((src_file, dst_file))
         for src, dst in self._file_list:
-            log.debug("Source %s; Dest. %s", src, dst)
+            log.debug("generate_file_list Source: %s, Dest: %s", src, dst)
 
     def _reduce_file_list(self) -> None:
         """Reduce the file list."""
         copy_list = []
         for src, dst in self._file_list:
-            log.debug("Comparing")
-            log.debug(src)
-            log.debug(dst)
+            log.debug("Comparing %s %s", src, dst)
             try:
-                if self._hashes:
-                    if (
-                        self.hash_file(dst)
-                        == self._hashes[dst.replace(self._path + "\\", "")]
-                    ):
+                if self._src_files:
+                    if self.hash_file(dst) == self._src_files[src]:
                         log.debug("Files are equal")
                         continue
                 else:
@@ -199,10 +188,10 @@ class CopyWorker(QObject):
         self._file_list = copy_list
 
     @staticmethod
-    def hash_file(file: str) -> str:
+    def hash_file(file: Path) -> str:
         """Create a hash for a given file."""
         file_hash = hashlib.sha256()
-        with open(file, "rb") as fhandle:
+        with file.open("rb") as fhandle:
             file_block = fhandle.read(65536)
             while len(file_block) > 0:
                 file_hash.update(file_block)
@@ -211,17 +200,17 @@ class CopyWorker(QObject):
 
     def _parse_json(self) -> None:
         """Parse the update json_file."""
-        with open(
-            os.path.join(self._source, "update.json"), encoding="utf-8"
-        ) as fhandle:
-            json_obj = json.load(fhandle)
+        update_file = self._source_path / "update.json"
+        with update_file.open(encoding="utf-8") as f_handle:
+            json_obj = json.load(f_handle)
         log.debug("Parsed json: %s", str(json_obj))
-        for file in json_obj["files"]:
-            src_path = os.path.join(self._source, file)
-            dst_path = src_path.replace(self._source, self._path)
-            log.debug("Adding src: %s", src_path)
-            log.debug("Destination: %s", dst_path)
+        # src_files holds the relative file path and hashes from the json file
+        src_files: Dict[str, str] = json_obj["files"]
+        for file, hash_ in src_files.items():
+            self._src_files[self._source_path / file] = hash_
+            src_path = self._source_path / file
+            dst_path = self._destination_path / file
+            log.debug("Src path: %s, Dest path: %s", src_path, dst_path)
             self._file_list.append((src_path, dst_path))
-        self._hashes = json_obj["files"]
         self._app_name = json_obj["name"] + ".exe"
         log.debug("App-Name: %s", self._app_name)

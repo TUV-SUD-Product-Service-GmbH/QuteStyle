@@ -5,11 +5,13 @@ from pathlib import Path
 from typing import Optional, cast
 from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
 
-from PyQt5.QtCore import QBuffer, QByteArray, QIODevice
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, QObject
+from PyQt5.QtGui import QPaintEvent, QPixmap
 from sqlalchemy.orm.exc import NoResultFound
+from waitingspinnerwidget import QtWaitingSpinner
 
 from tsl.edoc_database import AdminSession, Process, Project
+from tsl.style import get_color
 
 log = logging.getLogger("tsl")  # pylint: disable=invalid-name
 
@@ -86,3 +88,30 @@ def get_selected_psex_id() -> Optional[int]:
         raise
     finally:
         key.Close()
+
+
+class StyledWaitingSpinner(QtWaitingSpinner):  # type: ignore
+    """Styled Version of QWaitingSpinner."""
+
+    def paintEvent(  # pylint: disable=invalid-name, arguments-renamed
+        self, event: QPaintEvent
+    ) -> None:
+        """Overwrite method to change color of spinner."""
+        self.setColor(get_color("context_color"))
+        super().paintEvent(event)
+
+
+def create_waiting_spinner(
+    parent: QObject,
+    number_of_lines: int = 28,
+    line_length: int = 20,
+    inner_radius: int = 15,
+) -> QtWaitingSpinner:
+    """Create a waiting spinner with default config."""
+    spinner = StyledWaitingSpinner(parent)
+    spinner.setColor(get_color("context_color"))
+    spinner.setNumberOfLines(number_of_lines)
+    spinner.setLineLength(line_length)
+    spinner.setInnerRadius(inner_radius)
+    spinner.setLineWidth(2)
+    return spinner

@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QPoint, QSettings, QSize
 from pytestqt.qtbot import QtBot
 
-from tsl.update_window import TSLMainWindow
+from tsl.update_window import AppData, TSLMainWindow
 
 
 def test_update_window(qtbot: QtBot) -> None:
@@ -24,7 +24,7 @@ def test_update_window(qtbot: QtBot) -> None:
 
 def create_new_tsl_main_window(qtbot: QtBot) -> TSLMainWindow:
     """Create and show a new TSLMainWindow."""
-    widget = TSLMainWindow(False, "", "", "1.0.0")
+    widget = TSLMainWindow(AppData("", "1.0.0"))
     qtbot.addWidget(widget)
     widget.show()
     qtbot.waitUntil(widget.isVisible)

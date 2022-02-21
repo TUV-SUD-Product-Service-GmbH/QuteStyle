@@ -12,6 +12,7 @@ from pytestqt.qtbot import QtBot
 
 from tsl import tsl_main_gui
 from tsl.tsl_main_gui import TSLStyledMainWindow
+from tsl.update_window import AppData
 from tsl.widgets.base_widgets import BaseWidget, MainWidget
 from tsl.widgets.left_menu_button import LeftMenuButton
 from tsl.widgets.title_button import TitleButton
@@ -143,7 +144,9 @@ def create_new_main_window(
         return "RightTeam"
 
     monkeypatch.setattr(tsl_main_gui, "get_user_group_name", mock_get_user)
-    widget = window_class(False, "", "TestApp", "1.0.0")
+    widget = window_class(
+        AppData("TestApp", "1.0.0", ":/svg_icons/no_icon.svg")
+    )
     qtbot.addWidget(widget)
     widget.show()
     qtbot.waitUntil(widget.isVisible)

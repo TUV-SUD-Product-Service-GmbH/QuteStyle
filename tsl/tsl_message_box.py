@@ -110,6 +110,21 @@ class TSLMessageBox(QMessageBox):
         )
 
     @staticmethod
+    def critical(
+        parent: Optional[QWidget],
+        title: str,
+        text: str,
+        buttons: Union[
+            QMessageBox.StandardButtons, QMessageBox.StandardButton
+        ] = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
+    ) -> QMessageBox.StandardButton:
+        """Show warning message box."""
+        return TSLMessageBox._show_message_box(
+            parent, title, text, QMessageBox.Critical, buttons, default_button
+        )
+
+    @staticmethod
     def question(
         parent: Optional[QWidget],
         title: str,

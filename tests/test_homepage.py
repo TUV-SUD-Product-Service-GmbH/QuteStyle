@@ -8,13 +8,14 @@ from _pytest.monkeypatch import MonkeyPatch
 from PyQt5.QtWidgets import QGridLayout, QLabel
 from pytestqt.qtbot import QtBot
 
-from examples.main import StyledMainWindow
+from examples.styled_main_window import StyledMainWindow
 from tests.test_tsl_style_main_window import WindowT
 from tsl import tsl_main_gui
 from tsl.dev.dev_functions import (
     generate_changelog_resource_file,
     get_change_log_data,
 )
+from tsl.update_window import AppData
 from tsl.widgets.home_page import HomePage
 
 APP_NAME = "TEST-APP"
@@ -40,7 +41,7 @@ def create_new_main_window(
     )
     monkeypatch.setattr(tsl_main_gui, "get_app_language", lambda: lang)
 
-    widget = window_class(False, "", APP_NAME, "1.0.0")
+    widget = window_class(AppData(APP_NAME, "1.0.0"))
     qtbot.addWidget(widget)
     widget.show()
     qtbot.waitUntil(widget.isVisible)

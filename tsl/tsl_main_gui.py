@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (
 import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from tsl.edoc_database import get_user_group_name
 from tsl.style import get_style, set_current_style
-from tsl.update_window import TSLMainWindow
+from tsl.update_window import AppData, TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
 from tsl.widgets.base_widgets import BaseWidget, MainWidget
 from tsl.widgets.credit_bar import CreditBar
@@ -74,34 +74,25 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     # Define the maximum width for the columns (left and right).
     MAX_COLUMN_WIDTH = 240
 
-    # Logo of the Application
-    LOGO: str = ":/svg_icons/no_icon.svg"
-
     # Signal that is emitted when the window has shut down.
     shutdown_complete = pyqtSignal(name="shutdown_complete")
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        update: bool,
-        help_text: str,
-        name: str,
-        version: str,
+        app_data: AppData,
         force_whats_new: bool = False,
         registry_reset: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new TSLStyledMainWindow."""
         super().__init__(
-            update,
-            help_text,
-            name,
-            version,
+            app_data,
             force_whats_new,
             registry_reset,
             parent,
         )
 
-        self._app_name = name
+        self._app_data = app_data
 
         # Set the global stylesheet.
         self.set_style()
@@ -157,7 +148,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         ) = self._add_main_area(right_app_layout)
 
         # Add credit bar to the main frame
-        right_app_layout.addWidget(CreditBar(self._version))
+        right_app_layout.addWidget(CreditBar(self._app_data.app_version))
 
         self._grips = [
             EdgeGrip(self, Qt.LeftEdge),
@@ -224,7 +215,11 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         for widget_class in self._visible_widgets:
             if issubclass(widget_class, HomePage):
                 widget = widget_class(
-                    (self._app_name, self.LOGO, get_app_language().lower()),
+                    (
+                        self._app_data.app_name,
+                        self._app_data.app_icon,
+                        get_app_language().lower(),
+                    ),
                     self._visible_widgets,
                 )
                 content.addWidget(widget)
@@ -268,7 +263,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     def _configure_main_window(self) -> None:
         """Configure the TSLStyledMainWindow."""
         # Set the name of the app.
-        self.setWindowTitle(self._app_name)
+        self.setWindowTitle(self._app_data.app_name)
 
         # Make the window borderless and transparent.
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -283,8 +278,8 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             self,
             self.centralWidget(),
             self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
-            self._app_name,
-            self.LOGO,
+            self._app_data.app_name,
+            self._app_data.app_icon,
         )
         title_bar.close_app.connect(self.close)
         title_bar.minimize.connect(self.showMinimized)
@@ -548,7 +543,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             if isinstance(widget, widget_class):
                 self._content.setCurrentWidget(widget)
                 self._title_bar.title_bar_text = (
-                    f"{self._app_name} - {widget.NAME}"
+                    f"{self._app_data.app_name} - {widget.NAME}"
                 )
                 # show the individual settings widgets per main widget
                 if self._column_is_visible(self._left_column_frame):
