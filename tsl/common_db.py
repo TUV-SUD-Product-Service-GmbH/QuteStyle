@@ -47,10 +47,7 @@ def create_db_engine(
         # only print for debug purposes in IDE!
         print(f"Creating Engine for Application: {app} with Environment {env}")
     if not env:
-        env_name = os.getenv(
-            f"{app.name}_ENV", "DEV" if check_ide() else "PROD"
-        )
-        env = Vault.Environment[env_name]
+        env = get_env(app)
         if check_ide():
             # only print for debug purposes in IDE!
             print("Environment for Engine: " + env.name)
@@ -90,6 +87,17 @@ def create_db_engine(
         # only print for debug purposes in IDE!
         print(f"Created engine for {app}: {engine}")
     return engine
+
+
+def get_env(app: Vault.Application) -> Vault.Environment:
+    """
+    Return the environment for the given application.
+
+    The function will check, if any Environment is configured as environment
+    variable. It returns DEV as default if running from ide, else PROD.
+    """
+    env_name = os.getenv(f"{app.name}_ENV", "DEV" if check_ide() else "PROD")
+    return Vault.Environment[env_name]
 
 
 def receive_checkout(
