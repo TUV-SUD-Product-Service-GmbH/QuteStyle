@@ -60,7 +60,7 @@ SETTINGS = SettingsDict(
 def check_ide() -> bool:
     """Check if the application is run from the IDE."""
     log.info("Checking if running from IDE")
-    return Path(sys.argv[0]).suffix != ".exe"
+    return Path(sys.argv[0]).suffix == ".py"
 
 
 def edit_registry_keys(app_name: str) -> None:
