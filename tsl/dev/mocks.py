@@ -18,6 +18,8 @@ from _pytest.monkeypatch import MonkeyPatch
 from mypy_extensions import KwArg, VarArg
 from PyQt5.QtWidgets import QMessageBox, QWidget
 
+from tsl.tsl_message_box import TSLMessageBox
+
 log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
 
 Call = Tuple[Tuple[Any, ...], Dict[str, Any]]
@@ -42,9 +44,10 @@ def _mp_message_dialog(
     monkeypatch: MonkeyPatch,
     method: str = "warning",
     return_value: QMessageBox.StandardButton | None = None,
+    mock_class: Type[QMessageBox] = QMessageBox,
 ) -> CallList:
     """Mock a QMessageDialog and return a list with the call's arguments."""
-    return _mp_call(monkeypatch, QMessageBox, method, return_value, False)
+    return _mp_call(monkeypatch, mock_class, method, return_value, False)
 
 
 @overload
@@ -91,6 +94,9 @@ def _mp_call(
         if isinstance(return_value, Exception):
             # bug in pylint https://www.logilab.org/ticket/3207
             raise return_value  # pylint: disable-msg=raising-bad-type
+        if callable(return_value):
+            # Handle the case that a function was passed
+            return return_value(*a, **k)
         return return_value
 
     # first case handles class + method, second one mock as str
@@ -141,6 +147,34 @@ def mock_q_message_dialog(
 
 
 @contextlib.contextmanager
+def mock_tsl_message_dialog(
+    title: str,
+    text: str,
+    parent: QWidget,
+    method: str = "warning",
+    return_value: TSLMessageBox.StandardButton | None = None,
+) -> Generator[None, None, None]:
+    """
+    Mock the TSLMessageBox call of a method in a context.
+
+    Same method as mock_q_message_dialog. Must be reimplemented for typing.
+    """
+    if method != "question" and return_value is not None:
+        raise ValueError(
+            f"Cannot return anything from methods other than question. Given "
+            f"method type: '{method}' and return value: {return_value}"
+        )
+
+    monkeypatch = MonkeyPatch()
+    calls = _mp_message_dialog(
+        monkeypatch, method, return_value, TSLMessageBox
+    )
+    yield
+    _check_mp_dialog(calls, parent, title, text)
+    monkeypatch.undo()
+
+
+@contextlib.contextmanager
 def check_call(  # pylint: disable=too-many-arguments
     mock_class: Type[Any] | ModuleType,
     method: str,
@@ -160,7 +194,10 @@ def check_call(  # pylint: disable=too-many-arguments
 
     If called is False, it will assert that the mock was not called.
 
-    If a return_value is given, the mock will return this value.
+    If a return_value is given, the mock will return this value. One can pass
+    as exception that will be raised by the mocked method instead of returning
+    a value. If a Callable is passed, it will be called and its return value
+    returned.
     """
     assert (call_args_list is not None and call_kwargs_list is not None) or (
         call_args_list is None and call_kwargs_list is None
