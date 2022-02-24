@@ -10,6 +10,7 @@ from PyQt5.QtCore import QSettings, pyqtSlot
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QWidget
 
+import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from tsl.edoc_database import get_user_group_name
 from tsl.whats_new_window import WhatsNewWindow
 
