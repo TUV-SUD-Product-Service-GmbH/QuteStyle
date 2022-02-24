@@ -130,7 +130,7 @@ class TslApplication(  # pylint: disable=too-many-instance-attributes
         self._threads_running: List[StartupThread] = []
         self._threads_finished: List[StartupThread] = []
 
-        if self.STARTUP_THREADS:
+        if self._threads_to_run:
             self._run_threads()
         else:
             # if startup threads are empty show the main window

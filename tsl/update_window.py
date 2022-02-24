@@ -160,7 +160,8 @@ class TSLMainWindow(QMainWindow):
     def on_about(self) -> None:
         """Show a message box about the used app version."""
         log.debug(
-            "User pressed button to show dialog about %s", self._app_name
+            "User pressed button to show dialog about %s",
+            self._app_data.app_name,
         )
         title = self.tr("Über {}").format(self._app_data.app_name)
         QMessageBox.about(self, title, self._app_data.help_text)
