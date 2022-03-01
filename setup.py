@@ -25,6 +25,11 @@ setup(
             "SP_NAV_INSERT_PACKAGE_WITH_FILTER.sql",
         ],
     },
-    install_requires=["sqlalchemy", "pyodbc", "PyQt5"],
+    install_requires=[
+        "sqlalchemy",
+        "pyodbc",
+        "PyQt5",
+        "QtWaitingSpinner @ git+https://github.com/z3ntu/QtWaitingSpinner.git",
+    ],
     zip_safe=False,
 )
