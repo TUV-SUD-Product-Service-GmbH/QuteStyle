@@ -12,8 +12,15 @@ from PyQt5.QtGui import (
     QPainter,
     QResizeEvent,
     QStandardItem,
+    QStandardItemModel,
 )
-from PyQt5.QtWidgets import QComboBox, QStyle, QStyleOptionComboBox, QWidget
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QListView,
+    QStyle,
+    QStyleOptionComboBox,
+    QWidget,
+)
 
 from tsl.style import get_color
 from tsl.widgets.custom_icon_engine import PixmapStore
@@ -36,9 +43,7 @@ class StyledComboBox(QComboBox):
         super().__init__(parent)
         # options below are needed, otherwise the rounded
         # corners of dropdowns cannot be drawn correctly
-        self.view().window().setWindowFlags(
-            cast(Qt.WindowFlags, Qt.Popup | Qt.FramelessWindowHint)
-        )
+        self.view().window().setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
         self.view().window().setAttribute(Qt.WA_TranslucentBackground)
 
     def paintEvent(  # pylint: disable=invalid-name
@@ -116,7 +121,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         self.view().viewport().installEventFilter(self)
 
         # add some spacing between the items
-        self.view().setSpacing(2)
+        cast(QListView, self.view()).setSpacing(2)
 
         # add checkbox delegate for custom checkboxes
         self.setItemDelegate(StyledCheckboxDelegate())
@@ -177,7 +182,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     def _check_item_at_pos(self, pos: QPoint) -> None:
         """Toggle the CheckState at the given pos."""
         index = self.view().indexAt(pos)
-        item = self.model().item(index.row())
+        item = cast(QStandardItemModel, self.model()).item(index.row())
         if item.checkState() == Qt.Checked:
             item.setCheckState(Qt.Unchecked)
         else:
@@ -220,9 +225,10 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     def _get_text(self) -> str:
         """Return the text that is shown at the top of the combobox."""
         texts = [
-            str(self.model().item(idx).data())
+            str(cast(QStandardItemModel, self.model()).item(idx).data())
             for idx in range(self.model().rowCount())
-            if self.model().item(idx).checkState() == Qt.Checked
+            if cast(QStandardItemModel, self.model()).item(idx).checkState()
+            == Qt.Checked
         ]
 
         text = ", ".join(texts)
@@ -243,22 +249,21 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         """Add an Item to the Combobox."""
         item = QStandardItem(text)
         item.setData(data)
-        item.setFlags(
-            Qt.ItemIsEnabled | Qt.ItemIsUserCheckable  # type: ignore
-        )
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
         item.setData(Qt.Unchecked, Qt.CheckStateRole)
         item.setData(icon_path, Qt.DecorationRole)
         item.setData(icon_color, Qt.ForegroundRole)
-        self.model().appendRow(item)
+        cast(QStandardItemModel, self.model()).appendRow(item)
         self.update_text()
 
     @property
     def item_ids(self) -> List[ItemData]:
         """Return the list of ids checked by the user."""
         return [
-            self.model().item(i).data()
+            cast(QStandardItemModel, self.model()).item(i).data()
             for i in range(self.model().rowCount())
-            if self.model().item(i).checkState() == Qt.Checked
+            if cast(QStandardItemModel, self.model()).item(i).checkState()
+            == Qt.Checked
         ]
 
     @item_ids.setter
@@ -271,7 +276,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             )
         log.debug("Setting item_ids: %s", item_ids)
         for idx in range(self.model().rowCount()):
-            data = self.model().item(idx).data()
-            self.model().item(idx).setCheckState(
+            data = cast(QStandardItemModel, self.model()).item(idx).data()
+            cast(QStandardItemModel, self.model()).item(idx).setCheckState(
                 Qt.Checked if data in item_ids else Qt.Unchecked
             )

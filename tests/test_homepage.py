@@ -5,7 +5,7 @@ from typing import Type, cast
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
-from PyQt5.QtWidgets import QGridLayout, QLabel
+from PyQt5.QtWidgets import QGridLayout, QLabel, QScrollArea
 from pytestqt.qtbot import QtBot
 
 from examples.styled_main_window import StyledMainWindow
@@ -77,7 +77,10 @@ def test_changelog_data(  # pylint: disable=too-many-locals
     layout = homepage._widget_stack.widget(1).layout()
     label = cast(QLabel, layout.itemAt(0).widget())
     assert label.text() == "Versionshistorie"
-    grid = cast(QGridLayout, layout.itemAt(1).widget().widget().layout())
+    grid = cast(
+        QGridLayout,
+        cast(QScrollArea, layout.itemAt(1).widget()).widget().layout(),
+    )
 
     row = 0
     for key, log_data_dict in change_log_data.items():

@@ -147,7 +147,6 @@ class Ui_test_widget(object):
         self.checkBox.setCheckable(True)
         self.checkBox.setChecked(False)
         self.checkBox.setAutoExclusive(False)
-        self.checkBox.setTristate(True)
         self.checkBox.setObjectName("checkBox")
         self.horizontalLayout_4.addWidget(self.checkBox)
         spacerItem2 = QtWidgets.QSpacerItem(
@@ -305,7 +304,12 @@ class Ui_test_widget(object):
         self.radioButton.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_2.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_3.setText(_translate("test_widget", "RadioButton"))
-        self.checkBox_3.setText(_translate("test_widget", "CheckBox"))
+        self.checkBox_3.setText(
+            _translate(
+                "test_widget",
+                "This is a very long test text so that we can crop",
+            )
+        )
         self.checkBox_4.setText(_translate("test_widget", "CheckBox"))
         self.textEdit.setHtml(
             _translate(

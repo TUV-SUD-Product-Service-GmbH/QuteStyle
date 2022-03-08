@@ -44,10 +44,7 @@ class TestWidget(MainWidget):
         menu.addAction(widget_action)
         menu.addSeparator()
         buttons = QDialogButtonBox(
-            cast(
-                QDialogButtonBox.StandardButtons,
-                QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-            ),
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             Qt.Horizontal,
             menu,
         )
@@ -84,10 +81,10 @@ class TestWidget(MainWidget):
         if self._ui.disable_widgets.isChecked():
             for child in self.children():
                 if child.objectName() != "disable_widgets":
-                    child.setEnabled(False)
+                    cast(QWidget, child).setEnabled(False)
         else:
             for child in self.children():
-                child.setEnabled(True)
+                cast(QWidget, child).setEnabled(True)
 
 
 class Model(QStringListModel):
@@ -119,10 +116,7 @@ class Model(QStringListModel):
         self, _: QModelIndex
     ) -> Qt.ItemFlags:
         """Return the flags for the given index."""
-        return cast(
-            Qt.ItemFlags,
-            Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable,
-        )
+        return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
 
 
 class ModelViewWidget(MainWidget):

@@ -1,6 +1,6 @@
 """Left Menu containing the widget selection."""
 import logging
-from typing import Any, Iterable, List, Type, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Iterable, List, Type, TypedDict, cast
 
 from PyQt5.QtCore import (
     QEasingCurve,
@@ -106,6 +106,12 @@ class LeftMenu(QWidget):
 
         self.setMinimumWidth(50)
         self._animation = QPropertyAnimation(parent, b"minimumWidth")
+
+    if TYPE_CHECKING:
+
+        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+            """Override base class method for correct type hint."""
+            ...
 
     def _add_main_widgets(self, widgets: Iterable[Type[MainWidget]]) -> None:
         """Create the widgets and add them to the main area."""

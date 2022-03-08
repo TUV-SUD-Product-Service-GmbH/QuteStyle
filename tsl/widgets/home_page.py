@@ -56,9 +56,7 @@ class StackedWidget(QStackedWidget):
         self._animation = QPropertyAnimation(self, b"size")
         self._animation.setDuration(400)
         self._animation.setEasingCurve(QEasingCurve.OutQuad)
-        self._animation.finished.connect(  # type: ignore
-            self.on_animation_finished
-        )
+        self._animation.finished.connect(self.on_animation_finished)
 
     def set_current_index(self, index: int, animate: bool = True) -> None:
         """Set page index."""

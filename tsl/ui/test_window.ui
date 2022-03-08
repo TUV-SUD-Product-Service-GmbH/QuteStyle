@@ -244,7 +244,7 @@
           <item>
            <widget class="Toggle" name="checkBox_3">
             <property name="text">
-             <string>CheckBox</string>
+             <string>This is a very long test text so that we can crop</string>
             </property>
            </widget>
           </item>
@@ -288,9 +288,6 @@
             </property>
             <property name="autoExclusive">
              <bool>false</bool>
-            </property>
-            <property name="tristate">
-             <bool>true</bool>
             </property>
            </widget>
           </item>

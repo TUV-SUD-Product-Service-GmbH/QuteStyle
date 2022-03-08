@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Tuple, Type, cast
+from typing import List, Optional, Tuple, Type, TypeVar, cast
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (
@@ -20,6 +20,8 @@ from tsl.widgets.icon import Icon
 from tsl.widgets.left_column_close_button import LeftColumnCloseButton
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+
+BaseWidgetT = TypeVar("BaseWidgetT", bound=BaseWidget)
 
 
 class LeftColumn(QWidget):
@@ -146,7 +148,7 @@ class LeftColumn(QWidget):
         assert current_type is not None
         current_widget = self.widget(current_type)
         # Check if settings are displayed
-        if issubclass(current_type, SettingsBaseWidget):
+        if isinstance(current_type, SettingsBaseWidget):
 
             # Clear settings
             current_widget.clear_widget()
@@ -167,7 +169,7 @@ class LeftColumn(QWidget):
         self._title_label.setText(widget.NAME)
         self._icon.set_icon(widget.ICON)
 
-    def widget(self, widget_type: Type[BaseWidget]) -> BaseWidget:
+    def widget(self, widget_type: Type[BaseWidgetT]) -> BaseWidgetT:
         """Get the widget of the given type."""
         for widget in self._widgets:
             if isinstance(widget, widget_type):

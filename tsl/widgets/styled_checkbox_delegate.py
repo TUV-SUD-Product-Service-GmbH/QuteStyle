@@ -37,7 +37,7 @@ def set_background_color(
     """Set the background color of the selected or hovered item."""
     color = get_color(
         "context_pressed"
-        if option.state & QStyle.State_Selected  # type: ignore
+        if option.state & QStyle.State_Selected
         else "context_color"
     )
     # Save the pen, since we draw the background with a brush
@@ -85,8 +85,8 @@ class StyledCheckboxDelegate(QStyledItemDelegate, TextTruncator):
 
         # Check if we need to paint a background.
         if (
-            option.state & QStyle.State_Selected  # type: ignore
-            or option.state & QStyle.State_MouseOver  # type: ignore
+            option.state & QStyle.State_Selected
+            or option.state & QStyle.State_MouseOver
         ):
             set_background_color(option, painter)
 

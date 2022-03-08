@@ -1,12 +1,12 @@
 black==21.12b0
 coverage==6.2
+git+https://github.com/python-qt-tools/PyQt5-stubs.git@6b964eb
 isort==5.10.1
 mypy==0.920
 pre-commit==2.16.0
 pydocstyle==6.1.1
 pylint==2.12.2
 pylint-sqlalchemy==0.2.0
-PyQt5-stubs==5.15.2.0
 pytest==6.2.5
 pytest-qt==4.0.2
 requests==2.26.0

@@ -32,7 +32,7 @@ class TSLMessageBox(QMessageBox):
         # Here come the styling bits...First need the frameless window flag
         # hint
         self.setWindowFlags(
-            self.windowFlags()  # type: ignore
+            self.windowFlags()
             | Qt.FramelessWindowHint
             | Qt.WindowSystemMenuHint
         )

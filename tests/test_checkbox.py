@@ -1,9 +1,10 @@
 """Tests for StyledComboBox and CheckableComboBox."""
 from random import randint
-from typing import List
+from typing import List, cast
 
 import pytest
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QStandardItemModel
 from pytestqt.qtbot import QtBot
 
 from tsl.widgets.styled_combobox import CheckableComboBox, TooManyItemsError
@@ -74,7 +75,9 @@ def test_item_ids(
     with qtbot.captureExceptions() as exceptions:
         combobox.single_mode = mode
         for item in items:
-            combobox.model().item(item).setCheckState(Qt.Checked)
+            cast(QStandardItemModel, combobox.model()).item(
+                item
+            ).setCheckState(Qt.Checked)
         if mode:
             assert combobox.item_ids == [items[-1]]
         else:
@@ -119,6 +122,9 @@ def test_check_state_event_filter(
         pos = combobox.view().visualRect(index).center()
 
         qtbot.mouseClick(combobox.view().viewport(), Qt.LeftButton, pos=pos)
-        assert combobox.model().item(0).checkState() == checked
+        assert (
+            cast(QStandardItemModel, combobox.model()).item(0).checkState()
+            == checked
+        )
 
     assert not exceptions

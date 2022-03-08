@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Dict
+from typing import Dict, cast
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QColor, QPaintEvent
@@ -147,7 +147,7 @@ class ColorManager(BaseWidget):
         """Set the new stylesheet when a color has changed."""
         log.debug("Color has changed, changing theme.")
         theme = self._create_theme()
-        app = QApplication.instance()
+        app = cast(QApplication, QApplication.instance())
         assert app is not None
         app.activeWindow().setStyleSheet(MAIN_STYLE.format(**theme))
         self.set_code()

@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, cast
 
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QGridLayout, QWidget
+from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -92,7 +92,9 @@ class SettingsBaseWidget(BaseWidget):
         """Global widget can only be set once."""
         if self._has_no_global:
             # insert local settings layout into global one
-            global_widget.layout().insertLayout(-1, self._layout)
+            cast(QVBoxLayout, global_widget.layout()).insertLayout(
+                -1, self._layout
+            )
 
     def add_widget(self, widget: QWidget) -> None:
         """Add the given widget to the settings."""

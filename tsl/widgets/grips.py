@@ -1,5 +1,6 @@
 """Custom widgets for grips to resize the application."""
 import logging
+from typing import TYPE_CHECKING
 
 from PyQt5.QtCore import QRect, Qt, pyqtSignal
 from PyQt5.QtGui import QCursor, QMouseEvent
@@ -19,6 +20,12 @@ class CornerGrip(QSizeGrip):
         self._position = position
         self.setObjectName("grip")
         self.setFixedSize(15, 15)
+
+    if TYPE_CHECKING:
+
+        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+            """Override base class method for correct type hint."""
+            ...
 
     def adapt(self) -> None:
         """Adapt the position when the main window was resized."""
@@ -122,6 +129,12 @@ class EdgeGrip(QWidget):
         elif position in (Qt.LeftEdge, Qt.RightEdge):
             self.setCursor(QCursor(Qt.SizeHorCursor))
             self.setMaximumWidth(10)
+
+    if TYPE_CHECKING:
+
+        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+            """Override base class method for correct type hint."""
+            ...
 
     def adapt(self) -> None:
         """Adapt the size and position when the main window was resized."""

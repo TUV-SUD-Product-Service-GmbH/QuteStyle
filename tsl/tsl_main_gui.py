@@ -150,7 +150,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         # Add credit bar to the main frame
         right_app_layout.addWidget(CreditBar(self._app_data.app_version))
 
-        self._grips = [
+        self._grips: List[EdgeGrip | CornerGrip] = [
             EdgeGrip(self, Qt.LeftEdge),
             EdgeGrip(self, Qt.RightEdge),
             EdgeGrip(self, Qt.TopEdge),
@@ -641,7 +641,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
         self._left_column.handle_settings_display(
             cast(MainWidget, self._content.currentWidget()).settings_widget,
-            self._content.currentWidget().ICON,
+            cast(MainWidget, self._content.currentWidget()).ICON,
         )
 
     @pyqtSlot(name="on_close_left_column")
@@ -657,7 +657,8 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     def closeEvent(self, close_event: QCloseEvent) -> None:
         """Handle a close event."""
         widgets = [
-            self._content.widget(idx) for idx in range(self._content.count())
+            cast(MainWidget, self._content.widget(idx))
+            for idx in range(self._content.count())
         ]
         for widget in widgets:
             log.debug("Requesting shutdown from widget")

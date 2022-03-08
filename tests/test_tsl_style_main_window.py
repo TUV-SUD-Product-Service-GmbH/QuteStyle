@@ -1,13 +1,14 @@
 """Tests for the TSLStyledMainWindow."""
 # pylint: disable=protected-access
 import logging
-from typing import List, Type, TypeVar, Union
+from typing import List, Type, TypeVar, Union, cast
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent, QPointF, Qt
 from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from tsl import tsl_main_gui
@@ -355,8 +356,7 @@ def test_maximize_mode(qtbot: QtBot, monkeypatch: MonkeyPatch) -> None:
     window = create_new_main_window(qtbot, monkeypatch, MainWindow)
     window.showMaximized()
 
-    app = QtWidgets.QApplication.instance()
-    assert app
+    app = cast(QApplication, QtWidgets.QApplication.instance())
     screen = app.primaryScreen()
     rect = screen.availableGeometry()
     log.debug("Available Geometry: %d x %d", rect.width(), rect.height())

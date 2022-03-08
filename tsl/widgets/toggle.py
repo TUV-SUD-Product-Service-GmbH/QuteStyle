@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Union
+from typing import Union, cast
 
 from PyQt5.QtCore import (  # type: ignore # for pyqtProperty
     QEasingCurve,
     QPoint,
     QPropertyAnimation,
+    QRect,
     QSize,
     Qt,
     pyqtProperty,
@@ -17,12 +18,20 @@ from PyQt5.QtGui import (
     QColor,
     QFont,
     QFontMetrics,
-    QMoveEvent,
     QPainter,
     QPaintEvent,
-    QPen,
+    QPalette,
 )
-from PyQt5.QtWidgets import QCheckBox, QSizePolicy, QWidget
+from PyQt5.QtWidgets import (
+    QCheckBox,
+    QCommonStyle,
+    QSizePolicy,
+    QStyle,
+    QStyleOption,
+    QStyleOptionButton,
+    QStylePainter,
+    QWidget,
+)
 
 from tsl.style import get_color
 from tsl.widgets.text_truncator import TextTruncator
@@ -30,74 +39,212 @@ from tsl.widgets.text_truncator import TextTruncator
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
+class ToggleStyle(QCommonStyle):
+    """Custom QStyle for drawing a Toggle."""
+
+    class ToggleOptions:  # pylint: disable=too-few-public-methods
+        """Toggle configuration."""
+
+        # This is the offset with which the circle is shown on both sides and
+        # on top and bottom of the box.
+        CIRCLE_OFFSET = 3
+
+        # Diameter of the circle.
+        CIRCLE_SIZE = 16
+
+        # Font definitions
+        FONT_SIZE = 9
+        # Todo: This font is not a good font for the ui. fix with 70912
+        FONT_NAME = "Segoe UI"
+
+        # Width and height of the Box
+        BOX_WIDTH = 40
+        BOX_HEIGHT = CIRCLE_SIZE + (2 * CIRCLE_OFFSET)
+
+        # Spacer between the text and the toggle box.
+        SPACER = 5
+
+        # Duration of the animation.
+        ANIM_DURATION = 500
+
+    def standardPalette(self) -> QPalette:  # pylint: disable=invalid-name
+        """Return the QStyle's standard QPalette."""
+        palette = super().standardPalette()
+        palette.setColor(
+            QPalette.Normal,
+            QPalette.WindowText,
+            QColor(get_color("foreground")),
+        )
+        palette.setColor(
+            QPalette.Disabled,
+            QPalette.WindowText,
+            QColor(get_color("fg_disabled")),
+        )
+        palette.setColor(
+            QPalette.Inactive,
+            QPalette.WindowText,
+            QColor(get_color("foreground")),
+        )
+        palette.setColor(
+            QPalette.Normal, QPalette.Base, QColor(get_color("dark_two"))
+        )
+        palette.setColor(
+            QPalette.Inactive, QPalette.Base, QColor(get_color("dark_two"))
+        )
+        palette.setColor(
+            QPalette.Disabled, QPalette.Base, QColor(get_color("bg_disabled"))
+        )
+
+        return palette
+
+    def background_color(self, option: QStyleOptionButton) -> QColor:
+        """Return the color to print the Toggle's background."""
+        if not option.state & QStyle.State_Enabled:
+            return self.standardPalette().color(
+                QPalette.Inactive, QPalette.Base
+            )
+        if option.state & QStyle.State_On:
+            return QColor(get_color("context_color"))
+        return self.standardPalette().color(QPalette.Normal, QPalette.Base)
+
+    @staticmethod
+    def toggle_color(option: QStyleOptionButton) -> str:
+        """Return the color to print the Toggle's circle."""
+        if option.state & QStyle.State_Enabled:
+            return get_color("foreground")
+        return get_color("fg_disabled")
+
+    @staticmethod
+    def _toggle_x(option: QStyleOption) -> int:
+        """Calculate x position of Toggle box."""
+        if option.direction == Qt.LeftToRight:
+            x_pos = 0
+        else:
+            x_pos = option.rect.width() - ToggleStyle.ToggleOptions.BOX_WIDTH
+        return x_pos
+
+    @staticmethod
+    def _label_x(option: QStyleOption) -> int:
+        """Calculate x position of label."""
+        if option.direction == Qt.LeftToRight:
+            x_pos = (
+                ToggleStyle.ToggleOptions.BOX_WIDTH
+                + ToggleStyle.ToggleOptions.SPACER
+            )
+        else:
+            x_pos = 0
+        return x_pos
+
+    def drawControl(  # pylint: disable=invalid-name
+        self,
+        element: QStyle.ControlElement,
+        option: QStyleOption,
+        painter: QPainter,
+        widget: QWidget | None = None,
+    ) -> None:
+        """Draw the checkbox."""
+        if element == QStyle.CE_CheckBox and isinstance(widget, Toggle):
+            if not isinstance(option, QStyleOptionButton):
+                raise AssertionError(
+                    f"Expected option type QStyleOptionButton, "
+                    f"got {type(option)}"
+                )
+            x_pos = self._toggle_x(option)
+            toggle_rect = QRect(
+                x_pos,
+                0,
+                ToggleStyle.ToggleOptions.BOX_WIDTH,
+                ToggleStyle.ToggleOptions.BOX_HEIGHT,
+            )
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(QColor(self.background_color(option)))
+            painter.drawRoundedRect(toggle_rect, 12, 12)
+            painter.setBrush(QColor(self.toggle_color(option)))
+            painter.drawEllipse(
+                x_pos + cast(int, widget.position),
+                ToggleStyle.ToggleOptions.CIRCLE_OFFSET,
+                ToggleStyle.ToggleOptions.CIRCLE_SIZE,
+                ToggleStyle.ToggleOptions.CIRCLE_SIZE,
+            )
+            if option.text:
+                self.drawControl(
+                    QStyle.CE_CheckBoxLabel,
+                    option,
+                    painter,
+                    widget,
+                )
+        elif element == QStyle.CE_CheckBoxLabel:
+            if not isinstance(option, QStyleOptionButton):
+                raise AssertionError(
+                    f"Expected option type QStyleOptionButton, "
+                    f"got {type(option)}"
+                )
+            option.palette = self.standardPalette()
+            x_pos = self._label_x(option)
+            text_rect = QRect(
+                x_pos,
+                0,
+                option.rect.width()
+                - ToggleStyle.ToggleOptions.BOX_WIDTH
+                - ToggleStyle.ToggleOptions.SPACER,
+                option.rect.height(),
+            )
+            option.rect = text_rect
+            option.text = option.fontMetrics.elidedText(
+                option.text, Qt.ElideRight, option.rect.width()
+            )
+            super().drawControl(element, option, painter, widget)
+
+
 class Toggle(QCheckBox, TextTruncator):
     """Toggle button (custom checkbox)."""
-
-    _FONT = QFont("Segoe UI", 8)
-
-    # This is the offset with which the circle is shown on both sides.
-    _CIRCLE_OFFSET = 3
-
-    # Size of the circle.
-    _CIRCLE_SIZE = 16
-
-    # Width of the Box, Height is based on the circle.
-    _BOX_WIDTH = 40
-
-    # Spacer between the text and the toggle box.
-    _SPACER = 5
-
-    # Duration of the animation.
-    _ANIM_DURATION = 500
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new Toggle."""
         super().__init__(parent)
 
-        # Minimum width is the BOX_WIDTH, the height can be calculated
-        height = Toggle._CIRCLE_SIZE + (2 * Toggle._CIRCLE_OFFSET)
+        self.setFont(
+            QFont(
+                ToggleStyle.ToggleOptions.FONT_NAME,
+                ToggleStyle.ToggleOptions.FONT_SIZE,
+            )
+        )
 
-        # We're at least as wide as the toggle box is. Nevertheless we want to
-        # be as wide as the size hint to show the full text. Height is fixed.
-        self.setMinimumWidth(Toggle._BOX_WIDTH)
-        self.setFixedHeight(height)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # Todo: This must ultimately be moved to a QApplication-wide style.
+        self.setStyle(ToggleStyle())
+
+        # The minimum size is defined by the toggle box's dimensions.
+        self.setMinimumHeight(ToggleStyle.ToggleOptions.BOX_HEIGHT)
+        self.setMinimumWidth(ToggleStyle.ToggleOptions.BOX_WIDTH)
+
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
         self.setCursor(Qt.PointingHandCursor)
 
-        self._position = Toggle._CIRCLE_OFFSET
+        self._position = ToggleStyle.ToggleOptions.CIRCLE_OFFSET
 
         self._animation = QPropertyAnimation(self, b"position")
         self._animation.setEasingCurve(QEasingCurve.OutBounce)
-        self._animation.setDuration(Toggle._ANIM_DURATION)
+        self._animation.setDuration(ToggleStyle.ToggleOptions.ANIM_DURATION)
         self.stateChanged.connect(self.setup_animation)
 
-        # Set the font metrics for text length calculation.
-        self._font_metrics: QFontMetrics = QFontMetrics(Toggle._FONT)
-
-        # Store the preferred text width to calculate the size hint.
-        self._preferred_width = 0
-
-        # Remember the screen we're on.
-        self.current_screen = self.screen()
-
-    def moveEvent(  # pylint: disable=invalid-name
-        self, event: QMoveEvent
+    def setTristate(  # pylint: disable=invalid-name
+        self, on: bool = True  # pylint: disable=invalid-name
     ) -> None:
-        """
-        Detect a screen change when moving the Toggle.
+        """Override setTristate to ensure it's never set."""
+        if on:
+            raise ValueError("Toggle cannot use tristate.")
+        super().setTristate(on)
 
-        When a screen change is detected, the preferred text size is
-        recalculated and stored.
-        """
-        if self.current_screen != self.screen():
-            log.debug("Current screen has changed, updating geometry.")
-            self.current_screen = self.screen()
-            self._preferred_width = self._font_metrics.horizontalAdvance(
-                self.text()
+    def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
+        """Return the size hint."""
+        width = ToggleStyle.ToggleOptions.BOX_WIDTH
+        if self.text():
+            width += (
+                QFontMetrics(self.font()).horizontalAdvance(self.text())
+                + ToggleStyle.ToggleOptions.SPACER
             )
-            self.updateGeometry()
-        return super().moveEvent(event)
+        return QSize(width, ToggleStyle.ToggleOptions.BOX_HEIGHT)
 
     @pyqtProperty(float)
     def position(self) -> float:
@@ -117,11 +264,13 @@ class Toggle(QCheckBox, TextTruncator):
         if value != Qt.Unchecked:
             # Calculate the x-position from the right.
             end = (
-                Toggle._BOX_WIDTH - Toggle._CIRCLE_OFFSET - Toggle._CIRCLE_SIZE
+                ToggleStyle.ToggleOptions.BOX_WIDTH
+                - ToggleStyle.ToggleOptions.CIRCLE_OFFSET
+                - ToggleStyle.ToggleOptions.CIRCLE_SIZE
             )
         else:
             # Move the circle back to its initial position
-            end = Toggle._CIRCLE_OFFSET
+            end = ToggleStyle.ToggleOptions.CIRCLE_OFFSET
         self._animation.setEndValue(end)
         self._animation.start()
 
@@ -131,104 +280,18 @@ class Toggle(QCheckBox, TextTruncator):
         """States if checkbox was hit."""
         return self.contentsRect().contains(pos)
 
-    def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
-        """Return the size hint."""
-        factor = self.screen().logicalDotsPerInchX() / 96.0
-        width = (
-            int(self._preferred_width * factor)
-            + Toggle._BOX_WIDTH
-            + Toggle._SPACER
-        )
-        log.debug(
-            "Width in size hint for Toggle: %s with factor %s", width, factor
-        )
-        return QSize(width, self.height())
-
-    def setText(self, text: str) -> None:  # pylint: disable=invalid-name
-        """Override setText to calculate a new minimum width."""
-        self._preferred_width = self._font_metrics.horizontalAdvance(text)
-        super().setText(text)
-
-    def _draw_text(self, painter: QPainter, offset: int, width: int) -> None:
-        """Draw Text."""
-        if self.isEnabled():
-            color = QColor(get_color("foreground"))
-        else:
-            color = QColor(get_color("fg_disabled"))
-
-        painter.setPen(QPen(color))
-        painter.setFont(Toggle._FONT)
-        text = self.truncate_text(self.text(), width, self._font_metrics)
-        y_pos = (self.height() - text.size().height()) / 2
-        painter.drawStaticText(offset, int(y_pos), text)
-
-    def _draw_checkbox(self, painter: QPainter, offset: int) -> None:
-        """Draw the checkbox."""
-        painter.setPen(Qt.NoPen)
-        if not self.isEnabled():
-            color = get_color("bg_disabled")
-            fg_color = QColor(get_color("fg_disabled"))
-        else:
-            fg_color = QColor(get_color("foreground"))
-            if self.isChecked():
-                color = get_color("context_color")
-            else:
-                color = get_color("dark_two")
-
-        painter.setBrush(QColor(color))
-
-        height = self.height()
-        painter.drawRoundedRect(
-            offset,
-            0,
-            Toggle._BOX_WIDTH,
-            height,
-            12,
-            12,
-        )
-        painter.setBrush(fg_color)
-        painter.drawEllipse(
-            self._position + offset,
-            Toggle._CIRCLE_OFFSET,
-            Toggle._CIRCLE_SIZE,
-            Toggle._CIRCLE_SIZE,
-        )
-
     def paintEvent(  # pylint: disable=invalid-name
         self, _: QPaintEvent
     ) -> None:
         """Draw toggle switch."""
-        painter = QPainter(self)
+        painter = QStylePainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        if not self.text():
-            self._draw_checkbox(painter, 0)
-        else:
-            # Use the available space. If more space is available, use the
-            # calculated preferred text width.
-            text_width = min(
-                self.width() - Toggle._BOX_WIDTH - Toggle._SPACER,
-                self._preferred_width,
-            )
+        option = QStyleOptionButton()
+        option.initFrom(self)
+        option.text = self.text()
+        if self.checkState() == Qt.Checked:
+            option.state |= QStyle.State_On
 
-            if self.layoutDirection() == Qt.LeftToRight:
-                self._draw_checkbox(painter, 0)
-                self._draw_text(
-                    painter, Toggle._BOX_WIDTH + Toggle._SPACER, text_width
-                )
-            else:  # Qt.RightToLeft:
-                # Calculate the offset for the case that more space is
-                # available than needed for the text. Otherwise (the calc is
-                # negative) we use 0 and crop the text in _draw_text.
-                offset = max(
-                    self.width()
-                    - Toggle._BOX_WIDTH
-                    - Toggle._SPACER
-                    - self._preferred_width,
-                    0,
-                )
-                self._draw_text(painter, offset, text_width)
-                self._draw_checkbox(
-                    painter, offset + Toggle._SPACER + text_width
-                )
+        painter.drawControl(ToggleStyle.CE_CheckBox, option)
         painter.end()
