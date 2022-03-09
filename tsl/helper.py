@@ -2,8 +2,9 @@
 import errno
 import logging
 from pathlib import Path
-from typing import Optional, cast
+from typing import List, Optional, Union, cast
 from winreg import HKEY_CURRENT_USER, KEY_READ, OpenKey, QueryValueEx
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, QObject
 from PyQt5.QtGui import QPaintEvent, QPixmap
@@ -115,3 +116,18 @@ def create_waiting_spinner(
     spinner.setInnerRadius(inner_radius)
     spinner.setLineWidth(2)
     return spinner
+
+
+def create_tooltip(title: str, description: Union[str, List[str]]) -> str:
+    """Create a tooltip as HTML str."""
+    top = Element("div")
+    first = SubElement(top, "p")
+    headline = SubElement(first, "b")
+    headline.text = title
+    second = SubElement(top, "p")
+    text = SubElement(second, "small")
+    if isinstance(description, str):
+        text.text = description
+    else:
+        text.text = "<br />".join(description)
+    return tostring(top).decode("utf-8")

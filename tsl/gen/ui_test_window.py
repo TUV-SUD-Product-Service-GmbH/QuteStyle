@@ -165,6 +165,7 @@ class Ui_test_widget(object):
         self.verticalLayout_4.addLayout(self.verticalLayout_5)
         self.gridLayout_2.addWidget(self.groupBox, 2, 0, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(test_widget)
+        self.tabWidget.setAcceptDrops(True)
         self.tabWidget.setAutoFillBackground(False)
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
@@ -245,6 +246,20 @@ class Ui_test_widget(object):
         self.splitter_button.setObjectName("splitter_button")
         self.horizontalLayout_2.addWidget(self.splitter)
         self.tabWidget.addTab(self.tab_3, "")
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.tab_4)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.drop_widget = QtWidgets.QTreeWidget(self.tab_4)
+        self.drop_widget.setAcceptDrops(True)
+        self.drop_widget.setDragEnabled(True)
+        self.drop_widget.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.drop_widget.setObjectName("drop_widget")
+        self.verticalLayout_6.addWidget(self.drop_widget)
+        self.clear_drop_button = QtWidgets.QPushButton(self.tab_4)
+        self.clear_drop_button.setObjectName("clear_drop_button")
+        self.verticalLayout_6.addWidget(self.clear_drop_button)
+        self.tabWidget.addTab(self.tab_4, "")
         self.gridLayout_2.addWidget(self.tabWidget, 4, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -317,7 +332,7 @@ class Ui_test_widget(object):
                 '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
-                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
                 '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>',
             )
         )
@@ -383,6 +398,14 @@ class Ui_test_widget(object):
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_3),
             _translate("test_widget", "QSplitter"),
+        )
+        self.drop_widget.headerItem().setText(
+            0, _translate("test_widget", "Test Files")
+        )
+        self.clear_drop_button.setText(_translate("test_widget", "Clear"))
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_4),
+            _translate("test_widget", "DropArea"),
         )
         self.disable_widgets.setText(
             _translate("test_widget", "Disable Widgets")

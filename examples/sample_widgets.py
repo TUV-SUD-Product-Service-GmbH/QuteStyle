@@ -1,27 +1,40 @@
 """Sample widgets."""
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Dict, List, cast
 
-from PyQt5.QtCore import QModelIndex, QObject, QStringListModel, Qt, pyqtSlot
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import (
+    QEvent,
+    QFileInfo,
+    QModelIndex,
+    QObject,
+    QStringListModel,
+    Qt,
+    pyqtSlot,
+)
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
 from PyQt5.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
+    QFileIconProvider,
     QHBoxLayout,
     QLabel,
     QListView,
     QMenu,
     QSizePolicy,
     QSpacerItem,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
     QWidgetAction,
 )
 
 from tsl.gen.ui_test_window import Ui_test_widget
+from tsl.helper import create_tooltip
 from tsl.widgets.base_widgets import MainWidget
 from tsl.widgets.custom_icon_engine import CustomIconEngine
+from tsl.widgets.drop_label import DropLabel
 from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 
 
@@ -66,6 +79,64 @@ class TestWidget(MainWidget):
         self._ui.horizontalSlider.valueChanged.connect(
             self._ui.progressBar.setValue
         )
+
+        text = self.tr("Legen Sie Dateien hier ab.")
+        self._drop_label = DropLabel(text, self._ui.drop_widget)
+        self._ui.drop_widget.installEventFilter(self)
+        self._ui.clear_drop_button.clicked.connect(self.on_clear_drop)
+
+        title = self.tr("Hello there")
+        text = self.tr("This might be quite useful.")
+        for child in self.children():
+            if hasattr(cast(QWidget, child), "toolTip"):
+                cast(QWidget, child).setToolTip(create_tooltip(title, text))
+
+    def eventFilter(  # pylint: disable=invalid-name
+        self, obj: QObject, event: QEvent
+    ) -> bool:
+        """Filter and handle QDragEnterEvents and QDropEvents."""
+        if event.type() == QEvent.Drop:
+            if obj is self._ui.drop_widget:
+                self._handle_file_drop(cast(QDropEvent, event))
+                return True
+        if (
+            event.type() == QEvent.DragEnter
+            and cast(QDragEnterEvent, event).mimeData().hasUrls()
+        ):
+            return self._handle_drag_event(cast(QDragEnterEvent, event), obj)
+        return False
+
+    def _handle_drag_event(self, event: QDragEnterEvent, obj: QObject) -> bool:
+        """Handle a QDragEnterEvent."""
+        if obj is self._ui.drop_widget:
+            event.acceptProposedAction()
+            return True
+        return False  # pragma: no cover
+
+    def _handle_file_drop(self, event: QDropEvent) -> None:
+        """Handle a QDropEvent on the list of files."""
+        files = event.mimeData().urls()
+        for file in files:
+            path = Path(file.toLocalFile())
+            if path.is_dir():
+                return
+            self._add_file(path)
+
+    def _add_file(self, path: Path) -> None:
+        """Add a file to the list of files."""
+        self._drop_label.hide()
+
+        # Create a QTreeWidgetItem that displays the filename only.
+        item = QTreeWidgetItem(self._ui.drop_widget, [path.name])
+        item.setData(0, Qt.UserRole, path)
+
+        # Get a QIcon for the file from OS and set it.
+        item.setIcon(0, QFileIconProvider().icon(QFileInfo(str(path))))
+
+    def on_clear_drop(self) -> None:
+        """Remove all items from DropArea."""
+        self._ui.drop_widget.clear()
+        self._drop_label.show()
 
     @pyqtSlot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
