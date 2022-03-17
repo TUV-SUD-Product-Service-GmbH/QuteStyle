@@ -146,11 +146,13 @@ class LeftColumn(QWidget):
         """Handle the display of the settings widget."""
         current_type = self.current_widget_type()
         assert current_type is not None
-        current_widget = self.widget(current_type)
-        # Check if settings are displayed
-        if isinstance(current_type, SettingsBaseWidget):
 
+        # Check if settings are displayed
+        # Do not change to isinstance
+        if issubclass(current_type, SettingsBaseWidget):
+            current_widget = self.widget(current_type)
             # Clear settings
+            # clear_widget() and add_widget() are methods of SettingsBaseWidget
             current_widget.clear_widget()
 
             # Set general settings icon

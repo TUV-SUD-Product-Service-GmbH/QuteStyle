@@ -1,6 +1,5 @@
 """Test init methods."""
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -10,12 +9,14 @@ from tsl.init import check_ide
 @pytest.mark.parametrize(
     "path,result",
     (
-        (Path(r"C:\test\test.exe"), False),
-        (Path(r"C:\test\test"), False),
-        (Path(r"C:\test\test.py"), True),
+        (r"C:\test\test.exe", False),
+        (r"C:\test\test", False),
+        (r"C:\test\test.py", True),
     ),
 )
-def test_check_ide(path: Path, result: bool) -> None:
+def test_check_ide(path: str, result: bool) -> None:
     """Test that the check_ide method returns the correct result."""
-    sys.argv[0] = path  # type: ignore
+    old_path = sys.argv[0]
+    sys.argv[0] = path
     assert check_ide() == result
+    sys.argv[0] = old_path

@@ -12,9 +12,11 @@ from PyQt5.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from tsl import tsl_main_gui
+from tsl.dev.mocks import check_call
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.update_window import AppData
 from tsl.widgets.base_widgets import BaseWidget, MainWidget
+from tsl.widgets.left_column import LeftColumn
 from tsl.widgets.left_menu_button import LeftMenuButton
 from tsl.widgets.title_button import TitleButton
 
@@ -438,3 +440,28 @@ def test_maximize_event_handling(
             ),
         )
         assert signal.signal_triggered
+
+
+@pytest.mark.parametrize("visible", [True, False])
+def test_on_main_widget_settings(
+    qtbot: QtBot, monkeypatch: MonkeyPatch, visible: bool
+) -> None:
+    """Test that settings are display when user clicked on main widget."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+    if visible:
+        window._left_column_frame.setFixedWidth(MainWindow.MAX_COLUMN_WIDTH)
+    with check_call(
+        LeftColumn, "handle_settings_display", call_count=1 if visible else 0
+    ):
+        window.on_main_widget(MainTest)
+
+
+def test_on_left_column_settings(
+    qtbot: QtBot,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Test that settings are display when user clicked on left column."""
+    window = create_new_main_window(qtbot, monkeypatch, MainWindow)
+
+    with check_call(LeftColumn, "handle_settings_display"):
+        window.on_left_column(UpperLeftColumn)

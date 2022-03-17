@@ -101,7 +101,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         super().__init__(parent)
 
         # default text that is shown when nothing is selected
-        self._default_text = ""
+        self._default_text = self.tr("Keine Auswahl")
 
         # sets the single mode so that only one class can be selected.
         self._single = False
