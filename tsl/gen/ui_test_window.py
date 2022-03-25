@@ -123,6 +123,10 @@ class Ui_test_widget(object):
         self.radioButton_3 = QtWidgets.QRadioButton(self.groupBox)
         self.radioButton_3.setObjectName("radioButton_3")
         self.verticalLayout_5.addWidget(self.radioButton_3)
+        self.checkBox_5 = QtWidgets.QCheckBox(self.groupBox)
+        self.checkBox_5.setTristate(True)
+        self.checkBox_5.setObjectName("checkBox_5")
+        self.verticalLayout_5.addWidget(self.checkBox_5)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.checkBox_3 = Toggle(self.groupBox)
@@ -263,7 +267,7 @@ class Ui_test_widget(object):
         self.gridLayout_2.addWidget(self.tabWidget, 4, 0, 1, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.disable_widgets = StyledCheckBox(test_widget)
+        self.disable_widgets = QtWidgets.QCheckBox(test_widget)
         self.disable_widgets.setChecked(False)
         self.disable_widgets.setObjectName("disable_widgets")
         self.horizontalLayout.addWidget(self.disable_widgets)
@@ -319,6 +323,7 @@ class Ui_test_widget(object):
         self.radioButton.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_2.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_3.setText(_translate("test_widget", "RadioButton"))
+        self.checkBox_5.setText(_translate("test_widget", "CheckBox"))
         self.checkBox_3.setText(
             _translate(
                 "test_widget",
@@ -332,7 +337,7 @@ class Ui_test_widget(object):
                 '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
-                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
                 '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>',
             )
         )
@@ -414,6 +419,5 @@ class Ui_test_widget(object):
 
 from examples.sample_classes import TestComboBox
 from tsl.widgets.icon_button import IconButton
-from tsl.widgets.styled_checkbox_delegate import StyledCheckBox
 from tsl.widgets.styled_combobox import StyledComboBox
 from tsl.widgets.toggle import Toggle

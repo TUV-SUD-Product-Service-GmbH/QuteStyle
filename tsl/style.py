@@ -1,6 +1,5 @@
 """Style handling for TSLStyleWindow."""
 import logging
-from enum import Enum
 from typing import Dict, Optional
 
 from PyQt5.QtCore import QRect, QSettings, QSize
@@ -9,19 +8,9 @@ from PyQt5.QtGui import QColor, QPainter, QPixmap
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class Themes(str, Enum):
-    """Available themes."""
-
-    DARCULA = "Darcula"
-    SNOW_WHITE = "Snow White"
-    PRINCESS_PINK = "Princess Pink"
-    HIGHBRIDGE_GRAY = "Highbridge Gray"
-    RUBY_RED = "Ruby Red"
-
-
 # Use this variable when referencing a default style so that adapting to a new
 # default style will only require changes in the lib.
-DEFAULT_STYLE = Themes.DARCULA
+DEFAULT_STYLE = "Darcula"
 
 CURRENT_STYLE: Optional[str] = None
 
@@ -41,7 +30,7 @@ def _create_theme_drawing(
     menu = QRect(0, 0, 20, pixmap.height())
     painter.fillRect(menu, QColor(color_names["dark_one"]))
     # draw menu icons
-    for i in range(0, 8):
+    for i in range(8):
         y_pos = i * 20 + 5
         if y_pos + 8 < menu.height():
             painter.fillRect(
@@ -66,7 +55,7 @@ def _create_theme_drawing(
     painter.fillRect(widget, QColor(color_names["bg_two"]))
 
     # draw widget data
-    for i in range(0, 6):
+    for i in range(6):
         y_pos = i * 20 + 10
         if y_pos + 5 < widget.height():
             if i % 2:
@@ -111,7 +100,7 @@ def set_current_style(style: str) -> None:
 
 
 THEMES: Dict[str, Dict[str, str]] = {
-    Themes.SNOW_WHITE: {
+    "Snow White": {
         "dark_one": "#b5c3dd",
         "dark_two": "#bfcde6",
         "bg_one": "#c9d7ef",
@@ -138,7 +127,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#7e5300",
         "grey": "#d3d3d3",
     },
-    Themes.PRINCESS_PINK: {
+    "Princess Pink": {
         "active": "#fffefe",
         "dark_one": "#282a36",
         "dark_two": "#363948",
@@ -165,7 +154,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
-    Themes.DARCULA: {
+    "Darcula": {
         "active": "#dfe4ed",
         "dark_one": "#1b1e23",
         "dark_two": "#242830",
@@ -192,7 +181,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "dark_yellow": "#787d46",
         "grey": "#d3d3d3",
     },
-    Themes.HIGHBRIDGE_GRAY: {
+    "Highbridge Gray": {
         "active": "#0e0e0e",
         "bg_disabled": "#d9d9d9",
         "bg_one": "#ffffff",
@@ -204,7 +193,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "bg_elements": "#ededed",
         "dark_two": "#dedede",
         "dark_green": "#007f3f",
-        "dark_one": "#f4f4f4",
+        "dark_one": "#c6c6c6",
         "dark_red": "#7f2a2a",
         "dark_yellow": "#787d46",
         "fg_disabled": "#919191",
@@ -219,7 +208,7 @@ THEMES: Dict[str, Dict[str, str]] = {
         "white": "#f5f6f9",
         "yellow": "#fda600",
     },
-    Themes.RUBY_RED: {
+    "Ruby Red": {
         "dark_one": "#431e1e",
         "dark_two": "#4f2424",
         "bg_one": "#5f2d2d",
@@ -640,13 +629,13 @@ Because of not inheriting the values properly each
 widget of QTabWidget needs to be set manually.
 */
 QTabWidget > QStackedWidget {{
-    background-color: {bg_three};
+    background-color: {bg_two};
     border-top-right-radius: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }}
 QTabWidget > QStackedWidget > QWidget {{
-    background-color: {bg_three};
+    background-color: {bg_two};
     border-top-right-radius: 8px;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -660,7 +649,7 @@ QTabWidget > QStackedWidget > QWidget {{
 
 /* QTabBar */
 QTabBar::tab {{
-    background-color: {bg_two};
+    background-color: {bg_three};
     color: {foreground};
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -671,7 +660,7 @@ QTabBar::tab:hover {{
     color: {active};
 }}
 QTabBar::tab:selected {{
-    background-color: {bg_three};
+    background-color: {bg_two};
     color: {foreground};
 }}
 
@@ -717,22 +706,6 @@ QTreeWidget {{
 #frozen_column_table_view QHeaderView::section:horizontal:last{{
     /* The last section of the frozen table's header isn't the real last one */
     border-right: 1px solid {dark_two};
-}}
-QTreeView::item:hover,
-QListView::item:hover,
-QTableView::item:hover,
-QTableWidget::item:hover,
-QTreeWidget::item:hover{{
-color: {active};
-background-color: {context_color};
-}}
-QTreeView::item:selected,
-QListView::item:selected,
-QTableView::item:selected,
-QTableWidget::item:selected,
-QTreeWidget::item:selected{{
-color: {active};
-background-color: {context_pressed};
 }}
 QTreeView:disabled,
 QListView:disabled,

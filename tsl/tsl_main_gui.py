@@ -19,6 +19,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
 from PyQt5.QtWidgets import (
+    QApplication,
     QFrame,
     QHBoxLayout,
     QLayout,
@@ -30,6 +31,7 @@ from PyQt5.QtWidgets import (
 import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from tsl.edoc_database import get_user_group_name
 from tsl.style import get_style, set_current_style
+from tsl.tsl_style import TSLStyle
 from tsl.update_window import AppData, TSLMainWindow
 from tsl.widgets.background_frame import BackgroundFrame
 from tsl.widgets.base_widgets import BaseWidget, MainWidget
@@ -91,6 +93,9 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
             registry_reset,
             parent,
         )
+
+        QApplication.setStyle(TSLStyle())
+        QApplication.setPalette(QApplication.style().standardPalette())
 
         self._app_data = app_data
 
@@ -188,12 +193,12 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         widgets: List[Type[Union[WidgetT]]],
     ) -> List[Type[WidgetT]]:
         """Determine the widgets visible to the current user."""
-        visible_widgets = []
         team = get_user_group_name()
-        for widget_class in widgets:
-            if team in widget_class.GROUPS or not widget_class.GROUPS:
-                visible_widgets.append(widget_class)
-        return visible_widgets
+        return [
+            widget_class
+            for widget_class in widgets
+            if team in widget_class.GROUPS or not widget_class.GROUPS
+        ]
 
     def _add_main_area(
         self, layout: QLayout
@@ -501,7 +506,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
         This method will clear an ongoing animation (group), and create a new
         one based on the request parameters and state of the columns.
         """
-        assert left_open is False or right_open is False
+        assert not left_open or not right_open
         self._group.clear()
 
         # Create the two animations that that open/close the columns.
@@ -596,8 +601,7 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
 
     def right_widget_type(self) -> Optional[Type[BaseWidget]]:
         """Return the type of the right widget."""
-        widget = self._right_content.currentWidget()
-        if widget:
+        if widget := self._right_content.currentWidget():
             return cast(Type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None
@@ -693,5 +697,6 @@ class TSLStyledMainWindow(  # pylint: disable=too-many-instance-attributes
     def on_change_theme(self, theme: str) -> None:
         """Change the theme to the theme with the given name."""
         set_current_style(theme)
+        QApplication.setPalette(QApplication.style().standardPalette())
         self.setStyleSheet(get_style())
         self.update()

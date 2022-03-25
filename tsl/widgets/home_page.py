@@ -123,7 +123,7 @@ class HomePage(MainWidget):
             QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         )
 
-        label = QLabel("Willkommen zur " + self._app_name)
+        label = QLabel(f"Willkommen zur {self._app_name}")
         label.setObjectName("heading_label")
         layout.addWidget(label, 1, 0)
         layout.setAlignment(label, Qt.AlignCenter)

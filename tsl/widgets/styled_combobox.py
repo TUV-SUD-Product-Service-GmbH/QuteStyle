@@ -24,7 +24,6 @@ from PyQt5.QtWidgets import (
 
 from tsl.style import get_color
 from tsl.widgets.custom_icon_engine import PixmapStore
-from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -122,9 +121,6 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
 
         # add some spacing between the items
         cast(QListView, self.view()).setSpacing(2)
-
-        # add checkbox delegate for custom checkboxes
-        self.setItemDelegate(StyledCheckboxDelegate())
 
     @property
     def single_mode(self) -> bool:

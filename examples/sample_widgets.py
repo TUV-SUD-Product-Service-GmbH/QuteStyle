@@ -35,7 +35,6 @@ from tsl.helper import create_tooltip
 from tsl.widgets.base_widgets import MainWidget
 from tsl.widgets.custom_icon_engine import CustomIconEngine
 from tsl.widgets.drop_label import DropLabel
-from tsl.widgets.styled_checkbox_delegate import StyledCheckboxDelegate
 
 
 class TestWidget(MainWidget):
@@ -203,7 +202,7 @@ class ModelViewWidget(MainWidget):
         self._view = QListView()
         self._settings_widget: None | QWidget = None
         layout.addWidget(self._view)
-        model = Model(["A", "B", "C"])
+        model = Model(["Item1", "Item2", "Item3\nwith line break"])
 
         for row in range(model.rowCount()):
             index = model.index(row)
@@ -213,8 +212,6 @@ class ModelViewWidget(MainWidget):
                 Qt.CheckStateRole,
             )
         self._view.setModel(model)
-        delegate = StyledCheckboxDelegate()
-        self._view.setItemDelegateForColumn(0, delegate)
 
     @property
     def settings_widget(self) -> QWidget:

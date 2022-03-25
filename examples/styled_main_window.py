@@ -14,13 +14,7 @@ from PyQt5.QtWidgets import (
 )
 
 from examples.sample_widgets import ModelViewWidget, TestWidget
-from tsl.style import (
-    THEMES,
-    Themes,
-    get_current_style,
-    get_style,
-    set_current_style,
-)
+from tsl.style import THEMES, get_current_style
 from tsl.tsl_main_gui import TSLStyledMainWindow
 from tsl.update_window import AppData
 from tsl.widgets.base_widgets import BaseWidget, SettingsBaseWidget
@@ -120,11 +114,11 @@ class StyledMainWindow(TSLStyledMainWindow):
 
         try:
             self._current_idx = (
-                Themes.SNOW_WHITE,
-                Themes.DARCULA,
-                Themes.PRINCESS_PINK,
-                Themes.HIGHBRIDGE_GRAY,
-                Themes.RUBY_RED,
+                "Snow White",
+                "Princess Pink",
+                "Darcula",
+                "Highbridge Gray",
+                "Ruby Red",
             ).index(get_current_style())
         except KeyError:
             self._current_idx = 0
@@ -135,7 +129,5 @@ class StyledMainWindow(TSLStyledMainWindow):
         self._current_idx += 1
         if self._current_idx == len(THEMES.keys()):
             self._current_idx = 0
-        style_name = tuple(THEMES.keys())[self._current_idx]
-        set_current_style(style_name)
-        self.setStyleSheet(get_style())
-        self.update()
+        style = list(THEMES.keys())[self._current_idx]
+        self.on_change_theme(style)
