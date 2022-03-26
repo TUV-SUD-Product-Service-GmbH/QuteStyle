@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from PyQt5.QtWidgets import QWidget
 
-from tsl.widgets.styled_combobox import CheckableComboBox
+from qute_style.widgets.styled_combobox import CheckableComboBox
 
 
 class TestComboBox(CheckableComboBox[int]):

@@ -7,8 +7,8 @@ import pytest
 from PyQt5.QtGui import QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
-from tsl.dev.mocks import CallList, check_call
-from tsl.widgets.icon import Icon
+from qute_style.dev.mocks import CallList, check_call
+from qute_style.widgets.icon import Icon
 
 
 @pytest.fixture(name="radius", scope="session")

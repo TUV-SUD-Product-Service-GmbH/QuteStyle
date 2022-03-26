@@ -10,5 +10,4 @@ pylint-sqlalchemy==0.2.0
 pytest==6.2.5
 pytest-qt==4.0.2
 requests==2.26.0
-sqlalchemy2-stubs==0.0.2a19
 types-requests==2.26.2

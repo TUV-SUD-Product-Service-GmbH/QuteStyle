@@ -53,7 +53,7 @@ repos:
     rev: '4.0.1'
     hooks:
     -   id: flake8
-        exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*|resources_rc.py"
+        exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py"
         args: # arguments to configure flake8
           - "--max-line-length=79"
           - "--max-complexity=18"
@@ -70,14 +70,14 @@ repos:
         language: system
         types: [ python ]
         args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
-        exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*"
+        exclude: ".*venv/.*|.*qute_style/gen/.*"
 
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle
     rev: 6.1.1
     hooks:
       - id: pydocstyle
-        exclude: ".*venv/.*|.*generated_models/.*|.*tsl/gen/.*|resources_rc.py|__init__.py"
+        exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py|__init__.py"
 
 # Should be activated once there is time to check setup.py:
 #  - repo: https://github.com/regebro/pyroma

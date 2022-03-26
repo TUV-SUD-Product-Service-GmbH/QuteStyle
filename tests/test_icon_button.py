@@ -5,9 +5,9 @@ from _pytest.monkeypatch import MonkeyPatch
 from PyQt5.QtGui import QColor, QPaintDevice, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
-from tsl.style import get_color
-from tsl.widgets.custom_icon_engine import PixmapStore
-from tsl.widgets.icon_button import IconButton
+from qute_style.style import get_color
+from qute_style.widgets.custom_icon_engine import PixmapStore
+from qute_style.widgets.icon_button import IconButton
 
 
 # qtbot is necessary for QPixmap

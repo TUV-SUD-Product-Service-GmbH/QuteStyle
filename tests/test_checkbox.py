@@ -7,7 +7,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel
 from pytestqt.qtbot import QtBot
 
-from tsl.widgets.styled_combobox import CheckableComboBox, TooManyItemsError
+from qute_style.widgets.styled_combobox import (
+    CheckableComboBox,
+    TooManyItemsError,
+)
 
 
 # pylint: disable=protected-access

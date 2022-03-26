@@ -1,8 +1,7 @@
-"""Configuration for ChemUp unit tests with pytest."""
+"""Configuration for unit tests with pytest."""
 from __future__ import annotations
 
 import logging
-import os
 import string
 import sys
 from pathlib import Path
@@ -18,77 +17,32 @@ from PyQt5.QtCore import (
     QCoreApplication,
     QSettings,
     Qt,
-    qInstallMessageHandler,
 )
 from PyQt5.QtWidgets import QStyle, QStyleOptionButton, QStyleOptionViewItem
 
 # ensure that the resources are loaded
-import tsl.resources_rc  # pylint: disable=unused-import  # noqa: F401
-from tests.test_tsl_style_main_window import EmptyWindow
-from tsl import style
-from tsl.dev.mocks import check_call
-from tsl.init import qt_message_handler
-from tsl.tsl_application import TslApplication
-from tsl.tsl_style import ToggleOptionButton, TSLStyle
-from tsl.update_window import AppData
+import qute_style.resources_rc  # pylint: disable=unused-import  # noqa: F401
+from qute_style import style
+from qute_style.dev.mocks import check_call
+
+from qute_style.qs_application import QuteStyleApplication
+from qute_style.qute_style import QuteStyle, ToggleOptionButton
+from qute_style.update_window import AppData
+from tests.test_qs_main_window import EmptyWindowStyled
 
 log = logging.getLogger(  # pylint: disable=invalid-name
-    ".".join(["tsl", __name__])
+    ".".join(["tests", __name__])
 )
 
 TFPATH = Path("tests") / "test_files"
 
 
-def pytest_configure(config: Config) -> None:
-    """Configure the tests."""
-    markers = [
-        "style: Test for styling which will reset global default style.",
-        "pse_db: Configure the PSE Db for usage.",
-        "edoc_db: Configure the eDOC Db for usage.",
-    ]
-    for marker in markers:
-        config.addinivalue_line("markers", marker)
-
-
-def pytest_runtest_setup(item: Function) -> None:
+def pytest_runtest_setup() -> None:
     """Execute this function before every test case."""
-    qInstallMessageHandler(qt_message_handler)
 
-    # raise an exception if the database path isn't configured correctly
-    # see https://pswiki.tuev-sued.com/display/TSL/Unit-Tests
-
-    if "edoc_db" in [mark.name for mark in item.iter_markers()]:
-        # pylint: disable=import-outside-toplevel
-        from tsl.edoc_database import (
-            ENGINE,
-            Base,
-            Staff,
-            _fetch_user_id,
-            session_scope,
-        )
-
-        # pylint: enable=import-outside-toplevel
-
-        assert os.getenv("EDOC_ENV") == "DEV"
-        assert "test_db" in ENGINE.url.query["odbc_connect"]
-        Base.metadata.drop_all()
-        Base.metadata.create_all()
-
-        with session_scope() as session:
-            edoc_user = Staff(
-                ST_WINDOWSID=os.getlogin(),
-                ST_SURNAME="TSL-Toolbox",
-                ST_ACTIVE=True,
-                ST_TYPE=1,
-                ST_SKILLGROUP="00000000",
-                ST_FORENAME="Klaus",
-            )
-            session.add(edoc_user)
-        _fetch_user_id()
-
-    QCoreApplication.setOrganizationName("TÜV SÜD Product Service GmbH")
-    QCoreApplication.setOrganizationDomain("tuvsud.com")
-    QCoreApplication.setApplicationName("tsl-lib")
+    QCoreApplication.setOrganizationName("Sample Organization")
+    QCoreApplication.setOrganizationDomain("sample_organization.com")
+    QCoreApplication.setApplicationName("Test-App")
 
     # Remove the settings stored with QSettings in the registry.
     QSettings().clear()
@@ -104,12 +58,12 @@ def pytest_runtest_teardown(item: Function) -> None:
         style.CURRENT_STYLE = "Darcula"
 
 
-class TSLTestApplication(TslApplication):
+class QuteStyleTestApplication(QuteStyleApplication):
     """TSL Test Application."""
 
-    MAIN_WINDOW_CLASS = EmptyWindow
+    MAIN_WINDOW_CLASS = EmptyWindowStyled
 
-    APP_DATA = AppData("TSL-APP", "2.3.4")
+    APP_DATA = AppData("Test-App", "2.3.4")
 
 
 @pytest.fixture(scope="session")
@@ -120,15 +74,16 @@ def qapp():  # type: ignore
     This is required because a custom QApplication is used and there can
     only be one QApplication during the tests (qtbot also creates one).
     """
-    with check_call(TslApplication, "show_main_window", None, call_count=-1):
-        yield TSLTestApplication(sys.argv, False)
+    with check_call(
+        QuteStyleApplication, "show_main_window", None, call_count=-1
+    ):
+        yield QuteStyleTestApplication(sys.argv, False)
 
 
 def random_string(
     length: int = 5, allow_space: bool = False, new_line: bool = False
 ) -> str:
     """Generate a random string that is length long."""
-    # todo: this is used in ChemUp and Toolbox, but implemented there also,
     # it should be imported and used from library.
     characters = string.ascii_lowercase + string.ascii_uppercase
     if allow_space:
@@ -159,7 +114,7 @@ def fixture_style_option_button(
     option = QStyleOptionButton()
     option.direction = direction
     option.state = state  # type: ignore
-    option.palette = TSLStyle().standardPalette()
+    option.palette = QuteStyle().standardPalette()
     # todo: Fix this in the PyQt5/6 stubs
     option.text = text  # type: ignore
     return option

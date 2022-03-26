@@ -30,11 +30,11 @@ from PyQt5.QtWidgets import (
     QWidgetAction,
 )
 
-from tsl.gen.ui_test_window import Ui_test_widget
-from tsl.helper import create_tooltip
-from tsl.widgets.base_widgets import MainWidget
-from tsl.widgets.custom_icon_engine import CustomIconEngine
-from tsl.widgets.drop_label import DropLabel
+from qute_style.gen.ui_test_window import Ui_test_widget
+from qute_style.helper import create_tooltip
+from qute_style.widgets.base_widgets import MainWidget
+from qute_style.widgets.custom_icon_engine import CustomIconEngine
+from qute_style.widgets.drop_label import DropLabel
 
 
 class TestWidget(MainWidget):
@@ -42,7 +42,6 @@ class TestWidget(MainWidget):
 
     ICON = ":/svg_icons/heart_broken.svg"
     NAME = "Test-Widget"
-    GROUPS: List[str] = ["PS-CPS-TSL-G"]
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new TestWidget."""
@@ -50,7 +49,7 @@ class TestWidget(MainWidget):
         self._ui = Ui_test_widget()
         self._ui.setupUi(self)
         menu = QMenu(self._ui.pushButton_2)
-        all_checkbox = QCheckBox(self.tr("Alles auswählen"))
+        all_checkbox = QCheckBox(self.tr("Select everything"))
         widget_action = QWidgetAction(menu)
         widget_action.setDefaultWidget(all_checkbox)
         menu.addAction(widget_action)
@@ -79,7 +78,7 @@ class TestWidget(MainWidget):
             self._ui.progressBar.setValue
         )
 
-        text = self.tr("Legen Sie Dateien hier ab.")
+        text = self.tr("Drop some files.")
         self._drop_label = DropLabel(text, self._ui.drop_widget)
         self._ui.drop_widget.installEventFilter(self)
         self._ui.clear_drop_button.clicked.connect(self.on_clear_drop)
@@ -94,10 +93,9 @@ class TestWidget(MainWidget):
         self, obj: QObject, event: QEvent
     ) -> bool:
         """Filter and handle QDragEnterEvents and QDropEvents."""
-        if event.type() == QEvent.Drop:
-            if obj is self._ui.drop_widget:
-                self._handle_file_drop(cast(QDropEvent, event))
-                return True
+        if event.type() == QEvent.Drop and obj is self._ui.drop_widget:
+            self._handle_file_drop(cast(QDropEvent, event))
+            return True
         if (
             event.type() == QEvent.DragEnter
             and cast(QDragEnterEvent, event).mimeData().hasUrls()

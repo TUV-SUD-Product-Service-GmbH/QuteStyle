@@ -1,33 +1,27 @@
-"""Setup script for tsl library."""
+"""Setup script for QuteStyle library."""
 from setuptools import setup
 
-from tsl.version import VERSION
+from qute_style.version import VERSION
 
 setup(
-    name="tsl",
+    name="qute_style",
     version=VERSION,
-    description="Library for TSL shared functions",
-    url="https://tfs.itgr.net/TPS/TSL/_dashboards",
-    author="Walid Amokrane, Tilman Krummeck",
+    description="An expandable application framework for Qt",
+    url="https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle",
+    author="Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, "
+    "Gerhard Trapp, Patrick Zwerschke",
     author_email="PS-TF-Entwicklung@tuev-sued.de",
     license="MIT",
     packages=[
-        "tsl",
-        "tsl.gen",
-        "tsl.dev",
-        "tsl.dev.test_procedures",
-        "tsl.widgets",
+        "qute_style",
+        "qute_style.gen",
+        "qute_style.dev",
+        "qute_style.widgets",
     ],
     package_data={
-        "tsl": ["py.typed", "widgets/**/*.py"],
-        "tsl.dev.test_procedures": [
-            "SP_NAV_INSERT_PACKAGE.sql",
-            "SP_NAV_INSERT_PACKAGE_WITH_FILTER.sql",
-        ],
+        "qute_style": ["py.typed", "widgets/**/*.py"],
     },
     install_requires=[
-        "sqlalchemy",
-        "pyodbc",
         "PyQt5",
         "QtWaitingSpinner @ git+https://github.com/z3ntu/QtWaitingSpinner.git",
     ],

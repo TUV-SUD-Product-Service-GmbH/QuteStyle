@@ -10,7 +10,7 @@ if __name__ == "__main__":
     if Path.cwd().stem == "dev_scripts":
         os.chdir(Path.cwd().parent)
 
-    ROOT = Path.cwd() / "tsl"
+    ROOT = Path.cwd() / "qute_style"
     RCS = ROOT / "resources"
     QRC_FILE = RCS / "resources.qrc"
     DIRS = list(RCS.iterdir())
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     print("Generating resource_rc.py with new resources.qrc")
     assert (
-        subprocess.call(["PyRCC5", "-o", ROOT / "resources_rc.py", QRC_FILE])
+        subprocess.call(["pyrcc5", "-o", ROOT / "resources_rc.py", QRC_FILE])
         == 0
     )
 

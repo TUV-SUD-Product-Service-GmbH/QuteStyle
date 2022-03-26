@@ -5,8 +5,8 @@ from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QStyleOption
 from pytestqt.qtbot import QtBot
 
-from tsl.tsl_style import TSLStyle
-from tsl.widgets.toggle import Toggle
+from qute_style.qute_style import QuteStyle
+from qute_style.widgets.toggle import Toggle
 
 
 def test_toggle_x(
@@ -14,12 +14,12 @@ def test_toggle_x(
 ) -> None:
     """Test position and size of the UpdateWindow are stored and loaded."""
     if direction == Qt.LeftToRight:
-        assert TSLStyle.ToggleOptions.toggle_x(style_option_button) == 0
+        assert QuteStyle.ToggleOptions.toggle_x(style_option_button) == 0
     else:
         assert (
-            TSLStyle.ToggleOptions.toggle_x(style_option_button)
+            QuteStyle.ToggleOptions.toggle_x(style_option_button)
             == style_option_button.rect.width()
-            - TSLStyle.ToggleOptions.BOX_WIDTH
+            - QuteStyle.ToggleOptions.BOX_WIDTH
         )
 
 
@@ -29,27 +29,27 @@ def test_label_x(
     """Test position and size of the UpdateWindow are stored and loaded."""
     if direction == Qt.LeftToRight:
         expected = (
-            TSLStyle.ToggleOptions.BOX_WIDTH + TSLStyle.ToggleOptions.SPACER
+            QuteStyle.ToggleOptions.BOX_WIDTH + QuteStyle.ToggleOptions.SPACER
         )
     else:
         expected = 0
 
-    assert TSLStyle.ToggleOptions.label_x(style_option_button) == expected
+    assert QuteStyle.ToggleOptions.label_x(style_option_button) == expected
 
 
 def test_size_hint(qtbot: QtBot) -> None:
     """Test that the Toggle.sizeHint() works correctly."""
     with qtbot.captureExceptions() as exceptions:
         toggle = Toggle()
-        width = TSLStyle.ToggleOptions.BOX_WIDTH
+        width = QuteStyle.ToggleOptions.BOX_WIDTH
         assert toggle.sizeHint() == QSize(
-            width, TSLStyle.ToggleOptions.BOX_HEIGHT
+            width, QuteStyle.ToggleOptions.BOX_HEIGHT
         )
         toggle.setText("Test")
         assert toggle.sizeHint() == QSize(
             width
             + QFontMetrics(toggle.font()).horizontalAdvance(toggle.text())
-            + TSLStyle.ToggleOptions.SPACER,
-            TSLStyle.ToggleOptions.BOX_HEIGHT,
+            + QuteStyle.ToggleOptions.SPACER,
+            QuteStyle.ToggleOptions.BOX_HEIGHT,
         )
     assert not exceptions

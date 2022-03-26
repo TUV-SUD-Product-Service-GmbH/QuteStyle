@@ -4,9 +4,9 @@ from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
+from qute_style.style import DEFAULT_STYLE, get_color, set_current_style
+from qute_style.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 from tests.test_update_window import create_new_tsl_main_window
-from tsl.style import DEFAULT_STYLE, get_color, set_current_style
-from tsl.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
 
 # qtbot is necessary for QPixmap

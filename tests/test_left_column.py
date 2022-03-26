@@ -9,10 +9,10 @@ from _pytest.fixtures import SubRequest
 from PyQt5.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
 
-from examples.styled_main_window import InfoWidget, SettingsWidget
-from tsl.dev.mocks import check_call
-from tsl.widgets.base_widgets import BaseWidget, SettingsBaseWidget
-from tsl.widgets.left_column import LeftColumn
+from examples.sample_main_window import InfoWidget, SettingsWidget
+from qute_style.dev.mocks import check_call
+from qute_style.widgets.base_widgets import BaseWidget, SettingsBaseWidget
+from qute_style.widgets.left_column import LeftColumn
 
 
 @pytest.fixture(name="left_column")

@@ -1,70 +1,22 @@
-"""Tests for tsl.helper."""
-from pathlib import Path
+"""Test helper methods."""
+import sys
 
 import pytest
 
-from tsl.edoc_database import Process, Project, session_scope
-from tsl.helper import get_process_path, get_project_path
+from qute_style.helper import check_ide
 
 
-@pytest.mark.edoc_db
-def test_check_project_path() -> None:
-    """Test getting a project path works as expected."""
-    with session_scope() as session:
-        session.add(
-            Project(
-                P_ID=1234575,
-                P_FOLDER=r"Projects\2018\1234575",
-                P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
-                P_RETEST=False,
-                MD_ID=1,
-                CATEGORY_ID=1,
-            )
-        )
-        session.add(
-            Project(
-                P_ID=1504436,
-                P_FOLDER=r"Projects\2020\1504436",
-                P_WC_ID="BB8E7738-0ACB-423C-8626-18AA3355B8FF",
-                P_RETEST=False,
-                MD_ID=1,
-                CATEGORY_ID=1,
-            )
-        )
-    assert get_project_path(1234575) == Path(
-        r"\\de001.itgr.net\PS\RF-UnitCentralPS_"
-        r"PSE\CPS\Projects\2018\1234575"
-    )
-    assert get_project_path(1504436) == Path(
-        r"\\de001.itgr.net\PS\RF-UnitCentralPS_"
-        r"PSE\CPS\Projects\2020\1504436"
-    )
-
-
-@pytest.mark.edoc_db
-def test_check_project_path_fail() -> None:
-    """Test getting a project path works as expected."""
-    with pytest.raises(ValueError):
-        get_project_path(1234567)
-
-
-@pytest.mark.edoc_db
-def test_check_process_path() -> None:
-    """Test getting a project path works as expected."""
-    with session_scope() as session:
-        session.add(
-            Process(
-                PC_ID=20000, PC_PATH=r"Prozesse\2015\20000", PC_DISABLED=False
-            )
-        )
-    assert get_process_path(20000) == Path(
-        r"\\de001.itgr.net\PS\RF-UnitCentralPS_"
-        r"PSE\CPS\PSEX\Prozesse\2015\20000"
-    )
-
-
-@pytest.mark.edoc_db
-def test_check_process_path_fail() -> None:
-    """Test getting a project path works as expected."""
-    with pytest.raises(ValueError):
-        get_project_path(9999999)
+@pytest.mark.parametrize(
+    "path,result",
+    (
+        (r"C:\test\test.exe", False),
+        (r"C:\test\test", False),
+        (r"C:\test\test.py", True),
+    ),
+)
+def test_check_ide(path: str, result: bool) -> None:
+    """Test that the check_ide method returns the correct result."""
+    old_path = sys.argv[0]
+    sys.argv[0] = path
+    assert check_ide() == result
+    sys.argv[0] = old_path

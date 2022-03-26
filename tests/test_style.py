@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
 
-from tsl.style import (
+from qute_style.style import (
     DEFAULT_STYLE,
     THEMES,
     get_color,

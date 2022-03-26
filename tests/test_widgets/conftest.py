@@ -7,7 +7,7 @@ from _pytest.fixtures import SubRequest
 from PyQt5.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
-from tsl.style import THEMES
+from qute_style.style import THEMES
 
 
 @pytest.fixture(scope="class", name="qtbot")
