@@ -1,0 +1,14 @@
+html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
+html{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{margin:0}
+html,body{font-family:Verdana,sans-serif;font-size:15px;line-height:1.5}
+html{overflow-x:hidden}
+h1{font-size:36px}
+h2{font-size:30px}
+.card:hover{box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)}
+.container:after,.container:before{content:"";display:table;clear:both}
+.tsl-ul{list-style-type:none;padding:0;margin:0}
+.tsl-ul li{padding:8px 16px;border-bottom:1px solid #ddd}
+.tsl-ul li:last-child{border-bottom:none}
+.border-top{border-top:1px solid #ccc!important}
+.border-bottom{border-bottom:1px solid #ccc!important}

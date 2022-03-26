@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   enable-background="new 0 0 24 24"
+   height="56"
+   viewBox="0 0 24 24"
+   width="56"
+   fill="#000000"
+   version="1.1"
+   id="svg20936"
+   sodipodi:docname="package_commander.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata20942">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs20940" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="933"
+     inkscape:window-height="480"
+     id="namedview20938"
+     showgrid="false"
+     inkscape:zoom="4.2142857"
+     inkscape:cx="7.2173814"
+     inkscape:cy="28"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g20934" />
+  <g
+     id="g20934">
+    <rect
+       fill="none"
+       height="24"
+       width="24"
+       id="rect20930" />
+    <path
+       d="M 6.996,16.8 3.6,13.404 l 1.692,-1.692 1.692,1.692 4.248,-4.248 1.692,1.692 z M 18.492,13.2 20.4,15.108 18.708,16.8 16.8,14.892 14.892,16.8 13.2,15.108 15.108,13.2 13.2,11.292 14.892,9.6 16.8,11.508 18.708,9.6 20.4,11.292 Z M 21.6,4.8 H 12 L 9.6,2.4 H 2.4 C 1.08,2.4 0.012,3.48 0.012,4.8 L 0,19.2 c 0,1.32 1.08,2.4 2.4,2.4 h 19.2 c 1.32,0 2.4,-1.08 2.4,-2.4 V 7.2 C 24,5.88 22.92,4.8 21.6,4.8 Z m 0,14.4 H 2.4 V 4.8 h 6.204 l 2.4,2.4 H 21.6 Z"
+       id="path20932"
+       inkscape:connector-curvature="0"
+       style="stroke-width:1.20000005" />
+  </g>
+</svg>
