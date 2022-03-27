@@ -2,7 +2,7 @@
 
 QuteStyle is an expandable application framework for PyQt5 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
 The main goal of this project is to provide a simple and easy to use application frame that can be used to create a new application.
-It is mainly suited for applications that rely on a center widget that shows a selected widget from the left menu.
+It is mainly suited for applications that rely on a center widget for user interaction. Functionality is extendable by having different widgets that can be loaded into that center widget area.
 
 **Project status**
 
@@ -50,7 +50,6 @@ from PyQt5.QtWidgets import QApplication
 from examples.sample_main_window import StyledMainWindow
 from qute_style.qs_application import QuteStyleApplication
 from qute_style.update_window import AppData
-import sys
 
 class MyApplication(QuteStyleApplication):
     # take a look at examples.sample_main_window and examples.sample_widgets
@@ -88,7 +87,7 @@ python -m examples.main
 
 ## License
 
-The original design idea is from [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6) (MIT License).
+The original design idea is from [Wanderson-Magalhaes](https://github.com/Wanderson-Magalhaes) and his project [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6) (MIT License).
 The svg files are derived from [Material design icons](https://fonts.google.com/icons) (Apache License Version 2.0). Other files are covered by QuteStyle's MIT license.
 
 ## Contributing
