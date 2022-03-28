@@ -10,6 +10,7 @@ It is mainly suited for applications that rely on a center widget for user inter
 [![Qt Versions](https://img.shields.io/badge/Qt-5-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/github/license/TUV-SUD-Product-Service-GmbH/QuteStyle.svg?color=green)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/LICENSE/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/python/black)
+[![Code Coverage](https://codecov.io/github/TUV-SUD-Product-Service-GmbH/QuteStyle/coverage.svg?branch=master&token=)](https://codecov.io/gh/TUV-SUD-Product-Service-GmbH/QuteStyle)
 
 ## Features
 
