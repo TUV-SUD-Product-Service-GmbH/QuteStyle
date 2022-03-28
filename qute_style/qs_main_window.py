@@ -44,14 +44,6 @@ from qute_style.widgets.title_bar import TitleBar
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-def get_app_language() -> str:
-    """Get the currently set language to use for the ui."""
-    sys_lang = QLocale().system().name()[:2]
-    lang = QSettings().value("lang", sys_lang)
-    assert isinstance(lang, str)
-    return lang
-
-
 class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
     TSLMainWindow
 ):
@@ -188,6 +180,14 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
     WidgetT = TypeVar("WidgetT", MainWidget, BaseWidget)
 
     @staticmethod
+    def get_app_language() -> str:
+        """Get the currently set language to use for the ui."""
+        sys_lang = QLocale().system().name()[:2]
+        lang = QSettings().value("lang", sys_lang)
+        assert isinstance(lang, str)
+        return lang
+
+    @staticmethod
     def get_widgets_to_display(
         widgets: List[Type[Union[WidgetT]]],
     ) -> List[Type[WidgetT]]:
@@ -217,7 +217,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
                     (
                         self._app_data.app_name,
                         self._app_data.app_icon,
-                        get_app_language().lower(),
+                        QuteStyleMainWindow.get_app_language().lower(),
                     ),
                     self._visible_widgets,
                 )
