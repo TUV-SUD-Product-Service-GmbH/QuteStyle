@@ -120,16 +120,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
         self._threads_to_run: List[Type[StartupThread]] = copy(
             self.STARTUP_THREADS
         )
-
-        # need to hold a reference to the threads until finished
-        self._threads_running: List[StartupThread] = []
-        self._threads_finished: List[StartupThread] = []
-
-        if self._threads_to_run:
-            self._run_threads()
-        else:
-            # if startup threads are empty show the main window
-            self.show_main_window()
+        self._handle_startup_threads()
 
     def check_startup_thread_configuration(self) -> None:
         """
@@ -150,6 +141,12 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
                     thread.EXIT_FUNCTION_PRIORITY not in thread_priorities
                 ), "EXIT_FUNCTION_PRIORITY of startup threads must be unique"
                 thread_priorities.append(thread.EXIT_FUNCTION_PRIORITY)
+
+    def _handle_startup_threads(self) -> None:
+        """Handle startup threads if any."""
+        # reimplement this method to handle starting threads or for
+        # example removing threads before start
+        self.show_main_window()
 
     def _run_threads(self) -> None:
         """Start processing the startup threads."""
