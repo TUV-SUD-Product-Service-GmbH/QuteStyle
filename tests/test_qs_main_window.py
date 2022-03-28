@@ -302,20 +302,6 @@ def test_no_widget_on_column(
             )
 
 
-def test_display_column_widgets(qtbot: QtBot) -> None:
-    """Test display of widgets dependent on user group."""
-    window = create_new_main_window(qtbot, ColumnVisibleWindowStyled)
-
-    # Check that one column widget is visible, the other not
-    assert window._left_column.widget(ColumnVisible)
-    with pytest.raises(ValueError):
-        window._left_column.widget(ColumnInvisible)
-    assert window._left_column._stacked_widget.count() == 1
-
-    assert window._right_content.widget(0).__class__ is ColumnVisible
-    assert window._right_content.count() == 1
-
-
 def test_title_bar_text(qtbot: QtBot) -> None:
     """Test title bar text."""
     window = create_new_main_window(qtbot, StyledMainWindow)
