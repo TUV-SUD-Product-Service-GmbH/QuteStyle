@@ -1,0 +1,25 @@
+name: Pylint
+on: [push]
+
+jobs:
+  lint:
+    name: Run Pylint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r dev_requirements.txt
+
+    - name: Analysing the code with pylint
+      run: |
+        find . -name '*.py' -exec pylint {} \;
