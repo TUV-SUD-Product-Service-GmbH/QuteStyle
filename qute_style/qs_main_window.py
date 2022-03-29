@@ -114,7 +114,8 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
 
         # Get widgets to set visible
         self._visible_widgets = self._get_widgets_to_display(
-            self.MAIN_WIDGET_CLASSES)
+            self.MAIN_WIDGET_CLASSES
+        )
 
         # Add the left menu.
         self._left_menu = self._add_left_menu(self._background.layout())
@@ -304,7 +305,9 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
 
         left_column = LeftColumn(
             app_parent=self.centralWidget(),
-            widget_types=self._get_widgets_to_display(self.LEFT_WIDGET_CLASSES),
+            widget_types=self._get_widgets_to_display(
+                self.LEFT_WIDGET_CLASSES
+            ),
             parent=left_column_frame,
         )
         left_column_layout.addWidget(left_column)
@@ -332,7 +335,8 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
             app_parent=self.centralWidget(),
             main_widgets=self._visible_widgets,
             left_column_widgets=self._get_widgets_to_display(
-                self.LEFT_WIDGET_CLASSES),
+                self.LEFT_WIDGET_CLASSES
+            ),
         )
         left_menu_layout.addWidget(left_menu)
         left_menu_frame.setFixedWidth(
