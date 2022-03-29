@@ -9,7 +9,7 @@ setup(
     description="An expandable application framework for Qt",
     url="https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle",
     author="Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, "
-    "Gerhard Trapp, Patrick Zwerschke",
+    "Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke",
     author_email="PS-TF-Entwicklung@tuev-sued.de",
     license="MIT",
     packages=[

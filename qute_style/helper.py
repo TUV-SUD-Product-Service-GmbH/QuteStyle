@@ -38,7 +38,7 @@ def decode_pixmap(pixmap_string: str) -> QPixmap:
     return qpixmap
 
 
-class StyledWaitingSpinner(QtWaitingSpinner):  # type: ignore
+class StyledWaitingSpinner(QtWaitingSpinner):
     """Styled Version of QWaitingSpinner."""
 
     def paintEvent(  # pylint: disable=invalid-name, arguments-renamed

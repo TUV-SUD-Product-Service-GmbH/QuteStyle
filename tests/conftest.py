@@ -10,21 +10,15 @@ from typing import Optional, cast
 
 import PyQt5
 import pytest
-from _pytest.config import Config
 from _pytest.fixtures import SubRequest
 from _pytest.python import Function
-from PyQt5.QtCore import (
-    QCoreApplication,
-    QSettings,
-    Qt,
-)
+from PyQt5.QtCore import QCoreApplication, QSettings, Qt
 from PyQt5.QtWidgets import QStyle, QStyleOptionButton, QStyleOptionViewItem
 
 # ensure that the resources are loaded
 import qute_style.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from qute_style import style
 from qute_style.dev.mocks import check_call
-
 from qute_style.qs_application import QuteStyleApplication
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
 from qute_style.update_window import AppData
@@ -39,7 +33,6 @@ TFPATH = Path("tests") / "test_files"
 
 def pytest_runtest_setup() -> None:
     """Execute this function before every test case."""
-
     QCoreApplication.setOrganizationName("Sample Organization")
     QCoreApplication.setOrganizationDomain("sample_organization.com")
     QCoreApplication.setApplicationName("Test-App")
@@ -67,7 +60,7 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
 
 @pytest.fixture(scope="session")
-def qapp():  # type: ignore
+def qapp():
     """
     Overwrite pytest's qapp fixture.
 

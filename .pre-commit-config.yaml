@@ -1,3 +1,6 @@
+ci:
+  autofix_prs: false
+
 repos:
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
@@ -7,7 +10,7 @@ repos:
         args: [ "--profile", "black", "-l 79" ]
 
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
         args: [ --safe, --quiet, -l 79 ]
@@ -40,14 +43,6 @@ repos:
       - id: python-no-log-warn
       - id: python-use-type-annotations
 
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [ python ]
-
   # flake8
   - repo: https://github.com/pycqa/flake8
     rev: '4.0.1'
@@ -59,18 +54,19 @@ repos:
           - "--max-complexity=18"
           # E722 (bare except) is handled by pylint
           # W503 (line break before binary operator) that's what black does.
-          - "--ignore=E722,W503"
+          # C901 complexity is handled by pylint
+          # E402 module level import not at top of file (done by pylint)
+          - "--ignore=E722,W503,C901,E402"
         types: [ python ]
 
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.920
     hooks:
       - id: mypy
-        name: mypy
-        entry: mypy
-        language: system
-        types: [ python ]
-        args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
+        types: [ python]
+        args: [ "--ignore-missing-imports", "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases" ]
         exclude: ".*venv/.*|.*qute_style/gen/.*"
+        additional_dependencies: [ "git+https://github.com/python-qt-tools/PyQt5-stubs.git@6b964eb" ]
 
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle
