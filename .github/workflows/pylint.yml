@@ -22,4 +22,4 @@ jobs:
 
     - name: Analysing the code with pylint
       run: |
-        find . -name '*.py' -exec pylint {} \;
+        pylint --rcfile=.pylintrc `ls -dR $PWD/qute_style/*|grep .py$|xargs`
