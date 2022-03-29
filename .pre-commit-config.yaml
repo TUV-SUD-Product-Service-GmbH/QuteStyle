@@ -7,7 +7,7 @@ repos:
         args: [ "--profile", "black", "-l 79" ]
 
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
         args: [ --safe, --quiet, -l 79 ]
@@ -59,7 +59,9 @@ repos:
           - "--max-complexity=18"
           # E722 (bare except) is handled by pylint
           # W503 (line break before binary operator) that's what black does.
-          - "--ignore=E722,W503"
+          # C901 complexity is handled by pylint
+          # E402 module level import not at top of file (done by pylint)
+          - "--ignore=E722,W503,C901,E402"
         types: [ python ]
 
   - repo: local
