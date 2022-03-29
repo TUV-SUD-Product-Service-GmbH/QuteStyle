@@ -10,7 +10,6 @@ from typing import Optional, cast
 
 import PyQt5
 import pytest
-from _pytest.config import Config
 from _pytest.fixtures import SubRequest
 from _pytest.python import Function
 from PyQt5.QtCore import (
@@ -39,7 +38,6 @@ TFPATH = Path("tests") / "test_files"
 
 def pytest_runtest_setup() -> None:
     """Execute this function before every test case."""
-
     QCoreApplication.setOrganizationName("Sample Organization")
     QCoreApplication.setOrganizationDomain("sample_organization.com")
     QCoreApplication.setApplicationName("Test-App")

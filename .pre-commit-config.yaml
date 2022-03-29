@@ -40,14 +40,6 @@ repos:
       - id: python-no-log-warn
       - id: python-use-type-annotations
 
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [ python ]
-
   # flake8
   - repo: https://github.com/pycqa/flake8
     rev: '4.0.1'
@@ -64,15 +56,13 @@ repos:
           - "--ignore=E722,W503,C901,E402"
         types: [ python ]
 
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: '0.920'
     hooks:
       - id: mypy
-        name: mypy
-        entry: mypy
-        language: system
-        types: [ python ]
-        args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
-        exclude: ".*venv/.*|.*qute_style/gen/.*"
+      - types: [ python ]
+      - args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
+      - exclude: ".*venv/.*|.*qute_style/gen/.*"
 
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle
