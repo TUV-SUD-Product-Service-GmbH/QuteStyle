@@ -56,14 +56,6 @@ repos:
           - "--ignore=E722,W503,C901,E402"
         types: [ python ]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: '0.920'
-    hooks:
-      - id: mypy
-      - types: [ python ]
-      - args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini" ]
-      - exclude: ".*venv/.*|.*qute_style/gen/.*"
-
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle
     rev: 6.1.1
