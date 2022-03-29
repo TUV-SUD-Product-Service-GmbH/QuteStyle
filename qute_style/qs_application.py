@@ -120,6 +120,11 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
         self._threads_to_run: List[Type[StartupThread]] = copy(
             self.STARTUP_THREADS
         )
+
+        # need to hold a reference to the threads until finished
+        self._threads_running: List[StartupThread] = []
+        self._threads_finished: List[StartupThread] = []
+
         self._handle_startup_threads()
 
     def check_startup_thread_configuration(self) -> None:

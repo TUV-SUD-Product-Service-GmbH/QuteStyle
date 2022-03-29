@@ -360,7 +360,7 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     assert window.height() == size.height()
 
     window.showNormal()
-    assert window.windowState() == Qt.WindowNoState  # type: ignore
+    assert window.windowState() == Qt.WindowNoState
     assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
 
 

@@ -60,7 +60,7 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
 
 @pytest.fixture(scope="session")
-def qapp():  # type: ignore
+def qapp():
     """
     Overwrite pytest's qapp fixture.
 

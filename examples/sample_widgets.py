@@ -169,7 +169,7 @@ class Model(QStringListModel):
         """Return data for the given role and index."""
         if role == Qt.CheckStateRole:
             return self._check_states[index.data()]
-        return super().data(index, role)  # type: ignore
+        return super().data(index, role)
 
     def setData(  # pylint: disable=invalid-name
         self, index: QModelIndex, value: Qt.CheckState, role: int = Qt.EditRole
