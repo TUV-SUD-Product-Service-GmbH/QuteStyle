@@ -113,7 +113,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         central_widget_layout.addWidget(self._background)
 
         # Get widgets to set visible
-        self._visible_widgets = self.get_widgets_to_display(
+        self._visible_widgets = self._get_widgets_to_display(
             self.MAIN_WIDGET_CLASSES
         )
 
@@ -188,7 +188,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         return lang
 
     @staticmethod
-    def get_widgets_to_display(
+    def _get_widgets_to_display(
         widgets: List[Type[Union[WidgetT]]],
     ) -> List[Type[WidgetT]]:
         """Reimplement to restrict access to certain widgets."""
@@ -253,7 +253,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         content_area_right_layout = QVBoxLayout(right_column_frame)
         content_area_right_layout.setContentsMargins(5, 5, 5, 5)
         right_content = QStackedWidget()
-        for widget in self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES):
+        for widget in self._get_widgets_to_display(self.RIGHT_WIDGET_CLASSES):
             right_content.addWidget(widget())
         content_area_right_layout.addWidget(right_content)
         layout.addWidget(right_column_frame)
@@ -276,7 +276,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         title_bar = TitleBar(
             self,
             self.centralWidget(),
-            self.get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
+            self._get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_data.app_name,
             self._app_data.app_icon,
         )
@@ -305,7 +305,9 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
 
         left_column = LeftColumn(
             app_parent=self.centralWidget(),
-            widget_types=self.get_widgets_to_display(self.LEFT_WIDGET_CLASSES),
+            widget_types=self._get_widgets_to_display(
+                self.LEFT_WIDGET_CLASSES
+            ),
             parent=left_column_frame,
         )
         left_column_layout.addWidget(left_column)
@@ -332,7 +334,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
             parent=left_menu_frame,
             app_parent=self.centralWidget(),
             main_widgets=self._visible_widgets,
-            left_column_widgets=self.get_widgets_to_display(
+            left_column_widgets=self._get_widgets_to_display(
                 self.LEFT_WIDGET_CLASSES
             ),
         )
