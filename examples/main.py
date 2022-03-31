@@ -40,6 +40,7 @@ class QuteStyleCustomApplication(QuteStyleApplication):
         ":/svg_images/logo_toolbox.svg",
         ":/svg_images/logo_toolbox.svg",
         "",
+        "Test Version",
     )
 
 

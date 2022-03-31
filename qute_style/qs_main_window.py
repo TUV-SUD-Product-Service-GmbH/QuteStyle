@@ -160,9 +160,6 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
 
-        # set debug text in title bar, if any
-        self._debug_text = ""
-
         # Activate the first widget to be visible by default.
         if self.MAIN_WIDGET_CLASSES:
             self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
@@ -282,7 +279,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
             self._get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_data.app_name,
             self._app_data.app_icon,
-            self._debug_text,
+            self._app_data.debug_text,
         )
         title_bar.close_app.connect(self.close)
         title_bar.minimize.connect(self.showMinimized)
