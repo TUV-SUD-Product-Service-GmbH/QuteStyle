@@ -75,6 +75,7 @@ class StyledMainWindow(QuteStyleMainWindow):
         parent: QWidget | None = None,
     ) -> None:
         """Create a new StyledMainWindow."""
+        self._debug_text = "This is a Test Version"
         super().__init__(
             app_data,
             force_whats_new,

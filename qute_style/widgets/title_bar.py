@@ -31,6 +31,7 @@ class TitleBar(QFrame):
         right_widget_classes: List[Type[BaseWidget]],
         name: str,
         logo: str,
+        debug_text: str = "",
     ) -> None:
         """Create a new TitleBar."""
         super().__init__(parent)
@@ -60,6 +61,13 @@ class TitleBar(QFrame):
         # moving + min/maximizing of the app itself.
         self._icon.installEventFilter(self)
         self._title_label.installEventFilter(self)
+
+        # set debug label if any
+        debug_label = QLabel(debug_text)
+        debug_label.setObjectName("db_label")
+        debug_label.setAlignment(Qt.AlignVCenter)
+        debug_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        bg_layout.addWidget(debug_label)
 
         # Button for the right column
         for widget_class in right_widget_classes:
