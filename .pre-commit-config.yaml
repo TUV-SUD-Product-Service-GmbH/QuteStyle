@@ -1,5 +1,6 @@
 ci:
   autofix_prs: false
+  skip: [ 'pylint' ]
 
 repos:
   - repo: https://github.com/pycqa/isort
@@ -74,6 +75,14 @@ repos:
     hooks:
       - id: pydocstyle
         exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py|__init__.py"
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [ python ]
 
 # Should be activated once there is time to check setup.py:
 #  - repo: https://github.com/regebro/pyroma
