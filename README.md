@@ -28,9 +28,21 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 ## Themes
 
-### Darcula Theme
+### Darcula
 
-# todo: add images
+![Darcula](./examples/example_images/darcula.PNG)
+
+### Highbridge Grey
+![Highbridge Grey](./examples/example_images/highbridge_grey.PNG)
+
+### Princess Pink
+![Princess Pink](./examples/example_images/princesspink.PNG)
+
+### Snow White
+![Snow Withe](./examples/example_images/snowwhite.PNG)
+
+### Ruby Red
+![Ruby Red](./examples/example_images/rubyred.PNG)
 
 ## Requirements
 
@@ -82,6 +94,8 @@ if __name__ == "__main__":
     APP = MyApplication(sys.argv)
     sys.exit(APP.exec())
 ```
+
+For further information, see our [documentation](./docs/README.md).
 
 ## Example
 
