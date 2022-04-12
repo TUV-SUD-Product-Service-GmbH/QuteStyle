@@ -38,7 +38,7 @@ log = logging.getLogger(
 class CustomSplashScreen(QSplashScreen):
     """Custom Splash screen for startup of app."""
 
-    def __init__(self, app_data: AppData):
+    def __init__(self, app_data: AppData) -> None:
         """Init CustomSplashScreen."""
         super().__init__()
         style_sheet = get_style()
@@ -96,7 +96,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 
     APP_DATA: AppData
 
-    def __init__(self, argv: List[str], show_splash: bool = True):
+    def __init__(self, argv: List[str], show_splash: bool = True) -> None:
         """Init QuteStyleApplication."""
         super().__init__(argv)
 

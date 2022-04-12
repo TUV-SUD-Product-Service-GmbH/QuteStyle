@@ -1,7 +1,7 @@
 name: Pylint
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, unlabeled, closed]
+    types: [opened, synchronize, reopened, ready_for_review, unlabeled]
     branches:
       - master
 
