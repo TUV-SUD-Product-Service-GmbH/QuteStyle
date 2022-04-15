@@ -5,6 +5,8 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, unlabeled]
     branches:
       - master
+  schedule:
+    - cron: '22 12 * * 6'
 
 jobs:
   analyze:
