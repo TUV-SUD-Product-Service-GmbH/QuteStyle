@@ -127,6 +127,14 @@ class Ui_test_widget(object):
         self.checkBox_5.setTristate(True)
         self.checkBox_5.setObjectName("checkBox_5")
         self.verticalLayout_5.addWidget(self.checkBox_5)
+        self.custom_icon_engine_checkbox = QtWidgets.QCheckBox(self.groupBox)
+        self.custom_icon_engine_checkbox.setObjectName(
+            "custom_icon_engine_checkbox"
+        )
+        self.verticalLayout_5.addWidget(self.custom_icon_engine_checkbox)
+        self.icon_checkbox = QtWidgets.QCheckBox(self.groupBox)
+        self.icon_checkbox.setObjectName("icon_checkbox")
+        self.verticalLayout_5.addWidget(self.icon_checkbox)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.checkBox_3 = Toggle(self.groupBox)
@@ -327,6 +335,12 @@ class Ui_test_widget(object):
         self.radioButton_2.setText(_translate("test_widget", "RadioButton"))
         self.radioButton_3.setText(_translate("test_widget", "RadioButton"))
         self.checkBox_5.setText(_translate("test_widget", "CheckBox"))
+        self.custom_icon_engine_checkbox.setText(
+            _translate("test_widget", "Checkbox with CustomIconEngine")
+        )
+        self.icon_checkbox.setText(
+            _translate("test_widget", "CheckBox with QIcon")
+        )
         self.checkBox_3.setText(
             _translate(
                 "test_widget",

@@ -8,6 +8,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QEvent, QModelIndex, QObject, QPoint, Qt, pyqtSlot
 from PyQt5.QtGui import (
     QFontMetrics,
+    QIcon,
     QMouseEvent,
     QPainter,
     QResizeEvent,
@@ -23,7 +24,7 @@ from PyQt5.QtWidgets import (
 )
 
 from qute_style.style import get_color
-from qute_style.widgets.custom_icon_engine import PixmapStore
+from qute_style.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
@@ -243,12 +244,20 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         icon_color: str | None = None,
     ) -> None:
         """Add an Item to the Combobox."""
+        assert not (
+            icon_color and not icon_path
+        ), "Color can only be passed together with an icon (path)"
         item = QStandardItem(text)
         item.setData(data)
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
         item.setData(Qt.Unchecked, Qt.CheckStateRole)
-        item.setData(icon_path, Qt.DecorationRole)
-        item.setData(icon_color, Qt.ForegroundRole)
+        if icon_path:
+            item.setData(
+                QIcon(CustomIconEngine(icon_path, "foreground")),
+                Qt.DecorationRole,
+            )
+            if icon_color:
+                item.setData(icon_color, Qt.ForegroundRole)
         cast(QStandardItemModel, self.model()).appendRow(item)
         self.update_text()
 

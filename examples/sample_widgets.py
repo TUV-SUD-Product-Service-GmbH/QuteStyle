@@ -9,6 +9,7 @@ from PyQt5.QtCore import (
     QFileInfo,
     QModelIndex,
     QObject,
+    QSize,
     QStringListModel,
     Qt,
     pyqtSlot,
@@ -48,6 +49,12 @@ class TestWidget(MainWidget):
         super().__init__(parent)
         self._ui = Ui_test_widget()
         self._ui.setupUi(self)
+        heart_path = ":/svg_icons/heart_broken.svg"
+        icon = QIcon(CustomIconEngine(heart_path, "foreground"))
+        self._ui.custom_icon_engine_checkbox.setIcon(icon)
+        self._ui.custom_icon_engine_checkbox.setIconSize(QSize(16, 16))
+        self._ui.icon_checkbox.setIcon(QIcon(heart_path))
+        self._ui.icon_checkbox.setIconSize(QSize(16, 16))
         menu = QMenu(self._ui.pushButton_2)
         all_checkbox = QCheckBox(self.tr("Select everything"))
         widget_action = QWidgetAction(menu)
@@ -66,11 +73,7 @@ class TestWidget(MainWidget):
         self._ui.disable_widgets.clicked.connect(self.on_widgets_disabled)
         self._ui.transparent_combobox.setProperty("cssClass", "transparent")
         self._ui.pushButton_2.setMenu(menu)
-        self._ui.pushButton_2.setIcon(
-            QIcon(
-                CustomIconEngine(":/svg_icons/heart_broken.svg", "foreground")
-            )
-        )
+        self._ui.pushButton_2.setIcon(icon)
         self._ui.pushButton_4.set_icon(":/svg_icons/accept.svg")
         self._ui.splitter_button.setText("Change orientation")
         self._ui.splitter_button.clicked.connect(self.on_change_orientation)
