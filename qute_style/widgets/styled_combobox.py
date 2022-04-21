@@ -244,9 +244,10 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         icon_color: str | None = None,
     ) -> None:
         """Add an Item to the Combobox."""
-        assert not (
-            icon_color and not icon_path
-        ), "Color can only be passed together with an icon (path)"
+        if icon_color and not icon_path:
+            raise AssertionError(
+                "Color can only be passed together with an icon (path)"
+            )
         item = QStandardItem(text)
         item.setData(data)
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
