@@ -1,4 +1,6 @@
 """Tests for StyledComboBox and CheckableComboBox."""
+from __future__ import annotations
+
 from random import randint
 from typing import List, cast
 
@@ -12,8 +14,10 @@ from qute_style.widgets.styled_combobox import (
     TooManyItemsError,
 )
 
-
 # pylint: disable=protected-access
+from tests.conftest import random_string
+
+
 @pytest.fixture(scope="function", name="cb_items")
 def fixture_cb_items(combobox: CheckableComboBox[int]) -> None:
     """Create several test items."""
@@ -33,6 +37,26 @@ def fixture_combobox(
     combobox.show()
     qtbot.waitUntil(combobox.isVisible)
     return combobox
+
+
+@pytest.mark.parametrize("icon", (None, "", "test.svg"))
+@pytest.mark.parametrize("color", ("foreground", None))
+def test_add_item(
+    combobox: CheckableComboBox[int], icon: str | None, color: str | None
+) -> None:
+    """Test that add_item creates a properly configured QStandardItem."""
+
+    def call():
+        combobox.addItem(random_string(), randint(0, 10), icon, color)
+
+    if color and not icon:
+        with pytest.raises(AssertionError):
+            call()
+    else:
+        call()
+        model = cast(QStandardItemModel, combobox.model())
+        item = model.item(model.rowCount() - 1, 0)
+        assert bool(item.data(Qt.DecorationRole)) is bool(icon)
 
 
 @pytest.mark.parametrize("mode", (False, True))
