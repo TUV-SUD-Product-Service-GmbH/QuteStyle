@@ -42,7 +42,7 @@ Attention: The pixmap store does not handle pixelratio or theme related issues. 
 To make all images available, one can create a new resource_rc.py file by running the script generate_rc.py. 
 The script handles the creation of resources.qrc, by adding everything in the qute_style/resources directory and its subfolders.
 It automatically converts it into resource_rc.py and deletes resources.qrc finally. Like this
-any icon inside the resources folder can be accessed via its path within this folder, for example:
+any icon inside the resources' folder can be accessed via its path within this folder, for example:
 
 ```plaintext
     str_path = ":/svg_icons/accept.svg"

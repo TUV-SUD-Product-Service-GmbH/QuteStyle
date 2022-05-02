@@ -59,15 +59,54 @@ Now the user can adjust single colors to his interest. When the ColorManger rece
 a new theme is created, and the window is updated.
 The paintEvent checks whether the theme has change before painting.
 
-## CreditBar
+## Grips
 
-## Div
+### CornerGrip
 
-## CornerGrip
+### Edge Grip
 
-## Edge Grip
+## ComboBox
 
-## StyledComboBox
+### StyledComboBox
+
+The StyledComboBox implements a custom drawing of the dropdown arrow. 
+For this purpose, we first draw the QComboBox within the ```paintEvent``` with the
+specifications set in the stylesheet by calling ```super().paintEvent(event)```. Next, the
+color for the arrow is retrieved depending whether the ComboBox is enabled or not. Now, the rectangle for drawing
+is defined through the subcontrol of the style. The radius of the arrow pixmap is calculated using the rectangle width and the current
+device`s pixelratio. The [PixmapStore](./style.md#pixmapstore) delivers pixmap, which is then painted over the
+existing arrow.
+
+### CheckableComboBox
+
+The Style of the CheckableComboBox is inherited from the StyledComboBox. The widget enables the user to select,
+one or many items from the dropdown-menü. Per default multiple items can be selected, to change set ```single_mode = True```.
+To retrieve information about the current selected items or to select multiple items programmatically use the getter and setter method ```item_ids```.
+It can be useful to further subclass the CheckableComboBox, for example:
+```plaintext
+class StateCombobox(CheckableComboBox[int]):
+    """Combobox that displays a list of States to be checked."""
+
+    def __init__(self, parent: QWidget = None) -> None:
+        """Create CheckableComboBox with state items."""
+        super().__init__(parent)
+        self._default_text = "No state selected"
+        self.single_mode = True
+
+        # Add states items
+        self.addItem("State 1", 1, ":/state1.svg", "foreground")
+        self.addItem("State 2", 2, ":/state2.svg", "foreground")
+        self.addItem("State 3", 3, ":/state3.svg", "foreground")
+
+    def _get_text(self) -> str:
+        """Return the text that is shown at the top of the combobox."""
+        for idx in range(self.model().rowCount()):
+            if self.model().item(idx).checkState() == Qt.Checked:
+                return self.model().item(idx).text()
+        return self._default_text
+```
+In the example, the datatype of the items (```int```) needs to be specified. The items are added inside the init construction, the icons are optional and displayed next to the checkboxes. 
+The ```_get_text``` method displays the item as "State 1" instead of "1", since the default implementation returns the data.
 
 ## TextTruncator
 
