@@ -30,19 +30,19 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 ### Darcula
 
-![Darcula](./examples/example_images/darcula.PNG)
+![Darcula](examples/example_images/darcula.PNG)
 
 ### Highbridge Grey
-![Highbridge Grey](./examples/example_images/highbridge_grey.PNG)
+![Highbridge Grey](examples/example_images/highbridge_grey.PNG)
 
 ### Princess Pink
-![Princess Pink](./examples/example_images/princesspink.PNG)
+![Princess Pink](examples/example_images/princesspink.PNG)
 
 ### Snow White
-![Snow Withe](./examples/example_images/snowwhite.PNG)
+![Snow Withe](examples/example_images/snowwhite.PNG)
 
 ### Ruby Red
-![Ruby Red](./examples/example_images/rubyred.PNG)
+![Ruby Red](examples/example_images/rubyred.PNG)
 
 ## Requirements
 
