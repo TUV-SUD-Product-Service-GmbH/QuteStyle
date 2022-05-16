@@ -29,7 +29,6 @@ It is mainly suited for applications that rely on a center widget for user inter
 ## Themes
 
 ### Darcula
-
 ![Darcula](./examples/example_images/darcula.PNG)
 
 ### Highbridge Grey

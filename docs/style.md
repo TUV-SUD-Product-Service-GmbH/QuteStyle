@@ -1,8 +1,22 @@
 # Style
 
-## StyleSheet
+[comment]: #(##Stylesheet)
+[comment]: #(##Style.py)
+## Themes
+### Darcula
+![Darcula](.././examples/example_images/darcula.PNG)
 
+### Highbridge Grey
+![Highbridge Grey](.././examples/example_images/highbridge_grey.PNG)
 
+### Princess Pink
+![Princess Pink](.././examples/example_images/princesspink.PNG)
+
+### Snow White
+![Snow Withe](.././examples/example_images/snowwhite.PNG)
+
+### Ruby Red
+![Ruby Red](.././examples/example_images/rubyred.PNG)
 ## Icons and Images
 
 To handle the color of icons and their size during runtime two features are used. 
@@ -41,7 +55,7 @@ Attention: The pixmap store does not handle pixelratio or theme related issues. 
 
 To make all images available, one can create a new resource_rc.py file by running the script generate_rc.py. 
 The script handles the creation of resources.qrc, by adding everything in the qute_style/resources directory and its subfolders.
-It automatically converts it into resource_rc.py and deletes resources.qrc finally. Like this
+It automatically converts it into resource_rc.py and deletes resources.qrc, finally. Like this
 any icon inside the resources' folder can be accessed via its path within this folder, for example:
 
 ```plaintext
