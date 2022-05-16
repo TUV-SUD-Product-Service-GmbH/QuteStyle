@@ -1,7 +1,5 @@
 # Style
 
-[comment]: #(##Stylesheet)
-[comment]: #(##Style.py)
 ## Themes
 ### Darcula
 ![Darcula](.././examples/example_images/darcula.PNG)
