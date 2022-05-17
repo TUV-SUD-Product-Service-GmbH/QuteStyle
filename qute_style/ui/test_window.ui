@@ -250,6 +250,20 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="custom_icon_engine_checkbox">
+          <property name="text">
+           <string>Checkbox with CustomIconEngine</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="icon_checkbox">
+          <property name="text">
+           <string>CheckBox with QIcon</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="Toggle" name="checkBox_3">
