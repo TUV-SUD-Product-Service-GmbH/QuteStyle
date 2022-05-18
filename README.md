@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle">
+    <img src="qute_style/resources/svg_images/banner_qute_style.svg" alt="QuteStyle logo" width="500" height="200">
+  </a>
+</p>
+
 # QuteStyle
 
 QuteStyle is an expandable application framework for PyQt5 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
@@ -13,6 +19,7 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 **Tests**
 
+[![CodeQL](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/CodeQL/badge.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ACodeQL)
 [![Build Status](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ATests)
 [![Code Coverage](https://codecov.io/github/TUV-SUD-Product-Service-GmbH/QuteStyle/coverage.svg?branch=master&token=)](https://codecov.io/gh/TUV-SUD-Product-Service-GmbH/QuteStyle)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master.svg)](https://results.pre-commit.ci/latest/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master)

@@ -6,7 +6,17 @@ import logging
 import sys
 from pathlib import Path
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (
+    QMessageLogContext,
+    Qt,
+    QtCriticalMsg,
+    QtDebugMsg,
+    QtFatalMsg,
+    QtInfoMsg,
+    QtMsgType,
+    QtWarningMsg,
+    qInstallMessageHandler,
+)
 from PyQt5.QtWidgets import QApplication
 
 from examples.sample_main_window import StyledMainWindow
@@ -29,6 +39,39 @@ def create_new_changelog_resource_file(app_name: str) -> None:
     importlib.import_module("examples.resources_cl")
 
 
+def configure_logging() -> None:
+    """Configure logging for the example app."""
+    format_str = (
+        "%(asctime)s.%(msecs)03d %(threadName)10s  - "
+        "%(name)-50s - %(funcName)-25s:%(lineno)-4s - "
+        "%(levelname)-8s - %(message)s"
+    )
+    date_format = "%Y-%m-%d %H:%M:%S"
+    formatter = logging.Formatter(format_str, date_format)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger("qute_style")
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+
+    def qt_message_handler(
+        mode: QtMsgType, _: QMessageLogContext, message: str
+    ) -> None:
+        """Handle messages from Qt logging."""
+        level = {
+            QtDebugMsg: logging.DEBUG,
+            QtInfoMsg: logging.INFO,
+            QtWarningMsg: logging.WARNING,
+            QtCriticalMsg: logging.ERROR,
+            QtFatalMsg: logging.FATAL,
+        }[mode]
+        log.log(level, message)
+
+    qInstallMessageHandler(qt_message_handler)
+
+
 class QuteStyleCustomApplication(QuteStyleApplication):
     """QuteStyleCustomApplication."""
 
@@ -40,15 +83,16 @@ class QuteStyleCustomApplication(QuteStyleApplication):
         ":/svg_images/logo_toolbox.svg",
         ":/svg_images/logo_toolbox.svg",
         "",
+        "Test Version",
     )
 
 
 if __name__ == "__main__":
-    APP_NAME = "Test-App"
+    configure_logging()
 
     # Create the resource file everytime the application starts.
     # No need to add it as a resource for the demo app
-    create_new_changelog_resource_file(APP_NAME)
+    create_new_changelog_resource_file("Test-App")
 
     # activate highdpi icons and scaling
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)

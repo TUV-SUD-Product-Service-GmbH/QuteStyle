@@ -279,6 +279,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
             self._get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_data.app_name,
             self._app_data.app_icon,
+            self._app_data.debug_text,
         )
         title_bar.close_app.connect(self.close)
         title_bar.minimize.connect(self.showMinimized)
