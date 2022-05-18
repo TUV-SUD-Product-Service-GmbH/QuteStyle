@@ -17,7 +17,7 @@
 ![Ruby Red](.././examples/example_images/rubyred.PNG)
 ## Icons and Images
 
-To handle the color of icons and their size during runtime two features are used. 
+To handle the color of icons and their size during runtime two features are used.
 First, the custom implementation of the IconEngine enables the usual use of QIcon. Secondly, the
 created QPixmaps are saved in a dictionary such that they are only created once during runtime.
 
@@ -44,14 +44,14 @@ The PixmapStore is a global handler for commonly used icons. To use, get the cur
 ```
 To keep the original color, set ```color=None```.
 
-The store first checks, if a pixmap with this path, size and color has been created before. If so, this pixmap is returned, 
+The store first checks, if a pixmap with this path, size and color has been created before. If so, this pixmap is returned,
 otherwise a new pixmap will be drawn in correct size and color, and finally saved in the class`s dictionary.
 
 Attention: The pixmap store does not handle pixel-ratio or theme related issues. Make sure you ask for the correct color (hexcode) and dimensions.
 
 ### Resources
 
-To make all images available, one can create a new resource_rc.py file by running the script generate_rc.py. 
+To make all images available, one can create a new resource_rc.py file by running the script generate_rc.py.
 The script handles the creation of resources.qrc, by adding everything in the qute_style/resources directory and its subfolders.
 It automatically converts it into resource_rc.py and deletes resources.qrc, finally. Like this
 any icon inside the resources' folder can be accessed via its path within this folder, for example:
