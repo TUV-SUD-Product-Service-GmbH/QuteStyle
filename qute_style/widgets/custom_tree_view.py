@@ -44,4 +44,3 @@ class CustomTreeView(QTreeView):
                 int(rect.y() + rect.height() / 5),
                 arrow,
             )
-
