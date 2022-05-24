@@ -9,6 +9,7 @@ from qute_style.widgets.custom_icon_engine import PixmapStore
 
 class CustomTreeView(QTreeView):
     """Create custom treeview."""
+
     def drawBranches(  # pylint: disable=invalid-name
         self, painter: QPainter, rect: QtCore.QRect, index: QtCore.QModelIndex
     ) -> None:
@@ -29,17 +30,8 @@ class CustomTreeView(QTreeView):
                     get_color("foreground"),
                 )
 
-            rect_x = int(rect.x() + rect.width() / 3)
-            # The arrows must be moved depending on the tree depth of the item
-            counter = 3
-            root_index = index
-            while root_index.parent().isValid():
-                rect_x = int(rect.x() + rect.width() - rect.width() / counter)
-                root_index = root_index.parent()
-                counter += 1
-
             painter.drawPixmap(
-                rect_x,
+                int(rect.x() + rect.width() / 3),
                 int(rect.y() + rect.height() / 5),
                 arrow,
             )
