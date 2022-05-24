@@ -8,12 +8,10 @@ from qute_style.widgets.custom_icon_engine import PixmapStore
 
 class CustomTreeView(QTreeView):
     """Create custom treeview."""
-
     def drawBranches(  # pylint: disable=invalid-name
         self, painter: QPainter, rect: QtCore.QRect, index: QtCore.QModelIndex
     ) -> None:
         """Draw a unfold/expand arrow."""
-
         if index.model().hasChildren(index):
             if self.isExpanded(index):
                 arrow = PixmapStore.inst().get_pixmap(
