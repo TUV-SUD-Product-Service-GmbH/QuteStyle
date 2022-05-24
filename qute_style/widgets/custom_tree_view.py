@@ -2,6 +2,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QTreeView
+
 from qute_style.style import get_color
 from qute_style.widgets.custom_icon_engine import PixmapStore
 
