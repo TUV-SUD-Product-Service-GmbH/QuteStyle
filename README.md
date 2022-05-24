@@ -35,20 +35,12 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 ## Themes
 
-### Darcula
-![Darcula](./examples/example_images/darcula.PNG)
+QuteStyle provides five themes, defining the color composition of the app.
+Additionally, the use can define new themes. A light and dark mode has been 
+implemented as ```Darcula``` and ```Highbridge Grey```, respectively:
 
-### Highbridge Grey
-![Highbridge Grey](./examples/example_images/highbridge_grey.PNG)
+<img src="./examples/example_images/darcula.PNG" alt="Darcula" width="300" height="200"><img src="./examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="300" height="200">
 
-### Princess Pink
-![Princess Pink](./examples/example_images/princesspink.PNG)
-
-### Snow White
-![Snow Withe](./examples/example_images/snowwhite.PNG)
-
-### Ruby Red
-![Ruby Red](./examples/example_images/rubyred.PNG)
 
 ## Requirements
 

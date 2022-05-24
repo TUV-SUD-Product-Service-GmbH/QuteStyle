@@ -20,6 +20,10 @@
   - [LeftMenuButton and TitleButton](#leftmenubutton-and-titlebutton)
 
 
+Many of our custom widgets can be found in the Test-Application:
+
+![Widgets](.././examples/example_images/widgets_display.PNG)
+
 ## BaseWidget
 
 The BaseWidget aims to define the properties ICON, NAME and GROUPS.

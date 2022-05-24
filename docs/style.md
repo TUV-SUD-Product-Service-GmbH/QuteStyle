@@ -1,20 +1,18 @@
 # Style
 
 ## Themes
-### Darcula
+
+Upon start of the application, the user can select the preferred theme amongst two
+darker themes, ```Darcula``` and ```Princess Pink```, two light themes, ```Highbridge Grey``` and ```Snow White```, 
+and the colorful theme ```Ruby Red```.
+
 ![Darcula](.././examples/example_images/darcula.PNG)
 
-### Highbridge Grey
-![Highbridge Grey](.././examples/example_images/highbridge_grey.PNG)
+Additionally, the colors of the themes can be adjusted or new ones created. For this purpose open the
+color picker and select the colors to be adjusted. For example, changing ```bg_elements``` to a dark blue:
 
-### Princess Pink
-![Princess Pink](.././examples/example_images/princesspink.PNG)
+![Custom Style](.././examples/example_images/custom_style.PNG)
 
-### Snow White
-![Snow Withe](.././examples/example_images/snowwhite.PNG)
-
-### Ruby Red
-![Ruby Red](.././examples/example_images/rubyred.PNG)
 ## Icons and Images
 
 To handle the color of icons and their size during runtime two features are used.
