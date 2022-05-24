@@ -14,7 +14,8 @@ from PyQt5.QtCore import (
     Qt,
     pyqtSlot,
 )
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon, QStandardItemModel, \
+    QStandardItem
 from PyQt5.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
@@ -80,6 +81,16 @@ class TestWidget(MainWidget):
         self._ui.horizontalSlider.valueChanged.connect(
             self._ui.progressBar.setValue
         )
+        treeview_model = QStandardItemModel()
+        deutschland_item = QStandardItem("Deutschland")
+        deutschland_item.appendRow(QStandardItem("Berlin"))
+        europa_item = QStandardItem("Europa")
+        treeview_model.invisibleRootItem().appendRow(deutschland_item)
+        treeview_model.invisibleRootItem().appendRow(europa_item)
+        self._ui.treeView.setModel(treeview_model)
+
+
+
 
         text = self.tr("Drop some files.")
         self._drop_label = DropLabel(text, self._ui.drop_widget)

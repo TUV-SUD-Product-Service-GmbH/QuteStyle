@@ -176,6 +176,27 @@ class Ui_test_widget(object):
         self.verticalLayout_5.addLayout(self.horizontalLayout_4)
         self.verticalLayout_4.addLayout(self.verticalLayout_5)
         self.gridLayout_2.addWidget(self.groupBox, 2, 0, 1, 1)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.disable_widgets = QtWidgets.QCheckBox(test_widget)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        self.disable_widgets.setFont(font)
+        self.disable_widgets.setChecked(False)
+        self.disable_widgets.setObjectName("disable_widgets")
+        self.horizontalLayout.addWidget(self.disable_widgets)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Minimum,
+        )
+        self.horizontalLayout.addItem(spacerItem3)
+        self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(test_widget)
+        self.progressBar.setProperty("value", 30)
+        self.progressBar.setObjectName("progressBar")
+        self.gridLayout_2.addWidget(self.progressBar, 6, 0, 1, 2)
         self.tabWidget = QtWidgets.QTabWidget(test_widget)
         self.tabWidget.setAcceptDrops(True)
         self.tabWidget.setAutoFillBackground(False)
@@ -272,31 +293,18 @@ class Ui_test_widget(object):
         self.clear_drop_button.setObjectName("clear_drop_button")
         self.verticalLayout_6.addWidget(self.clear_drop_button)
         self.tabWidget.addTab(self.tab_4, "")
+        self.tab_6 = QtWidgets.QWidget()
+        self.tab_6.setObjectName("tab_6")
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.tab_6)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.treeView = CustomTreeView(self.tab_6)
+        self.treeView.setObjectName("treeView")
+        self.horizontalLayout_7.addWidget(self.treeView)
+        self.tabWidget.addTab(self.tab_6, "")
         self.gridLayout_2.addWidget(self.tabWidget, 4, 0, 1, 1)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.disable_widgets = QtWidgets.QCheckBox(test_widget)
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        self.disable_widgets.setFont(font)
-        self.disable_widgets.setChecked(False)
-        self.disable_widgets.setObjectName("disable_widgets")
-        self.horizontalLayout.addWidget(self.disable_widgets)
-        spacerItem3 = QtWidgets.QSpacerItem(
-            40,
-            20,
-            QtWidgets.QSizePolicy.Expanding,
-            QtWidgets.QSizePolicy.Minimum,
-        )
-        self.horizontalLayout.addItem(spacerItem3)
-        self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
-        self.progressBar = QtWidgets.QProgressBar(test_widget)
-        self.progressBar.setProperty("value", 30)
-        self.progressBar.setObjectName("progressBar")
-        self.gridLayout_2.addWidget(self.progressBar, 6, 0, 1, 2)
 
         self.retranslateUi(test_widget)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(test_widget)
 
     def retranslateUi(self, test_widget):
@@ -348,13 +356,16 @@ class Ui_test_widget(object):
             )
         )
         self.checkBox_4.setText(_translate("test_widget", "CheckBox"))
+        self.disable_widgets.setText(
+            _translate("test_widget", "Disable Widgets")
+        )
         self.textEdit.setHtml(
             _translate(
                 "test_widget",
                 '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
                 '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
-                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
                 '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>',
             )
         )
@@ -429,12 +440,14 @@ class Ui_test_widget(object):
             self.tabWidget.indexOf(self.tab_4),
             _translate("test_widget", "DropArea"),
         )
-        self.disable_widgets.setText(
-            _translate("test_widget", "Disable Widgets")
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_6),
+            _translate("test_widget", "TreeView"),
         )
 
 
 from examples.sample_classes import TestComboBox
+from qute_style.widgets.custom_tree_view import CustomTreeView
 from qute_style.widgets.icon_button import IconButton
 from qute_style.widgets.styled_combobox import StyledComboBox
 from qute_style.widgets.toggle import Toggle
