@@ -36,10 +36,10 @@ It is mainly suited for applications that rely on a center widget for user inter
 ## Themes
 
 QuteStyle provides five themes, defining the color composition of the app.
-Additionally, the use can define new themes. A light and dark mode has been 
+Additionally, the use can define new themes ([check this out](./docs/style.md)). A light and dark mode has been
 implemented as ```Darcula``` and ```Highbridge Grey```, respectively:
 
-<img src="./examples/example_images/darcula.PNG" alt="Darcula" width="300" height="200"><img src="./examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="300" height="200">
+<img src="./examples/example_images/darcula.PNG" alt="Darcula" width="500" height="300"><img src="./examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="500" height="300">
 
 
 ## Requirements

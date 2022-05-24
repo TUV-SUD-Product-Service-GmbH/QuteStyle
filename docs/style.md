@@ -3,7 +3,7 @@
 ## Themes
 
 Upon start of the application, the user can select the preferred theme amongst two
-darker themes, ```Darcula``` and ```Princess Pink```, two light themes, ```Highbridge Grey``` and ```Snow White```, 
+darker themes, ```Darcula``` and ```Princess Pink```, two light themes, ```Highbridge Grey``` and ```Snow White```,
 and the colorful theme ```Ruby Red```.
 
 ![Darcula](.././examples/example_images/darcula.PNG)
