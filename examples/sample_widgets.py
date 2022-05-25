@@ -4,33 +4,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, cast
 
-from PyQt5.QtCore import (
-    QEvent,
-    QFileInfo,
-    QModelIndex,
-    QObject,
-    QSize,
-    QStringListModel,
-    Qt,
-    pyqtSlot,
-)
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon, QStandardItemModel, \
-    QStandardItem
-from PyQt5.QtWidgets import (
-    QCheckBox,
-    QDialogButtonBox,
-    QFileIconProvider,
-    QHBoxLayout,
-    QLabel,
-    QListView,
-    QMenu,
-    QSizePolicy,
-    QSpacerItem,
-    QTreeWidgetItem,
-    QVBoxLayout,
-    QWidget,
-    QWidgetAction,
-)
+from PyQt5.QtCore import (QEvent, QFileInfo, QModelIndex, QObject, QSize,
+                          QStringListModel, Qt, pyqtSlot)
+from PyQt5.QtGui import (QDragEnterEvent, QDropEvent, QIcon, QStandardItem,
+                         QStandardItemModel)
+from PyQt5.QtWidgets import (QCheckBox, QDialogButtonBox, QFileIconProvider,
+                             QHBoxLayout, QLabel, QListView, QMenu,
+                             QSizePolicy, QSpacerItem, QTreeWidgetItem,
+                             QVBoxLayout, QWidget, QWidgetAction)
 
 from qute_style.gen.ui_test_window import Ui_test_widget
 from qute_style.helper import create_tooltip
@@ -88,9 +69,6 @@ class TestWidget(MainWidget):
         treeview_model.invisibleRootItem().appendRow(deutschland_item)
         treeview_model.invisibleRootItem().appendRow(europa_item)
         self._ui.treeView.setModel(treeview_model)
-
-
-
 
         text = self.tr("Drop some files.")
         self._drop_label = DropLabel(text, self._ui.drop_widget)
