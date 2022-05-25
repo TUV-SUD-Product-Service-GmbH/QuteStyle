@@ -9,7 +9,13 @@ from typing import Generator
 import pytest
 from _pytest.fixtures import SubRequest
 from PyQt5.QtCore import QRect, Qt
-from PyQt5.QtGui import QBrush, QImage, QPainter, QPalette, QPen
+from PyQt5.QtGui import (
+    QBrush,
+    QImage,
+    QPainter,
+    QPalette,
+    QPen,
+)
 from PyQt5.QtWidgets import (
     QCheckBox,
     QProxyStyle,
@@ -25,6 +31,8 @@ from qute_style.dev.mocks import CallList, check_call, check_call_str
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
 
 # Create a QApplication for all tests as we're using QPainter objects.
+from qute_style.style import get_color
+
 pytestmark = pytest.mark.usefixtures("qapp")
 
 
@@ -134,6 +142,56 @@ class TestDrawIndicatorCheckbox:
     def test_rect(calls: CallList, rect: QRect) -> None:
         """Test the QRect is set correctly."""
         assert calls[0][0][2].rect == rect
+
+
+@pytest.fixture(name="qute_style")
+def fixture_qute_style() -> QuteStyle:
+    """Generate a QuteStyle."""
+    qute_style = QuteStyle()
+    return qute_style
+
+
+@pytest.fixture(name="option")
+def fixture_option() -> QStyleOption:
+    """Generate a QStyleOption."""
+    option = QStyleOption()
+    option.state = QStyle.State_Children
+    option.rect.setY(5)
+    option.rect.setX(5)
+    return option
+
+
+def test_get_branch_color(qute_style: QuteStyle, option: QStyleOption) -> None:
+    """Test _get_branch_color."""
+    assert qute_style._get_branch_color(option) == get_color("foreground")
+    option.state = QStyle.State_MouseOver
+    assert qute_style._get_branch_color(option) == get_color("context_hover")
+
+
+def test_get_branch_icon(qute_style: QuteStyle, option: QStyleOption) -> None:
+    """Test _get_branch_color."""
+    assert (
+        qute_style._get_branch_icon(option) == ":/svg_icons/chevron_right.svg"
+    )
+    option.state = QStyle.State_Open
+    assert (
+        qute_style._get_branch_icon(option) == ":/svg_icons/chevron_down.svg"
+    )
+
+
+# pylint: disable=redefined-outer-name
+def test_draw_branches(
+    qtbot: QtBot,
+    qute_style: QuteStyle,
+    option: QStyleOption,
+    painter: QPainter,
+) -> None:
+    """Test the drawBranches Funktion."""
+    with qtbot.captureExceptions() as exceptions:
+        with check_call(QuteStyle, "_get_branch_color"):
+            with check_call(QPainter, "drawPixmap"):
+                qute_style._draw_branch(option, painter)
+    assert not exceptions
 
 
 def test_draw_toggle(

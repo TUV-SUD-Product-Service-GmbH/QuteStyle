@@ -297,9 +297,16 @@ class Ui_test_widget(object):
         self.tab_6.setObjectName("tab_6")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.tab_6)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.treeView = CustomTreeView(self.tab_6)
-        self.treeView.setObjectName("treeView")
-        self.horizontalLayout_7.addWidget(self.treeView)
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.treeWidget = QtWidgets.QTreeWidget(self.tab_6)
+        self.treeWidget.setObjectName("treeWidget")
+        item_0 = QtWidgets.QTreeWidgetItem(self.treeWidget)
+        item_1 = QtWidgets.QTreeWidgetItem(item_0)
+        item_2 = QtWidgets.QTreeWidgetItem(item_1)
+        item_0 = QtWidgets.QTreeWidgetItem(self.treeWidget)
+        self.verticalLayout_7.addWidget(self.treeWidget)
+        self.horizontalLayout_7.addLayout(self.verticalLayout_7)
         self.tabWidget.addTab(self.tab_6, "")
         self.gridLayout_2.addWidget(self.tabWidget, 4, 0, 1, 1)
 
@@ -440,6 +447,22 @@ class Ui_test_widget(object):
             self.tabWidget.indexOf(self.tab_4),
             _translate("test_widget", "DropArea"),
         )
+        self.treeWidget.headerItem().setText(0, _translate("test_widget", "1"))
+        __sortingEnabled = self.treeWidget.isSortingEnabled()
+        self.treeWidget.setSortingEnabled(False)
+        self.treeWidget.topLevelItem(0).setText(
+            0, _translate("test_widget", "Item 1")
+        )
+        self.treeWidget.topLevelItem(0).child(0).setText(
+            0, _translate("test_widget", "Subitem")
+        )
+        self.treeWidget.topLevelItem(0).child(0).child(0).setText(
+            0, _translate("test_widget", "SubSub")
+        )
+        self.treeWidget.topLevelItem(1).setText(
+            0, _translate("test_widget", "Item 2")
+        )
+        self.treeWidget.setSortingEnabled(__sortingEnabled)
         self.tabWidget.setTabText(
             self.tabWidget.indexOf(self.tab_6),
             _translate("test_widget", "TreeView"),
@@ -447,7 +470,6 @@ class Ui_test_widget(object):
 
 
 from examples.sample_classes import TestComboBox
-from qute_style.widgets.custom_tree_view import CustomTreeView
 from qute_style.widgets.icon_button import IconButton
 from qute_style.widgets.styled_combobox import StyledComboBox
 from qute_style.widgets.toggle import Toggle

@@ -604,7 +604,37 @@ p, li { white-space: pre-wrap; }
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
-        <widget class="CustomTreeView" name="treeView"/>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <widget class="QTreeWidget" name="treeWidget">
+           <column>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </column>
+           <item>
+            <property name="text">
+             <string>Item 1</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Subitem</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>SubSub</string>
+              </property>
+             </item>
+            </item>
+           </item>
+           <item>
+            <property name="text">
+             <string>Item 2</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -632,11 +662,6 @@ p, li { white-space: pre-wrap; }
    <class>TestComboBox</class>
    <extends>QComboBox</extends>
    <header>examples.sample_classes</header>
-  </customwidget>
-  <customwidget>
-   <class>CustomTreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">qute_style.widgets.custom_tree_view</header>
   </customwidget>
  </customwidgets>
  <resources/>
