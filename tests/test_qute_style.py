@@ -10,12 +10,20 @@ import pytest
 from _pytest.fixtures import SubRequest
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QBrush, QImage, QPainter, QPalette, QPen
-from PyQt5.QtWidgets import (QCheckBox, QProxyStyle, QStyle, QStyleOption,
-                             QStyleOptionButton, QStyleOptionViewItem, QWidget)
+from PyQt5.QtWidgets import (
+    QCheckBox,
+    QProxyStyle,
+    QStyle,
+    QStyleOption,
+    QStyleOptionButton,
+    QStyleOptionViewItem,
+    QWidget,
+)
 from pytestqt.qtbot import QtBot
 
 from qute_style.dev.mocks import CallList, check_call, check_call_str
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
+
 # Create a QApplication for all tests as we're using QPainter objects.
 from qute_style.style import get_color
 
