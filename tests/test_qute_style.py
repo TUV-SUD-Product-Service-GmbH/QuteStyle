@@ -213,8 +213,8 @@ def test_draw_branches(
                 else 0,
             ):
                 with check_call(
-                    QPainter,
-                    "drawPixmap",
+                    QuteStyle,
+                    "draw_pixmap",
                     call_count=1
                     if option.state == option.state & QStyle.State_Children
                     else 0,
