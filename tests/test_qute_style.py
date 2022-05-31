@@ -184,12 +184,11 @@ def test_get_branch_icon(
     if option.state == option.state & QStyle.State_Children:
         assert (
             qute_style._get_branch_icon(option)
-            == ":/svg_icons/chevron_right.svg"
+            == ":/svg_icons/arrow_right.svg"
         )
         option.state = QStyle.State_Open
         assert (
-            qute_style._get_branch_icon(option)
-            == ":/svg_icons/chevron_down.svg"
+            qute_style._get_branch_icon(option) == ":/svg_icons/arrow_down.svg"
         )
     else:
         with check_call(QPainter, "drawPixmap", call_count=0):

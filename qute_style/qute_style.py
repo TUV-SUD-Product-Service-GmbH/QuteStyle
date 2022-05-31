@@ -406,21 +406,25 @@ class QuteStyle(QProxyStyle):
     def _get_branch_icon(option: QStyleOption) -> str:
         """Select the right Branch Icon."""
         if option.state & QStyle.State_Open:
-            return ":/svg_icons/chevron_down.svg"
-        return ":/svg_icons/chevron_right.svg"
+            return ":/svg_icons/arrow_down.svg"
+        return ":/svg_icons/arrow_right.svg"
 
     def _draw_branch(self, option: QStyleOption, painter: QPainter) -> None:
         """Draw the branch arrow."""
         if not option.state & QStyle.State_Children:
             return
 
-        pixmap = PixmapStore.inst().get_pixmap(
+        rect_width_height = int(
+            (option.rect.width() + option.rect.height()) / 2
+        )
+        option.rect.setHeight(rect_width_height)
+        option.rect.setWidth(rect_width_height)
+        self.draw_pixmap(
+            painter,
+            option.rect,
             self._get_branch_icon(option),
-            16,
-            16,
             self._get_branch_color(option),
         )
-        painter.drawPixmap(option.rect.x(), option.rect.y(), pixmap)
 
     @staticmethod
     def _draw_primitive_indicator_checkbox(
