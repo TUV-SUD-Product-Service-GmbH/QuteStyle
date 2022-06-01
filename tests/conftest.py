@@ -52,7 +52,7 @@ def pytest_runtest_teardown(item: Function) -> None:
 
 
 class QuteStyleTestApplication(QuteStyleApplication):
-    """TSL Test Application."""
+    """QS Test Application."""
 
     MAIN_WINDOW_CLASS = EmptyWindowStyled
 
