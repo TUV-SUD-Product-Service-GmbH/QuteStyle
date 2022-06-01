@@ -11,7 +11,9 @@ from PyQt5.QtWidgets import QWIDGETSIZE_MAX, QPushButton, QWidget
 from qute_style.style import get_color
 from qute_style.widgets.custom_icon_engine import PixmapStore
 
-log = logging.getLogger(f"qute_style.{__name__}")  # pylint: disable=invalid-name
+log = logging.getLogger(
+    f"qute_style.{__name__}"
+)  # pylint: disable=invalid-name
 
 
 class BackgroundColorNames(TypedDict):
