@@ -413,7 +413,6 @@ class QuteStyle(QProxyStyle):
         """Draw the branch arrow."""
         if not option.state & QStyle.State_Children:
             return
-        print("hall0")
 
         self.draw_pixmap(
             painter,
