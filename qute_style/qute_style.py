@@ -421,7 +421,9 @@ class QuteStyle(QProxyStyle):
         option.rect.setWidth(rect_width_height)
         self.draw_pixmap(
             painter,
-            option.rect,
+            option.rect.adjusted(
+                option.rect.width() - option.rect.height(), 0, 0, 0
+            ),
             self._get_branch_icon(option),
             self._get_branch_color(option),
         )
