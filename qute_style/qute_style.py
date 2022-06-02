@@ -414,14 +414,11 @@ class QuteStyle(QProxyStyle):
         if not option.state & QStyle.State_Children:
             return
 
-        rect_width_height = int(
-            (option.rect.width() + option.rect.height()) / 2
-        )
-        option.rect.setHeight(rect_width_height)
-        option.rect.setWidth(rect_width_height)
         self.draw_pixmap(
             painter,
-            option.rect,
+            option.rect.adjusted(
+                option.rect.width() - option.rect.height(), 0, 0, 0
+            ),
             self._get_branch_icon(option),
             self._get_branch_color(option),
         )
