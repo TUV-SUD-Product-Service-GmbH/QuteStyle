@@ -84,7 +84,6 @@ class ColorManager(BaseWidget):
 
     ICON = ":/svg_icons/palette.svg"
     NAME = "Color Manager"
-    GROUPS = ["PS-CPS-TSL-G"]
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new ColorManager."""

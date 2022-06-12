@@ -26,7 +26,9 @@ from PyQt5.QtWidgets import (
 from qute_style.style import get_color
 from qute_style.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
-log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+log = logging.getLogger(
+    f"qute_style.{__name__}"
+)  # pylint: disable=invalid-name
 
 ItemData = TypeVar("ItemData")
 

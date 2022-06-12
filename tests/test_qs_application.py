@@ -1,4 +1,4 @@
-"""Tests for TSL application."""
+"""Tests for QS application."""
 from copy import copy
 from typing import List, Type
 
@@ -75,10 +75,10 @@ class SampleThread6(StartupThread):
         return True
 
 
-def test_tsl_application(
+def test_qs_application(
     qapp: QuteStyleApplication,
 ) -> None:
-    """Test tsl app."""
+    """Test qs app."""
     assert qapp.APP_DATA.app_name == "Test-App"
     assert qapp.APP_DATA.app_version == "2.3.4"
     assert not qapp.STARTUP_THREADS

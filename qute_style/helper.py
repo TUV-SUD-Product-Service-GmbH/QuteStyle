@@ -11,7 +11,7 @@ from waitingspinnerwidget import QtWaitingSpinner
 
 from qute_style.style import get_color
 
-log = logging.getLogger("tsl")  # pylint: disable=invalid-name
+log = logging.getLogger("qute_style")  # pylint: disable=invalid-name
 
 
 def check_ide() -> bool:

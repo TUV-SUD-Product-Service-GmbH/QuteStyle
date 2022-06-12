@@ -72,10 +72,11 @@ class MyApplication(QuteStyleApplication):
     # add basic information about your application
     APP_DATA = AppData(
         "Test-App",
-        "1.1.0",
-        ":/svg_images/logo_toolbox.svg",
-        ":/svg_images/logo_toolbox.svg",
+        "2.3.4",
+        ":/svg_images/logo_qute_style.svg",
+        ":/svg_images/logo_qute_style.svg",
         "",
+        "Test Version",
     )
 
 if __name__ == "__main__":
