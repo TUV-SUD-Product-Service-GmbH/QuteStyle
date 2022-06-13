@@ -22,7 +22,9 @@ from qute_style.widgets.color_manager import ColorManager
 from qute_style.widgets.home_page import HomePage
 from qute_style.widgets.icon_button import IconButton
 
-log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+log = logging.getLogger(
+    f"qute_style.{__name__}"
+)  # pylint: disable=invalid-name
 
 
 class SettingsWidget(SettingsBaseWidget):

@@ -80,8 +80,8 @@ class QuteStyleCustomApplication(QuteStyleApplication):
     APP_DATA = AppData(
         "Test-App",
         "2.3.4",
-        ":/svg_images/logo_toolbox.svg",
-        ":/svg_images/logo_toolbox.svg",
+        ":/svg_images/logo_qute_style.svg",
+        ":/svg_images/logo_qute_style.svg",
         "",
         "Test Version",
     )

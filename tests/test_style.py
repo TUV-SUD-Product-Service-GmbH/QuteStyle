@@ -1,4 +1,4 @@
-"""Test for style handling in TSL-Library."""
+"""Test for style handling."""
 import re
 
 import pytest

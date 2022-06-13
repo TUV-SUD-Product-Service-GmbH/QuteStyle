@@ -25,6 +25,8 @@ from qute_style.dev.mocks import CallList, check_call, check_call_str
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
 
 # Create a QApplication for all tests as we're using QPainter objects.
+from qute_style.style import get_color
+
 pytestmark = pytest.mark.usefixtures("qapp")
 
 
@@ -134,6 +136,91 @@ class TestDrawIndicatorCheckbox:
     def test_rect(calls: CallList, rect: QRect) -> None:
         """Test the QRect is set correctly."""
         assert calls[0][0][2].rect == rect
+
+
+@pytest.fixture(name="qute_style")
+def fixture_qute_style() -> QuteStyle:
+    """Generate a QuteStyle."""
+    qute_style = QuteStyle()
+    return qute_style
+
+
+@pytest.fixture(
+    name="option",
+    params=(True, False),
+    ids=("With Children", "Without Children"),
+)
+def fixture_option(request: SubRequest) -> QStyleOption:
+    """Generate a QStyleOption."""
+    option = QStyleOption()
+    if request.param:
+        option.state = QStyle.State_Children
+    else:
+        option.state = QStyle.State_Open
+    option.rect.setY(5)
+    option.rect.setX(5)
+    return option
+
+
+def test_get_branch_color(
+    qute_style: QuteStyle, option: QStyleOption, painter: QPainter
+) -> None:
+    """Test _get_branch_color."""
+    if option.state == option.state & QStyle.State_Children:
+        assert qute_style._get_branch_color(option) == get_color("foreground")
+        option.state = QStyle.State_MouseOver
+        assert qute_style._get_branch_color(option) == get_color(
+            "context_hover"
+        )
+    else:
+        with check_call(QPainter, "drawPixmap", call_count=0):
+            qute_style._draw_branch(option, painter)
+
+
+def test_get_branch_icon(
+    qute_style: QuteStyle, option: QStyleOption, painter: QPainter
+) -> None:
+    """Test _get_branch_color."""
+    if option.state == option.state & QStyle.State_Children:
+        assert (
+            qute_style._get_branch_icon(option)
+            == ":/svg_icons/arrow_right.svg"
+        )
+        option.state = QStyle.State_Open
+        assert (
+            qute_style._get_branch_icon(option) == ":/svg_icons/arrow_down.svg"
+        )
+    else:
+        with check_call(QPainter, "drawPixmap", call_count=0):
+            qute_style._draw_branch(option, painter)
+
+
+# pylint: disable=redefined-outer-name
+def test_draw_branches(
+    qtbot: QtBot,
+    qute_style: QuteStyle,
+    option: QStyleOption,
+    painter: QPainter,
+) -> None:
+    """Test the drawBranches Funktion."""
+    with qtbot.captureExceptions() as exceptions:
+        if option.state == option.state & QStyle.State_Children:
+            with check_call(
+                QuteStyle,
+                "_get_branch_color",
+                call_count=1
+                if option.state == option.state & QStyle.State_Children
+                else 0,
+            ):
+                with check_call(
+                    QuteStyle,
+                    "draw_pixmap",
+                    call_count=1
+                    if option.state == option.state & QStyle.State_Children
+                    else 0,
+                ):
+                    qute_style._draw_branch(option, painter)
+        assert not exceptions
 
 
 def test_draw_toggle(
@@ -266,6 +353,14 @@ class TestDrawPrimitive:
         with check_call(QProxyStyle, "drawPrimitive", call_count=0):
             QuteStyle().drawPrimitive(
                 QuteStyle.PE_FrameFocusRect, QStyleOption(), QPainter(), None
+            )
+
+    @staticmethod
+    def test_draw_branch(option: QStyleOption) -> None:
+        """Test that drawing an IndicatorBranch is calling _draw_branch."""
+        with check_call(QuteStyle, "_draw_branch"):
+            QuteStyle().drawPrimitive(
+                QuteStyle.PE_IndicatorBranch, option, QPainter()
             )
 
     @staticmethod

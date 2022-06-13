@@ -26,7 +26,7 @@ class MainWidget(BaseWidget):
     shutdown_completed = pyqtSignal(QWidget, name="shutdown_completed")
 
     def __init__(self, parent: QWidget | None = None) -> None:
-        """Init the BaseWidget for a Widget in TSL-Toolbox."""
+        """Init the BaseWidget for a Widget in QuteStyle."""
         self._thread: Optional[QThread] = None
         super().__init__(parent)
 

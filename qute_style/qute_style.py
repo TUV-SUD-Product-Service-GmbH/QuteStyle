@@ -390,8 +390,38 @@ class QuteStyle(QProxyStyle):
                 option, (QStyleOptionButton, QStyleOptionViewItem)
             )
             self._draw_primitive_indicator_checkbox(option, painter)
+        elif element == self.PE_IndicatorBranch:
+            self._draw_branch(option, painter)
         else:  # pragma: no cover
             super().drawPrimitive(element, option, painter, widget)
+
+    @staticmethod
+    def _get_branch_color(option: QStyleOption) -> str:
+        """Select the right Branch color."""
+        if option.state & QStyle.State_MouseOver:
+            return get_color("context_hover")
+        return get_color("foreground")
+
+    @staticmethod
+    def _get_branch_icon(option: QStyleOption) -> str:
+        """Select the right Branch Icon."""
+        if option.state & QStyle.State_Open:
+            return ":/svg_icons/arrow_down.svg"
+        return ":/svg_icons/arrow_right.svg"
+
+    def _draw_branch(self, option: QStyleOption, painter: QPainter) -> None:
+        """Draw the branch arrow."""
+        if not option.state & QStyle.State_Children:
+            return
+
+        self.draw_pixmap(
+            painter,
+            option.rect.adjusted(
+                option.rect.width() - option.rect.height(), 0, 0, 0
+            ),
+            self._get_branch_icon(option),
+            self._get_branch_color(option),
+        )
 
     @staticmethod
     def _draw_primitive_indicator_checkbox(
