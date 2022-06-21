@@ -271,17 +271,20 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw a control element."""
         if element == self.CE_Toggle:
-            assert isinstance(option, ToggleOptionButton)
-            self._draw_toggle(option, painter, widget)
+            if isinstance(option, ToggleOptionButton):
+                self._draw_toggle(option, painter, widget)
+                return
         elif element == self.CE_CheckBox:
-            assert isinstance(option, QStyleOptionButton)
-            assert isinstance(widget, QCheckBox)
-            self._draw_checkbox(option, painter, widget)
+            if isinstance(option, QStyleOptionButton) and isinstance(
+                widget, QCheckBox
+            ):
+                self._draw_checkbox(option, painter, widget)
+                return
         elif element == QStyle.CE_CheckBoxLabel:
-            assert isinstance(option, QStyleOptionButton)
-            self._draw_check_box_label(option, painter, widget)
-        else:
-            super().drawControl(element, option, painter, widget)
+            if isinstance(option, QStyleOptionButton):
+                self._draw_check_box_label(option, painter, widget)
+                return
+        super().drawControl(element, option, painter, widget)
 
     def _draw_checkbox(
         self, option: QStyleOptionButton, painter: QPainter, widget: QCheckBox
