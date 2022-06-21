@@ -106,8 +106,8 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 
         self.check_startup_thread_configuration()
         self.setApplicationName(self.APP_DATA.app_name)
-        self.setOrganizationName("Sample Organization")
-        self.setOrganizationDomain("sample_organization.com")
+        self.setOrganizationName(self.APP_DATA.organization_name)
+        self.setOrganizationDomain(self.APP_DATA.organization_domain)
         if show_splash:
             self._splash_screen: QSplashScreen | None = CustomSplashScreen(
                 self.APP_DATA

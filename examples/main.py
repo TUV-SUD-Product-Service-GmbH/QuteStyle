@@ -84,6 +84,8 @@ class QuteStyleCustomApplication(QuteStyleApplication):
         ":/svg_images/logo_qute_style.svg",
         "",
         "Test Version",
+        "Sample Organization",
+        "sample_organization.com",
     )
 
 

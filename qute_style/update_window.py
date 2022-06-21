@@ -27,6 +27,8 @@ class AppData:
     app_splash_icon: str = ""
     help_text: str = ""
     debug_text: str = ""
+    organization_name: str = ""
+    organization_domain: str = ""
 
 
 class TSLMainWindow(QMainWindow):

@@ -33,10 +33,6 @@ TFPATH = Path("tests") / "test_files"
 
 def pytest_runtest_setup() -> None:
     """Execute this function before every test case."""
-    QCoreApplication.setOrganizationName("Sample Organization")
-    QCoreApplication.setOrganizationDomain("sample_organization.com")
-    QCoreApplication.setApplicationName("Test-App")
-
     # Remove the settings stored with QSettings in the registry.
     QSettings().clear()
 
@@ -56,7 +52,16 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
     MAIN_WINDOW_CLASS = EmptyWindowStyled
 
-    APP_DATA = AppData("Test-App", "2.3.4")
+    APP_DATA = APP_DATA = AppData(
+        "Test-App",
+        "2.3.4",
+        "",
+        "",
+        "",
+        "",
+        "Sample Organization",
+        "sample_organization.com",
+    )
 
 
 @pytest.fixture(scope="session")
