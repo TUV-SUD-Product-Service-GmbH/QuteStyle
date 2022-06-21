@@ -12,7 +12,7 @@ import PyQt5
 import pytest
 from _pytest.fixtures import SubRequest
 from _pytest.python import Function
-from PyQt5.QtCore import QCoreApplication, QSettings, Qt
+from PyQt5.QtCore import QSettings, Qt
 from PyQt5.QtWidgets import QStyle, QStyleOptionButton, QStyleOptionViewItem
 
 # ensure that the resources are loaded
