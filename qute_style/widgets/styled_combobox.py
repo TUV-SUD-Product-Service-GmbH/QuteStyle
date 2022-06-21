@@ -256,11 +256,9 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         item.setData(Qt.Unchecked, Qt.CheckStateRole)
         if icon_path:
             item.setData(
-                QIcon(CustomIconEngine(icon_path, "foreground")),
+                QIcon(CustomIconEngine(icon_path, icon_color or "foreground")),
                 Qt.DecorationRole,
             )
-            if icon_color:
-                item.setData(icon_color, Qt.ForegroundRole)
         cast(QStandardItemModel, self.model()).appendRow(item)
         self.update_text()
 
