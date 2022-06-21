@@ -18,7 +18,7 @@ log = logging.getLogger(LOG_NAME)  # pylint: disable=invalid-name
 
 
 @dataclass
-class AppData:
+class AppData:  # pylint: disable=too-many-instance-attributes
     """Provide required data to startup threads."""
 
     app_name: str = ""
