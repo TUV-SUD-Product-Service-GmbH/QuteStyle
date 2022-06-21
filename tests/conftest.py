@@ -52,7 +52,7 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
     MAIN_WINDOW_CLASS = EmptyWindowStyled
 
-    APP_DATA = APP_DATA = AppData(
+    APP_DATA = AppData(
         "Test-App",
         "2.3.4",
         "",
