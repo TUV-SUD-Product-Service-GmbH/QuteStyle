@@ -385,18 +385,17 @@ class QuteStyle(QProxyStyle):
             # to replace StyledCheckboxDelegate.
             return
         if element == self.PE_PanelItemViewItem:
-            assert isinstance(option, QStyleOptionViewItem)
-            self._panel_draw_item_view_item(option, painter, widget)
-
+            if isinstance(option, QStyleOptionViewItem):
+                self._panel_draw_item_view_item(option, painter, widget)
+                return
         elif element == self.PE_IndicatorCheckBox:
-            assert isinstance(
-                option, (QStyleOptionButton, QStyleOptionViewItem)
-            )
-            self._draw_primitive_indicator_checkbox(option, painter)
+            if isinstance(option, (QStyleOptionButton, QStyleOptionViewItem)):
+                self._draw_primitive_indicator_checkbox(option, painter)
+                return
         elif element == self.PE_IndicatorBranch:
             self._draw_branch(option, painter)
-        else:  # pragma: no cover
-            super().drawPrimitive(element, option, painter, widget)
+            return
+        super().drawPrimitive(element, option, painter, widget)
 
     @staticmethod
     def _get_branch_color(option: QStyleOption) -> str:
