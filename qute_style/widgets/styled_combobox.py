@@ -66,10 +66,11 @@ class StyledComboBox(QComboBox):
             color = get_color("fg_disabled")
 
         # Define size of arrow depending on ComboBox SubControl
-        opt = QStyleOptionComboBox()
-        rect = self.style().subControlRect(
-            QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxArrow, None
-        )
+        #opt = QStyleOptionComboBox()
+        #rect = self.style().subControlRect(
+        #    QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxArrow, None
+        #)
+        width = 0.2* self.width()
         radius = int(rect.width() * 0.5)
 
         # Get correct scale and pixmap
@@ -86,7 +87,7 @@ class StyledComboBox(QComboBox):
         # x-axis: in the middle of arrow rect with spacing 2
         # y-axis: in the middle of arrow rect
         painter.drawPixmap(
-            int(self.width() - 0.5 * (4 + rect.width() + radius)),
+            int(self.width() - 0.5 * (4 + width + radius)),
             int(0.5 * (self.height() - radius)),
             radius,
             radius,
