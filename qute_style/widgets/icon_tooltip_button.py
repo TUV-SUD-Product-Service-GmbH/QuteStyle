@@ -15,7 +15,9 @@ log = logging.getLogger(
     f"qute_style.{__name__}"
 )  # pylint: disable=invalid-name
 
-BaseWidgetType = TypeVar("BaseWidgetType", bound=Optional[BaseWidget])
+BaseWidgetType = TypeVar(  # pylint: disable=invalid-name
+    "BaseWidgetType", bound=Optional[BaseWidget]
+)
 
 
 class IconTooltipButton(IconButton, Generic[BaseWidgetType]):

@@ -1,4 +1,5 @@
 """Script to compile resources into python file."""
+# pylint: disable=deprecated-module
 
 import os
 import subprocess
