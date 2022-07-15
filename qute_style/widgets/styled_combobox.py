@@ -68,7 +68,7 @@ class StyledComboBox(QComboBox):
         # Define size of arrow depending on ComboBox SubControl
         opt = QStyleOptionComboBox()
         rect = self.style().subControlRect(
-            QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxArrow, None
+            QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxArrow
         )
         radius = int(rect.width() * 0.5)
 
