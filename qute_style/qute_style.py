@@ -271,17 +271,20 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw a control element."""
         if element == self.CE_Toggle:
-            assert isinstance(option, ToggleOptionButton)
-            self._draw_toggle(option, painter, widget)
+            if isinstance(option, ToggleOptionButton):
+                self._draw_toggle(option, painter, widget)
+                return
         elif element == self.CE_CheckBox:
-            assert isinstance(option, QStyleOptionButton)
-            assert isinstance(widget, QCheckBox)
-            self._draw_checkbox(option, painter, widget)
+            if isinstance(option, QStyleOptionButton) and isinstance(
+                widget, QCheckBox
+            ):
+                self._draw_checkbox(option, painter, widget)
+                return
         elif element == QStyle.CE_CheckBoxLabel:
-            assert isinstance(option, QStyleOptionButton)
-            self._draw_check_box_label(option, painter, widget)
-        else:
-            super().drawControl(element, option, painter, widget)
+            if isinstance(option, QStyleOptionButton):
+                self._draw_check_box_label(option, painter, widget)
+                return
+        super().drawControl(element, option, painter, widget)
 
     def _draw_checkbox(
         self, option: QStyleOptionButton, painter: QPainter, widget: QCheckBox
@@ -382,18 +385,17 @@ class QuteStyle(QProxyStyle):
             # to replace StyledCheckboxDelegate.
             return
         if element == self.PE_PanelItemViewItem:
-            assert isinstance(option, QStyleOptionViewItem)
-            self._panel_draw_item_view_item(option, painter, widget)
-
+            if isinstance(option, QStyleOptionViewItem):
+                self._panel_draw_item_view_item(option, painter, widget)
+                return
         elif element == self.PE_IndicatorCheckBox:
-            assert isinstance(
-                option, (QStyleOptionButton, QStyleOptionViewItem)
-            )
-            self._draw_primitive_indicator_checkbox(option, painter)
+            if isinstance(option, (QStyleOptionButton, QStyleOptionViewItem)):
+                self._draw_primitive_indicator_checkbox(option, painter)
+                return
         elif element == self.PE_IndicatorBranch:
             self._draw_branch(option, painter)
-        else:  # pragma: no cover
-            super().drawPrimitive(element, option, painter, widget)
+            return
+        super().drawPrimitive(element, option, painter, widget)
 
     @staticmethod
     def _get_branch_color(option: QStyleOption) -> str:
