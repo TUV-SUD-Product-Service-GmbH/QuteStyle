@@ -171,7 +171,7 @@ Attention: The Icon class inherits from QWidget, not QIcon.
 
 ### DropLabel
 
-The DropLabel offers a convenient way to display the could icon with an associated text and for example
+The DropLabel offers a convenient way to display the cloud icon with an associated text and for example
 connect it with an event filter, that handles events of type ```QEvent.Drag``` and ```QEvent.Drop```:
 
 ```plaintext
