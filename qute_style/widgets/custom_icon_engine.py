@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, cast
 
 from PyQt5.QtCore import QPoint, QRect, QSize, Qt
 from PyQt5.QtGui import QColor, QIcon, QIconEngine, QPainter, QPixmap
@@ -56,7 +56,7 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         radius = min(rect.width(), rect.height())
         rect.setSize(QSize(radius, radius))
         # Scale Icon (not rect) according to DevicePixelRatio
-        radius = radius * painter.device().devicePixelRatio()
+        radius = int(radius * cast(float, painter.device().devicePixelRatio()))
         pixmap = store.get_pixmap(
             self._path, radius, radius, get_color(self._color_name)
         )
