@@ -1,9 +1,7 @@
 """Script to compile resources into python file."""
-# pylint: disable=deprecated-module
-
 import os
 import subprocess
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 if __name__ == "__main__":

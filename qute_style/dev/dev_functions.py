@@ -1,6 +1,5 @@
 """Development functions."""
 # mypy: ignore-errors
-# pylint: disable=deprecated-module
 from __future__ import annotations
 
 import json
@@ -8,7 +7,7 @@ import pickle
 import re
 import subprocess
 import sys
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
