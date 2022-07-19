@@ -33,11 +33,14 @@ It is mainly suited for applications that rely on a center widget for user inter
 - Build-in release history
 - Used and developed in a productive environment
 
-## Themes
+## Themes and Styled Widgets
 
-### Darcula Theme
+QuteStyle provides five themes, defining the color composition of the app.
+Additionally, the user can define new themes ([check this out](./docs/style.md)). We provide five themes, for example a dark and light mode ```Darcula``` and ```Highbridge Grey```.
+We defined [custom widgets](./docs/widgets.md), such that they fit to the overall style and implemented new behaviour. A selection can be found in the Test-App:
 
-# todo: add images
+<img src="./examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="400" height="300"><img src="./examples/example_images/darcula.PNG" alt="Darcula" width="400" height="300">
+
 
 ## Requirements
 
@@ -90,6 +93,8 @@ if __name__ == "__main__":
     APP = MyApplication(sys.argv)
     sys.exit(APP.exec())
 ```
+
+For further information, see our [documentation](./docs/README.md).
 
 ## Example
 
