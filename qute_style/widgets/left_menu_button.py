@@ -55,7 +55,7 @@ class LeftMenuButton(
         )
 
         # This can't be a class variable because it get's garbage collected
-        # and the app crashes. It should be in the pixmap store of baumg-mi.
+        # and the app crashes. It should be in the pixmap store.
         self.active_menu = QPixmap(":/svg_icons/active_menu.svg")
 
         self._is_active_tab = False

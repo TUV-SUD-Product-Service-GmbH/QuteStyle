@@ -78,7 +78,7 @@ class PixmapStore:
     ] = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self) -> None:
-        """Create a new DatabaseCache."""
+        """Create a new PixmapStore instance."""
         assert not PixmapStore.INST
 
     # make sure correct class is called --> maybe privat or something
