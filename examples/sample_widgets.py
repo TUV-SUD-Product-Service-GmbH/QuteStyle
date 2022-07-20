@@ -183,9 +183,7 @@ class Model(QStringListModel):
             self.dataChanged.emit(index, index, [Qt.CheckStateRole])
         return super().setData(index, value, role)
 
-    def flags(  # pylint: disable=no-self-use
-        self, _: QModelIndex
-    ) -> Qt.ItemFlags:
+    def flags(self, _: QModelIndex) -> Qt.ItemFlags:
         """Return the flags for the given index."""
         return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
 

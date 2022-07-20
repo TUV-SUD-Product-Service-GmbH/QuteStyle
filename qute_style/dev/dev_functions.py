@@ -7,7 +7,7 @@ import pickle
 import re
 import subprocess
 import sys
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Tuple

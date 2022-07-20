@@ -48,7 +48,7 @@ class StartupThread(QThread):
         raise NotImplementedError  # pragma: no cover
 
     @property
-    def exit_application(self) -> bool:  # pylint: disable=no-self-use
+    def exit_application(self) -> bool:
         """Return if the app should call exit_function on thread finished."""
         return False
 
