@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "qute_style"
+version = "0.1.2"
+description = "QuteStyle is an expandable application framework for PyQt5"
+authors = ["Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke <PS-TF-Entwicklung@tuev-sued.de>"]
+readme = "README.md"
+repository = "https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle"
+license = "MIT"
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+PyQt5 = "5.15.6"
+pytest = "6.2.5"
+pytest-qt = "4.0.2"
+requests = "2.26.0"
+setuptools = "59.7.0"
+black = "22.3.0"
+coverage = "6.2"
+isort = "5.10.1"
+mypy = "0.920"
+pre-commit = "2.16.0"
+pydocstyle = "6.1.1"
+pylint = "2.12.2"
+pylint-sqlalchemy = "0.2.0"
+pytest-cov = "^3.0.0"
+pytest-github-actions-annotate-failures = "^0.1.7"
+types-requests = "2.26.2"
+pyqt5-stubs = "5.15.6.0"
+pyqtspinner = "^0.1.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

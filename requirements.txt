@@ -1,4 +1,4 @@
-git+https://github.com/z3ntu/QtWaitingSpinner.git
+
 PyQt5==5.15.6
 pytest==6.2.5
 pytest-qt==4.0.2

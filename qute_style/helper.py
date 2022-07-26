@@ -7,7 +7,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, QObject
 from PyQt5.QtGui import QPaintEvent, QPixmap
-from waitingspinnerwidget import QtWaitingSpinner
+from pyqtspinner.spinner import WaitingSpinner
 
 from qute_style.style import get_color
 
@@ -38,7 +38,7 @@ def decode_pixmap(pixmap_string: str) -> QPixmap:
     return qpixmap
 
 
-class StyledWaitingSpinner(QtWaitingSpinner):
+class StyledWaitingSpinner(WaitingSpinner):
     """Styled Version of QWaitingSpinner."""
 
     def paintEvent(  # pylint: disable=invalid-name, arguments-renamed
@@ -54,7 +54,7 @@ def create_waiting_spinner(
     number_of_lines: int = 28,
     line_length: int = 20,
     inner_radius: int = 15,
-) -> QtWaitingSpinner:
+) -> StyledWaitingSpinner:
     """Create a waiting spinner with default config."""
     spinner = StyledWaitingSpinner(parent)
     spinner.setColor(get_color("context_color"))
