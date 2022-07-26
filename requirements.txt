@@ -1,5 +1,5 @@
-pyqtspinner
 PyQt5==5.15.6
+pyqtspinner
 pytest==6.2.5
 pytest-qt==4.0.2
 requests==2.26.0
