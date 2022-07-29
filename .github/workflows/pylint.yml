@@ -18,11 +18,11 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r dev_requirements.txt
+    - name: Install Poetry
+      run: pip install poetry
+
+    - name: Install project dependencies
+      run: poetry install -vvv --no-root
 
     - name: Analysing the code with pylint
       run: |
