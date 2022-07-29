@@ -25,5 +25,4 @@ jobs:
       run: poetry install -vvv --no-root
 
     - name: Analysing the code with pylint
-      run: |
-        pylint --rcfile=.pylintrc `ls -dR $PWD/qute_style/*|grep .py$|xargs`
+      run: poetry run pylint --rcfile=.pylintrc `ls -dR $PWD/qute_style/*|grep .py$|xargs`
