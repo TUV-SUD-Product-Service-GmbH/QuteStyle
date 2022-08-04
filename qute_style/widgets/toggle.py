@@ -80,7 +80,7 @@ class Toggle(QCheckBox, TextTruncator):
     @pyqtProperty(float)
     def position(self) -> float:
         """Return actual position."""
-        return self._position
+        return int(self._position)
 
     @position.setter  # type: ignore
     def position(self, pos: float):
@@ -123,7 +123,7 @@ class Toggle(QCheckBox, TextTruncator):
         option.text = self.text()
         if self.checkState() == Qt.Checked:
             option.state |= QStyle.State_On
-        option.position = int(self.position)
+        option.position = cast(int, self.position)
 
         painter.drawControl(QuteStyle.CE_Toggle, option)
         painter.end()
