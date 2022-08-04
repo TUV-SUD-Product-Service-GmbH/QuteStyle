@@ -123,7 +123,7 @@ class Toggle(QCheckBox, TextTruncator):
         option.text = self.text()
         if self.checkState() == Qt.Checked:
             option.state |= QStyle.State_On
-        option.position = cast(int, self.position)
+        option.position = int(self.position)
 
         painter.drawControl(QuteStyle.CE_Toggle, option)
         painter.end()
