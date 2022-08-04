@@ -80,7 +80,7 @@ class Toggle(QCheckBox, TextTruncator):
     @pyqtProperty(float)
     def position(self) -> float:
         """Return actual position."""
-        return self._position
+        return int(self._position)
 
     @position.setter  # type: ignore
     def position(self, pos: float):
