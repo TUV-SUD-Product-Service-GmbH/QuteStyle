@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from examples.sample_widgets import ModelViewWidget, TestWidget
+from qute_style_examples.sample_widgets import ModelViewWidget, TestWidget
 from qute_style.qs_main_window import QuteStyleMainWindow
 from qute_style.style import THEMES, get_current_style
 from qute_style.update_window import AppData

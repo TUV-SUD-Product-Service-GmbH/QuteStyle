@@ -23,7 +23,7 @@ setup(
     },
     install_requires=[
         "PyQt5",
-        "QtWaitingSpinner @ git+https://github.com/z3ntu/QtWaitingSpinner.git",
+        "pyqtspinner"
     ],
     zip_safe=False,
 )

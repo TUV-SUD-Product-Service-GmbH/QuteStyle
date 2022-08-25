@@ -22,7 +22,7 @@
 
 Many of our custom widgets can be found in the Test-Application:
 
-![Widgets](.././examples/example_images/widgets_display.PNG)
+![Widgets](../qute_style_examples/example_images/widgets_display.PNG)
 
 ## BaseWidget
 
@@ -68,7 +68,7 @@ Example:
             )
 ```
 
-![QuteMessageBox](.././examples/example_images/information_messagebox.PNG)
+![QuteMessageBox](../qute_style_examples/example_images/information_messagebox.PNG)
 
 ## Color Manager
 
@@ -87,7 +87,7 @@ is activated, a new theme is created, and the window is updated.
 The paintEvent checks whether the theme has changed before painting.
 For reusing a newly created color scheme, the dictionary can be copied and defined as a new [theme](./style.md#themes) in the style.
 
-![ColorManager](.././examples/example_images/color_manager.PNG)
+![ColorManager](../qute_style_examples/example_images/color_manager.PNG)
 
 ## ComboBox
 
@@ -179,7 +179,7 @@ connect it with an event filter, that handles events of type ```QEvent.Drag``` a
     drop_widget.installEventFilter(drop_widget)
 ```
 
-![DropLabel](.././examples/example_images/drop_label.PNG)
+![DropLabel](../qute_style_examples/example_images/drop_label.PNG)
 
 ### IconButton
 

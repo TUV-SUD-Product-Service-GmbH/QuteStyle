@@ -19,7 +19,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtWidgets import QApplication
 
-from examples.sample_main_window import StyledMainWindow
+from qute_style_examples.sample_main_window import StyledMainWindow
 from qute_style.dev.dev_functions import generate_changelog_resource_file
 from qute_style.qs_application import QuteStyleApplication
 from qute_style.update_window import AppData
@@ -31,12 +31,10 @@ log = logging.getLogger(
 
 def create_new_changelog_resource_file(app_name: str) -> None:
     """Create the changelog resource file and import it."""
-    path = Path.cwd() / "examples"
-    if not path.exists():
-        path = Path.cwd().parent / "examples"
+    path = importlib.resources.files("qute_style_examples")
     generate_changelog_resource_file(app_name, path / "test_changelog", path)
 
-    importlib.import_module("examples.resources_cl")
+    importlib.import_module("qute_style_examples.resources_cl")
 
 
 def configure_logging() -> None:
@@ -89,7 +87,7 @@ class QuteStyleCustomApplication(QuteStyleApplication):
     )
 
 
-if __name__ == "__main__":
+def main_method() -> None:
     configure_logging()
 
     # Create the resource file everytime the application starts.
@@ -102,3 +100,7 @@ if __name__ == "__main__":
 
     APP = QuteStyleCustomApplication(sys.argv)
     sys.exit(APP.exec())
+
+
+if __name__ == "__main__":
+    main_method()
