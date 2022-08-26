@@ -469,7 +469,7 @@ class Ui_test_widget(object):
         )
 
 
-from qute_style_examples.sample_classes import TestComboBox
 from qute_style.widgets.icon_button import IconButton
 from qute_style.widgets.styled_combobox import StyledComboBox
 from qute_style.widgets.toggle import Toggle
+from qute_style_examples.sample_classes import TestComboBox

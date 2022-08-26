@@ -6,7 +6,7 @@ from typing import List, Union, cast
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, QObject, QRectF, Qt
-from PyQt5.QtGui import QPaintEvent, QPixmap, QPainter
+from PyQt5.QtGui import QPainter, QPaintEvent, QPixmap
 from pyqtspinner.spinner import WaitingSpinner
 
 from qute_style.style import get_color
@@ -42,18 +42,21 @@ class StyledWaitingSpinner(WaitingSpinner):
     """Styled Version of QWaitingSpinner."""
 
     def updateTimer(self):
+        """Overwrite updateTime in order to deal with float."""
         self._timer.setInterval(
-            int(1000 / (self._numberOfLines * self._revolutionsPerSecond)))
+            int(1000 / (self._numberOfLines * self._revolutionsPerSecond))
+        )
 
     def updatePosition(self):
+        """Overwrite updatePosition in order to deal with float."""
         if self.parentWidget() and self._centerOnParent:
             self.move(
                 int(self.parentWidget().width() / 2 - self.width() / 2),
-                int(self.parentWidget().height() / 2 - self.height() / 2)
+                int(self.parentWidget().height() / 2 - self.height() / 2),
             )
 
     def paintEvent(  # pylint: disable=invalid-name, arguments-renamed
-            self, event: QPaintEvent
+        self, _: QPaintEvent
     ) -> None:
         """Overwrite method to change color of spinner."""
         self.setColor(get_color("context_color"))
@@ -62,34 +65,37 @@ class StyledWaitingSpinner(WaitingSpinner):
         painter.fillRect(self.rect(), Qt.transparent)
         painter.setRenderHint(QPainter.Antialiasing, True)
 
-        if self._currentCounter >= self._numberOfLines:
+        if self._currentCounter >= self._numberOfLines:  # type: ignore
             self._currentCounter = 0
 
         painter.setPen(Qt.NoPen)
         for i in range(self._numberOfLines):
             painter.save()
-            painter.translate(self._innerRadius + self._lineLength,
-                              self._innerRadius + self._lineLength)
+            painter.translate(
+                self._innerRadius + self._lineLength,
+                self._innerRadius + self._lineLength,
+            )
             rotateAngle = float(360 * i) / float(self._numberOfLines)
             painter.rotate(rotateAngle)
             painter.translate(self._innerRadius, 0)
-            distance = self.lineCountDistanceFromPrimary(i,
-                                                         self._currentCounter,
-                                                         self._numberOfLines)
+            distance = self.lineCountDistanceFromPrimary(
+                i, self._currentCounter, self._numberOfLines
+            )
             color = self.currentLineColor(
                 distance,
                 self._numberOfLines,
                 self._trailFadePercentage,
                 self._minimumTrailOpacity,
-                self._color
+                self._color,
             )
             painter.setBrush(color)
             painter.drawRoundedRect(
-                QRectF(0, -self._lineWidth / 2, self._lineLength,
-                       self._lineWidth),
+                QRectF(
+                    0, -self._lineWidth / 2, self._lineLength, self._lineWidth
+                ),
                 self._roundness,
                 self._roundness,
-                Qt.RelativeSize
+                Qt.RelativeSize,
             )
             painter.restore()
 
