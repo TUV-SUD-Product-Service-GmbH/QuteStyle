@@ -101,7 +101,7 @@ For further information, see our [documentation](https://github.com/TUV-SUD-Prod
 Check out our example app by running:
 
 ```plaintext
-python -m examples.main
+python -m qute_style_examples
 ```
 
 ## License

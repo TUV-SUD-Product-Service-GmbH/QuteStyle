@@ -1,10 +1,9 @@
 """Test script to validate QuteStyle app."""
 from __future__ import annotations
 
-import importlib
+from importlib import resources, import_module
 import logging
 import sys
-from pathlib import Path
 
 from PyQt5.QtCore import (
     QMessageLogContext,
@@ -31,10 +30,10 @@ log = logging.getLogger(
 
 def create_new_changelog_resource_file(app_name: str) -> None:
     """Create the changelog resource file and import it."""
-    path = importlib.resources.files("qute_style_examples")
+    path = resources.files("qute_style_examples")
     generate_changelog_resource_file(app_name, path / "test_changelog", path)
 
-    importlib.import_module("qute_style_examples.resources_cl")
+    import_module("qute_style_examples.resources_cl")
 
 
 def configure_logging() -> None:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qute_style"
-version = "0.1.14"
+version = "0.1.4"
 description = "QuteStyle is an expandable application framework for PyQt5"
 authors = ["Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke <PS-TF-Entwicklung@tuev-sued.de>"]
 readme = "README.md"
@@ -12,7 +12,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 PyQt5 = "5.15.6"
 pyqtspinner = "^0.1.1"
 
@@ -36,7 +36,7 @@ pyqt5-stubs = "5.15.6.0"
 
 
 [tool.poetry.scripts]
-qute-style-example-main = "qute_style_examples.main:main_method"
+qute-style-example = "qute_style_examples.main:main_method"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
