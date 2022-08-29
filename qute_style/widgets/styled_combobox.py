@@ -113,7 +113,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         self.lineEdit().setReadOnly(True)
 
         # Update the text when an item is toggled
-        self.model().dataChanged.connect(self.handle_data_change)
+        self.model().dataChanged.connect(lambda: self.handle_data_change)
 
         # Hide and show popup when clicking the line edit
         self.lineEdit().installEventFilter(self)

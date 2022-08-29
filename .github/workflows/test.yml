@@ -8,7 +8,6 @@ on:
 jobs:
   tests:
     name: Run Python Tests
-    runs-on: windows-latest
     strategy:
       fail-fast: False
       matrix:
@@ -16,6 +15,10 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+        os:
+          - windows-latest
+          - ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
 
@@ -31,6 +34,23 @@ jobs:
         python3 -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r dev_requirements.txt
+
+    - name: Setup xvfb if necessary
+      if: ${{ matrix.os }} == "ubuntu-latest"
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb \
+            libxkbcommon-x11-0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-xinerama0 \
+            libxcb-xinput0 \
+            libxcb-xfixes0
+        # start xvfb in the background
+        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 
     - name: Test with pytest
       run: |
