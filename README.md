@@ -39,7 +39,7 @@ QuteStyle provides five themes, defining the color composition of the app.
 Additionally, the user can define new themes ([check this out](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/docs/style.md)). We provide five themes, for example a dark and light mode ```Darcula``` and ```Highbridge Grey```.
 We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/docs/widgets.md), such that they fit to the overall style and implemented new behaviour. A selection can be found in the Test-App:
 
-<img src="https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/raw/master/qute_stye/examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="400" height="300"><img src="https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/raw/master/qute_stye/examples/example_images/darcula.PNG" alt="Darcula" width="400" height="300">
+<img src="https://raw.githubusercontent.com/TUV-SUD-Product-Service-GmbH/QuteStyle/master/qute_style_examples/example_images/highbridge_grey.PNG" alt="Highbridge Grey" width="400" height="300"><img src="https://raw.githubusercontent.com/TUV-SUD-Product-Service-GmbH/QuteStyle/master/qute_style_examples/example_images/darcula.PNG" alt="Darcula" width="400" height="300">
 
 
 ## Requirements

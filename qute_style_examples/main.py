@@ -30,11 +30,10 @@ log = logging.getLogger(
 
 def create_new_changelog_resource_file(app_name: str) -> None:
     """Create the changelog resource file and import it."""
-    with resources.as_file(resources.files("qute_style_examples")) as path:
+    with resources.path("qute_style_examples", "") as path:
         generate_changelog_resource_file(
             app_name, path / "test_changelog", path
         )
-
     import_module("qute_style_examples.resources_cl")
 
 
