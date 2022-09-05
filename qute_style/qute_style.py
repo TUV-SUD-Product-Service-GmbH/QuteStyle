@@ -244,7 +244,7 @@ class QuteStyle(QProxyStyle):
                 QuteStyle.ToggleOptions.BOX_HEIGHT,
             )
 
-    def standardPalette(  # pylint: disable=invalid-name,no-self-use
+    def standardPalette(  # pylint: disable=invalid-name
         self,
     ) -> QPalette:
         """Return the QStyle's standard QPalette."""
