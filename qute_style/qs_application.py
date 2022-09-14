@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 import operator
 from copy import copy
+from dataclasses import dataclass
 from typing import List, Type, cast
 
 from PyQt5 import QtCore
@@ -26,9 +27,9 @@ from PyQt5.QtWidgets import (
 )
 
 from qute_style.helper import check_ide, create_waiting_spinner
+from qute_style.qs_main_window import AppData
 from qute_style.startup_threads import StartupThread
 from qute_style.style import get_color, get_style
-from qute_style.update_window import AppData, TSLMainWindow
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -90,7 +91,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 ):
     """QuteStyleApplication."""
 
-    MAIN_WINDOW_CLASS: Type[TSLMainWindow]
+    MAIN_WINDOW_CLASS: Type[QMainWindow]
 
     STARTUP_THREADS: List[Type[StartupThread]] = []
 
@@ -101,6 +102,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
         super().__init__(argv)
 
         self._update = "-u" not in argv and not check_ide()
+        # legacy parameter, not used anymore for qute style apps
         self._force_whats_new = "-w" in argv
         self._reset_settings = "-c" in argv
 

@@ -7,7 +7,7 @@ from typing import Tuple, Type
 
 from PyQt5.QtCore import QThread
 
-from qute_style.update_window import AppData
+from qute_style.qs_main_window import AppData
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
