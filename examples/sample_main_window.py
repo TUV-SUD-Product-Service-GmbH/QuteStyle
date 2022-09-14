@@ -14,9 +14,8 @@ from PyQt5.QtWidgets import (
 )
 
 from examples.sample_widgets import ModelViewWidget, TestWidget
-from qute_style.qs_main_window import QuteStyleMainWindow
+from qute_style.qs_main_window import AppData, QuteStyleMainWindow
 from qute_style.style import THEMES, get_current_style
-from qute_style.update_window import AppData
 from qute_style.widgets.base_widgets import BaseWidget, SettingsBaseWidget
 from qute_style.widgets.color_manager import ColorManager
 from qute_style.widgets.home_page import HomePage
@@ -72,8 +71,8 @@ class StyledMainWindow(QuteStyleMainWindow):
     def __init__(
         self,
         app_data: AppData,
-        force_whats_new: bool = False,
         registry_reset: bool = False,
+        force_whats_new: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new StyledMainWindow."""
