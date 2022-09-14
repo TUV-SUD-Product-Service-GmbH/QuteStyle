@@ -77,6 +77,7 @@ class StyledMainWindow(QuteStyleMainWindow):
         """Create a new StyledMainWindow."""
         super().__init__(
             app_data,
+            False,
             registry_reset,
             parent,
         )

@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import operator
 from copy import copy
-from dataclasses import dataclass
 from typing import List, Type, cast
 
 from PyQt5 import QtCore
