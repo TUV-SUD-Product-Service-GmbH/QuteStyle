@@ -59,7 +59,8 @@ class AppData:  # pylint: disable=too-many-instance-attributes
     organization_domain: str = ""
 
 
-class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
+class QuteStyleMainWindow(
+    # pylint: disable=too-many-instance-attributes, too-many-public-methods
     QMainWindow
 ):
     """QuteStyleMainWindow definition for custom Darcula style."""
@@ -697,7 +698,9 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         log.debug("Finished writing settings to registry")
 
     @pyqtSlot(QCloseEvent, name="closeEvent")
-    def closeEvent(self, close_event: QCloseEvent) -> None:
+    def closeEvent(  # pylint: disable=invalid-name
+        self, close_event: QCloseEvent
+    ) -> None:
         """Handle a close event."""
         widgets = [
             cast(MainWidget, self._content.widget(idx))
