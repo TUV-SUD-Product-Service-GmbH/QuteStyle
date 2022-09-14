@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import (
 )
 
 from qute_style.helper import check_ide, create_waiting_spinner
-from qute_style.qs_main_window import AppData
+from qute_style.qs_main_window import AppData, CustomMainWindow
 from qute_style.startup_threads import StartupThread
 from qute_style.style import get_color, get_style
 
@@ -90,7 +90,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 ):
     """QuteStyleApplication."""
 
-    MAIN_WINDOW_CLASS: Type[QMainWindow]
+    MAIN_WINDOW_CLASS: Type[CustomMainWindow]
 
     STARTUP_THREADS: List[Type[StartupThread]] = []
 

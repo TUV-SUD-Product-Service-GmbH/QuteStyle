@@ -59,9 +59,30 @@ class AppData:  # pylint: disable=too-many-instance-attributes
     organization_domain: str = ""
 
 
+class CustomMainWindow(QMainWindow):
+    """Base Main window class."""
+
+    def __init__(
+        self,
+        app_data: AppData,
+        # force_whats_new, legacy parameter for backward compatibility
+        # not required for qute style apps
+        force_whats_new: bool = False,
+        registry_reset: bool = False,
+        parent: QWidget | None = None,
+    ) -> None:
+        """Create a new QuteStyleMainWindow."""
+        super().__init__(parent)
+        self._app_data = app_data
+        self._force_whats_new: bool = force_whats_new
+        if registry_reset:
+            log.debug("Resetting QSettings in Registry.")
+            QSettings().clear()
+
+
 class QuteStyleMainWindow(
     # pylint: disable=too-many-instance-attributes, too-many-public-methods
-    QMainWindow
+    CustomMainWindow
 ):
     """QuteStyleMainWindow definition for custom Darcula style."""
 
@@ -86,20 +107,15 @@ class QuteStyleMainWindow(
     def __init__(  # pylint: disable=too-many-arguments
         self,
         app_data: AppData,
-        _: bool = False,  # legacy parameter for backward compatibility
+        force_whats_new: bool = False,
         registry_reset: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new QuteStyleMainWindow."""
-        super().__init__(parent)
-        if registry_reset:
-            log.debug("Resetting QSettings in Registry.")
-            QSettings().clear()
+        super().__init__(app_data, force_whats_new, registry_reset, parent)
 
         QApplication.setStyle(QuteStyle())
         QApplication.setPalette(QApplication.style().standardPalette())
-
-        self._app_data = app_data
 
         # Set the global stylesheet.
         self.set_style()

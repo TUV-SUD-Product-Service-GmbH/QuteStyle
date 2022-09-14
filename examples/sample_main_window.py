@@ -72,12 +72,13 @@ class StyledMainWindow(QuteStyleMainWindow):
         self,
         app_data: AppData,
         registry_reset: bool = False,
+        force_whats_new: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new StyledMainWindow."""
         super().__init__(
             app_data,
-            False,
+            force_whats_new,
             registry_reset,
             parent,
         )
