@@ -101,7 +101,6 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
         super().__init__(argv)
 
         self._update = "-u" not in argv and not check_ide()
-        # legacy parameter, not used anymore for qute style apps
         self._force_whats_new = "-w" in argv
         self._reset_settings = "-c" in argv
 
