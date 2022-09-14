@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
-from qute_style.qs_main_window import CustomMainWindow, AppData
+from qute_style.qs_main_window import AppData, CustomMainWindow
 from qute_style.style import DEFAULT_STYLE, get_color, set_current_style
 from qute_style.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
 
