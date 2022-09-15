@@ -22,7 +22,7 @@ jobs:
       run: pip install poetry
 
     - name: Install project dependencies
-      run: poetry install -vvv --no-root
+      run: poetry install --no-root
 
     - name: Analysing the code with pylint
       run: poetry run pylint --rcfile=.pylintrc `ls -dR $PWD/qute_style/*|grep .py$|xargs`
