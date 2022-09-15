@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QApplication
 
 from qute_style.dev.dev_functions import generate_changelog_resource_file
 from qute_style.qs_application import QuteStyleApplication
-from qute_style.update_window import AppData
+from qute_style.qs_main_window import AppData
 from qute_style_examples.sample_main_window import StyledMainWindow
 
 log = logging.getLogger(

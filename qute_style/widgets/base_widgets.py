@@ -53,7 +53,7 @@ class MainWidget(BaseWidget):
         """Store the settings."""
 
     @property
-    def settings_widget(  # pylint: disable=no-self-use
+    def settings_widget(
         self,
     ) -> None | QWidget:
         """Get the settings widget. Implemented by custom classes."""
@@ -65,7 +65,7 @@ class MainWidget(BaseWidget):
         log.debug("On thread finished base class %s", self.NAME)
         self.shutdown_completed.emit(self)
 
-    def request_shutdown(self) -> bool:  # pylint: disable=no-self-use
+    def request_shutdown(self) -> bool:
         """
         Request shutdown from a widget so that the widget can interfere.
 

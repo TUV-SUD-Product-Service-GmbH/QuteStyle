@@ -88,10 +88,11 @@ class LeftMenu(QWidget):
         self._top_layout.addWidget(Div())
 
         self._setup_scroll_area(len(main_widgets))
-        # Set strech factor 1 to ensure that,
+        # Set stretch factor 1 to ensure that,
         # if enough space is available, all widgets are displayed
         layout.addWidget(self._scroll_area, 1)
-        # Add strech to ensure that scroll area is aligned below the Menubutton
+        # Add stretch to ensure that scroll
+        # area is aligned below the Menubutton
         layout.addStretch()
 
         bottom_frame = QFrame()
@@ -111,9 +112,8 @@ class LeftMenu(QWidget):
 
     if TYPE_CHECKING:
 
-        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+        def parent(self) -> QWidget:
             """Override base class method for correct type hint."""
-            ...
 
     def _add_main_widgets(self, widgets: Iterable[Type[MainWidget]]) -> None:
         """Create the widgets and add them to the main area."""
@@ -139,7 +139,7 @@ class LeftMenu(QWidget):
         # MaximumHeight depends on number of widgets:
         # 50 px widget height + 1 px spacing
         self._scroll_area.setMaximumHeight(51 * num_widgets)
-        # Horizontal Policy: MinimumExpaning --> widget text gets displayed
+        # Horizontal Policy: MinimumExpanding --> widget text gets displayed
         # Vertical Policy: Maximum --> is set to the number of visible widgets
         self._scroll_area.setSizePolicy(
             QSizePolicy.MinimumExpanding, QSizePolicy.Maximum
