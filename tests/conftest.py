@@ -20,8 +20,8 @@ import qute_style.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from qute_style import style
 from qute_style.dev.mocks import check_call
 from qute_style.qs_application import QuteStyleApplication
+from qute_style.qs_main_window import AppData
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
-from qute_style.update_window import AppData
 from tests.test_qs_main_window import EmptyWindowStyled
 
 log = logging.getLogger(  # pylint: disable=invalid-name

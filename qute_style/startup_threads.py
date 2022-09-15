@@ -7,7 +7,7 @@ from typing import Tuple, Type
 
 from PyQt5.QtCore import QThread
 
-from qute_style.update_window import AppData
+from qute_style.qs_main_window import AppData
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -48,7 +48,7 @@ class StartupThread(QThread):
         raise NotImplementedError  # pragma: no cover
 
     @property
-    def exit_application(self) -> bool:  # pylint: disable=no-self-use
+    def exit_application(self) -> bool:
         """Return if the app should call exit_function on thread finished."""
         return False
 
