@@ -6,12 +6,12 @@ Upon start of the application, the user can select the preferred theme amongst t
 darker themes, ```Darcula``` and ```Princess Pink```, two light themes, ```Highbridge Grey``` and ```Snow White```,
 and the colorful theme ```Ruby Red```:
 
-![Darcula](.././examples/example_images/darcula.PNG)
+![Darcula](../qute_style_examples/example_images/darcula.PNG)
 
 Additionally, the colors of the themes can be adjusted or completely new themes can be created. For this purpose, open the
 [color picker](./widgets.md#color-manager) and select the colors to be adjusted. For example, changing ```bg_elements``` to a dark blue:
 
-![Custom Style](.././examples/example_images/custom_style.PNG)
+![Custom Style](../qute_style_examples/example_images/custom_style.PNG)
 
 ## Icons and Images
 

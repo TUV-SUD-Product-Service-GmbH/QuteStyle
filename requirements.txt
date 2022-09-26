@@ -1,2 +1,0 @@
-git+https://github.com/z3ntu/QtWaitingSpinner.git
-PyQt5==5.15.6

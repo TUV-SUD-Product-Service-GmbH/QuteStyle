@@ -13,13 +13,13 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from examples.sample_widgets import ModelViewWidget, TestWidget
 from qute_style.qs_main_window import AppData, QuteStyleMainWindow
 from qute_style.style import THEMES, get_current_style
 from qute_style.widgets.base_widgets import BaseWidget, SettingsBaseWidget
 from qute_style.widgets.color_manager import ColorManager
 from qute_style.widgets.home_page import HomePage
 from qute_style.widgets.icon_button import IconButton
+from qute_style_examples.sample_widgets import ModelViewWidget, TestWidget
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
