@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import (
 )
 
 from qute_style.gen.ui_test_window import Ui_test_widget
-from qute_style.helper import create_tooltip
+from qute_style.helper import create_tooltip, create_waiting_spinner
 from qute_style.widgets.base_widgets import MainWidget
 from qute_style.widgets.custom_icon_engine import CustomIconEngine
 from qute_style.widgets.drop_label import DropLabel
@@ -229,3 +229,20 @@ class ModelViewWidget(MainWidget):
                 QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)
             )
         return self._settings_widget
+
+
+class SpinnerWidget(MainWidget):
+    """Test Widget for pyqtspinner."""
+
+    ICON = ":/svg_icons/heart_broken.svg"
+    NAME = "Spinner-Widget"
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        """Create a new TestWidget."""
+        super().__init__(parent)
+        layout = QHBoxLayout(self)
+        self._view = QListView()
+        self._settings_widget: None | QWidget = None
+        layout.addWidget(self._view)
+        self._spinner = create_waiting_spinner(self)
+        self._spinner.start()

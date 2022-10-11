@@ -19,7 +19,11 @@ from qute_style.widgets.base_widgets import BaseWidget, SettingsBaseWidget
 from qute_style.widgets.color_manager import ColorManager
 from qute_style.widgets.home_page import HomePage
 from qute_style.widgets.icon_button import IconButton
-from qute_style_examples.sample_widgets import ModelViewWidget, TestWidget
+from qute_style_examples.sample_widgets import (
+    ModelViewWidget,
+    SpinnerWidget,
+    TestWidget,
+)
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -62,7 +66,12 @@ class InfoWidget(BaseWidget):
 class StyledMainWindow(QuteStyleMainWindow):
     """Test StyledMainWindow for validation of QuteStyle Darcula Style."""
 
-    MAIN_WIDGET_CLASSES = [HomePage, TestWidget, ModelViewWidget]
+    MAIN_WIDGET_CLASSES = [
+        HomePage,
+        TestWidget,
+        ModelViewWidget,
+        SpinnerWidget,
+    ]
     RIGHT_WIDGET_CLASSES = [ColorManager]
     LEFT_WIDGET_CLASSES = [SettingsWidget, InfoWidget]
 

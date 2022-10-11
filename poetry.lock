@@ -387,7 +387,7 @@ dev = ["mypy (==0.930)", "pytest", "pytest-xvfb"]
 
 [[package]]
 name = "pyqtspinner"
-version = "0.1.1"
+version = "1.0.2"
 description = "A waiting spinner for PyQt5"
 category = "main"
 optional = false
