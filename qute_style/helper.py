@@ -11,7 +11,7 @@ from pyqtspinner.spinner import WaitingSpinner
 
 from qute_style.style import get_color
 
-log = logging.getLogger("qute_style")  # pylint: disable=invalid-name
+log = logging.getLogger("qute_style")
 
 
 def check_ide() -> bool:
@@ -41,9 +41,7 @@ def decode_pixmap(pixmap_string: str) -> QPixmap:
 class StyledWaitingSpinner(WaitingSpinner):
     """Styled Version of QWaitingSpinner."""
 
-    def paintEvent(  # pylint: disable=invalid-name, arguments-renamed
-        self, _: QPaintEvent
-    ) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:
         """Overwrite method to change color of spinner."""
         self._color = QColor(get_color("context_color"))
         super().paintEvent(_)
