@@ -844,7 +844,7 @@ pyqt5-stubs = [
     {file = "PyQt5_stubs-5.15.6.0-py3-none-any.whl", hash = "sha256:7fb8177c72489a8911f021b7bd7c33f12c87f6dba92dcef3fdcdb5d9400f0f3f"},
 ]
 pyqtspinner = [
-    {file = "pyqtspinner-0.1.1.tar.gz", hash = "sha256:691e5c434aa34d2ac10302a1626cb37a9b6578033a796e67531687ce043a1ff2"},
+    {file = "pyqtspinner-1.0.2.tar.gz", hash = "sha256:cc1c4e89e674648d95159f85e3d67d2aeff5e8ea3e4e9c21d755d719a64c30a7"},
 ]
 pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
