@@ -21,9 +21,6 @@ setup(
     package_data={
         "qute_style": ["py.typed", "widgets/**/*.py"],
     },
-    install_requires=[
-        "PyQt5",
-        "QtWaitingSpinner @ git+https://github.com/z3ntu/QtWaitingSpinner.git",
-    ],
+    install_requires=["PyQt5", "pyqtspinner"],
     zip_safe=False,
 )

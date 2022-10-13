@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
 
 from PyQt5.QtCore import (
@@ -23,6 +24,7 @@ from PyQt5.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLayout,
+    QMainWindow,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
@@ -31,7 +33,6 @@ from PyQt5.QtWidgets import (
 import qute_style.resources_rc  # pylint: disable=unused-import  # noqa: F401
 from qute_style.qute_style import QuteStyle
 from qute_style.style import get_style, set_current_style
-from qute_style.update_window import AppData, TSLMainWindow
 from qute_style.widgets.background_frame import BackgroundFrame
 from qute_style.widgets.base_widgets import BaseWidget, MainWidget
 from qute_style.widgets.credit_bar import CreditBar
@@ -44,13 +45,46 @@ from qute_style.widgets.title_bar import TitleBar
 log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
 
 
-class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
-    TSLMainWindow
+@dataclass
+class AppData:  # pylint: disable=too-many-instance-attributes
+    """Provide required data to startup threads."""
+
+    app_name: str = ""
+    app_version: str = ""
+    app_icon: str = ""
+    app_splash_icon: str = ""
+    help_text: str = ""
+    debug_text: str = ""
+    organization_name: str = ""
+    organization_domain: str = ""
+
+
+class CustomMainWindow(QMainWindow):
+    """Base Main window class."""
+
+    def __init__(
+        self,
+        app_data: AppData,
+        # force_whats_new, legacy parameter for backward compatibility
+        # not required for qute style apps
+        force_whats_new: bool = False,
+        registry_reset: bool = False,
+        parent: QWidget | None = None,
+    ) -> None:
+        """Create a new QuteStyleMainWindow."""
+        super().__init__(parent)
+        self._app_data = app_data
+        self._force_whats_new: bool = force_whats_new
+        if registry_reset:
+            log.debug("Resetting QSettings in Registry.")
+            QSettings().clear()
+
+
+class QuteStyleMainWindow(
+    # pylint: disable=too-many-instance-attributes, too-many-public-methods
+    CustomMainWindow
 ):
     """QuteStyleMainWindow definition for custom Darcula style."""
-
-    # As default styled version does not show the WhatsNewWindow.
-    WHATS_NEW = False
 
     # Widgets that will be shown in the center content and which are
     # accessible from the main menu on the left side.
@@ -78,17 +112,10 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         parent: QWidget | None = None,
     ) -> None:
         """Create a new QuteStyleMainWindow."""
-        super().__init__(
-            app_data,
-            force_whats_new,
-            registry_reset,
-            parent,
-        )
+        super().__init__(app_data, force_whats_new, registry_reset, parent)
 
         QApplication.setStyle(QuteStyle())
         QApplication.setPalette(QApplication.style().standardPalette())
-
-        self._app_data = app_data
 
         # Set the global stylesheet.
         self.set_style()
@@ -165,6 +192,29 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
             self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
 
     MainWidgetT = TypeVar("MainWidgetT", bound=MainWidget)
+
+    def show(self) -> None:
+        """Override show to start update just before."""
+        self._load_settings()
+        super().show()
+
+    def _load_settings(self) -> None:
+        """Load geometry and state settings of the ui."""
+        log.debug("Loading settings from registry")
+        settings = QSettings()
+        try:
+            self.restoreGeometry(settings.value("geometry"))
+        except TypeError:
+            log.warning(
+                "Could not restore geometry from: %s",
+                settings.value("geometry"),
+            )
+        try:
+            self.restoreState(settings.value("state"))
+        except TypeError:
+            log.warning(
+                "Could not restore state from: %s", settings.value("state")
+            )
 
     def get_main_widget(
         self, widget: Type[MainWidgetT]
@@ -655,7 +705,18 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
         self._left_menu.set_button_active(widget_class, False)
         self._start_box_animation(False, False)
 
-    def closeEvent(self, close_event: QCloseEvent) -> None:
+    def _save_settings(self) -> None:
+        """Save the paint data and state/geometry settings."""
+        log.debug("Saving settings to registry.")
+        settings = QSettings()
+        settings.setValue("state", self.saveState())
+        settings.setValue("geometry", self.saveGeometry())
+        log.debug("Finished writing settings to registry")
+
+    @pyqtSlot(QCloseEvent, name="closeEvent")
+    def closeEvent(  # pylint: disable=invalid-name
+        self, close_event: QCloseEvent
+    ) -> None:
         """Handle a close event."""
         widgets = [
             cast(MainWidget, self._content.widget(idx))
@@ -667,6 +728,7 @@ class QuteStyleMainWindow(  # pylint: disable=too-many-instance-attributes
                 log.debug("Widget %s can't be shutdown", widget)
                 close_event.ignore()
                 return
+        self._save_settings()
         super().closeEvent(close_event)
 
         for widget in widgets:

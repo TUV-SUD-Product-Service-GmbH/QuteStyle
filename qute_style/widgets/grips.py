@@ -25,9 +25,8 @@ class CornerGrip(QSizeGrip):
 
     if TYPE_CHECKING:
 
-        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+        def parent(self) -> QWidget:
             """Override base class method for correct type hint."""
-            ...
 
     def adapt(self) -> None:
         """Adapt the position when the main window was resized."""
@@ -40,7 +39,7 @@ class CornerGrip(QSizeGrip):
         elif self._position == Qt.BottomRightCorner:
             self.move(self.parent().width() - 20, self.parent().height() - 20)
 
-    def mousePressEvent(  # pylint: disable=invalid-name,no-self-use
+    def mousePressEvent(  # pylint: disable=invalid-name
         self, _: QMouseEvent
     ) -> None:
         """
@@ -134,9 +133,8 @@ class EdgeGrip(QWidget):
 
     if TYPE_CHECKING:
 
-        def parent(self) -> QWidget:  # pylint: disable=no-self-use
+        def parent(self) -> QWidget:
             """Override base class method for correct type hint."""
-            ...
 
     def adapt(self) -> None:
         """Adapt the size and position when the main window was resized."""

@@ -11,8 +11,7 @@ from PyQt5.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from qute_style.dev.mocks import check_call
-from qute_style.qs_main_window import QuteStyleMainWindow
-from qute_style.update_window import AppData
+from qute_style.qs_main_window import AppData, QuteStyleMainWindow
 from qute_style.widgets.base_widgets import BaseWidget, MainWidget
 from qute_style.widgets.left_column import LeftColumn
 from qute_style.widgets.left_menu_button import LeftMenuButton

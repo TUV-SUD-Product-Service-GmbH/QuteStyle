@@ -4,12 +4,11 @@ from PyQt5.QtCore import QRect, QSize
 from PyQt5.QtGui import QColor, QIcon, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
+from qute_style.qs_main_window import AppData, CustomMainWindow
 from qute_style.style import DEFAULT_STYLE, get_color, set_current_style
 from qute_style.widgets.custom_icon_engine import CustomIconEngine, PixmapStore
-from tests.test_update_window import create_new_tsl_main_window
 
 
-# qtbot is necessary for QPixmap
 def test_get_new_pixmap(  # pylint: disable=unused-argument
     qtbot: QtBot,
 ) -> None:
@@ -40,11 +39,20 @@ def test_get_old_pixmap(  # pylint: disable=unused-argument
     assert old_pixmap is new_pixmap
 
 
+def create_new_main_window(qtbot: QtBot) -> CustomMainWindow:
+    """Create and show a new QuteStyleMainWindow."""
+    widget = CustomMainWindow(AppData("", "1.0.0"))
+    qtbot.addWidget(widget)
+    widget.show()
+    qtbot.waitUntil(widget.isVisible)
+    return widget
+
+
 def test_custom_icon_engine_paint(
     qtbot: QtBot, monkeypatch: MonkeyPatch
 ) -> None:
     """Test that drawPixmap method inside is called correctly."""
-    widget = create_new_tsl_main_window(qtbot)
+    widget = create_new_main_window(qtbot)
     engine = CustomIconEngine("tests/test_images/test_icon.svg", "yellow")
     painter = QPainter(widget)
     rect = QRect(0, 0, 40, 16)
