@@ -1,6 +1,8 @@
 """Combobox that displays a list of items to be checked."""
+
 from __future__ import annotations
 
+import contextlib
 import logging
 from typing import Generic, List, Tuple, TypeVar, cast
 
@@ -164,12 +166,9 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                 return True
 
             if obj is self.view().viewport():
-                try:
+                with contextlib.suppress(AttributeError):
                     self._check_item_at_pos(event.pos())
                     return True
-                except AttributeError:
-                    # happens when the user clicks between two items
-                    pass
         return False
 
     def hidePopup(self) -> None:  # pylint: disable=invalid-name
