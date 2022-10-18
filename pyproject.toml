@@ -14,7 +14,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 PyQt5 = "5.15.6"
-pyqtspinner = "^0.1.1"
+pyqtspinner = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
