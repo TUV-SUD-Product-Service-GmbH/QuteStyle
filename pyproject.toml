@@ -12,7 +12,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<3.12"
 PyQt5 = "5.15.6"
 pyqtspinner = "^2.0.0"
 
@@ -26,7 +26,7 @@ isort = "5.10.1"
 mypy = "0.920"
 pre-commit = "2.16.0"
 pydocstyle = "6.1.1"
-pylint = "2.12.2"
+pylint = "^2.15.3"
 pylint-sqlalchemy = "0.2.0"
 pytest-cov = "^3.0.0"
 pytest-github-actions-annotate-failures = "^0.1.7"
