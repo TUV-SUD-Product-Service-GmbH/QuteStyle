@@ -12,21 +12,21 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<3.12"
 PyQt5 = "5.15.6"
 pyqtspinner = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "6.2.5"
-pytest-qt = "4.0.2"
+pytest = "7.2.0"
+pytest-qt = "4.2.0"
 requests = "2.26.0"
 black = "22.3.0"
-coverage = "6.2"
+coverage = "6.5.0"
 isort = "5.10.1"
 mypy = "0.920"
 pre-commit = "2.16.0"
 pydocstyle = "6.1.1"
-pylint = "2.12.2"
+pylint = "^2.15.3"
 pylint-sqlalchemy = "0.2.0"
 pytest-cov = "^3.0.0"
 pytest-github-actions-annotate-failures = "^0.1.7"
