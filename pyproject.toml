@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qute_style"
-version = "0.1.5"
+version = "0.1.6"
 description = "QuteStyle is an expandable application framework for PyQt5"
 authors = ["Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke <PS-TF-Entwicklung@tuev-sued.de>"]
 readme = "README.md"
