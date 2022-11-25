@@ -1,4 +1,3 @@
 ignore:
   - "qute_style/dev"
   - "qute_style/gen"
-  - "qute_style/version.py"
