@@ -1,7 +1,9 @@
 """Setup script for QuteStyle library."""
+import importlib.metadata
+
 from setuptools import setup
 
-from qute_style.version import VERSION
+VERSION = importlib.metadata.version("qute_style")
 
 setup(
     name="qute_style",
