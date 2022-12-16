@@ -50,10 +50,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
 
     def __repr__(self) -> str:
         """Return a str representation of the object."""
-        if self._widget_class:
-            class_name = self._widget_class.__name__
-        else:
-            class_name = "None"
+        class_name = self._widget_class.__name__ if self._widget_class else "None"
         return f"<{self.__class__.__name__} for widget {class_name}>"
 
     @property

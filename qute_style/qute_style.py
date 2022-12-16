@@ -589,8 +589,8 @@ class QuteStyle(QProxyStyle):
         """Return a button's background color depending on option."""
         if option.state & QStyle.State_On:
             return option.palette.color(QPalette.Normal, QPalette.Highlight)
-        if not option.state & QStyle.State_Enabled:
-            return option.palette.color(
-                QPalette.Disabled, QPalette.AlternateBase
-            )
-        return option.palette.color(QPalette.Normal, QPalette.AlternateBase)
+        return (
+            option.palette.color(QPalette.Normal, QPalette.AlternateBase)
+            if option.state & QStyle.State_Enabled
+            else option.palette.color(QPalette.Disabled, QPalette.AlternateBase)
+        )

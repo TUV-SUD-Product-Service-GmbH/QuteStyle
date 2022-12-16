@@ -74,10 +74,11 @@ class LeftMenuButton(
         painter.setPen(Qt.NoPen)
 
         if self._is_active or self._is_active_tab:
-            if self._is_active:
-                indicator_color = get_color("context_color")
-            else:
-                indicator_color = self._bgs["pressed"]
+            indicator_color = (
+                get_color("context_color")
+                if self._is_active
+                else self._bgs["pressed"]
+            )
             painter.setBrush(QColor(indicator_color))
             rect_blue = QRect(4, 5, 20, self.height() - 10)
             painter.drawRoundedRect(rect_blue, 8, 8)

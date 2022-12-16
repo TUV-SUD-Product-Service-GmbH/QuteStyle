@@ -94,10 +94,7 @@ def _mp_call(
         if isinstance(return_value, Exception):
             # bug in pylint https://www.logilab.org/ticket/3207
             raise return_value  # pylint: disable-msg=raising-bad-type
-        if callable(return_value):
-            # Handle the case that a function was passed
-            return return_value(*a, **k)
-        return return_value
+        return return_value(*a, **k) if callable(return_value) else return_value
 
     # first case handles class + method, second one mock as str
     if as_property or (isinstance(mock_class, str) and return_value):

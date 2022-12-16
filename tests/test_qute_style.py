@@ -47,16 +47,12 @@ pytestmark = pytest.mark.usefixtures("qapp")
 )
 def test_draw_control(element: QuteStyle.ControlElement) -> None:
     """Test that drawControl calls the correct sub functions."""
-    method_name = {
+    if method_name := {
         QuteStyle.CE_Toggle: "_draw_toggle",
         QuteStyle.CE_CheckBoxLabel: "_draw_check_box_label",
         QuteStyle.CE_CheckBox: "_draw_checkbox",
         QuteStyle.CE_ItemViewItem: None,
-    }[element]
-    if not method_name:
-        with check_call(QProxyStyle, "drawControl"):
-            QuteStyle().drawControl(element, QStyleOption(), QPainter(), None)
-    else:
+    }[element]:
         with check_call(QuteStyle, method_name):
             option = (
                 ToggleOptionButton
@@ -65,6 +61,10 @@ def test_draw_control(element: QuteStyle.ControlElement) -> None:
             )
             widget = QCheckBox() if element == QuteStyle.CE_CheckBox else None
             QuteStyle().drawControl(element, option(), QPainter(), widget)
+
+    else:
+        with check_call(QProxyStyle, "drawControl"):
+            QuteStyle().drawControl(element, QStyleOption(), QPainter(), None)
 
 
 def test_draw_check_box(style_option_button: QStyleOptionButton) -> None:
@@ -141,8 +141,7 @@ class TestDrawIndicatorCheckbox:
 @pytest.fixture(name="qute_style")
 def fixture_qute_style() -> QuteStyle:
     """Generate a QuteStyle."""
-    qute_style = QuteStyle()
-    return qute_style
+    return QuteStyle()
 
 
 @pytest.fixture(
@@ -153,10 +152,7 @@ def fixture_qute_style() -> QuteStyle:
 def fixture_option(request: SubRequest) -> QStyleOption:
     """Generate a QStyleOption."""
     option = QStyleOption()
-    if request.param:
-        option.state = QStyle.State_Children
-    else:
-        option.state = QStyle.State_Open
+    option.state = QStyle.State_Children if request.param else QStyle.State_Open
     option.rect.setY(5)
     option.rect.setX(5)
     return option
