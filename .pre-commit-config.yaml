@@ -85,11 +85,6 @@ repos:
         language: system
         types: [ python ]
 
-# Should be activated once there is time to check setup.py:
-#  - repo: https://github.com/regebro/pyroma
-#    rev: "3.2"
-#    hooks:
-#      - id: pyroma
 
 # Should be activated once there is time to find unused code:
 #  - repo: https://github.com/PyCQA/bandit
