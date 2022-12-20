@@ -1,8 +1,6 @@
 name: Python package
 on:
-  release:
-    branches:
-      - master
+  push:
     tags:
       - "v*.*.*"
 jobs:
