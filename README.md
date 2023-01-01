@@ -90,8 +90,8 @@ if __name__ == "__main__":
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
-    APP = MyApplication(sys.argv)
-    sys.exit(APP.exec())
+    app = MyApplication(sys.argv)
+    sys.exit(app.exec())
 ```
 
 For further information, see our [documentation](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/tree/master/docs).

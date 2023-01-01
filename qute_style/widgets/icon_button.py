@@ -44,15 +44,12 @@ class IconButton(QPushButton):
             super().__init__(text=text, parent=parent)
         else:
             super().__init__(parent=parent)
-        if bgs:
-            self._bgs = bgs
-        else:
-            self._bgs = BackgroundColorNames(
-                hovering="bg_elements",
-                background="transparent",
-                pressed="dark_two",
-                released="bg_elements",
-            )
+        self._bgs = bgs or BackgroundColorNames(
+            hovering="bg_elements",
+            background="transparent",
+            pressed="dark_two",
+            released="bg_elements",
+        )
 
         self._set_icon_path = icon_path
 
