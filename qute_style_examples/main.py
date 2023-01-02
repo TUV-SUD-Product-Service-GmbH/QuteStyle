@@ -99,8 +99,8 @@ def main_method() -> None:
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
-    APP = QuteStyleCustomApplication(sys.argv)
-    sys.exit(APP.exec())
+    app = QuteStyleCustomApplication(sys.argv)
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":
