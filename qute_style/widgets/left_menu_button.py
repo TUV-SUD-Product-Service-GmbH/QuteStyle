@@ -54,7 +54,7 @@ class LeftMenuButton(
             margin,
         )
 
-        # This can't be a class variable because it get's garbage collected
+        # This can't be a class variable because it gets garbage collected
         # and the app crashes. It should be in the pixmap store.
         self.active_menu = QPixmap(":/svg_icons/active_menu.svg")
 
@@ -73,21 +73,12 @@ class LeftMenuButton(
         # set NoPen so that no borders are drawn.
         painter.setPen(Qt.NoPen)
 
-        if self._is_active or self._is_active_tab:
-            if self._is_active:
-                indicator_color = get_color("context_color")
-            else:
-                indicator_color = self._bgs["pressed"]
-            painter.setBrush(QColor(indicator_color))
-            rect_blue = QRect(4, 5, 20, self.height() - 10)
-            painter.drawRoundedRect(rect_blue, 8, 8)
-            painter.setBrush(QColor(get_color("bg_one")))
-            rect_inside_active = QRect(
-                7, 5, self.visible_width(), self.height() - 10
-            )
-            painter.drawRoundedRect(rect_inside_active, 8, 8)
-            self._paint_active_icon(painter)
-
+        if self._is_active:
+            indicator_color = get_color("context_color")
+            self._draw_button_rect(painter, indicator_color)
+        elif self._is_active_tab:
+            indicator_color = self._bgs["pressed"]
+            self._draw_button_rect(painter, indicator_color)
         else:
             # If the button is neither active (i.e. left column is shown) nor
             # does it belong to the active tab, we draw the hover effect.
@@ -110,7 +101,7 @@ class LeftMenuButton(
                 text_color = get_color("foreground")
             self._text_paint(painter, QColor(text_color))
 
-        # Draw the icon depending of the hover/click state. If the button is
+        # Draw the icon depending on the hover/click state. If the button is
         # toggled (current menu button), we always draw context_color.
         if self._is_toggle_active:
             color = get_color("context_color")
@@ -118,6 +109,20 @@ class LeftMenuButton(
             color = get_color(self._icon_color)
 
         self._icon_paint(painter, QColor(color))
+
+    def _draw_button_rect(
+        self, painter: QPainter, indicator_color: str
+    ) -> None:
+        """Draw the rectangle of the menu button with the given color."""
+        painter.setBrush(QColor(indicator_color))
+        rect_blue = QRect(4, 5, 20, self.height() - 10)
+        painter.drawRoundedRect(rect_blue, 8, 8)
+        painter.setBrush(QColor(get_color("bg_one")))
+        rect_inside_active = QRect(
+            7, 5, self.visible_width(), self.height() - 10
+        )
+        painter.drawRoundedRect(rect_inside_active, 8, 8)
+        self._paint_active_icon(painter)
 
     def set_active_tab(self, is_active: bool) -> None:
         """

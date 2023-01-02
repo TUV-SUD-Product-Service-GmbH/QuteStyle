@@ -184,8 +184,7 @@ class LeftColumn(QWidget):
 
     def current_widget_type(self) -> Optional[Type[BaseWidget]]:
         """Return the currently active widget class."""
-        widget = self._stacked_widget.currentWidget()
-        if widget:
+        if widget := self._stacked_widget.currentWidget():
             return cast(Type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None
