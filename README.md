@@ -10,12 +10,18 @@ QuteStyle is an expandable application framework for PyQt5 and heavily inspired 
 The main goal of this project is to provide a simple and easy to use application frame that can be used to create a new application.
 It is mainly suited for applications that rely on a center widget for user interaction. Functionality is extendable by having different widgets that can be loaded into that center widget area.
 
+**Package**
+
+[![PyPI](https://img.shields.io/pypi/v/qute_style)](https://pypi.org/project/qute-style/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/qute_style)](https://pypi.org/project/qute-style/#files)
+
 **Project status**
 
 [![Python Versions](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
 [![Qt Versions](https://img.shields.io/badge/Qt-5-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/github/license/TUV-SUD-Product-Service-GmbH/QuteStyle.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/python/black)
+
 
 **Tests**
 
@@ -48,8 +54,6 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 - [PyQt5](https://pypi.org/project/PyQt5/)
 
 ## Installation Method
-
-- Latest development version
 
    ```plaintext
    pip install qute-style
