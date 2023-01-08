@@ -10,11 +10,6 @@ QuteStyle is an expandable application framework for PyQt5 and heavily inspired 
 The main goal of this project is to provide a simple and easy to use application frame that can be used to create a new application.
 It is mainly suited for applications that rely on a center widget for user interaction. Functionality is extendable by having different widgets that can be loaded into that center widget area.
 
-**Package**
-
-[![PyPI](https://img.shields.io/pypi/v/qute_style)](https://pypi.org/project/qute-style/)
-[![PyPI - Wheel](https://img.shields.io/pypi/wheel/qute_style)](https://pypi.org/project/qute-style/#files)
-
 **Project status**
 
 [![Python Versions](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
@@ -25,10 +20,17 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 **Tests**
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master.svg)](https://results.pre-commit.ci/latest/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master)
 [![CodeQL](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/CodeQL/badge.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ACodeQL)
 [![Build Status](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ATests)
 [![Code Coverage](https://codecov.io/github/TUV-SUD-Product-Service-GmbH/QuteStyle/coverage.svg?branch=master&token=)](https://codecov.io/gh/TUV-SUD-Product-Service-GmbH/QuteStyle)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master.svg)](https://results.pre-commit.ci/latest/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master)
+
+
+**Package**
+
+[![PyPI](https://img.shields.io/pypi/v/qute_style)](https://pypi.org/project/qute-style/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/qute_style)](https://pypi.org/project/qute-style/#files)
+
 
 ## Features
 
