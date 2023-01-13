@@ -17,12 +17,20 @@ It is mainly suited for applications that rely on a center widget for user inter
 [![License](https://img.shields.io/github/license/TUV-SUD-Product-Service-GmbH/QuteStyle.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/python/black)
 
+
 **Tests**
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master.svg)](https://results.pre-commit.ci/latest/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master)
 [![CodeQL](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/CodeQL/badge.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ACodeQL)
 [![Build Status](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/workflows/Tests/badge.svg?branch=master&event=push)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/actions?query=workflow%3ATests)
 [![Code Coverage](https://codecov.io/github/TUV-SUD-Product-Service-GmbH/QuteStyle/coverage.svg?branch=master&token=)](https://codecov.io/gh/TUV-SUD-Product-Service-GmbH/QuteStyle)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master.svg)](https://results.pre-commit.ci/latest/github/TUV-SUD-Product-Service-GmbH/QuteStyle/master)
+
+
+**Package**
+
+[![PyPI](https://img.shields.io/pypi/v/qute_style)](https://pypi.org/project/qute-style/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/qute_style)](https://pypi.org/project/qute-style/#files)
+
 
 ## Features
 
@@ -48,8 +56,6 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 - [PyQt5](https://pypi.org/project/PyQt5/)
 
 ## Installation Method
-
-- Latest development version
 
    ```plaintext
    pip install qute-style
