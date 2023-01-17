@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import pickle
 from enum import IntEnum
-from typing import Callable, Dict, List, Tuple, Type, cast
+from typing import Callable, Type, cast
 
-from PyQt5.QtCore import (
+from PySide6.QtCore import (
     QEasingCurve,
     QFile,
     QIODevice,
@@ -13,12 +13,12 @@ from PyQt5.QtCore import (
     QSettings,
     QSize,
     Qt,
-    pyqtSignal,
-    pyqtSlot,
+    Signal,
+    Slot,
 )
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import (
     QGridLayout,
     QLabel,
     QLayout,
@@ -47,7 +47,7 @@ class WidgetType(IntEnum):
 class StackedWidget(QStackedWidget):
     """Stacked widget for homepage."""
 
-    widget_selected = pyqtSignal(int, name="widget_selected")
+    widget_selected = Signal(int, name="widget_selected")
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new StackedWidget."""
@@ -55,7 +55,7 @@ class StackedWidget(QStackedWidget):
         self._animation_running = False
         self._animation = QPropertyAnimation(self, b"size")
         self._animation.setDuration(400)
-        self._animation.setEasingCurve(QEasingCurve.OutQuad)
+        self._animation.setEasingCurve(QEasingCurve.Type.OutQuad)
         self._animation.finished.connect(self.on_animation_finished)
 
     def set_current_index(self, index: int, animate: bool = True) -> None:
@@ -79,7 +79,7 @@ class StackedWidget(QStackedWidget):
             self._animation.start()
             self._animation_running = True
 
-    @pyqtSlot(name="on_animation_finished")
+    @Slot(name="on_animation_finished")
     def on_animation_finished(self) -> None:
         """Animation finished."""
         self._animation_running = False
@@ -91,20 +91,20 @@ class HomePage(MainWidget):
     ICON = ":/svg_icons/home.svg"
     NAME = "Information"
 
-    change_theme = pyqtSignal(str, name="change_theme")
+    change_theme = Signal(str, name="change_theme")
 
     def __init__(
         self,
-        app_info: Tuple[str, str, str],
-        visible_widgets: List[Type[MainWidget]],
+        app_info: tuple[str, str, str],
+        visible_widgets: list[Type[MainWidget]],
         parent: QWidget | None = None,
     ) -> None:
         """Init Homepage."""
         super().__init__(parent)
-        self._visible_widgets: List[Type[MainWidget]] = visible_widgets
+        self._visible_widgets: list[Type[MainWidget]] = visible_widgets
         self._app_name, self._app_logo, self._app_lang = app_info
         self._widget_stack = StackedWidget()
-        self._select_buttons: Dict[int, QPushButton] = {}
+        self._select_buttons: dict[int, QPushButton] = {}
         self.setLayout(self._create_layout(self._create_welcome_widget()))
         if self._check_show_theme_selection_widget():
             self._widget_stack.set_current_index(
@@ -120,21 +120,25 @@ class HomePage(MainWidget):
         layout.setVerticalSpacing(100)
         widget.setLayout(layout)
         layout.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+            )
         )
 
         label = QLabel(f"Willkommen zur {self._app_name}")
         label.setObjectName("heading_label")
         layout.addWidget(label, 1, 0)
-        layout.setAlignment(label, Qt.AlignCenter)
+        layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
 
         logo_svg = QSvgWidget(self._app_logo)
         logo_svg.setFixedSize(QSize(200, 200))
         layout.addWidget(logo_svg, 2, 0)
-        layout.setAlignment(logo_svg, Qt.AlignCenter)
+        layout.setAlignment(logo_svg, Qt.AlignmentFlag.AlignCenter)
 
         layout.addItem(
-            QSpacerItem(3, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            QSpacerItem(
+                3, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+            )
         )
 
         return widget
@@ -193,7 +197,7 @@ class HomePage(MainWidget):
         layout.addWidget(stylesheet_btn, 1, 2)
         return layout
 
-    @pyqtSlot(int, name="on_index_changed")
+    @Slot(int, name="on_index_changed")
     def on_index_changed(self, index: int) -> None:
         """
         On index changed.
@@ -206,7 +210,7 @@ class HomePage(MainWidget):
         """Create the version history."""
         resource_path = ":/change_log_data.pickle"
         resource_file = QFile(resource_path)
-        change_log_data: Dict[str, Dict[str, List[Dict[str, str]]]] = {}
+        change_log_data: dict[str, dict[str, list[dict[str, str]]]] = {}
         if resource_file.open(QIODevice.ReadOnly):
             pickle_data = resource_file.readAll()
             change_log_data = pickle.loads(pickle_data.data())
@@ -221,10 +225,12 @@ class HomePage(MainWidget):
         label.setObjectName("heading_label")
         label.setContentsMargins(0, 0, 0, 10)
         vert_box_layout.addWidget(label)
-        vert_box_layout.setAlignment(label, Qt.AlignCenter)
+        vert_box_layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
 
         scroll_area = QScrollArea()
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
         vert_box_layout.addWidget(scroll_area)
         scroll_area.setWidgetResizable(True)
         central_widget = QWidget()
@@ -241,8 +247,8 @@ class HomePage(MainWidget):
     def fill_version_info(
         self,
         grid_layout: QGridLayout,
-        change_log_data: Dict[str, Dict[str, List[Dict[str, str]]]],
-        visible_widgets: List[Type[MainWidget]],
+        change_log_data: dict[str, dict[str, list[dict[str, str]]]],
+        visible_widgets: list[Type[MainWidget]],
     ) -> None:
         """Set up version grid from change_log_data."""
         log.debug("Fill version grid")
@@ -253,16 +259,20 @@ class HomePage(MainWidget):
             label.setObjectName("heading1_label")
             label.setMinimumHeight(30)
             grid_layout.addWidget(label, 0, 1)
-            grid_layout.setAlignment(label, Qt.AlignCenter)
+            grid_layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
             return
 
         grid_layout.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            ),
             0,
             3,
         )
         grid_layout.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            ),
             0,
             0,
         )
@@ -322,7 +332,9 @@ class HomePage(MainWidget):
                 row += 1
 
         grid_layout.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+            ),
             row,
             0,
             -1,
@@ -333,8 +345,8 @@ class HomePage(MainWidget):
         self,
         grid_layout: QGridLayout,
         row: int,
-        widget_info: Tuple[str, str],
-        text_items: List[str],
+        widget_info: tuple[str, str],
+        text_items: list[str],
     ) -> int:
         """Add changelog item to grid."""
         widget_name, widget_icon = widget_info
@@ -376,7 +388,7 @@ class HomePage(MainWidget):
         label.setObjectName("heading_label")
         label.setContentsMargins(0, 0, 0, 20)
         vert_box_layout.addWidget(label)
-        vert_box_layout.setAlignment(label, Qt.AlignCenter)
+        vert_box_layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
 
         label = QLabel(
             self.tr(
@@ -387,7 +399,7 @@ class HomePage(MainWidget):
         )
         label.setObjectName("heading_label")
         vert_box_layout.addWidget(label)
-        vert_box_layout.setAlignment(label, Qt.AlignCenter)
+        vert_box_layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
         label = QLabel(
             self.tr(
                 "(Der Design-Stil kann jederzeit über die "
@@ -396,7 +408,7 @@ class HomePage(MainWidget):
             self,
         )
         vert_box_layout.addWidget(label)
-        vert_box_layout.setAlignment(label, Qt.AlignCenter)
+        vert_box_layout.setAlignment(label, Qt.AlignmentFlag.AlignCenter)
 
         scroll_area = QScrollArea(self)
         vert_box_layout.addWidget(scroll_area)
@@ -420,14 +432,18 @@ class HomePage(MainWidget):
 
         icon_size = QSize(300, 200)
         grid.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            ),
             0,
             0,
             -1,
             0,
         )
         grid.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Minimum),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+            ),
             0,
             3,
             -1,
@@ -442,7 +458,9 @@ class HomePage(MainWidget):
             pixmap = QPixmap(_create_theme_drawing(icon_size, color_names))
             button.setIcon(QIcon(pixmap))
             button.setIconSize(icon_size)
-            button.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+            button.setSizePolicy(
+                QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
+            )
             if grid_column > 2:
                 grid_row += 2
                 grid_column = 1
@@ -451,7 +469,9 @@ class HomePage(MainWidget):
             grid.addWidget(QLabel(theme, self), grid_row + 1, grid_column)
             grid_column += 1
         grid.addItem(
-            QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding),
+            QSpacerItem(
+                0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+            ),
             grid_row + 2,
             0,
             -1,

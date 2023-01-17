@@ -3,10 +3,9 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Dict, Optional, Tuple, cast
 
-from PyQt5.QtCore import QPoint, QRect, QSize, Qt
-from PyQt5.QtGui import QColor, QIcon, QIconEngine, QPainter, QPixmap
+from PySide6.QtCore import QPoint, QRect, QSize, Qt
+from PySide6.QtGui import QColor, QIcon, QIconEngine, QPainter, QPixmap
 
 from qute_style.style import get_color
 
@@ -40,7 +39,7 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         transparent backgrounds.
         """
         pixmap = QPixmap(size)
-        pixmap.fill(Qt.transparent)
+        pixmap.fill(Qt.GlobalColor.transparent)
         self.paint(QPainter(pixmap), QRect(QPoint(0, 0), size), mode, state)
         return pixmap
 
@@ -56,7 +55,7 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         radius = min(rect.width(), rect.height())
         rect.setSize(QSize(radius, radius))
         # Scale Icon (not rect) according to DevicePixelRatio
-        radius = int(radius * cast(float, painter.device().devicePixelRatio()))
+        radius = int(radius * painter.device().devicePixelRatio())
         pixmap = store.get_pixmap(
             self._path, radius, radius, get_color(self._color_name)
         )
@@ -71,10 +70,10 @@ class PixmapStore:
     get_pixmap for the desired icon.
     """
 
-    INST: Optional[PixmapStore] = None
+    INST: PixmapStore | None = None
     # _pixmap[path][width, height][color]
-    _pixmaps: Dict[
-        str, Dict[Tuple[int, int], Dict[Optional[str], QPixmap]]
+    _pixmaps: dict[
+        str, dict[tuple[int, int], dict[str | None, QPixmap]]
     ] = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self) -> None:
@@ -102,7 +101,7 @@ class PixmapStore:
         try:
             return self._pixmaps[path][width, height][color]
         # Pixmap has not been created so far
-        except KeyError:
+        except KeyError as exc:
             log.debug(
                 "Creating QPixmap for path '%s' "
                 "with width '%s', height '%s' and color '%s'",
@@ -116,15 +115,20 @@ class PixmapStore:
             if icon.isNull():
                 raise ValueError(  # pylint: disable=raise-missing-from
                     f"Could not load pixmap: {path}"
-                )
+                ) from exc
             painter = QPainter(icon)
-            painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+            painter.setCompositionMode(
+                QPainter.CompositionMode.CompositionMode_SourceIn
+            )
             if color:
                 painter.fillRect(icon.rect(), QColor(color))
             painter.end()
             # Scaling works best if svg has dimensions ~56x56
             pixmap = icon.scaled(
-                width, height, Qt.KeepAspectRatio, Qt.SmoothTransformation
+                width,
+                height,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
             )
             self._pixmaps[path][width, height][color] = pixmap
             return pixmap

@@ -1,7 +1,7 @@
 """Close Button on the left Menu."""
 from __future__ import annotations
 
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 
 from qute_style.widgets.icon_button import BackgroundColorNames
 from qute_style.widgets.title_button import TitleButton

@@ -68,7 +68,6 @@ repos:
         types: [ python]
         args: [ "--ignore-missing-imports", "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases" ]
         exclude: ".*venv/.*|.*qute_style/gen/.*"
-        additional_dependencies: [ "git+https://github.com/python-qt-tools/PyQt5-stubs.git@6b964eb" ]
 
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle

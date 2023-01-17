@@ -8,9 +8,9 @@ from typing import Generator
 
 import pytest
 from _pytest.fixtures import SubRequest
-from PyQt5.QtCore import QRect, Qt
-from PyQt5.QtGui import QBrush, QImage, QPainter, QPalette, QPen
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QRect, Qt
+from PySide6.QtGui import QBrush, QImage, QPainter, QPalette, QPen
+from PySide6.QtWidgets import (
     QCheckBox,
     QProxyStyle,
     QStyle,
@@ -34,9 +34,9 @@ pytestmark = pytest.mark.usefixtures("qapp")
     "element",
     (
         QuteStyle.CE_Toggle,
-        QuteStyle.CE_CheckBoxLabel,
-        QuteStyle.CE_CheckBox,
-        QuteStyle.CE_ItemViewItem,
+        QuteStyle.ControlElement.CE_CheckBoxLabel,
+        QuteStyle.ControlElement.CE_CheckBox,
+        QuteStyle.ControlElement.CE_ItemViewItem,
     ),
     ids=(
         "QuteStyle.CE_Toggle",
@@ -45,13 +45,13 @@ pytestmark = pytest.mark.usefixtures("qapp")
         "QuteStyle.CE_ItemViewItem",
     ),
 )
-def test_draw_control(element: QuteStyle.ControlElement) -> None:
+def test_draw_control(element: QStyle.ControlElement) -> None:
     """Test that drawControl calls the correct sub functions."""
     if method_name := {
         QuteStyle.CE_Toggle: "_draw_toggle",
-        QuteStyle.CE_CheckBoxLabel: "_draw_check_box_label",
-        QuteStyle.CE_CheckBox: "_draw_checkbox",
-        QuteStyle.CE_ItemViewItem: None,
+        QuteStyle.ControlElement.CE_CheckBoxLabel: "_draw_check_box_label",
+        QuteStyle.ControlElement.CE_CheckBox: "_draw_checkbox",
+        QuteStyle.ControlElement.CE_ItemViewItem: None,
     }[element]:
         with check_call(QuteStyle, method_name):
             option = (
@@ -59,7 +59,11 @@ def test_draw_control(element: QuteStyle.ControlElement) -> None:
                 if element == QuteStyle.CE_Toggle
                 else QStyleOptionButton
             )
-            widget = QCheckBox() if element == QuteStyle.CE_CheckBox else None
+            widget = (
+                QCheckBox()
+                if element == QuteStyle.ControlElement.CE_CheckBox
+                else None
+            )
             QuteStyle().drawControl(element, option(), QPainter(), widget)
     else:
         with check_call(QProxyStyle, "drawControl"):
@@ -73,11 +77,13 @@ def test_draw_check_box(style_option_button: QStyleOptionButton) -> None:
             QuteStyle()._draw_checkbox(
                 style_option_button, QPainter(), QCheckBox()
             )
-    assert draw_control_calls[0][0][1] == QStyle.CE_CheckBoxLabel
+    assert (
+        draw_control_calls[0][0][1] == QStyle.ControlElement.CE_CheckBoxLabel
+    )
 
 
 def test_draw_checkbox_label(
-    style_option_button: QStyleOptionButton, state: QStyle.State
+    style_option_button: QStyleOptionButton, state: QStyle.StateFlag
 ) -> None:
     """Test that the Checkbox label is drawn with the correct color."""
     with check_call(QProxyStyle, "drawControl") as calls:
@@ -87,7 +93,7 @@ def test_draw_checkbox_label(
     option = calls[0][0][2]
     role = QPalette.WindowText
     disabled_color = option.palette.color(QPalette.Disabled, role).name()
-    if state & QStyle.State_Enabled:
+    if state & QStyle.StateFlag.State_Enabled:
         assert (
             disabled_color
             == QuteStyle()
@@ -129,7 +135,7 @@ class TestDrawIndicatorCheckbox:
     @staticmethod
     def test_element(calls: CallList) -> None:
         """Test that the correct element is used."""
-        assert calls[0][0][1] == QStyle.PE_IndicatorCheckBox
+        assert calls[0][0][1] == QStyle.PrimitiveElement.PE_IndicatorCheckBox
 
     @staticmethod
     def test_rect(calls: CallList, rect: QRect) -> None:
@@ -152,10 +158,12 @@ def fixture_option(request: SubRequest) -> QStyleOption:
     """Generate a QStyleOption."""
     option = QStyleOption()
     option.state = (
-        QStyle.State_Children if request.param else QStyle.State_Open
+        QStyle.StateFlag.State_Children
+        if request.param
+        else QStyle.StateFlag.State_Open
     )
-    option.rect.setY(5)
-    option.rect.setX(5)
+    option.rect.Y = 5
+    option.rect.X = 5
     return option
 
 
@@ -163,9 +171,9 @@ def test_get_branch_color(
     qute_style: QuteStyle, option: QStyleOption, painter: QPainter
 ) -> None:
     """Test _get_branch_color."""
-    if option.state == option.state & QStyle.State_Children:
+    if option.state == option.state & QStyle.StateFlag.State_Children:
         assert qute_style._get_branch_color(option) == get_color("foreground")
-        option.state = QStyle.State_MouseOver
+        option.state = QStyle.StateFlag.State_MouseOver
         assert qute_style._get_branch_color(option) == get_color(
             "context_hover"
         )
@@ -178,12 +186,12 @@ def test_get_branch_icon(
     qute_style: QuteStyle, option: QStyleOption, painter: QPainter
 ) -> None:
     """Test _get_branch_color."""
-    if option.state == option.state & QStyle.State_Children:
+    if option.state == option.state & QStyle.StateFlag.State_Children:
         assert (
             qute_style._get_branch_icon(option)
             == ":/svg_icons/arrow_right.svg"
         )
-        option.state = QStyle.State_Open
+        option.state = QStyle.StateFlag.State_Open
         assert (
             qute_style._get_branch_icon(option) == ":/svg_icons/arrow_down.svg"
         )
@@ -201,19 +209,21 @@ def test_draw_branches(
 ) -> None:
     """Test the drawBranches Funktion."""
     with qtbot.captureExceptions() as exceptions:
-        if option.state == option.state & QStyle.State_Children:
+        if option.state == option.state & QStyle.StateFlag.State_Children:
             with check_call(
                 QuteStyle,
                 "_get_branch_color",
                 call_count=1
-                if option.state == option.state & QStyle.State_Children
+                if option.state
+                == option.state & QStyle.StateFlag.State_Children
                 else 0,
             ):
                 with check_call(
                     QuteStyle,
                     "draw_pixmap",
                     call_count=1
-                    if option.state == option.state & QStyle.State_Children
+                    if option.state
+                    == option.state & QStyle.StateFlag.State_Children
                     else 0,
                 ):
                     qute_style._draw_branch(option, painter)
@@ -349,7 +359,10 @@ class TestDrawPrimitive:
         """Test that drawing is disabled for a PE_FrameFocusRect."""
         with check_call(QProxyStyle, "drawPrimitive", call_count=0):
             QuteStyle().drawPrimitive(
-                QuteStyle.PE_FrameFocusRect, QStyleOption(), QPainter(), None
+                QuteStyle.PrimitiveElement.PE_FrameFocusRect,
+                QStyleOption(),
+                QPainter(),
+                None,
             )
 
     @staticmethod
@@ -357,7 +370,9 @@ class TestDrawPrimitive:
         """Test that drawing an IndicatorBranch is calling _draw_branch."""
         with check_call(QuteStyle, "_draw_branch"):
             QuteStyle().drawPrimitive(
-                QuteStyle.PE_IndicatorBranch, option, QPainter()
+                QuteStyle.PrimitiveElement.PE_IndicatorBranch,
+                option,
+                QPainter(),
             )
 
     @staticmethod
@@ -367,7 +382,7 @@ class TestDrawPrimitive:
         """Test drawing an ItemViewItem calls _panel_draw_item_view_item."""
         with check_call(QuteStyle, "_panel_draw_item_view_item"):
             QuteStyle().drawPrimitive(
-                QuteStyle.PE_PanelItemViewItem,
+                QuteStyle.PrimitiveElement.PE_PanelItemViewItem,
                 style_option_view_item,
                 QPainter(),
                 None,
@@ -380,7 +395,7 @@ class TestDrawPrimitive:
         """Test drawing a checkbox calls _draw_primitive_indicator_checkbox."""
         with check_call(QuteStyle, "_draw_primitive_indicator_checkbox"):
             QuteStyle().drawPrimitive(
-                QuteStyle.PE_IndicatorCheckBox,
+                QuteStyle.PrimitiveElement.PE_IndicatorCheckBox,
                 style_option_view_item,
                 QPainter(),
                 None,
@@ -388,13 +403,14 @@ class TestDrawPrimitive:
 
 
 def test_draw_primitive_indicator_checkbox(
-    style_option_button: QStyleOptionButton, state: QStyle.State
+    style_option_button: QStyleOptionButton, state: QStyle.StateFlag
 ) -> None:
     """Test that primitive indicator checkbox is drawn correctly."""
     with check_call(QuteStyle, "_draw_checkbox_background"):
         with check_call(QuteStyle, "_draw_checkbox_frame"):
             draw_check = (
-                state & QStyle.State_On or state & QStyle.State_NoChange
+                state & QStyle.StateFlag.State_On
+                or state & QStyle.StateFlag.State_NoChange
             )
             with check_call(
                 QuteStyle,

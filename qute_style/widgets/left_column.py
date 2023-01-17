@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, Tuple, Type, TypeVar, cast
+from typing import Type, TypeVar, cast
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -29,12 +29,12 @@ BaseWidgetT = TypeVar("BaseWidgetT", bound=BaseWidget)
 class LeftColumn(QWidget):
     """Widget that contains the widgets of the left column."""
 
-    close_column = pyqtSignal(name="close_column")
+    close_column = Signal(name="close_column")
 
     def __init__(
         self,
         app_parent: QWidget,
-        widget_types: List[Type[BaseWidget]],
+        widget_types: list[Type[BaseWidget]],
         parent: QWidget | None = None,
     ):
         """Create a new LeftColumn."""
@@ -69,8 +69,8 @@ class LeftColumn(QWidget):
     @staticmethod
     def create_content_frame(
         base_layout: QLayout,
-        widget_types: List[Type[BaseWidget]],
-    ) -> Tuple[QStackedWidget, List[BaseWidget]]:
+        widget_types: list[Type[BaseWidget]],
+    ) -> tuple[QStackedWidget, list[BaseWidget]]:
         """
         Create the content QFrame and add it to the given layout.
 
@@ -95,7 +95,7 @@ class LeftColumn(QWidget):
 
     def _create_title_frame(
         self, app_parent: QWidget, layout: QLayout
-    ) -> Tuple[Icon, QLabel]:
+    ) -> tuple[Icon, QLabel]:
         """
         Create the title frame containing icon, title and close button.
 
@@ -182,7 +182,7 @@ class LeftColumn(QWidget):
             f"Could not find widget {widget_type}"
         )
 
-    def current_widget_type(self) -> Optional[Type[BaseWidget]]:
+    def current_widget_type(self) -> Type[BaseWidget] | None:
         """Return the currently active widget class."""
         if widget := self._stacked_widget.currentWidget():
             return cast(Type[BaseWidget], type(widget))

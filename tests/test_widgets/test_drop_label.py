@@ -1,7 +1,7 @@
 """Test for drop label."""
 from typing import cast
 
-from PyQt5.QtWidgets import QLabel, QWidget
+from PySide6.QtWidgets import QLabel, QWidget
 from pytestqt.qtbot import QtBot
 
 from qute_style.widgets.drop_label import DropLabel

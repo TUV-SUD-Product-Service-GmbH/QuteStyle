@@ -1,8 +1,8 @@
 """BackgroundFrame for the App."""
 from __future__ import annotations
 
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
     QHBoxLayout,

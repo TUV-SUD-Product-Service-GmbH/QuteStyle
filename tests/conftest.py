@@ -6,14 +6,14 @@ import string
 import sys
 from pathlib import Path
 from random import choice, randint
-from typing import Optional, cast
+from typing import cast
 
-import PyQt5
 import pytest
 from _pytest.fixtures import SubRequest
 from _pytest.python import Function
-from PyQt5.QtCore import QSettings, Qt
-from PyQt5.QtWidgets import QStyle, QStyleOptionButton, QStyleOptionViewItem
+from PySide6 import QtWidgets
+from PySide6.QtCore import QSettings, Qt
+from PySide6.QtWidgets import QStyle, QStyleOptionButton, QStyleOptionViewItem
 
 # ensure that the resources are loaded
 import qute_style.resources_rc  # pylint: disable=unused-import  # noqa: F401
@@ -99,22 +99,21 @@ def random_string(
 )
 def fixture_text(request: SubRequest) -> str | None:
     """Return the text for a QStyleOptionButton."""
-    return cast(Optional[str], request.param)
+    return cast(str | None, request.param)
 
 
 @pytest.fixture(name="style_option_button", scope="class")
 def fixture_style_option_button(
     direction: Qt.LayoutDirection,
-    state: PyQt5.QtWidgets.QStyle,
+    state: QtWidgets.QStyle,
     text: str | None,
 ) -> QStyleOptionButton:
     """Create an QStyleOptionButton for testing."""
     option = QStyleOptionButton()
     option.direction = direction
-    option.state = state  # type: ignore
+    option.state = state
     option.palette = QuteStyle().standardPalette()
-    # todo: Fix this in the PyQt5/6 stubs
-    option.text = text  # type: ignore
+    option.text = text
     return option
 
 
@@ -160,10 +159,10 @@ def fixture_direction(
 @pytest.fixture(
     name="state",
     params=(
-        QStyle.State_On | QStyle.State_Enabled,
-        QStyle.State_On,
-        QStyle.State_Enabled,
-        QStyle.State_None,
+        QStyle.StateFlag.State_On | QStyle.StateFlag.State_Enabled,
+        QStyle.StateFlag.State_On,
+        QStyle.StateFlag.State_Enabled,
+        QStyle.StateFlag.State_None,
     ),
     ids=(
         "QStyle.State_On | QStyle.State_Enabled",
@@ -175,6 +174,6 @@ def fixture_direction(
 )
 def fixture_state(
     request: SubRequest,
-) -> QStyle.State:
+) -> QStyle.StateFlag:
     """Return the request.param to set the state at the fixture_option."""
-    return cast(QStyle.State, request.param)
+    return cast(QStyle.StateFlag, request.param)

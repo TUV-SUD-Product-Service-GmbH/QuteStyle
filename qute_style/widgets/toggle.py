@@ -2,19 +2,19 @@
 from __future__ import annotations
 
 import logging
-from typing import Union, cast
+from typing import cast
 
-from PyQt5.QtCore import (  # type: ignore # for pyqtProperty
+from PySide6.QtCore import (
+    Property,
     QEasingCurve,
     QPoint,
     QPropertyAnimation,
     QSize,
     Qt,
-    pyqtProperty,
-    pyqtSlot,
+    Slot,
 )
-from PyQt5.QtGui import QFont, QFontMetrics, QPainter, QPaintEvent
-from PyQt5.QtWidgets import (
+from PySide6.QtGui import QFont, QFontMetrics, QPainter, QPaintEvent
+from PySide6.QtWidgets import (
     QCheckBox,
     QSizePolicy,
     QStyle,
@@ -35,7 +35,7 @@ class Toggle(QCheckBox, TextTruncator):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new Toggle."""
-        super().__init__(parent)
+        super().__init__(parent)  # type: ignore
 
         self.setFont(
             QFont(
@@ -48,14 +48,16 @@ class Toggle(QCheckBox, TextTruncator):
         self.setMinimumHeight(QuteStyle.ToggleOptions.BOX_HEIGHT)
         self.setMinimumWidth(QuteStyle.ToggleOptions.BOX_WIDTH)
 
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed
+        )
 
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self._position = QuteStyle.ToggleOptions.CIRCLE_OFFSET
 
         self._animation = QPropertyAnimation(self, b"position")
-        self._animation.setEasingCurve(QEasingCurve.OutBounce)
+        self._animation.setEasingCurve(QEasingCurve.Type.OutBounce)
         self._animation.setDuration(QuteStyle.ToggleOptions.ANIM_DURATION)
         self.stateChanged.connect(self.setup_animation)
 
@@ -77,7 +79,7 @@ class Toggle(QCheckBox, TextTruncator):
             )
         return QSize(width, QuteStyle.ToggleOptions.BOX_HEIGHT)
 
-    @pyqtProperty(float)
+    @Property(float)
     def position(self) -> float:
         """Return actual position."""
         return int(self._position)
@@ -88,11 +90,13 @@ class Toggle(QCheckBox, TextTruncator):
         self._position = pos
         self.update()
 
-    @pyqtSlot(int, name="setup_animation")
+    @Slot(Qt.CheckState, name="setup_animation")
     def setup_animation(self, value: Qt.CheckState) -> None:
         """Initiate _animation of inner circle."""
         self._animation.stop()
-        if value != Qt.Unchecked:
+        # todo: stateChanged sends integer value, that doesn't seem correct,
+        #  should be Qt.CheckState, maybe a mapping problem?
+        if value == Qt.CheckState.Checked.value:
             # Calculate the x-position from the right.
             end = (
                 QuteStyle.ToggleOptions.BOX_WIDTH
@@ -106,7 +110,7 @@ class Toggle(QCheckBox, TextTruncator):
         self._animation.start()
 
     def hitButton(  # pylint: disable=invalid-name
-        self, pos: Union[QPoint, QPoint]
+        self, pos: QPoint | QPoint
     ) -> bool:
         """States if checkbox was hit."""
         return self.contentsRect().contains(pos)
@@ -116,13 +120,13 @@ class Toggle(QCheckBox, TextTruncator):
     ) -> None:
         """Draw toggle switch."""
         painter = QStylePainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         option = ToggleOptionButton()
         option.initFrom(self)
         option.text = self.text()
         if self.checkState() == Qt.Checked:
-            option.state |= QStyle.State_On
+            option.state |= QStyle.StateFlag.State_On
         option.position = cast(int, self.position)
 
         painter.drawControl(QuteStyle.CE_Toggle, option)

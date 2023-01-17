@@ -6,7 +6,7 @@
 
 # QuteStyle
 
-QuteStyle is an expandable application framework for PyQt5 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
+QuteStyle is an expandable application framework for PySide6 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
 The main goal of this project is to provide a simple and easy to use application frame that can be used to create a new application.
 It is mainly suited for applications that rely on a center widget for user interaction. Functionality is extendable by having different widgets that can be loaded into that center widget area.
 
@@ -53,7 +53,7 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 ## Requirements
 
 - [Python 3.8+](https://www.python.org/downloads/)
-- [PyQt5](https://pypi.org/project/PyQt5/)
+- [PySide6](https://wiki.qt.io/Qt_for_Python)
 
 ## Installation Method
 
@@ -65,9 +65,6 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 
 ```Python
 import sys
-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
 
 from qute_style_examples.sample_main_window import StyledMainWindow
 from qute_style.qs_application import QuteStyleApplication
@@ -91,10 +88,6 @@ class MyApplication(QuteStyleApplication):
 if __name__ == "__main__":
 
     APP_NAME = "Test-App"
-
-    # activate highdpi icons and scaling
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
     app = MyApplication(sys.argv)
     sys.exit(app.exec())

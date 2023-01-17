@@ -1,9 +1,9 @@
 """Style handling for QuteStyleWindow."""
 import logging
-from typing import Dict, Optional
+from typing import Optional
 
-from PyQt5.QtCore import QRect, QSettings, QSize
-from PyQt5.QtGui import QColor, QPainter, QPixmap
+from PySide6.QtCore import QRect, QSettings, QSize
+from PySide6.QtGui import QColor, QPainter, QPixmap
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -18,7 +18,7 @@ CURRENT_STYLE: Optional[str] = None
 
 
 def _create_theme_drawing(
-    icon_size: QSize, color_names: Dict[str, str]
+    icon_size: QSize, color_names: dict[str, str]
 ) -> QPixmap:
     """Create theme drawing."""
     pixmap = QPixmap(icon_size)
@@ -101,7 +101,7 @@ def set_current_style(style: str) -> None:
     QSettings().setValue("style", style)
 
 
-THEMES: Dict[str, Dict[str, str]] = {
+THEMES: dict[str, dict[str, str]] = {
     "Snow White": {
         "dark_one": "#b5c3dd",
         "dark_two": "#bfcde6",

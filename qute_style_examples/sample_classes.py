@@ -1,7 +1,7 @@
 """Sample classes."""
 from __future__ import annotations
 
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 
 from qute_style.widgets.styled_combobox import CheckableComboBox
 

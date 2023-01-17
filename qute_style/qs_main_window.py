@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Type, TypeVar, Union, cast
+from typing import Type, TypeVar, cast
 
-from PyQt5.QtCore import (
+from PySide6.QtCore import (
     QEasingCurve,
     QLocale,
     QParallelAnimationGroup,
@@ -15,11 +15,11 @@ from PyQt5.QtCore import (
     QSettings,
     QSize,
     Qt,
-    pyqtSignal,
-    pyqtSlot,
+    Signal,
+    Slot,
 )
-from PyQt5.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
-from PyQt5.QtWidgets import (
+from PySide6.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
+from PySide6.QtWidgets import (
     QApplication,
     QFrame,
     QHBoxLayout,
@@ -88,13 +88,13 @@ class QuteStyleMainWindow(
 
     # Widgets that will be shown in the center content and which are
     # accessible from the main menu on the left side.
-    MAIN_WIDGET_CLASSES: List[Type[MainWidget]]
+    MAIN_WIDGET_CLASSES: list[Type[MainWidget]]
 
     # Widgets that are shown in the right column.
-    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]]
+    RIGHT_WIDGET_CLASSES: list[Type[BaseWidget]]
 
     # Widgets that are shown in the left column.
-    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]]
+    LEFT_WIDGET_CLASSES: list[Type[BaseWidget]]
 
     MIN_SIZE: QSize = QSize(0, 0)
 
@@ -102,7 +102,7 @@ class QuteStyleMainWindow(
     MAX_COLUMN_WIDTH = 240
 
     # Signal that is emitted when the window has shut down.
-    shutdown_complete = pyqtSignal(name="shutdown_complete")
+    shutdown_complete = Signal(name="shutdown_complete")
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -173,7 +173,7 @@ class QuteStyleMainWindow(
         # Add credit bar to the main frame
         right_app_layout.addWidget(CreditBar(self._app_data.app_version))
 
-        self._grips: List[EdgeGrip | CornerGrip] = [
+        self._grips: list[EdgeGrip | CornerGrip] = [
             EdgeGrip(self, Qt.LeftEdge),
             EdgeGrip(self, Qt.RightEdge),
             EdgeGrip(self, Qt.TopEdge),
@@ -216,13 +216,11 @@ class QuteStyleMainWindow(
                 "Could not restore state from: %s", settings.value("state")
             )
 
-    def get_main_widget(
-        self, widget: Type[MainWidgetT]
-    ) -> Optional[MainWidgetT]:
+    def get_main_widget(self, widget: Type[MainWidgetT]) -> MainWidgetT | None:
         """Get main widget from content."""
         return self._content.findChild(widget)
 
-    @pyqtSlot(QRect, name="window_geometry_changed")
+    @Slot(QRect, name="window_geometry_changed")
     def window_geometry_changed(self, geometry: QRect) -> None:
         """Handle change of window geometry by using the grips."""
         self.setGeometry(geometry)
@@ -239,14 +237,14 @@ class QuteStyleMainWindow(
 
     @staticmethod
     def _get_widgets_to_display(
-        widgets: List[Type[Union[WidgetT]]],
-    ) -> List[Type[WidgetT]]:
+        widgets: list[Type[WidgetT]],
+    ) -> list[Type[WidgetT]]:
         """Reimplement to restrict access to certain widgets."""
         return widgets
 
     def _add_main_area(
         self, layout: QLayout
-    ) -> Tuple[QFrame, QStackedWidget, QStackedWidget]:
+    ) -> tuple[QFrame, QStackedWidget, QStackedWidget]:
         """
         Add a Frame that contains the main content and the right column widget.
 
@@ -288,7 +286,7 @@ class QuteStyleMainWindow(
 
     def _add_right_column(
         self, layout: QLayout
-    ) -> Tuple[QFrame, QStackedWidget]:
+    ) -> tuple[QFrame, QStackedWidget]:
         """
         Create a frame containing the right column widget and return it.
 
@@ -339,7 +337,7 @@ class QuteStyleMainWindow(
         title_bar.right_button_clicked.connect(self.on_right_column)
         return title_bar
 
-    def _add_left_column(self, layout: QLayout) -> Tuple[QFrame, LeftColumn]:
+    def _add_left_column(self, layout: QLayout) -> tuple[QFrame, LeftColumn]:
         """
         Add a QFrame and the LeftColumn to the given QLayout.
 
@@ -404,7 +402,7 @@ class QuteStyleMainWindow(
         """Set the main stylesheet of the app."""
         self.setStyleSheet(get_style())
 
-    @pyqtSlot(QPoint, name="move_window")
+    @Slot(QPoint, name="move_window")
     def move_window(self, pos: QPoint) -> None:
         """
         Move the window.
@@ -431,7 +429,7 @@ class QuteStyleMainWindow(
             self.move(self.pos() + diff)
         self.last_move_pos = pos
 
-    @pyqtSlot(name="maximize")
+    @Slot(name="maximize")
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
         if self.isMaximized():
@@ -506,7 +504,7 @@ class QuteStyleMainWindow(
             or self._check_is_opening(column) is True
         )
 
-    def _check_is_opening(self, frame: QFrame) -> Optional[bool]:
+    def _check_is_opening(self, frame: QFrame) -> bool | None:
         """
         Check if the given QFrame is currently opening or closing.
 
@@ -581,7 +579,7 @@ class QuteStyleMainWindow(
         log.debug("Storing last click at %s", event.globalPos())
         self.last_move_pos = event.globalPos()
 
-    @pyqtSlot(type, name="on_main_widget")
+    @Slot(type, name="on_main_widget")
     def on_main_widget(self, widget_class: Type[MainWidget]) -> None:
         """Handle display of the main widget that is of the given type."""
         current_widget = cast(
@@ -605,7 +603,7 @@ class QuteStyleMainWindow(
                 return
         raise ValueError("Could not find widget {widget_class}")
 
-    @pyqtSlot(type, name="on_right_column")
+    @Slot(type, name="on_right_column")
     def on_right_column(self, widget_class: Type[BaseWidget]) -> None:
         """Handle a click on the button for the right column."""
         right_widget_type = self.right_widget_type()
@@ -646,14 +644,14 @@ class QuteStyleMainWindow(
             # Set the button to the opposite state.
             self._title_bar.set_button_active(widget_class, not visible)
 
-    def right_widget_type(self) -> Optional[Type[BaseWidget]]:
+    def right_widget_type(self) -> Type[BaseWidget] | None:
         """Return the type of the right widget."""
         if widget := self._right_content.currentWidget():
             return cast(Type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None
 
-    @pyqtSlot(type, name="on_left_column")
+    @Slot(type, name="on_left_column")
     def on_left_column(self, widget_class: Type[BaseWidget]) -> None:
         """Handle a click on the button for the left column."""
         right_widget_type = self.right_widget_type()
@@ -695,7 +693,7 @@ class QuteStyleMainWindow(
             cast(MainWidget, self._content.currentWidget()).ICON,
         )
 
-    @pyqtSlot(name="on_close_left_column")
+    @Slot(name="on_close_left_column")
     def on_close_left_column(self) -> None:
         """Handle a click on the button for the left column."""
         # if the column was opened before, a widget must be set.
@@ -713,7 +711,7 @@ class QuteStyleMainWindow(
         settings.setValue("geometry", self.saveGeometry())
         log.debug("Finished writing settings to registry")
 
-    @pyqtSlot(QCloseEvent, name="closeEvent")
+    @Slot(QCloseEvent, name="closeEvent")
     def closeEvent(  # pylint: disable=invalid-name
         self, close_event: QCloseEvent
     ) -> None:
@@ -752,7 +750,7 @@ class QuteStyleMainWindow(
                 ],
             )
 
-    @pyqtSlot(str, name="on_change_theme")
+    @Slot(str, name="on_change_theme")
     def on_change_theme(self, theme: str) -> None:
         """Change the theme to the theme with the given name."""
         set_current_style(theme)

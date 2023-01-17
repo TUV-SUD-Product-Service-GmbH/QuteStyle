@@ -2,7 +2,7 @@
 # pylint: disable=protected-access
 
 from _pytest.monkeypatch import MonkeyPatch
-from PyQt5.QtGui import QColor, QPaintDevice, QPainter, QPixmap
+from PySide6.QtGui import QColor, QPaintDevice, QPainter, QPixmap
 from pytestqt.qtbot import QtBot
 
 from qute_style.style import get_color

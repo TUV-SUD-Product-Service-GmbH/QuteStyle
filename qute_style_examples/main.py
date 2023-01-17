@@ -5,18 +5,11 @@ import logging
 import sys
 from importlib import import_module, resources
 
-from PyQt5.QtCore import (
+from PySide6.QtCore import (
     QMessageLogContext,
-    Qt,
-    QtCriticalMsg,
-    QtDebugMsg,
-    QtFatalMsg,
-    QtInfoMsg,
     QtMsgType,
-    QtWarningMsg,
     qInstallMessageHandler,
 )
-from PyQt5.QtWidgets import QApplication
 
 from qute_style.dev.dev_functions import generate_changelog_resource_file
 from qute_style.qs_application import QuteStyleApplication
@@ -34,7 +27,7 @@ def create_new_changelog_resource_file(app_name: str) -> None:
         generate_changelog_resource_file(
             app_name, path / "test_changelog", path
         )
-    import_module("qute_style_examples.resources_cl")
+        import_module("qute_style_examples.resources_cl")
 
 
 def configure_logging() -> None:
@@ -59,11 +52,11 @@ def configure_logging() -> None:
     ) -> None:
         """Handle messages from Qt logging."""
         level = {
-            QtDebugMsg: logging.DEBUG,
-            QtInfoMsg: logging.INFO,
-            QtWarningMsg: logging.WARNING,
-            QtCriticalMsg: logging.ERROR,
-            QtFatalMsg: logging.FATAL,
+            QtMsgType.QtDebugMsg: logging.DEBUG,
+            QtMsgType.QtInfoMsg: logging.INFO,
+            QtMsgType.QtWarningMsg: logging.WARNING,
+            QtMsgType.QtCriticalMsg: logging.ERROR,
+            QtMsgType.QtFatalMsg: logging.FATAL,
         }[mode]
         log.log(level, message)
 
@@ -94,10 +87,6 @@ def main_method() -> None:
     # Create the resource file everytime the application starts.
     # No need to add it as a resource for the demo app
     create_new_changelog_resource_file("Test-App")
-
-    # activate highdpi icons and scaling
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
     app = QuteStyleCustomApplication(sys.argv)
     sys.exit(app.exec())

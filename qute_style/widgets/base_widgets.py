@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, cast
+from typing import cast
 
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QWidget
+from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -17,17 +17,17 @@ class BaseWidget(QWidget):
 
     ICON: str
     NAME: str
-    GROUPS: List[str] = []
+    GROUPS: list[str] = []
 
 
 class MainWidget(BaseWidget):
     """Base class for a widget that is display in the main section."""
 
-    shutdown_completed = pyqtSignal(QWidget, name="shutdown_completed")
+    shutdown_completed = Signal(QWidget, name="shutdown_completed")
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Init the BaseWidget for a Widget in QuteStyle."""
-        self._thread: Optional[QThread] = None
+        self._thread: QThread | None = None
         super().__init__(parent)
 
     def __repr__(self) -> str:
@@ -59,7 +59,7 @@ class MainWidget(BaseWidget):
         """Get the settings widget. Implemented by custom classes."""
         return None
 
-    @pyqtSlot(name="on_thread_finished")
+    @Slot(name="on_thread_finished")
     def on_thread_finished(self) -> None:
         """Handle the shutdown when the thread has finished."""
         log.debug("On thread finished base class %s", self.NAME)
@@ -105,4 +105,4 @@ class SettingsBaseWidget(BaseWidget):
     def clear_widget(self) -> None:
         """Remove a widget from the settings if present."""
         if item := self._layout.itemAtPosition(1, 0):
-            item.widget().setParent(None)  # type: ignore
+            item.widget().setParent(None)

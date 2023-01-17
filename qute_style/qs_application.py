@@ -4,11 +4,11 @@ from __future__ import annotations
 import logging
 import operator
 from copy import copy
-from typing import List, Type, cast
+from typing import Type, cast
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QRectF, QSize, Qt, pyqtSlot
-from PyQt5.QtGui import (
+from PySide6 import QtCore
+from PySide6.QtCore import QRectF, QSize, Qt, Slot
+from PySide6.QtGui import (
     QCloseEvent,
     QColor,
     QMouseEvent,
@@ -16,8 +16,8 @@ from PyQt5.QtGui import (
     QPainterPath,
     QPixmap,
 )
-from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtWidgets import (
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import (
     QApplication,
     QGridLayout,
     QLabel,
@@ -43,7 +43,7 @@ class CustomSplashScreen(QSplashScreen):
         super().__init__()
         style_sheet = get_style()
         self.setStyleSheet(style_sheet)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         background_color = get_color("bg_one")
         # use a pixmap as background
         size = QSize(350, 200)
@@ -76,7 +76,7 @@ class CustomSplashScreen(QSplashScreen):
         self, close_event: QCloseEvent
     ) -> None:
         """Handle close event."""
-        self._spinner.stop()
+        # self._spinner.stop()
         super().closeEvent(close_event)
 
     def mousePressEvent(  # pylint: disable=invalid-name
@@ -92,11 +92,11 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 
     MAIN_WINDOW_CLASS: Type[CustomMainWindow]
 
-    STARTUP_THREADS: List[Type[StartupThread]] = []
+    STARTUP_THREADS: list[Type[StartupThread]] = []
 
     APP_DATA: AppData
 
-    def __init__(self, argv: List[str], show_splash: bool = True) -> None:
+    def __init__(self, argv: list[str], show_splash: bool = True) -> None:
         """Init QuteStyleApplication."""
         super().__init__(argv)
 
@@ -117,13 +117,13 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
             self._splash_screen = None
         self._main_window: QMainWindow | None = None
 
-        self._threads_to_run: List[Type[StartupThread]] = copy(
+        self._threads_to_run: list[Type[StartupThread]] = copy(
             self.STARTUP_THREADS
         )
 
         # need to hold a reference to the threads until finished
-        self._threads_running: List[StartupThread] = []
-        self._threads_finished: List[StartupThread] = []
+        self._threads_running: list[StartupThread] = []
+        self._threads_finished: list[StartupThread] = []
 
         self._handle_startup_threads()
 
@@ -134,7 +134,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
         In case exit application function is overriden check for a unique
         priority of EXIT_FUNCTION_PRIORITY.
         """
-        thread_priorities: List[int] = []
+        thread_priorities: list[int] = []
         for thread in self.STARTUP_THREADS:
             if id(StartupThread.exit_application) != id(
                 thread.exit_application
@@ -174,7 +174,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
             thread.start()
             log.debug("Thread starting: %s", thread)
 
-    @pyqtSlot(name="on_finished_thread")
+    @Slot(name="on_finished_thread")
     def on_finished_thread(self) -> None:
         """Handle a finished StartupThread."""
         thread = cast(StartupThread, self.sender())

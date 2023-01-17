@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, Tuple, Type
+from typing import Generic, Type
 
-from PyQt5.QtCore import QEvent, QPoint, QRect, Qt
-from PyQt5.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtCore import QEvent, QPoint, QRect, Qt
+from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
+from PySide6.QtWidgets import QWidget
 
 from qute_style.style import get_color
 from qute_style.widgets.icon_button import BackgroundColorNames, IconButton
@@ -69,9 +69,9 @@ class LeftMenuButton(
     def paintEvent(self, _: QPaintEvent) -> None:
         """Handle a paint event for the MenuButton."""
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         # set NoPen so that no borders are drawn.
-        painter.setPen(Qt.NoPen)
+        painter.setPen(Qt.PenStyle.NoPen)
 
         if self._is_active:
             indicator_color = get_color("context_color")
@@ -153,7 +153,9 @@ class LeftMenuButton(
         this method does.
         """
         painter = QPainter(self.active_menu)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.setCompositionMode(
+            QPainter.CompositionMode.CompositionMode_SourceIn
+        )
         painter.fillRect(self.active_menu.rect(), QColor(get_color("bg_one")))
         root_painter.drawPixmap(self.visible_width() - 5, 0, self.active_menu)
         painter.end()
@@ -177,7 +179,7 @@ class LeftMenuButton(
         self._tooltip.hide()
         super().mousePressEvent(event)
 
-    def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
+    def _get_tooltip_coords(self, pos: QPoint) -> tuple[int, int]:
         """Return the tooltip coords from the global position."""
         pos_x = pos.x() + self.visible_width() + 5
         pos_y = pos.y() + (self.visible_width() - self._tooltip.height()) // 2

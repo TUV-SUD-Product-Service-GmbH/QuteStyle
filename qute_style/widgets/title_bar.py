@@ -1,10 +1,10 @@
 """Top bar with system buttons and extra menu."""
 import logging
-from typing import List, Type, cast
+from typing import Type, cast
 
-from PyQt5.QtCore import QEvent, QObject, QPoint, Qt, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt, Signal, Slot
+from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
 from qute_style.widgets.base_widgets import BaseWidget
 from qute_style.widgets.icon import Icon
@@ -18,17 +18,17 @@ log = logging.getLogger(
 class TitleBar(QFrame):
     """Top bar with system buttons and extra menu."""
 
-    right_button_clicked = pyqtSignal(type, name="right_button_clicked")
-    close_app = pyqtSignal(name="close_app")
-    minimize = pyqtSignal(name="minimize")
-    maximize = pyqtSignal(name="maximize")
-    move_window = pyqtSignal(QPoint, name="move")
+    right_button_clicked = Signal(type, name="right_button_clicked")
+    close_app = Signal(name="close_app")
+    minimize = Signal(name="minimize")
+    maximize = Signal(name="maximize")
+    move_window = Signal(QPoint, name="move")
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
         parent: QWidget,
         app_parent: QWidget,
-        right_widget_classes: List[Type[BaseWidget]],
+        right_widget_classes: list[Type[BaseWidget]],
         name: str,
         logo: str,
         debug_text: str = "",
@@ -47,13 +47,15 @@ class TitleBar(QFrame):
         # Icon with ToolBox logo
         self._icon = Icon(int(self.height() * 0.5), None)
         self._icon.set_icon(logo)
-        self._icon.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self._icon.setSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
+        )
         bg_layout.addWidget(self._icon)
 
         # Label with the application title text.
         self._title_label = QLabel()
         self._title_label.setObjectName("title_label")
-        self._title_label.setAlignment(Qt.AlignVCenter)
+        self._title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self._title_label.setText(name)
         bg_layout.addWidget(self._title_label)
 
@@ -65,8 +67,10 @@ class TitleBar(QFrame):
         # set debug label if any
         debug_label = QLabel(debug_text)
         debug_label.setObjectName("db_label")
-        debug_label.setAlignment(Qt.AlignVCenter)
-        debug_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        debug_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        debug_label.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
         bg_layout.addWidget(debug_label)
 
         # Button for the right column
@@ -134,14 +138,14 @@ class TitleBar(QFrame):
         """
         if obj is not self._title_label and not self._icon:
             return False
-        if event.type() == QEvent.MouseButtonRelease:
+        if event.type() == QEvent.Type.MouseButtonRelease:
             self._double_click_in_progress = False
             return True
-        if event.type() == QEvent.MouseButtonDblClick:
+        if event.type() == QEvent.Type.MouseButtonDblClick:
             self._double_click_in_progress = True
             self.maximize.emit()
             return True
-        if event.type() == QEvent.MouseMove:
+        if event.type() == QEvent.Type.MouseMove:
             if not self._double_click_in_progress:
                 self.move_window.emit(cast(QMouseEvent, event).globalPos())
             return True
@@ -156,7 +160,7 @@ class TitleBar(QFrame):
         else:
             self.maximize_button.tooltip_text = self.tr("Maximieren")
 
-    @pyqtSlot(name="on_right_column_button")
+    @Slot(name="on_right_column_button")
     def on_right_column_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(TitleButton, self.sender()).widget_class
@@ -176,7 +180,7 @@ class TitleBar(QFrame):
         """Return the button for the given widget class."""
         for btn in self.findChildren(TitleButton):
             if btn.widget_class == widget_class:
-                return btn
+                return cast(TitleButton, btn)
         raise ValueError(  # pragma: no cover
             f"Could not find button for widget: {widget_class}"
         )

@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import logging
 
-from PyQt5.QtCore import QSize, pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QSize, Signal, Slot
+from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QSizePolicy,
@@ -51,7 +51,7 @@ class InfoWidget(BaseWidget):
     ICON = ":/svg_icons/info.svg"
     NAME = "Info"
 
-    switch_style = pyqtSignal(name="switch_style")
+    switch_style = Signal(name="switch_style")
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new SettingsWidget."""
@@ -106,7 +106,7 @@ class StyledMainWindow(QuteStyleMainWindow):
         except KeyError:
             self._current_idx = 0
 
-    @pyqtSlot(name="on_switch_style")
+    @Slot(name="on_switch_style")
     def on_switch_style(self) -> None:
         """Set the next available style."""
         self._current_idx += 1

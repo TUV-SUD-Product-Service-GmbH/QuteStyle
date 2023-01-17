@@ -2,8 +2,8 @@
 
 import logging
 
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QLabel, QWidget
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGraphicsDropShadowEffect, QLabel, QWidget
 
 log = logging.getLogger("qute_style._tooltip")  # pylint: disable=invalid-name
 

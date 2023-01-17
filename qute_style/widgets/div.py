@@ -1,5 +1,5 @@
 """Container widget."""
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QWidget
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QWidget
 
 
 class Div(QWidget):
