@@ -195,7 +195,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         else:
             item.setCheckState(Qt.CheckState.Checked)
 
-    @Slot(QModelIndex, QModelIndex, list[int], name="handle_data_change")
+    @Slot(QModelIndex, QModelIndex, "QVector<int>", name="handle_data_change")
     def handle_data_change(
         self, start: QModelIndex, end: QModelIndex, roles: list[int]
     ) -> None:
