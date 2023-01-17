@@ -84,7 +84,7 @@ class WaitingSpinner(QWidget):
 
     def paintEvent(
         self, _: QPaintEvent
-    ) -> None:  # pylint: disable=invalid-name
+    ) -> None:
         """Paint the WaitingSpinner."""
         self._update_position()
         painter = QPainter(self)
