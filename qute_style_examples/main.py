@@ -23,7 +23,8 @@ log = logging.getLogger(
 
 def create_new_changelog_resource_file(app_name: str) -> None:
     """Create the changelog resource file and import it."""
-    with resources.files("qute_style_examples") as path:
+    traversable = resources.files("qute_style_examples")
+    with resources.as_file(traversable) as path:
         generate_changelog_resource_file(
             app_name, path / "test_changelog", path
         )
