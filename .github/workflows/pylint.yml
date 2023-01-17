@@ -24,8 +24,5 @@ jobs:
     - name: Install project dependencies
       run: poetry install --no-root
 
-    - name: Export current directory
-      run: export PYTHONPATH=.
-
     - name: Analysing the code with pylint
-      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style
+      run: pylint --rcfile=.pylintrc --recursive=y qute_style
