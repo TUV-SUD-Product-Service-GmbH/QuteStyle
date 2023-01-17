@@ -16,7 +16,7 @@ def test_get_new_pixmap(  # pylint: disable=unused-argument
     set_current_style(DEFAULT_STYLE)
     store = PixmapStore.inst()
     new_pixmap = store.get_pixmap(
-        "tests/test_images/test_icon.svg", 16, 16, get_color("yellow")
+        "tests/test_images/square.svg", 16, 16, get_color("yellow")
     )
     assert new_pixmap.size() == QSize(16, 16)
     # due to transformation effects color of pixels is not correct everywhere

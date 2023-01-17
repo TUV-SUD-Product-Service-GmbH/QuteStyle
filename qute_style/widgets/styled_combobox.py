@@ -195,16 +195,19 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         else:
             item.setCheckState(Qt.CheckState.Checked)
 
-    @Slot(QModelIndex, QModelIndex, "QVector<int>", name="handle_data_change")
+    @Slot(QModelIndex, QModelIndex, list[int], name="handle_data_change")
     def handle_data_change(
-        self, start: QModelIndex, end: QModelIndex, roles: tuple[int]
+        self, start: QModelIndex, end: QModelIndex, roles: list[int]
     ) -> None:
         """Handle a data change event to handle single_mode."""
+        # todo: Handling is not straight forward at this point. Compared to
+        #  pyqt the actual value has to be accessed because the signal carries
+        #  raw integer.
         if (
             self._single
-            and Qt.ItemDataRole.CheckStateRole in roles
+            and Qt.ItemDataRole.CheckStateRole.value in roles
             and start.data(Qt.ItemDataRole.CheckStateRole)
-            == Qt.CheckState.Checked
+            == Qt.CheckState.Checked.value
         ):
             log.debug("Unchecking other items, since single mode is active.")
             # we should never edit check state for two indexes at the same time

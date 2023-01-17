@@ -105,7 +105,6 @@ def test_item_ids(
             cast(QStandardItemModel, combobox.model()).item(
                 item
             ).setCheckState(Qt.CheckState.Checked)
-        print(combobox.single_mode)
         if mode:
             assert combobox.item_ids == [items[-1]]
         else:
@@ -132,7 +131,9 @@ def test_popup_event_filter(
     assert not exceptions
 
 
-@pytest.mark.parametrize("checked", (Qt.CheckState.Unchecked, Qt.CheckState.Checked))
+@pytest.mark.parametrize(
+    "checked", (Qt.CheckState.Unchecked, Qt.CheckState.Checked)
+)
 def test_check_state_event_filter(
     combobox: CheckableComboBox[int],
     cb_items: None,  # pylint: disable=unused-argument
@@ -149,7 +150,9 @@ def test_check_state_event_filter(
         index = combobox.model().index(0, 0)
         pos = combobox.view().visualRect(index).center()
 
-        qtbot.mouseClick(combobox.view().viewport(), Qt.MouseButton.LeftButton, pos=pos)
+        qtbot.mouseClick(
+            combobox.view().viewport(), Qt.MouseButton.LeftButton, pos=pos
+        )
         assert (
             cast(QStandardItemModel, combobox.model()).item(0).checkState()
             == checked
