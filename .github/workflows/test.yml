@@ -36,7 +36,6 @@ jobs:
     - name: Install project dependencies
       run: poetry install -vvv --no-root
 
-
     - name: Test with pytest
       run: poetry run python -m pytest --cov --cov-report=term-missing --cov-report=xml
 

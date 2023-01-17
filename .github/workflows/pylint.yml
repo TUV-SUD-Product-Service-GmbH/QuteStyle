@@ -25,4 +25,4 @@ jobs:
       run: poetry install --no-root
 
     - name: Analysing the code with pylint
-      run: pylint --rcfile=.pylintrc --recursive=y qute_style
+      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style
