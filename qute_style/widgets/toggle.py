@@ -31,9 +31,12 @@ log = logging.getLogger(
 class Toggle(QCheckBox, TextTruncator):
     """Toggle button (custom checkbox)."""
 
+    # todo: Working, but probably not ok
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new Toggle."""
-        super().__init__(parent)  # type: ignore
+        super().__init__(  # pylint: disable=too-many-function-args
+            parent  # type: ignore
+        )
 
         self.setFont(
             QFont(
@@ -124,7 +127,10 @@ class Toggle(QCheckBox, TextTruncator):
         option.initFrom(self)
         option.text = self.text()
         if self.checkState() == Qt.CheckState.Checked:
-            option.state |= QStyle.StateFlag.State_On
+            # todo: this works but doesn't seem correct
+            option.state |= (  # pylint: disable=no-member
+                QStyle.StateFlag.State_On
+            )
         option.position = self.position
 
         painter.drawControl(QuteStyle.CE_Toggle, option)

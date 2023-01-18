@@ -82,7 +82,9 @@ class WaitingSpinner(QWidget):
         self.setWindowModality(modality)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-    def paintEvent(self, _: QPaintEvent) -> None:
+    def paintEvent(  # pylint: disable=invalid-name
+        self, _: QPaintEvent
+    ) -> None:
         """Paint the WaitingSpinner."""
         self._update_position()
         painter = QPainter(self)

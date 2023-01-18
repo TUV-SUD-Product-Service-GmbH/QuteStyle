@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 import operator
 from copy import copy
-from typing import Type, cast
+from typing import Type
 
 from PySide6 import QtCore
 from PySide6.QtCore import QRectF, QSize, Qt, Slot
@@ -76,7 +76,7 @@ class CustomSplashScreen(QSplashScreen):
         self, close_event: QCloseEvent
     ) -> None:
         """Handle close event."""
-        # self._spinner.stop()
+        self._spinner.stop()
         super().closeEvent(close_event)
 
     def mousePressEvent(  # pylint: disable=invalid-name
@@ -170,14 +170,15 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
             thread = thread_class(self.APP_DATA)
             self._threads_running.append(thread)
             self._threads_to_run.remove(thread_class)
-            thread.finished.connect(self.on_finished_thread)
+            thread.finished.connect(
+                lambda t=thread: self.on_finished_thread(t)
+            )
             thread.start()
             log.debug("Thread starting: %s", thread)
 
-    @Slot(name="on_finished_thread")
-    def on_finished_thread(self) -> None:
+    @Slot(StartupThread, name="on_finished_thread")
+    def on_finished_thread(self, thread: StartupThread) -> None:
         """Handle a finished StartupThread."""
-        thread = cast(StartupThread, self.sender())
         log.debug("Thread finished: %s", thread)
         self._threads_running.remove(thread)
         self._threads_finished.append(thread)

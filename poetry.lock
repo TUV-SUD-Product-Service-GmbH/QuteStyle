@@ -2,19 +2,19 @@
 
 [[package]]
 name = "astroid"
-version = "2.13.2"
+version = "2.12.14"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 files = [
-    {file = "astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
-    {file = "astroid-2.13.2.tar.gz", hash = "sha256:3bc7834720e1a24ca797fd785d77efb14f7a28ee8e635ef040b6e2d80ccb3303"},
+    {file = "astroid-2.12.14-py3-none-any.whl", hash = "sha256:a1fbaad9d3e5f2eeb8e3a1d1d6008a081b1aac33ef86ff7742ae0714d92e9cf2"},
+    {file = "astroid-2.12.14.tar.gz", hash = "sha256:b573ed96112061150eade70851c277a92fba544812b781836ab16fedbbddb497"},
 ]
 
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
-typing-extensions = ">=4.0.0"
+typing-extensions = {version = ">=3.10", markers = "python_version < \"3.10\""}
 wrapt = [
     {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
     {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
@@ -1097,4 +1097,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "bc2c00961161329a4722eb45be0bbf9e432c838e2451713860032e60f57e7b36"
+content-hash = "5487784e5989950ff1cae3fed0a38ebcb000b9ca1775021ada6ac894be789892"
