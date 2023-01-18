@@ -23,6 +23,6 @@ setup(
     package_data={
         "qute_style": ["py.typed", "widgets/**/*.py"],
     },
-    install_requires=["PySide"],
+    install_requires=["PySide6"],
     zip_safe=False,
 )
