@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-from typing import cast
 
 from PySide6.QtCore import (
     QEasingCurve,
