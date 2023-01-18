@@ -12,8 +12,8 @@ It is mainly suited for applications that rely on a center widget for user inter
 
 **Project status**
 
-[![Python Versions](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
-[![Qt Versions](https://img.shields.io/badge/Qt-5-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
+[![Python Versions](https://img.shields.io/badge/Python-3.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
+[![Qt Versions](https://img.shields.io/badge/Qt-6-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/github/license/TUV-SUD-Product-Service-GmbH/QuteStyle.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/python/black)
 
@@ -52,7 +52,7 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 
 ## Requirements
 
-- [Python 3.8+](https://www.python.org/downloads/)
+- [Python 3.10+](https://www.python.org/downloads/)
 - [PySide6](https://wiki.qt.io/Qt_for_Python)
 
 ## Installation Method
