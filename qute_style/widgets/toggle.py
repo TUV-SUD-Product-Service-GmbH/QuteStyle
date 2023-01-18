@@ -5,7 +5,6 @@ import logging
 from typing import cast
 
 from PySide6.QtCore import (
-    Property,
     QEasingCurve,
     QPoint,
     QPropertyAnimation,
@@ -79,19 +78,19 @@ class Toggle(QCheckBox, TextTruncator):
             )
         return QSize(width, QuteStyle.ToggleOptions.BOX_HEIGHT)
 
-    @Property(float)
-    def position(self) -> float:
+    @property
+    def position(self) -> int:
         """Return actual position."""
         return int(self._position)
 
-    @position.setter  # type: ignore
-    def position(self, pos: float):
+    @position.setter
+    def position(self, pos: int):
         """Set actual position."""
         self._position = pos
         self.update()
 
-    @Slot(Qt.CheckState, name="setup_animation")
-    def setup_animation(self, value: Qt.CheckState) -> None:
+    @Slot(int, name="setup_animation")
+    def setup_animation(self, value: int) -> None:
         """Initiate _animation of inner circle."""
         self._animation.stop()
         # todo: stateChanged sends integer value, that doesn't seem correct,
@@ -125,9 +124,9 @@ class Toggle(QCheckBox, TextTruncator):
         option = ToggleOptionButton()
         option.initFrom(self)
         option.text = self.text()
-        if self.checkState() == Qt.Checked:
+        if self.checkState() == Qt.CheckState.Checked:
             option.state |= QStyle.StateFlag.State_On
-        option.position = cast(int, self.position)
+        option.position = self.position
 
         painter.drawControl(QuteStyle.CE_Toggle, option)
         painter.end()
