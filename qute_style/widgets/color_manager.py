@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Dict, cast
+from typing import cast
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QColor, QPaintEvent
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QColor, QPaintEvent
+from PySide6.QtWidgets import (
     QApplication,
     QColorDialog,
     QGridLayout,
@@ -36,7 +36,7 @@ class SmallIconButton(IconButton):
 class ColorWidget(QWidget):
     """Widget displaying a color with a button to change it."""
 
-    color_changed = pyqtSignal(name="color_changed")
+    color_changed = Signal(name="color_changed")
 
     def __init__(
         self, key: str, color: str, parent: QWidget | None = None
@@ -47,7 +47,9 @@ class ColorWidget(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         self._color_label = QLabel(color)
-        self._color_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self._color_label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+        )
         layout.addWidget(self._color_label)
         self._color_button = SmallIconButton(self, ":/svg_icons/palette.svg")
         self._color_button.clicked.connect(self.on_change_color)
@@ -74,7 +76,7 @@ class ColorWidget(QWidget):
     def on_change_color(self) -> None:
         """Open a color dialog to change the color."""
         dialog = QColorDialog(QColor(self._color_label.text()), self)
-        if dialog.exec() == QColorDialog.Accepted:
+        if dialog.exec() == QColorDialog.DialogCode.Accepted:
             self.color = dialog.selectedColor().name()
             self.color_changed.emit()
 
@@ -92,7 +94,9 @@ class ColorManager(BaseWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         scroll_area = QScrollArea(self)
         scroll_area.setObjectName("bg_two_frame")
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
         layout.addWidget(scroll_area)
 
         frame = QWidget()
@@ -101,7 +105,7 @@ class ColorManager(BaseWidget):
         assert frame.layout() is grid_layout
         scroll_area.setWidget(frame)
         grid_layout.setContentsMargins(0, 0, 0, 0)
-        grid_layout.setSizeConstraint(QGridLayout.SetFixedSize)
+        grid_layout.setSizeConstraint(QGridLayout.SizeConstraint.SetFixedSize)
         grid_layout.setSpacing(2)
 
         self._widgets = []
@@ -115,7 +119,9 @@ class ColorManager(BaseWidget):
             self._widgets.append(widget)
 
         self._code_label = QLabel(self)
-        self._code_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        self._code_label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+        )
         grid_layout.addWidget(
             self._code_label, grid_layout.rowCount(), 0, 1, 2
         )
@@ -140,7 +146,7 @@ class ColorManager(BaseWidget):
         for widget in self._widgets:
             widget.color = style[widget.key]
 
-    def _create_theme(self) -> Dict[str, str]:
+    def _create_theme(self) -> dict[str, str]:
         """Create the code from the selected colors."""
         return {widget.key: widget.color for widget in self._widgets}
 

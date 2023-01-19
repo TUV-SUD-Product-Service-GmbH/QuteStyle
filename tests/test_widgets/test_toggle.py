@@ -1,8 +1,8 @@
 """Tests for homepage."""
 # pylint: disable=protected-access
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QStyleOption
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QFontMetrics
+from PySide6.QtWidgets import QStyleOption
 from pytestqt.qtbot import QtBot
 
 from qute_style.qute_style import QuteStyle

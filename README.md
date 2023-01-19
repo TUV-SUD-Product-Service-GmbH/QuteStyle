@@ -6,14 +6,14 @@
 
 # QuteStyle
 
-QuteStyle is an expandable application framework for PyQt5 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
+QuteStyle is an expandable application framework for PySide6 and heavily inspired by [PyDracula](https://github.com/Wanderson-Magalhaes/Modern_GUI_PyDracula_PySide6_or_PyQt6).
 The main goal of this project is to provide a simple and easy to use application frame that can be used to create a new application.
 It is mainly suited for applications that rely on a center widget for user interaction. Functionality is extendable by having different widgets that can be loaded into that center widget area.
 
 **Project status**
 
-[![Python Versions](https://img.shields.io/badge/Python-3.8%20|%203.9%20|%203.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
-[![Qt Versions](https://img.shields.io/badge/Qt-5-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
+[![Python Versions](https://img.shields.io/badge/Python-3.10%20|%203.11-blue.svg?&logo=Python&logoWidth=18&logoColor=white)](https://www.python.org/downloads/)
+[![Qt Versions](https://img.shields.io/badge/Qt-6-blue.svg?&logo=Qt&logoWidth=18&logoColor=white)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/github/license/TUV-SUD-Product-Service-GmbH/QuteStyle.svg)](https://github.com/TUV-SUD-Product-Service-GmbH/QuteStyle/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/python/black)
 
@@ -52,8 +52,8 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 
 ## Requirements
 
-- [Python 3.8+](https://www.python.org/downloads/)
-- [PyQt5](https://pypi.org/project/PyQt5/)
+- [Python 3.10+](https://www.python.org/downloads/)
+- [PySide6](https://wiki.qt.io/Qt_for_Python)
 
 ## Installation Method
 
@@ -65,9 +65,6 @@ We defined [custom widgets](https://github.com/TUV-SUD-Product-Service-GmbH/Qute
 
 ```Python
 import sys
-
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
 
 from qute_style_examples.sample_main_window import StyledMainWindow
 from qute_style.qs_application import QuteStyleApplication
@@ -91,10 +88,6 @@ class MyApplication(QuteStyleApplication):
 if __name__ == "__main__":
 
     APP_NAME = "Test-App"
-
-    # activate highdpi icons and scaling
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
     app = MyApplication(sys.argv)
     sys.exit(app.exec())

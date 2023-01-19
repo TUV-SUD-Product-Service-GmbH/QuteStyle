@@ -1,10 +1,9 @@
 """Configuration for widget tests."""
 from random import choice, randint
-from typing import Dict
 
 import pytest
 from _pytest.fixtures import SubRequest
-from PyQt5.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from qute_style.style import THEMES
@@ -25,13 +24,13 @@ def fixture_theme_name() -> str:
 
 
 @pytest.fixture(name="theme", scope="session")
-def fixture_theme(theme_name: str) -> Dict[str, str]:
+def fixture_theme(theme_name: str) -> dict[str, str]:
     """Return a random theme."""
     return THEMES[theme_name]
 
 
 @pytest.fixture(name="color_name", scope="session")
-def fixture_color_name(theme: Dict[str, str]) -> str:
+def fixture_color_name(theme: dict[str, str]) -> str:
     """Return a random color name."""
     return choice(list(theme))
 

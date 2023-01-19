@@ -2,8 +2,8 @@
 import re
 
 import pytest
-from PyQt5.QtCore import QSettings
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtCore import QSettings
+from PySide6.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
 
 from qute_style.style import (

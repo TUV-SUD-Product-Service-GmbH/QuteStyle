@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, Optional, Tuple, Type, TypeVar
+from typing import Generic, Optional, Type, TypeVar
 
-from PyQt5.QtCore import QEvent, QPoint
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtCore import QEvent, QPoint
+from PySide6.QtWidgets import QWidget
 
 from qute_style.widgets.base_widgets import BaseWidget
 from qute_style.widgets.icon_button import BackgroundColorNames, IconButton
@@ -40,7 +40,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         # App is needed to show the tooltip outside the button's rect.
         self._app_parent = app_parent
 
-        self._widget_class: Optional[Type[BaseWidgetType]] = widget_class
+        self._widget_class: Type[BaseWidgetType] | None = widget_class
 
         self._tooltip = ToolTip(
             app_parent,
@@ -68,11 +68,11 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
     @property
     def widget_class(
         self,
-    ) -> Optional[Type[BaseWidgetType]]:
+    ) -> Type[BaseWidgetType] | None:
         """Return the widget class the button will trigger."""
         return self._widget_class
 
-    def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
+    def _get_tooltip_coords(self, pos: QPoint) -> tuple[int, int]:
         """Get the tooltip coordinates from the given position."""
         raise NotImplementedError("Child class must implement this")
 

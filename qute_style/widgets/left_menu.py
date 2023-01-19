@@ -1,15 +1,9 @@
 """Left Menu containing the widget selection."""
 import logging
-from typing import TYPE_CHECKING, Any, Iterable, List, Type, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Iterable, Type, TypedDict, cast
 
-from PyQt5.QtCore import (
-    QEasingCurve,
-    QPropertyAnimation,
-    Qt,
-    pyqtSignal,
-    pyqtSlot,
-)
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, Signal, Slot
+from PySide6.QtWidgets import (
     QFrame,
     QScrollArea,
     QSizePolicy,
@@ -41,8 +35,8 @@ class LeftMenuItem(TypedDict):
 class LeftMenu(QWidget):
     """Left menu that implements the widget selection."""
 
-    top_button_clicked = pyqtSignal(type, name="top_button_clicked")
-    bottom_button_clicked = pyqtSignal(type, name="bottom_button_clicked")
+    top_button_clicked = Signal(type, name="top_button_clicked")
+    bottom_button_clicked = Signal(type, name="bottom_button_clicked")
 
     ICON_PATH_OPEN = ":/svg_icons/menu.svg"
     ICON_PATH_CLOSE = ":/svg_icons/arrow_back.svg"
@@ -51,8 +45,8 @@ class LeftMenu(QWidget):
         self,
         parent: QWidget,
         app_parent: QWidget,
-        main_widgets: List[Type[MainWidget]],
-        left_column_widgets: List[Type[BaseWidget]],
+        main_widgets: list[Type[MainWidget]],
+        left_column_widgets: list[Type[BaseWidget]],
     ) -> None:
         """Create a new LeftMenu."""
         super().__init__()
@@ -73,7 +67,7 @@ class LeftMenu(QWidget):
         self._top_layout = QVBoxLayout(top_frame)
         self._top_layout.setContentsMargins(0, 0, 0, 0)
         self._top_layout.setSpacing(1)
-        layout.addWidget(top_frame, 0, Qt.AlignTop)
+        layout.addWidget(top_frame, 0, Qt.AlignmentFlag.AlignTop)
 
         self._toggle_button: LeftMenuButton[None] = LeftMenuButton(
             app_parent,
@@ -99,7 +93,7 @@ class LeftMenu(QWidget):
         self._bottom_layout = QVBoxLayout(bottom_frame)
         self._bottom_layout.setContentsMargins(0, 0, 0, 8)
         self._bottom_layout.setSpacing(1)
-        layout.addWidget(bottom_frame, 0, Qt.AlignBottom)
+        layout.addWidget(bottom_frame, 0, Qt.AlignmentFlag.AlignBottom)
 
         self._add_main_widgets(main_widgets)
         log.debug("Handling left column widgets: %s", left_column_widgets)
@@ -132,8 +126,12 @@ class LeftMenu(QWidget):
         """Create the ScrollArea with correct sizePolicies and margins."""
         self._scroll_area = QScrollArea()
         # Never show a scrollbar
-        self._scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self._scroll_area.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
         self._scroll_area.setFixedWidth(self.width())
 
         # MaximumHeight depends on number of widgets:
@@ -142,7 +140,7 @@ class LeftMenu(QWidget):
         # Horizontal Policy: MinimumExpanding --> widget text gets displayed
         # Vertical Policy: Maximum --> is set to the number of visible widgets
         self._scroll_area.setSizePolicy(
-            QSizePolicy.MinimumExpanding, QSizePolicy.Maximum
+            QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Maximum
         )
 
         self._scroll_area.setWidgetResizable(True)
@@ -169,21 +167,21 @@ class LeftMenu(QWidget):
             button.clicked.connect(self.on_left_column_button)
             self._bottom_layout.addWidget(button)
 
-    @pyqtSlot(name="on_left_column_button")
+    @Slot(name="on_left_column_button")
     def on_left_column_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting bottom_button_clicked for class %s", widget_class)
         self.bottom_button_clicked.emit(widget_class)
 
-    @pyqtSlot(name="on_main_page_button")
+    @Slot(name="on_main_page_button")
     def on_main_page_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting top_button_clicked for class %s", widget_class)
         self.top_button_clicked.emit(widget_class)
 
-    @pyqtSlot(name="toggle_animation")
+    @Slot(name="toggle_animation")
     def toggle_animation(self) -> None:
         """
         Toggle the animation (closing/opening the menu).
@@ -206,7 +204,7 @@ class LeftMenu(QWidget):
         self._toggle_button.set_active_toggle(closed)
         icon = LeftMenu.ICON_PATH_CLOSE if closed else LeftMenu.ICON_PATH_OPEN
         self._toggle_button.set_icon(icon)
-        self._animation.setEasingCurve(QEasingCurve.InOutCubic)
+        self._animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
         self._animation.setDuration(500)
         self._animation.start()
 
@@ -216,7 +214,7 @@ class LeftMenu(QWidget):
         """Return the button for the given widget class."""
         for btn in self.findChildren(LeftMenuButton):
             if btn.widget_class == widget_class:
-                return btn
+                return cast(LeftMenuButton[BaseWidgetType], btn)
         raise ValueError(  # pragma: no cover
             f"Could not find button for widget: {widget_class}"
         )

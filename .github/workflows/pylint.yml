@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.10"
+        python-version: "3.11"
 
     - name: Install Poetry
       run: pip install poetry
@@ -25,4 +25,4 @@ jobs:
       run: poetry install --no-root
 
     - name: Analysing the code with pylint
-      run: poetry run pylint --rcfile=.pylintrc `ls -dR $PWD/qute_style/*|grep .py$|xargs`
+      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style

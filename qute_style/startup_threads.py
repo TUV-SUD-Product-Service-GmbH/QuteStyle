@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Tuple, Type
+from typing import Type
 
-from PyQt5.QtCore import QThread
+from PySide6.QtCore import QThread
 
 from qute_style.qs_main_window import AppData
 
@@ -17,7 +17,7 @@ log = logging.getLogger(
 class StartupThread(QThread):
     """StartupThread base class."""
 
-    START_DEPENDS_ON: Tuple[Type[StartupThread], ...] = ()
+    START_DEPENDS_ON: tuple[Type[StartupThread], ...] = ()
 
     # Each startup thread must have a unique priority for its exit function.
     # The exit function of the thread with the lowest priority is executed

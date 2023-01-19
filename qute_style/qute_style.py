@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import contextlib
 import logging
-from typing import Dict, Generator, cast
+from typing import Generator, cast
 
-from PyQt5.QtCore import QRect, Qt
-from PyQt5.QtGui import QBrush, QColor, QPainter, QPalette, QPen
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QRect, Qt
+from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPen
+from PySide6.QtWidgets import (
     QCheckBox,
     QProxyStyle,
     QStyle,
@@ -74,11 +74,11 @@ class QuteStyle(QProxyStyle):
     """Custom style for a TSL Style application."""
 
     # Custom ControlElement for drawControl method.
-    CE_Toggle = QStyle.ControlElement(QProxyStyle.CE_CustomBase + 1)
+    CE_Toggle = QStyle.ControlElement(QStyle.ControlElement.CE_CustomBase + 1)
 
     # This is the cache that holds QPalettes already created, since they will
     # not change unless the user changes the theme.
-    PALETTE_CACHE: Dict[str, QPalette] = {}
+    PALETTE_CACHE: dict[str, QPalette] = {}
 
     # The different color names from which a QPalette for a style is created.
     # The comments reflect the description within the Qt documentation, for the
@@ -274,13 +274,13 @@ class QuteStyle(QProxyStyle):
             if isinstance(option, ToggleOptionButton):
                 self._draw_toggle(option, painter, widget)
                 return
-        elif element == self.CE_CheckBox:
+        elif element == self.ControlElement.CE_CheckBox:
             if isinstance(option, QStyleOptionButton) and isinstance(
                 widget, QCheckBox
             ):
                 self._draw_checkbox(option, painter, widget)
                 return
-        elif element == QStyle.CE_CheckBoxLabel:
+        elif element == QStyle.ControlElement.CE_CheckBoxLabel:
             if isinstance(option, QStyleOptionButton):
                 self._draw_check_box_label(option, painter, widget)
                 return
@@ -292,7 +292,12 @@ class QuteStyle(QProxyStyle):
         """Draw a QCheckBox."""
         self._draw_indicator_checkbox(option, painter, widget)
         text_option = QuteStyle.QCheckBoxOptions.text_option(option)
-        self.drawControl(QStyle.CE_CheckBoxLabel, text_option, painter, widget)
+        self.drawControl(
+            QStyle.ControlElement.CE_CheckBoxLabel,
+            text_option,
+            painter,
+            widget,
+        )
 
     def _draw_check_box_label(
         self,
@@ -307,11 +312,13 @@ class QuteStyle(QProxyStyle):
         # the Qt source code for QStyle::drawItemText). Therefore, we need
         # to set the correct text color for a disabled text element into
         # the QPalette.Normal role.
-        if not option.state & QStyle.State_Enabled:
+        if not option.state & QStyle.StateFlag.State_Enabled:
             role = QPalette.WindowText
             disabled_color = option.palette.color(QPalette.Disabled, role)
             option.palette.setColor(QPalette.Normal, role, disabled_color)
-        super().drawControl(QStyle.CE_CheckBoxLabel, option, painter, widget)
+        super().drawControl(
+            QStyle.ControlElement.CE_CheckBoxLabel, option, painter, widget
+        )
 
     def _draw_indicator_checkbox(
         self, option: QStyleOptionButton, painter: QPainter, widget: QWidget
@@ -319,10 +326,13 @@ class QuteStyle(QProxyStyle):
         # Get Qt's default rectangle for drawing a CheckBox
         check_option = QStyleOptionButton(option)
         check_option.rect = self.subElementRect(
-            self.SE_CheckBoxIndicator, option, widget
+            self.SubElement.SE_CheckBoxIndicator, option, widget
         )
         self.drawPrimitive(
-            self.PE_IndicatorCheckBox, check_option, painter, widget
+            self.PrimitiveElement.PE_IndicatorCheckBox,
+            check_option,
+            painter,
+            widget,
         )
 
     def _draw_toggle(
@@ -336,7 +346,7 @@ class QuteStyle(QProxyStyle):
 
         if option.text:
             self.drawControl(
-                QStyle.CE_CheckBoxLabel,
+                QStyle.ControlElement.CE_CheckBoxLabel,
                 QuteStyle.ToggleOptions.text_option(option),
                 painter,
                 widget,
@@ -379,20 +389,20 @@ class QuteStyle(QProxyStyle):
         widget: QWidget | None = None,
     ) -> None:
         """Draw a primitive Element."""
-        if element == self.PE_FrameFocusRect:
+        if element == self.PrimitiveElement.PE_FrameFocusRect:
             # Disable the drawing of a rectangle with a dashed line around a
             # focussed item. This was disabled when implementing the QStyle
             # to replace StyledCheckboxDelegate.
             return
-        if element == self.PE_PanelItemViewItem:
+        if element == self.PrimitiveElement.PE_PanelItemViewItem:
             if isinstance(option, QStyleOptionViewItem):
                 self._panel_draw_item_view_item(option, painter, widget)
                 return
-        elif element == self.PE_IndicatorCheckBox:
+        elif element == self.PrimitiveElement.PE_IndicatorCheckBox:
             if isinstance(option, (QStyleOptionButton, QStyleOptionViewItem)):
                 self._draw_primitive_indicator_checkbox(option, painter)
                 return
-        elif element == self.PE_IndicatorBranch:
+        elif element == self.PrimitiveElement.PE_IndicatorBranch:
             self._draw_branch(option, painter)
             return
         super().drawPrimitive(element, option, painter, widget)
@@ -400,20 +410,20 @@ class QuteStyle(QProxyStyle):
     @staticmethod
     def _get_branch_color(option: QStyleOption) -> str:
         """Select the right Branch color."""
-        if option.state & QStyle.State_MouseOver:
+        if option.state & QStyle.StateFlag.State_MouseOver:
             return get_color("context_hover")
         return get_color("foreground")
 
     @staticmethod
     def _get_branch_icon(option: QStyleOption) -> str:
         """Select the right Branch Icon."""
-        if option.state & QStyle.State_Open:
+        if option.state & QStyle.StateFlag.State_Open:
             return ":/svg_icons/arrow_down.svg"
         return ":/svg_icons/arrow_right.svg"
 
     def _draw_branch(self, option: QStyleOption, painter: QPainter) -> None:
         """Draw the branch arrow."""
-        if not option.state & QStyle.State_Children:
+        if not option.state & QStyle.StateFlag.State_Children:
             return
 
         self.draw_pixmap(
@@ -437,8 +447,8 @@ class QuteStyle(QProxyStyle):
         # Draw check mark if checkbox is checked. Note that State_NoChange
         # indeed is the QStyle.State for Qt.PartiallyChecked.
         if (
-            option.state & QStyle.State_On
-            or option.state & QStyle.State_NoChange
+            option.state & QStyle.StateFlag.State_On
+            or option.state & QStyle.StateFlag.State_NoChange
         ):
             QuteStyle._draw_checkbox_check(option, painter)
 
@@ -474,7 +484,7 @@ class QuteStyle(QProxyStyle):
         """Draw the check of the checkbox."""
         state = (
             Qt.Checked
-            if option.state & QStyle.State_On
+            if option.state & QStyle.StateFlag.State_On
             else Qt.PartiallyChecked
         )
         QuteStyle.draw_pixmap(
@@ -489,9 +499,9 @@ class QuteStyle(QProxyStyle):
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the frame color of a checkbox."""
-        if not option.state & QStyle.State_Enabled:
-            role = QPalette.Background
-        elif option.state & QStyle.State_MouseOver:
+        if not option.state & QStyle.StateFlag.State_Enabled:
+            role = QPalette.Window
+        elif option.state & QStyle.StateFlag.State_MouseOver:
             role = QPalette.Highlight
         else:
             role = QPalette.WindowText
@@ -502,7 +512,7 @@ class QuteStyle(QProxyStyle):
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the background color of a checkbox."""
-        if option.state & QStyle.State_Enabled:
+        if option.state & QStyle.StateFlag.State_Enabled:
             group = QPalette.Normal
         else:
             group = QPalette.Disabled
@@ -518,8 +528,8 @@ class QuteStyle(QProxyStyle):
         painter.save()
         brush = self._item_view_item_background_brush(option)
         if option.showDecorationSelected and (
-            option.state & QStyle.State_Selected
-            or option.state & QStyle.State_MouseOver
+            option.state & QStyle.StateFlag.State_Selected
+            or option.state & QStyle.StateFlag.State_MouseOver
         ):
             painter.fillRect(option.rect, brush)
         else:
@@ -529,10 +539,10 @@ class QuteStyle(QProxyStyle):
                 painter.fillRect(option.rect, option.backgroundBrush)
                 painter.setBrushOrigin(old_brush_origin)
 
-            if option.state & QStyle.State_Selected:
+            if option.state & QStyle.StateFlag.State_Selected:
                 assert widget
                 text_rect = self.subElementRect(
-                    QStyle.SE_ItemViewItemText, option, widget
+                    QStyle.SubElement.SE_ItemViewItemText, option, widget
                 )
                 painter.fillRect(text_rect, brush)
         painter.restore()
@@ -543,12 +553,12 @@ class QuteStyle(QProxyStyle):
     ) -> QBrush:
         """Return the brush for painting an ItemView's item background."""
         if (
-            option.state & QStyle.State_MouseOver
-            and not option.state & QStyle.State_Selected
+            option.state & QStyle.StateFlag.State_MouseOver
+            and not option.state & QStyle.StateFlag.State_Selected
         ):
             return QBrush(QColor(get_color("context_hover")))
-        if option.state & QStyle.State_Enabled:
-            if option.state & QStyle.State_Active:
+        if option.state & QStyle.StateFlag.State_Enabled:
+            if option.state & QStyle.StateFlag.State_Active:
                 color_group = QPalette.Normal
             else:
                 color_group = QPalette.Inactive
@@ -576,22 +586,22 @@ class QuteStyle(QProxyStyle):
     def button_foreground(option: QStyleOption) -> QColor:
         """Return a button's foreground color depending on option."""
         if (
-            option.state & QStyle.State_Selected
-            or option.state & QStyle.State_MouseOver
+            option.state & QStyle.StateFlag.State_Selected
+            or option.state & QStyle.StateFlag.State_MouseOver
         ):
             return option.palette.color(QPalette.Normal, QPalette.ButtonText)
-        if option.state & QStyle.State_Enabled:
+        if option.state & QStyle.StateFlag.State_Enabled:
             return option.palette.color(QPalette.Normal, QPalette.ButtonText)
         return option.palette.color(QPalette.Disabled, QPalette.ButtonText)
 
     @staticmethod
     def button_background(option: QStyleOptionButton) -> QColor:
         """Return a button's background color depending on option."""
-        if option.state & QStyle.State_On:
+        if option.state & QStyle.StateFlag.State_On:
             return option.palette.color(QPalette.Normal, QPalette.Highlight)
         return (
             option.palette.color(QPalette.Normal, QPalette.AlternateBase)
-            if option.state & QStyle.State_Enabled
+            if option.state & QStyle.StateFlag.State_Enabled
             else option.palette.color(
                 QPalette.Disabled, QPalette.AlternateBase
             )

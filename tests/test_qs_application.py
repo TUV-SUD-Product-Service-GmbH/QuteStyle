@@ -3,8 +3,8 @@ from copy import copy
 from typing import List, Type
 
 import pytest
-from PyQt5.QtCore import QEventLoop, QThread, QTimer
-from PyQt5.QtWidgets import QApplication
+from PySide6.QtCore import QEventLoop, QThread, QTimer
+from PySide6.QtWidgets import QApplication
 
 from qute_style.dev.mocks import check_call
 from qute_style.qs_application import QuteStyleApplication

@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Dict, Optional
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFontMetrics, QStaticText
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFontMetrics, QStaticText
 
 
 class TextTruncator:  # pylint: disable=too-few-public-methods
@@ -18,8 +17,8 @@ class TextTruncator:  # pylint: disable=too-few-public-methods
 
     def __init__(self) -> None:
         """Create a new TextTruncator."""
-        self._text_sizes: Dict[str, Dict[int, QStaticText]] = defaultdict(dict)
-        self._font_metrics: Optional[QFontMetrics] = None
+        self._text_sizes: dict[str, dict[int, QStaticText]] = defaultdict(dict)
+        self._font_metrics: QFontMetrics | None = None
 
     def truncate_text(
         self,
@@ -40,12 +39,16 @@ class TextTruncator:  # pylint: disable=too-few-public-methods
             if not font_metrics:
                 font_metrics = self._font_metrics
             assert font_metrics
-            elided_text = font_metrics.elidedText(text, Qt.ElideRight, width)
+            elided_text = font_metrics.elidedText(
+                text, Qt.TextElideMode.ElideRight, width
+            )
             self._text_sizes[text][width] = QStaticText(elided_text)
 
             # Activate AggressiveCaching (better performance, more memory)
-            self._text_sizes[text][width].setTextFormat(Qt.PlainText)
+            self._text_sizes[text][width].setTextFormat(
+                Qt.TextFormat.PlainText
+            )
             self._text_sizes[text][width].setPerformanceHint(
-                QStaticText.AggressiveCaching
+                QStaticText.PerformanceHint.AggressiveCaching
             )
             return self._text_sizes[text][width]

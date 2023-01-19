@@ -2,14 +2,14 @@
 import logging
 import sys
 from pathlib import Path
-from typing import List, Union, cast
+from typing import Union, cast
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from PyQt5.QtCore import QBuffer, QByteArray, QIODevice, QObject
-from PyQt5.QtGui import QColor, QPaintEvent, QPixmap
-from pyqtspinner.spinner import WaitingSpinner
+from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QObject
+from PySide6.QtGui import QColor, QPaintEvent, QPixmap
 
 from qute_style.style import get_color
+from qute_style.widgets.spinner import WaitingSpinner
 
 log = logging.getLogger("qute_style")
 
@@ -63,7 +63,7 @@ def create_waiting_spinner(
     return spinner
 
 
-def create_tooltip(title: str, description: Union[str, List[str]]) -> str:
+def create_tooltip(title: str, description: Union[str, list[str]]) -> str:
     """Create a tooltip as HTML str."""
     top = Element("div")
     first = SubElement(top, "p")

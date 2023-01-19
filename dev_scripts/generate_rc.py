@@ -30,7 +30,9 @@ if __name__ == "__main__":
 
     print("Generating resource_rc.py with new resources.qrc")
     assert (
-        subprocess.call(["pyrcc5", "-o", ROOT / "resources_rc.py", QRC_FILE])
+        subprocess.call(
+            ["pyside6-rcc", "-o", ROOT / "resources_rc.py", QRC_FILE]
+        )
         == 0
     )
 

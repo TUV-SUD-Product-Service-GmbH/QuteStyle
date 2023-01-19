@@ -12,18 +12,18 @@ from __future__ import annotations
 import contextlib
 import logging
 from types import ModuleType
-from typing import Any, Callable, Dict, Generator, List, Tuple, Type, overload
+from typing import Any, Callable, Generator, Type, overload
 
 from _pytest.monkeypatch import MonkeyPatch
 from mypy_extensions import KwArg, VarArg
-from PyQt5.QtWidgets import QMessageBox, QWidget
+from PySide6.QtWidgets import QMessageBox, QWidget
 
 from qute_style.qs_message_box import QuteMessageBox
 
 log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
 
-Call = Tuple[Tuple[Any, ...], Dict[str, Any]]
-CallList = List[Call]
+Call = tuple[tuple[Any, ...], dict[str, Any]]
+CallList = list[Call]
 
 
 def _check_mp_dialog(
@@ -151,7 +151,7 @@ def mock_qute_message_dialog(
     text: str,
     parent: QWidget,
     method: str = "warning",
-    return_value: QuteMessageBox.StandardButton | None = None,
+    return_value: QMessageBox.StandardButton | None = None,
 ) -> Generator[None, None, None]:
     """
     Mock the QuteMessageBox call of a method in a context.
@@ -178,8 +178,8 @@ def check_call(  # pylint: disable=too-many-arguments
     mock_class: Type[Any] | ModuleType,
     method: str,
     return_value: Any = None,
-    call_args_list: List[Tuple[Any, ...]] | None = None,
-    call_kwargs_list: List[Dict[str, Any]] | None = None,
+    call_args_list: list[tuple[Any, ...]] | None = None,
+    call_kwargs_list: list[dict[str, Any]] | None = None,
     call_count: int = 1,
     as_property: bool = False,
 ) -> Generator[CallList, None, None]:
@@ -220,8 +220,8 @@ def check_call(  # pylint: disable=too-many-arguments
 def check_call_str(  # pylint: disable=too-many-arguments
     mock_class: str,
     return_value: Any = None,
-    call_args_list: List[Tuple[Any, ...]] | None = None,
-    call_kwargs_list: List[Dict[str, Any]] | None = None,
+    call_args_list: list[tuple[Any, ...]] | None = None,
+    call_kwargs_list: list[dict[str, Any]] | None = None,
     call_count: int = 1,
     as_property: bool = False,
 ) -> Generator[CallList, None, None]:
@@ -246,8 +246,8 @@ def check_call_str(  # pylint: disable=too-many-arguments
 
 def assert_calls(
     call_count: int,
-    call_args_list: List[Tuple[Any, ...]] | None,
-    call_kwargs_list: List[Dict[str, Any]] | None,
+    call_args_list: list[tuple[Any, ...]] | None,
+    call_kwargs_list: list[dict[str, Any]] | None,
     calls: CallList,
     m_name: str,
 ) -> None:

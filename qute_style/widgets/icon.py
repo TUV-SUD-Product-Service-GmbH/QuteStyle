@@ -1,9 +1,9 @@
 """Icon that can be painted in any given color."""
 from typing import Union, cast
 
-from PyQt5 import QtGui
-from PyQt5.QtGui import QPainter, QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget
+from PySide6 import QtGui
+from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtWidgets import QApplication, QWidget
 
 from qute_style.style import get_color
 from qute_style.widgets.custom_icon_engine import PixmapStore

@@ -1,7 +1,7 @@
 """Tests for message boxes."""
 
 import pytest
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
 
 from qute_style.dev.mocks import check_call

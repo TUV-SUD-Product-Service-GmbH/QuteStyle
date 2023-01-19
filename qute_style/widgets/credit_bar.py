@@ -1,6 +1,6 @@
 """Credit bar with copyright text on the left and version on the right."""
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -23,13 +23,13 @@ class CreditBar(QFrame):
         bg_layout.setContentsMargins(0, 0, 0, 0)
 
         copyright_label = QLabel("By: Technical Support Local")
-        copyright_label.setAlignment(Qt.AlignVCenter)
+        copyright_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         version_label = QLabel(version)
-        version_label.setAlignment(Qt.AlignVCenter)
+        version_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         separator = QSpacerItem(
-            20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
+            20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
         )
 
         bg_layout.addWidget(copyright_label)

@@ -16,17 +16,15 @@ jobs:
       fail-fast: False
       matrix:
         python-version:
-          - "3.8"
-          - "3.9"
           - "3.10"
           - "3.11"
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -35,7 +33,6 @@ jobs:
 
     - name: Install project dependencies
       run: poetry install -vvv --no-root
-
 
     - name: Test with pytest
       run: poetry run python -m pytest --cov --cov-report=term-missing --cov-report=xml

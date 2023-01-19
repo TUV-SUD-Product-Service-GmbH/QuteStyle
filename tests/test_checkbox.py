@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from random import randint
-from typing import List, cast
+from typing import cast
 
 import pytest
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QStandardItemModel
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QStandardItemModel
 from pytestqt.qtbot import QtBot
 
 from qute_style.widgets.styled_combobox import (
@@ -65,7 +65,7 @@ def test_text(
     combobox: CheckableComboBox[int],
     cb_items: None,  # pylint: disable=unused-argument
     mode: bool,
-    items: List[int],
+    items: list[int],
     qtbot: QtBot,
 ) -> None:
     """Test that the text of CheckableComboBox reflects the selected items."""
@@ -95,7 +95,7 @@ def test_item_ids(
     combobox: CheckableComboBox[int],
     cb_items: None,  # pylint: disable=unused-argument
     mode: bool,
-    items: List[int],
+    items: list[int],
     qtbot: QtBot,
 ) -> None:
     """Test that the ids of checked items are correctly returned."""
@@ -104,7 +104,7 @@ def test_item_ids(
         for item in items:
             cast(QStandardItemModel, combobox.model()).item(
                 item
-            ).setCheckState(Qt.Checked)
+            ).setCheckState(Qt.CheckState.Checked)
         if mode:
             assert combobox.item_ids == [items[-1]]
         else:
@@ -131,7 +131,9 @@ def test_popup_event_filter(
     assert not exceptions
 
 
-@pytest.mark.parametrize("checked", (Qt.Unchecked, Qt.Checked))
+@pytest.mark.parametrize(
+    "checked", (Qt.CheckState.Unchecked, Qt.CheckState.Checked)
+)
 def test_check_state_event_filter(
     combobox: CheckableComboBox[int],
     cb_items: None,  # pylint: disable=unused-argument
@@ -142,13 +144,15 @@ def test_check_state_event_filter(
     with qtbot.captureExceptions() as exceptions:
 
         combobox.showPopup()
-        if not checked:
+        if checked == Qt.CheckState.Unchecked:
             combobox.item_ids = [0]
 
         index = combobox.model().index(0, 0)
         pos = combobox.view().visualRect(index).center()
 
-        qtbot.mouseClick(combobox.view().viewport(), Qt.LeftButton, pos=pos)
+        qtbot.mouseClick(
+            combobox.view().viewport(), Qt.MouseButton.LeftButton, pos=pos
+        )
         assert (
             cast(QStandardItemModel, combobox.model()).item(0).checkState()
             == checked

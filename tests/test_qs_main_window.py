@@ -1,13 +1,13 @@
 """Tests for the QuteStyleMainWindow."""
 # pylint: disable=protected-access
 import logging
-from typing import List, Type, TypeVar, Union, cast
+from typing import List, Type, Union, cast
 
 import pytest
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QEvent, QPointF, Qt
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QApplication
+from PySide6 import QtWidgets
+from PySide6.QtCore import QEvent, QPointF, Qt
+from PySide6.QtGui import QMouseEvent
+from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
 
 from qute_style.dev.mocks import check_call
@@ -130,13 +130,10 @@ class EmptyWindowStyled(QuteStyleMainWindow):
     LEFT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
 
 
-WindowT = TypeVar("WindowT", bound=QuteStyleMainWindow)
-
-
 def create_new_main_window(
     qtbot: QtBot,
-    window_class: Type[WindowT],
-) -> WindowT:
+    window_class: Type[QuteStyleMainWindow],
+) -> QuteStyleMainWindow:
     """Create and show a new QuteStyleMainWindow."""
     widget = window_class(
         AppData("TestApp", "1.0.0", ":/svg_icons/no_icon.svg")

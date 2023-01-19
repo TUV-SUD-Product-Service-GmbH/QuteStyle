@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import contextlib
 import logging
-from typing import Generic, List, Tuple, TypeVar, cast
+from typing import Generic, TypeVar, cast
 
-from PyQt5 import QtGui
-from PyQt5.QtCore import QEvent, QModelIndex, QObject, QPoint, Qt, pyqtSlot
-from PyQt5.QtGui import (
+from PySide6 import QtGui
+from PySide6.QtCore import QEvent, QModelIndex, QObject, QPoint, Qt, Slot
+from PySide6.QtGui import (
     QFontMetrics,
     QIcon,
     QMouseEvent,
@@ -17,7 +17,7 @@ from PyQt5.QtGui import (
     QStandardItem,
     QStandardItemModel,
 )
-from PyQt5.QtWidgets import (
+from PySide6.QtWidgets import (
     QComboBox,
     QListView,
     QStyle,
@@ -47,8 +47,12 @@ class StyledComboBox(QComboBox):
         super().__init__(parent)
         # options below are needed, otherwise the rounded
         # corners of dropdowns cannot be drawn correctly
-        self.view().window().setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
-        self.view().window().setAttribute(Qt.WA_TranslucentBackground)
+        self.view().window().setWindowFlags(
+            Qt.WindowType.Popup | Qt.FramelessWindowHint
+        )
+        self.view().window().setAttribute(
+            Qt.WidgetAttribute.WA_TranslucentBackground
+        )
 
     def paintEvent(  # pylint: disable=invalid-name
         self, event: QtGui.QPaintEvent
@@ -70,7 +74,10 @@ class StyledComboBox(QComboBox):
         # Define size of arrow depending on ComboBox SubControl
         opt = QStyleOptionComboBox()
         rect = self.style().subControlRect(
-            QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxArrow, None
+            QStyle.ComplexControl.CC_ComboBox,
+            opt,
+            QStyle.SubControl.SC_ComboBoxArrow,
+            None,
         )
         radius = int(rect.width() * 0.5)
 
@@ -83,7 +90,9 @@ class StyledComboBox(QComboBox):
             color,
         )
         # Draw arrow above existing ComboBox
-        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.setCompositionMode(
+            QPainter.CompositionMode.CompositionMode_SourceOver
+        )
         # Draw arrow in rect 25x25 at the end, with size: radius x radius
         # x-axis: in the middle of arrow rect with spacing 2
         # y-axis: in the middle of arrow rect
@@ -149,7 +158,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         self, obj: QObject, event: QEvent
     ) -> bool:
         """Filter events to show popup and set check states."""
-        if event.type() == QEvent.MouseButtonRelease:
+        if event.type() == QEvent.Type.MouseButtonRelease:
             event = cast(QMouseEvent, event)
             if obj is self.lineEdit():
                 log.debug(
@@ -181,22 +190,24 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         """Toggle the CheckState at the given pos."""
         index = self.view().indexAt(pos)
         item = cast(QStandardItemModel, self.model()).item(index.row())
-        if item.checkState() == Qt.Checked:
-            item.setCheckState(Qt.Unchecked)
+        if item.checkState() == Qt.CheckState.Checked:
+            item.setCheckState(Qt.CheckState.Unchecked)
         else:
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.CheckState.Checked)
 
-    @pyqtSlot(
-        QModelIndex, QModelIndex, "QVector<int>", name="handle_data_change"
-    )
+    @Slot(QModelIndex, QModelIndex, "QVector<int>", name="handle_data_change")
     def handle_data_change(
-        self, start: QModelIndex, end: QModelIndex, roles: Tuple[int]
+        self, start: QModelIndex, end: QModelIndex, roles: list[int]
     ) -> None:
         """Handle a data change event to handle single_mode."""
+        # todo: Handling is not straight forward at this point. Compared to
+        #  pyqt the actual value has to be accessed because the signal carries
+        #  raw integer.
         if (
             self._single
-            and Qt.CheckStateRole in roles
-            and start.data(Qt.CheckStateRole) == Qt.Checked
+            and Qt.ItemDataRole.CheckStateRole.value in roles
+            and start.data(Qt.ItemDataRole.CheckStateRole)
+            == Qt.CheckState.Checked.value
         ):
             log.debug("Unchecking other items, since single mode is active.")
             # we should never edit check state for two indexes at the same time
@@ -205,7 +216,9 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                 if idx != start.row():
                     index = self.model().index(idx, 0, QModelIndex())
                     self.model().setData(
-                        index, Qt.Unchecked, Qt.CheckStateRole
+                        index,
+                        Qt.CheckState.Unchecked,
+                        Qt.ItemDataRole.CheckStateRole,
                     )
         self.update_text()
 
@@ -216,7 +229,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         # Compute elided text (with "...")
         metrics = QFontMetrics(self.lineEdit().font())
         elided_text = metrics.elidedText(
-            text, Qt.ElideRight, self.lineEdit().width()
+            text, Qt.TextElideMode.ElideRight, self.lineEdit().width()
         )
         self.lineEdit().setText(elided_text)
 
@@ -226,7 +239,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             str(cast(QStandardItemModel, self.model()).item(idx).data())
             for idx in range(self.model().rowCount())
             if cast(QStandardItemModel, self.model()).item(idx).checkState()
-            == Qt.Checked
+            == Qt.CheckState.Checked
         ]
 
         text = ", ".join(texts)
@@ -237,7 +250,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             text = self._default_text
         return text
 
-    def addItem(  # type: ignore  # pylint: disable=invalid-name
+    def addItem(  # pylint: disable=invalid-name
         self,
         text: str,
         data: ItemData | None = None,
@@ -251,28 +264,30 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             )
         item = QStandardItem(text)
         item.setData(data)
-        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-        item.setData(Qt.Unchecked, Qt.CheckStateRole)
+        item.setFlags(
+            Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable
+        )
+        item.setData(Qt.CheckState.Unchecked, Qt.ItemDataRole.CheckStateRole)
         if icon_path:
             item.setData(
                 QIcon(CustomIconEngine(icon_path, icon_color or "foreground")),
-                Qt.DecorationRole,
+                Qt.ItemDataRole.DecorationRole,
             )
         cast(QStandardItemModel, self.model()).appendRow(item)
         self.update_text()
 
     @property
-    def item_ids(self) -> List[ItemData]:
+    def item_ids(self) -> list[ItemData]:
         """Return the list of ids checked by the user."""
         return [
             cast(QStandardItemModel, self.model()).item(i).data()
             for i in range(self.model().rowCount())
             if cast(QStandardItemModel, self.model()).item(i).checkState()
-            == Qt.Checked
+            == Qt.CheckState.Checked
         ]
 
     @item_ids.setter
-    def item_ids(self, item_ids: List[ItemData]) -> None:
+    def item_ids(self, item_ids: list[ItemData]) -> None:
         """Set the ids that are selected/checked."""
         if self.single_mode and len(item_ids) > 1:
             raise TooManyItemsError(
@@ -283,5 +298,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         for idx in range(self.model().rowCount()):
             data = cast(QStandardItemModel, self.model()).item(idx).data()
             cast(QStandardItemModel, self.model()).item(idx).setCheckState(
-                Qt.Checked if data in item_ids else Qt.Unchecked
+                Qt.CheckState.Checked
+                if data in item_ids
+                else Qt.CheckState.Unchecked
             )

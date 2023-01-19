@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, TypedDict
+from typing import TypedDict
 
-from PyQt5.QtCore import QEvent, QRect, Qt
-from PyQt5.QtGui import QBrush, QColor, QMouseEvent, QPainter, QPaintEvent
-from PyQt5.QtWidgets import QWIDGETSIZE_MAX, QPushButton, QWidget
+from PySide6.QtCore import QEvent, QRect, Qt
+from PySide6.QtGui import QBrush, QColor, QMouseEvent, QPainter, QPaintEvent
+from PySide6.QtWidgets import QPushButton, QWidget
 
 from qute_style.style import get_color
 from qute_style.widgets.custom_icon_engine import PixmapStore
@@ -14,6 +14,10 @@ from qute_style.widgets.custom_icon_engine import PixmapStore
 log = logging.getLogger(
     f"qute_style.{__name__}"
 )  # pylint: disable=invalid-name
+
+# todo: QWIDGETSIZE_MAX is a constant in C++ but not available in PySide6.
+#  What now?
+QWIDGETSIZE_MAX = (1 << 24) - 1
 
 
 class BackgroundColorNames(TypedDict):
@@ -29,7 +33,7 @@ class IconButton(QPushButton):
     """Simple button showing an icon."""
 
     FIXED_HEIGHT: int = 36
-    FIXED_WIDTH: Optional[int] = 36
+    FIXED_WIDTH: int | None = 36
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -55,7 +59,7 @@ class IconButton(QPushButton):
 
         self.set_sizes()
 
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self._is_active: bool = False
 
@@ -100,8 +104,8 @@ class IconButton(QPushButton):
         """Customize painting of the button and icon."""
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(Qt.NoPen)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setPen(Qt.PenStyle.NoPen)
         if self._bg_color == "transparent":
             painter.setBrush(QBrush(QColor(self._bg_color)))
         else:
@@ -138,7 +142,7 @@ class IconButton(QPushButton):
         self, event: QMouseEvent
     ) -> None:
         """Event triggered on mouse button press."""
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._bg_color = self._bgs["pressed"]
             self._icon_color = "context_pressed"
             self._text_color = "context_pressed"
@@ -150,7 +154,7 @@ class IconButton(QPushButton):
         self, event: QMouseEvent
     ) -> None:
         """Event triggered on mouse button release."""
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self._bg_color = self._bgs["released"]
             self._icon_color = "active"
             self._text_color = "foreground"
@@ -206,7 +210,9 @@ class IconButton(QPushButton):
             self.width() - self.FIXED_HEIGHT,
             self.height(),
         )
-        root_painter.drawText(rect_text, Qt.AlignVCenter, self.text())
+        root_painter.drawText(
+            rect_text, Qt.AlignmentFlag.AlignVCenter, self.text()
+        )
 
     def set_icon(self, icon_path: str) -> None:
         """Set the icon to the given path."""

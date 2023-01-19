@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import cast
 
-from PyQt5.QtCore import (
+from PySide6.QtCore import (
     QEvent,
     QFileInfo,
     QModelIndex,
@@ -12,10 +12,10 @@ from PyQt5.QtCore import (
     QSize,
     QStringListModel,
     Qt,
-    pyqtSlot,
+    Slot,
 )
-from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QIcon
-from PyQt5.QtWidgets import (
+from PySide6.QtGui import QDragEnterEvent, QDropEvent, QIcon
+from PySide6.QtWidgets import (
     QCheckBox,
     QDialogButtonBox,
     QFileIconProvider,
@@ -138,7 +138,7 @@ class TestWidget(MainWidget):
         self._ui.drop_widget.clear()
         self._drop_label.show()
 
-    @pyqtSlot(name="on_change_orientation")
+    @Slot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
         """Change the orientation of the QSplitter."""
         if self._ui.splitter.orientation() == Qt.Horizontal:
@@ -146,7 +146,7 @@ class TestWidget(MainWidget):
         else:
             self._ui.splitter.setOrientation(Qt.Horizontal)
 
-    @pyqtSlot(name="on_widgets_disabled")
+    @Slot(name="on_widgets_disabled")
     def on_widgets_disabled(self) -> None:
         """Disable all widgets."""
         if self._ui.disable_widgets.isChecked():
@@ -161,9 +161,9 @@ class TestWidget(MainWidget):
 class Model(QStringListModel):
     """Test model with check states."""
 
-    def __init__(self, data: List[str], parent: QObject | None = None) -> None:
+    def __init__(self, data: list[str], parent: QObject | None = None) -> None:
         """Create a new Model."""
-        self._check_states: Dict[str, Qt.CheckState] = {}
+        self._check_states: dict[str, Qt.CheckState] = {}
         super().__init__(data, parent)
 
     def data(

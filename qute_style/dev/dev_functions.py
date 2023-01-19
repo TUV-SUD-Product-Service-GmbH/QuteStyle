@@ -10,12 +10,10 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
-
-from PyQt5 import uic  # pylint: disable=wrong-import-order
+from typing import Any
 
 
-def compile_ui_files(src_folders: List[Path]) -> None:
+def compile_ui_files(src_folders: list[Path]) -> None:
     """
     Compile the ui files.
 
@@ -25,13 +23,16 @@ def compile_ui_files(src_folders: List[Path]) -> None:
     for folder in src_folders:
         for file in folder.iterdir():
             print(f"Converting file {file}")
-            with file.open("r", encoding="utf-8") as source:
-                new_file = file.parent.parent / "gen" / f"ui_{file.stem}.py"
-                with new_file.open(
-                    "w",
-                    encoding="utf-8",
-                ) as target:
-                    uic.compileUi(source, target)
+            target = file.parent.parent / "gen" / f"ui_{file.stem}.py"
+            subprocess.run(
+                [
+                    Path(sys.executable).parent / "pyside6-uic",
+                    file,
+                    "-o",
+                    target,
+                ],
+                check=True,
+            )
         # run black after ui files are created
         subprocess.run(
             [
@@ -44,7 +45,7 @@ def compile_ui_files(src_folders: List[Path]) -> None:
     print("Conversion finished")
 
 
-def get_sorted_version_directories(changelog_path: Path) -> List[Path]:
+def get_sorted_version_directories(changelog_path: Path) -> list[Path]:
     """Get all version directories and return them sorted as list."""
     directories = [item for item in changelog_path.iterdir() if item.is_dir()]
     return sorted(
@@ -56,10 +57,10 @@ def get_sorted_version_directories(changelog_path: Path) -> List[Path]:
 
 # key = widget class name
 # values = changelogs for widget according to language (de/en)
-WidgetLogInfo = Dict[str, List[Dict[str, str]]]
+WidgetLogInfo = dict[str, list[dict[str, str]]]
 
 
-def list_dd() -> Dict[Any, List[Any]]:
+def list_dd() -> dict[Any, list[Any]]:
     """
     Implement module level method to allow pickling of defaultdict.
 
@@ -71,10 +72,10 @@ def list_dd() -> Dict[Any, List[Any]]:
 def get_change_log_data(
     app_name: str,
     change_log_path: Path,
-) -> Dict[str, WidgetLogInfo]:
+) -> dict[str, WidgetLogInfo]:
     """Read in all the changelog data per version."""
     print("Get changelog data")
-    change_log_data: Dict[str, WidgetLogInfo] = defaultdict(list_dd)
+    change_log_data: dict[str, WidgetLogInfo] = defaultdict(list_dd)
     sorted_directories = get_sorted_version_directories(change_log_path)
     for version in sorted_directories:
         for file in version.glob("*.json"):
@@ -86,11 +87,11 @@ def get_change_log_data(
     return dict(change_log_data)
 
 
-def _parse_change_log(file: Path) -> Tuple[str, Dict[str, str]]:
+def _parse_change_log(file: Path) -> tuple[str, dict[str, str]]:
     """Parse the widget name and the change log texts from a JSON file."""
     with file.open(encoding="utf-8") as handle:
         entry = json.loads(handle.read())
-    if isinstance(entry, List):
+    if isinstance(entry, list):
         # old changelog data was stored as list. Do not add to logs
         raise NotImplementedError(
             "Parsing of old changelogs isn't implemented"
@@ -102,7 +103,7 @@ def _parse_change_log(file: Path) -> Tuple[str, Dict[str, str]]:
     return widget, {"de": text, "en": text_en}
 
 
-def _parse_str(entry: Dict[Any, Any], key: str) -> str:
+def _parse_str(entry: dict[Any, Any], key: str) -> str:
     """Parse the text for the given key from the entry (dict from JSON)."""
     try:
         text = entry[key]
@@ -120,7 +121,7 @@ def _parse_str(entry: Dict[Any, Any], key: str) -> str:
 def _create_resource_file(  # pylint: disable=too-many-locals
     resource_file_path: Path,
     change_log_path: Path,
-    change_log_data: Dict[str, WidgetLogInfo],
+    change_log_data: dict[str, WidgetLogInfo],
 ) -> None:
     """Create the resource file from data."""
     print("Creating new resources.qrc")
@@ -157,7 +158,9 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     tree.write(resource_file)
 
     print("Generating resource_rc.py with new resources.qrc")
-    assert subprocess.call(f"pyrcc5 -o {resource_py} {resource_file}") == 0
+    assert (
+        subprocess.call(f"pyside6-rcc -o {resource_py} {resource_file}") == 0
+    )
 
     print("Deleting resources.qrc")
     resource_file.unlink()

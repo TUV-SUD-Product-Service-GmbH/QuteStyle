@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Tuple, Type
+from typing import Type
 
-from PyQt5.QtCore import QPoint
-from PyQt5.QtWidgets import QWidget
+from PySide6.QtCore import QPoint
+from PySide6.QtWidgets import QWidget
 
 from qute_style.widgets.base_widgets import BaseWidget
 from qute_style.widgets.icon_button import BackgroundColorNames
@@ -51,7 +51,7 @@ class TitleButton(IconTooltipButton[BaseWidget]):
             margin=margin,
         )
 
-    def _get_tooltip_coords(self, pos: QPoint) -> Tuple[int, int]:
+    def _get_tooltip_coords(self, pos: QPoint) -> tuple[int, int]:
         """Return the tooltip coords from the global position."""
         pos_x = (pos.x() - self._tooltip.width()) + self.width() + 5
         pos_y = pos.y() + self.height() + 6

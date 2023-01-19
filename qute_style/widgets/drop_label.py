@@ -6,9 +6,9 @@ onto the underlying widget.
 """
 from typing import cast
 
-from PyQt5.QtCore import QEvent, QObject, Qt
-from PyQt5.QtGui import QResizeEvent
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QEvent, QObject, Qt
+from PySide6.QtGui import QResizeEvent
+from PySide6.QtWidgets import (
     QLabel,
     QSizePolicy,
     QSpacerItem,
@@ -28,15 +28,17 @@ class DropLabel(QWidget):
         # Define Custom Icon
         icon = Icon(56)
         icon.set_icon(":/svg_icons/cloud_upload.svg")
-        icon.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        icon.setSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
+        )
         text_label = QLabel(text)
         text_label.setWordWrap(True)
-        text_label.setAlignment(Qt.AlignCenter)
+        text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setLayout(QVBoxLayout())
-        exp = QSizePolicy.Expanding
+        exp = QSizePolicy.Policy.Expanding
         self.layout().addItem(QSpacerItem(40, 20, exp, exp))
         self.layout().addWidget(icon)
-        self.layout().setAlignment(icon, Qt.AlignHCenter)
+        self.layout().setAlignment(icon, Qt.AlignmentFlag.AlignHCenter)
         self.layout().addWidget(text_label)
         self.layout().addItem(QSpacerItem(40, 20, exp, exp))
 

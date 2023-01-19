@@ -2,9 +2,9 @@
 import logging
 from typing import TYPE_CHECKING
 
-from PyQt5.QtCore import QRect, Qt, pyqtSignal
-from PyQt5.QtGui import QCursor, QMouseEvent
-from PyQt5.QtWidgets import QSizeGrip, QWidget
+from PySide6.QtCore import QRect, Qt, Signal
+from PySide6.QtGui import QCursor, QMouseEvent
+from PySide6.QtWidgets import QSizeGrip, QWidget
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
@@ -14,7 +14,7 @@ log = logging.getLogger(
 class CornerGrip(QSizeGrip):
     """Widget that shows a grip handle in a corner."""
 
-    window_geometry_changed = pyqtSignal(QRect, name="window_geometry_changed")
+    window_geometry_changed = Signal(QRect, name="window_geometry_changed")
 
     def __init__(self, parent: QWidget, position: Qt.Corner) -> None:
         """Create a new CornerGrip."""
@@ -30,13 +30,13 @@ class CornerGrip(QSizeGrip):
 
     def adapt(self) -> None:
         """Adapt the position when the main window was resized."""
-        if self._position == Qt.TopLeftCorner:
+        if self._position == Qt.Corner.TopLeftCorner:
             self.move(5, 5)
-        elif self._position == Qt.TopRightCorner:
+        elif self._position == Qt.Corner.TopRightCorner:
             self.move(self.parent().width() - 20, 5)
-        elif self._position == Qt.BottomLeftCorner:
+        elif self._position == Qt.Corner.BottomLeftCorner:
             self.move(5, self.parent().height() - 20)
-        elif self._position == Qt.BottomRightCorner:
+        elif self._position == Qt.Corner.BottomRightCorner:
             self.move(self.parent().width() - 20, self.parent().height() - 20)
 
     def mousePressEvent(  # pylint: disable=invalid-name
@@ -70,7 +70,7 @@ class CornerGrip(QSizeGrip):
         of Qt.WA_TranslucentBackground.
         """
         geo = self.parent().geometry()
-        if self._position == Qt.TopLeftCorner:
+        if self._position == Qt.Corner.TopLeftCorner:
             width = max(
                 self.parent().minimumWidth(), self.parent().width() - delta_x
             )
@@ -80,7 +80,7 @@ class CornerGrip(QSizeGrip):
             )
             geo.setLeft(geo.right() - width)
             geo.setTop(geo.bottom() - height)
-        elif self._position == Qt.BottomLeftCorner:
+        elif self._position == Qt.Corner.BottomLeftCorner:
             width = max(
                 self.parent().minimumWidth(), self.parent().width() - delta_x
             )
@@ -90,7 +90,7 @@ class CornerGrip(QSizeGrip):
             )
             geo.setLeft(geo.right() - width)
             geo.setHeight(height)
-        elif self._position == Qt.TopRightCorner:
+        elif self._position == Qt.Corner.TopRightCorner:
             width = max(
                 self.parent().minimumWidth(), self.parent().width() + delta_x
             )
@@ -100,7 +100,7 @@ class CornerGrip(QSizeGrip):
             )
             geo.setTop(geo.bottom() - height)
             geo.setWidth(width)
-        elif self._position == Qt.BottomRightCorner:
+        elif self._position == Qt.Corner.BottomRightCorner:
             width = max(
                 self.parent().minimumWidth(), self.parent().width() + delta_x
             )
@@ -116,7 +116,7 @@ class CornerGrip(QSizeGrip):
 class EdgeGrip(QWidget):
     """Widget that shows a grip handle in an edge."""
 
-    window_geometry_changed = pyqtSignal(QRect, name="window_geometry_changed")
+    window_geometry_changed = Signal(QRect, name="window_geometry_changed")
 
     def __init__(self, parent: QWidget, position: Qt.Edge) -> None:
         """Create a new EdgeGrip."""
@@ -124,11 +124,11 @@ class EdgeGrip(QWidget):
         self.installEventFilter(self.parent())
         self._position = position
         self.setObjectName("grip")
-        if position in (Qt.TopEdge, Qt.BottomEdge):
-            self.setCursor(QCursor(Qt.SizeVerCursor))
+        if position in (Qt.Edge.TopEdge, Qt.Edge.BottomEdge):
+            self.setCursor(QCursor(Qt.CursorShape.SizeVerCursor))
             self.setMaximumHeight(10)
-        elif position in (Qt.LeftEdge, Qt.RightEdge):
-            self.setCursor(QCursor(Qt.SizeHorCursor))
+        elif position in (Qt.Edge.LeftEdge, Qt.Edge.RightEdge):
+            self.setCursor(QCursor(Qt.CursorShape.SizeHorCursor))
             self.setMaximumWidth(10)
 
     if TYPE_CHECKING:
@@ -140,13 +140,13 @@ class EdgeGrip(QWidget):
         """Adapt the size and position when the main window was resized."""
         width = self.parent().width()
         height = self.parent().height()
-        if self._position == Qt.TopEdge:
+        if self._position == Qt.Edge.TopEdge:
             self.setGeometry(5, 5, width, 10)
-        elif self._position == Qt.BottomEdge:
+        elif self._position == Qt.Edge.BottomEdge:
             self.setGeometry(5, height - 15, width, 10)
-        elif self._position == Qt.LeftEdge:
+        elif self._position == Qt.Edge.LeftEdge:
             self.setGeometry(5, 10, 10, height)
-        elif self._position == Qt.RightEdge:
+        elif self._position == Qt.Edge.RightEdge:
             self.setGeometry(width - 15, 10, 10, height)
 
     def mouseMoveEvent(  # pylint: disable=invalid-name
@@ -157,19 +157,19 @@ class EdgeGrip(QWidget):
 
         The mouseMoveEvent method is only called after a mousePressEvent call.
         """
-        if self._position in (Qt.TopEdge, Qt.BottomEdge):
+        if self._position in (Qt.Edge.TopEdge, Qt.Edge.BottomEdge):
             self._resize_y(event.pos().y())
-        if self._position in (Qt.LeftEdge, Qt.RightEdge):
+        if self._position in (Qt.Edge.LeftEdge, Qt.Edge.RightEdge):
             self._resize_x(event.pos().x())
         event.accept()
 
     def _resize_x(self, delta_x: int) -> None:
         """Resize the grip in x-direction."""
         geo = self.parent().geometry()
-        if self._position == Qt.LeftEdge:
+        if self._position == Qt.Edge.LeftEdge:
             width = max(self.parent().minimumWidth(), geo.width() - delta_x)
             geo.setLeft(geo.right() - width)
-        elif self._position == Qt.RightEdge:
+        elif self._position == Qt.Edge.RightEdge:
             width = max(
                 self.parent().minimumWidth(), self.parent().width() + delta_x
             )
@@ -179,13 +179,13 @@ class EdgeGrip(QWidget):
     def _resize_y(self, delta_y: int) -> None:
         """Resize the grip in y-direction."""
         geo = self.parent().geometry()
-        if self._position == Qt.TopEdge:
+        if self._position == Qt.Edge.TopEdge:
             height = max(
                 self.parent().minimumHeight(),
                 geo.height() - delta_y,
             )
             geo.setTop(geo.bottom() - height)
-        elif self._position == Qt.BottomEdge:
+        elif self._position == Qt.Edge.BottomEdge:
             height = max(
                 self.parent().minimumHeight(),
                 self.parent().height() + delta_y,

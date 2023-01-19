@@ -1,9 +1,9 @@
 """QuteStyledMessageBox definition for custom Darcula style."""
 from typing import Optional, Union, cast
 
-from PyQt5.QtCore import QPoint, QRect, Qt
-from PyQt5.QtGui import QBitmap, QColor, QPainter, QPalette
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QPoint, QRect, Qt
+from PySide6.QtGui import QBitmap, QColor, QPainter, QPalette
+from PySide6.QtWidgets import (
     QApplication,
     QGraphicsDropShadowEffect,
     QMessageBox,
@@ -82,7 +82,9 @@ class QuteMessageBox(QMessageBox):
         buttons: Union[
             QMessageBox.StandardButtons, QMessageBox.StandardButton
         ] = QMessageBox.Ok,
-        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = (
+            QMessageBox.StandardButton.Ok
+        ),
     ) -> QMessageBox.StandardButton:
         """Show information message box."""
         return QuteMessageBox._show_message_box(
@@ -102,7 +104,9 @@ class QuteMessageBox(QMessageBox):
         buttons: Union[
             QMessageBox.StandardButtons, QMessageBox.StandardButton
         ] = QMessageBox.Ok,
-        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = (
+            QMessageBox.StandardButton.Ok
+        ),
     ) -> QMessageBox.StandardButton:
         """Show warning message box."""
         return QuteMessageBox._show_message_box(
@@ -117,7 +121,9 @@ class QuteMessageBox(QMessageBox):
         buttons: Union[
             QMessageBox.StandardButtons, QMessageBox.StandardButton
         ] = QMessageBox.Ok,
-        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = (
+            QMessageBox.StandardButton.Ok
+        ),
     ) -> QMessageBox.StandardButton:
         """Show warning message box."""
         return QuteMessageBox._show_message_box(
@@ -133,7 +139,9 @@ class QuteMessageBox(QMessageBox):
             QMessageBox.StandardButtons, QMessageBox.StandardButton
         ] = QMessageBox.Yes
         | QMessageBox.No,
-        default_button: QMessageBox.StandardButton = QMessageBox.Yes,
+        default_button: QMessageBox.StandardButton = (
+            QMessageBox.StandardButton.Yes
+        ),
     ) -> QMessageBox.StandardButton:
         """Show warning message box."""
         return QuteMessageBox._show_message_box(
@@ -154,7 +162,9 @@ class QuteMessageBox(QMessageBox):
         buttons: Union[
             QMessageBox.StandardButtons, QMessageBox.StandardButton
         ] = QMessageBox.Ok,
-        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = (
+            QMessageBox.StandardButton.Ok
+        ),
     ) -> QMessageBox.StandardButton:
         """Show message box."""
         msg_box = QuteMessageBox(parent, title, text)
