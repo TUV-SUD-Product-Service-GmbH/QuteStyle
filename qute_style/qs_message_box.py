@@ -79,9 +79,9 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Union[
-            QMessageBox.StandardButtons, QMessageBox.StandardButton
-        ] = QMessageBox.Ok,
+        buttons: Optional[
+            QMessageBox.StandardButton
+        ] = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
@@ -91,7 +91,7 @@ class QuteMessageBox(QMessageBox):
             parent,
             title,
             text,
-            QMessageBox.Information,
+            QMessageBox.Icon.Information,
             buttons,
             default_button,
         )
@@ -101,16 +101,21 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Union[
-            QMessageBox.StandardButtons, QMessageBox.StandardButton
-        ] = QMessageBox.Ok,
+        buttons: Optional[
+            QMessageBox.StandardButton
+        ] = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
     ) -> QMessageBox.StandardButton:
         """Show warning message box."""
         return QuteMessageBox._show_message_box(
-            parent, title, text, QMessageBox.Warning, buttons, default_button
+            parent,
+            title,
+            text,
+            QMessageBox.Icon.Warning,
+            buttons,
+            default_button,
         )
 
     @staticmethod
@@ -118,16 +123,21 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Union[
-            QMessageBox.StandardButtons, QMessageBox.StandardButton
-        ] = QMessageBox.Ok,
+        buttons: Optional[
+            QMessageBox.StandardButton
+        ] = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
     ) -> QMessageBox.StandardButton:
         """Show warning message box."""
         return QuteMessageBox._show_message_box(
-            parent, title, text, QMessageBox.Critical, buttons, default_button
+            parent,
+            title,
+            text,
+            QMessageBox.Icon.Critical,
+            buttons,
+            default_button,
         )
 
     @staticmethod
@@ -135,10 +145,10 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Union[
-            QMessageBox.StandardButtons, QMessageBox.StandardButton
-        ] = QMessageBox.Yes
-        | QMessageBox.No,
+        buttons: Optional[
+            QMessageBox.StandardButton
+        ] = QMessageBox.StandardButton.Yes
+        | QMessageBox.StandardButton.No,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Yes
         ),
@@ -148,7 +158,7 @@ class QuteMessageBox(QMessageBox):
             parent,
             title,
             text,
-            QMessageBox.Question,
+            QMessageBox.Icon.Question,
             buttons,
             default_button,
         )
@@ -159,9 +169,9 @@ class QuteMessageBox(QMessageBox):
         title: str,
         text: str,
         icon: QMessageBox.Icon,
-        buttons: Union[
-            QMessageBox.StandardButtons, QMessageBox.StandardButton
-        ] = QMessageBox.Ok,
+        buttons: Optional[
+            QMessageBox.StandardButton
+        ] = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
