@@ -1,5 +1,5 @@
 """QuteStyledMessageBox definition for custom Darcula style."""
-from typing import Optional, Union, cast
+from typing import Optional, cast
 
 from PySide6.QtCore import QPoint, QRect, Qt
 from PySide6.QtGui import QBitmap, QColor, QPainter, QPalette
