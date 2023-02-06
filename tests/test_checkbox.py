@@ -142,7 +142,6 @@ def test_check_state_event_filter(
 ) -> None:
     """Test that clicking on an entry checks or unchecks the item."""
     with qtbot.captureExceptions() as exceptions:
-
         combobox.showPopup()
         if checked == Qt.CheckState.Unchecked:
             combobox.item_ids = [0]

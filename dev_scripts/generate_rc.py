@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 if __name__ == "__main__":
-
     if Path.cwd().stem == "dev_scripts":
         os.chdir(Path.cwd().parent)
 

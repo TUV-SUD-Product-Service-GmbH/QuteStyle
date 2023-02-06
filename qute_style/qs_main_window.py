@@ -621,7 +621,6 @@ class QuteStyleMainWindow(
         # Check if switching the widget.
         visible = self._column_is_visible(self._right_column_frame)
         if widget_class != right_widget_type:
-
             # Set the current widget for the right column to make it visible.
             for idx in range(self._right_content.count()):
                 if isinstance(self._right_content.widget(idx), widget_class):
@@ -669,7 +668,6 @@ class QuteStyleMainWindow(
         # Check if switching the widget.
         visible = self._column_is_visible(self._left_column_frame)
         if widget_class != left_widget_type:
-
             # Set the current widget for the left column to make it visible.
             self._left_column.set_column_widget(widget_class)
 
