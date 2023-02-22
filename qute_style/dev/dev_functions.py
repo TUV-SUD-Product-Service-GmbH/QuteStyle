@@ -27,6 +27,7 @@ def compile_ui_files(src_folders: list[Path]) -> None:
             subprocess.run(
                 [
                     Path(sys.executable).parent / "pyside6-uic",
+                    "--no-autoconnection",
                     file,
                     "-o",
                     target,
