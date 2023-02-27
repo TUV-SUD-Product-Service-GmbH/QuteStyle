@@ -13,7 +13,7 @@ def test_toggle_x(
     style_option_button: QStyleOption, direction: Qt.LayoutDirection
 ) -> None:
     """Test position and size of the UpdateWindow are stored and loaded."""
-    if direction == Qt.LeftToRight:
+    if direction == Qt.LayoutDirection.LeftToRight:
         assert QuteStyle.ToggleOptions.toggle_x(style_option_button) == 0
     else:
         assert (
@@ -27,7 +27,7 @@ def test_label_x(
     style_option_button: QStyleOption, direction: Qt.LayoutDirection
 ) -> None:
     """Test position and size of the UpdateWindow are stored and loaded."""
-    if direction == Qt.LeftToRight:
+    if direction == Qt.LayoutDirection.LeftToRight:
         expected = (
             QuteStyle.ToggleOptions.BOX_WIDTH + QuteStyle.ToggleOptions.SPACER
         )
