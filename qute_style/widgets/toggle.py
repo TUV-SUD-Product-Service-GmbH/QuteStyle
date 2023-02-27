@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 
 from PySide6.QtCore import (
+    Property,
     QEasingCurve,
     QPoint,
     QPropertyAnimation,
@@ -21,22 +22,19 @@ from PySide6.QtWidgets import (
 )
 
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
-from qute_style.widgets.text_truncator import TextTruncator
 
 log = logging.getLogger(
     f"qute_style.{__name__}"
 )  # pylint: disable=invalid-name
 
 
-class Toggle(QCheckBox, TextTruncator):
+class Toggle(QCheckBox):
     """Toggle button (custom checkbox)."""
 
     # todo: Working, but probably not ok
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new Toggle."""
-        super().__init__(  # pylint: disable=too-many-function-args
-            parent  # type: ignore
-        )
+        super().__init__(parent)  # pylint: disable=too-many-function-args
 
         self.setFont(
             QFont(
@@ -80,24 +78,23 @@ class Toggle(QCheckBox, TextTruncator):
             )
         return QSize(width, QuteStyle.ToggleOptions.BOX_HEIGHT)
 
-    @property
+    @Property(int)
     def position(self) -> int:
         """Return actual position."""
-        return int(self._position)
+        return self._position
 
-    @position.setter
+    # todo: Qt property is not recognized properly atm
+    @position.setter  # type: ignore[no-redef]
     def position(self, pos: int):
         """Set actual position."""
         self._position = pos
         self.update()
 
     @Slot(int, name="setup_animation")
-    def setup_animation(self, value: int) -> None:
+    def setup_animation(self, value: Qt.CheckState) -> None:
         """Initiate _animation of inner circle."""
         self._animation.stop()
-        # todo: stateChanged sends integer value, that doesn't seem correct,
-        #  should be Qt.CheckState, maybe a mapping problem?
-        if value == Qt.CheckState.Checked.value:
+        if Qt.CheckState(value) == Qt.CheckState.Checked:
             # Calculate the x-position from the right.
             end = (
                 QuteStyle.ToggleOptions.BOX_WIDTH
@@ -131,7 +128,7 @@ class Toggle(QCheckBox, TextTruncator):
             option.state |= (  # pylint: disable=no-member
                 QStyle.StateFlag.State_On
             )
-        option.position = self.position
+        option.position = self.position  # type: ignore[assignment]
 
         painter.drawControl(QuteStyle.CE_Toggle, option)
         painter.end()
