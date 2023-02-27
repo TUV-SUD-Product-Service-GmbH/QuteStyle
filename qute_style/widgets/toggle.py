@@ -94,9 +94,7 @@ class Toggle(QCheckBox):
     def setup_animation(self, value: Qt.CheckState) -> None:
         """Initiate _animation of inner circle."""
         self._animation.stop()
-        # todo: stateChanged sends integer value, that doesn't seem correct,
-        #  should be Qt.CheckState, maybe a mapping problem?
-        if value == Qt.CheckState.Checked.value:
+        if Qt.CheckState(value) == Qt.CheckState.Checked:
             # Calculate the x-position from the right.
             end = (
                 QuteStyle.ToggleOptions.BOX_WIDTH

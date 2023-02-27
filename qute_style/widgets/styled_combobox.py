@@ -200,14 +200,11 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         self, start: QModelIndex, end: QModelIndex, roles: list[int]
     ) -> None:
         """Handle a data change event to handle single_mode."""
-        # todo: Handling is not straight forward at this point. Compared to
-        #  pyqt the actual value has to be accessed because the signal carries
-        #  raw integer.
         if (
             self._single
-            and Qt.ItemDataRole.CheckStateRole.value in roles
-            and start.data(Qt.ItemDataRole.CheckStateRole)
-            == Qt.CheckState.Checked.value
+            and Qt.ItemDataRole.CheckStateRole in roles
+            and Qt.CheckState(start.data(Qt.ItemDataRole.CheckStateRole))
+            == Qt.CheckState.Checked
         ):
             log.debug("Unchecking other items, since single mode is active.")
             # we should never edit check state for two indexes at the same time
