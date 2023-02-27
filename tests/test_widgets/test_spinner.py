@@ -15,20 +15,26 @@ def test_spinner_properties(qtbot: QtBot) -> None:
 
     spinner.roundness = 1
     spinner.fade = 2
-    spinner.lines = 3
+    spinner.number_of_lines = 3
     spinner.line_length = 4
     spinner.line_width = 5
-    spinner.radius = 6
+    spinner.inner_radius = 6
     spinner.speed = 7
+    spinner.minimum_trail_opacity = 8
+    spinner.trail_fade_percentage = 9
+    spinner.revolutions_per_second = 10
     spinner.color = QColor(1, 2, 3)
 
     assert spinner.roundness == 1
     assert spinner.fade == 2
-    assert spinner.lines == 3
+    assert spinner.number_of_lines == 3
     assert spinner.line_length == 4
     assert spinner.line_width == 5
-    assert spinner.radius == 6
+    assert spinner.inner_radius == 6
     assert spinner.speed == 7
+    assert spinner.minimum_trail_opacity == 8
+    assert spinner.trail_fade_percentage == 9
+    assert spinner.revolutions_per_second == 10
     assert spinner.color == QColor(1, 2, 3)
 
 
@@ -38,6 +44,7 @@ def test_spinning(qtbot: QtBot) -> None:
     qtbot.addWidget(widget)
     spinner = WaitingSpinner(widget)
     qtbot.addWidget(spinner)
+    spinner.show()
 
     assert spinner.is_spinning is False
     spinner.start()
