@@ -65,9 +65,12 @@ repos:
     rev: v1.1.1
     hooks:
       - id: mypy
-        types: [ python]
-        args: [ "--ignore-missing-imports", "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases" ]
-        exclude: ".*venv/.*|.*qute_style/gen/.*"
+        name: mypy
+        entry: mypy
+        language: system
+        types: [ python ]
+        args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini"]
+
 
   # pydocstyle
   - repo: https://github.com/pycqa/pydocstyle

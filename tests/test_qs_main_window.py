@@ -339,13 +339,17 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     for grip in window._grips:
         assert not grip.isEnabled()
 
-    qtbot.mouseClick(window._title_bar.maximize_button, Qt.LeftButton)
+    qtbot.mouseClick(
+        window._title_bar.maximize_button, Qt.MouseButton.LeftButton
+    )
     assert not window.isMaximized()
     assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
     for grip in window._grips:
         assert grip.isEnabled()
 
-    qtbot.mouseClick(window._title_bar.maximize_button, Qt.LeftButton)
+    qtbot.mouseClick(
+        window._title_bar.maximize_button, Qt.MouseButton.LeftButton
+    )
     assert window.isMaximized()
 
     window.showFullScreen()
@@ -356,7 +360,7 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     assert window.height() == size.height()
 
     window.showNormal()
-    assert window.windowState() == Qt.WindowNoState
+    assert window.windowState() == Qt.WindowState.WindowNoState
     assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
 
 
@@ -366,7 +370,8 @@ def test_maximize_event_handling(qtbot: QtBot) -> None:
     window.showNormal()
     with qtbot.waitSignal(window._title_bar.maximize) as signal:
         window._title_bar.eventFilter(
-            window._title_bar._title_label, QEvent(QEvent.MouseButtonDblClick)
+            window._title_bar._title_label,
+            QEvent(QEvent.Type.MouseButtonDblClick),
         )
         assert signal.signal_triggered
     assert window.isMaximized()
@@ -378,19 +383,19 @@ def test_maximize_event_handling(qtbot: QtBot) -> None:
         window._title_bar.eventFilter(
             window._title_bar._title_label,
             QMouseEvent(
-                QEvent.MouseMove,
+                QEvent.Type.MouseMove,
                 QPointF(1, 1),
                 QPointF(1, 1),
-                Qt.LeftButton,
-                Qt.LeftButton,
-                Qt.KeyboardModifier(),
+                Qt.MouseButton.LeftButton,
+                Qt.MouseButton.LeftButton,
+                Qt.KeyboardModifier.NoModifier,
             ),
         )
         assert not signal.signal_triggered
 
     # complete mouse double click
     window._title_bar.eventFilter(
-        window._title_bar._title_label, QEvent(QEvent.MouseButtonRelease)
+        window._title_bar._title_label, QEvent(QEvent.Type.MouseButtonRelease)
     )
 
     # test that moving is now possible
@@ -398,12 +403,12 @@ def test_maximize_event_handling(qtbot: QtBot) -> None:
         window._title_bar.eventFilter(
             window._title_bar._title_label,
             QMouseEvent(
-                QEvent.MouseMove,
+                QEvent.Type.MouseMove,
                 QPointF(1, 1),
                 QPointF(1, 1),
-                Qt.LeftButton,
-                Qt.LeftButton,
-                Qt.KeyboardModifier(),
+                Qt.MouseButton.LeftButton,
+                Qt.MouseButton.LeftButton,
+                Qt.KeyboardModifier.NoModifier,
             ),
         )
         assert signal.signal_triggered

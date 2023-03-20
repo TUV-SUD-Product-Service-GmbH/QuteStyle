@@ -7,7 +7,15 @@ import logging
 from typing import Generic, TypeVar, cast
 
 from PySide6 import QtGui
-from PySide6.QtCore import QEvent, QModelIndex, QObject, QPoint, Qt, Slot
+from PySide6.QtCore import (
+    QEvent,
+    QModelIndex,
+    QObject,
+    QPoint,
+    Qt,
+    Signal,
+    Slot,
+)
 from PySide6.QtGui import (
     QFontMetrics,
     QIcon,
@@ -48,7 +56,7 @@ class StyledComboBox(QComboBox):
         # options below are needed, otherwise the rounded
         # corners of dropdowns cannot be drawn correctly
         self.view().window().setWindowFlags(
-            Qt.WindowType.Popup | Qt.FramelessWindowHint
+            Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
         )
         self.view().window().setAttribute(
             Qt.WidgetAttribute.WA_TranslucentBackground
@@ -108,6 +116,8 @@ class StyledComboBox(QComboBox):
 
 class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     """Combobox that displays a list of items to be checked."""
+
+    dataChanged = Signal(name="dataChanged")
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new BatchCombobox."""
@@ -195,7 +205,12 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         else:
             item.setCheckState(Qt.CheckState.Checked)
 
-    @Slot(QModelIndex, QModelIndex, "QVector<int>", name="handle_data_change")
+    @Slot(
+        QModelIndex,
+        QModelIndex,
+        "QVector<int>",  # type: ignore
+        name="handle_data_change",
+    )
     def handle_data_change(
         self, start: QModelIndex, end: QModelIndex, roles: list[int]
     ) -> None:
@@ -218,6 +233,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                         Qt.ItemDataRole.CheckStateRole,
                     )
         self.update_text()
+        self.dataChanged.emit()
 
     def update_text(self) -> None:
         """Update the texts."""
@@ -247,13 +263,15 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             text = self._default_text
         return text
 
-    def addItem(  # pylint: disable=invalid-name
+    # pylint: disable=invalid-name
+    def addItem(  # type: ignore
         self,
         text: str,
         data: ItemData | None = None,
         icon_path: str | None = None,
         icon_color: str | None = None,
     ) -> None:
+        # pylint: enable=invalid-name
         """Add an Item to the Combobox."""
         if icon_color and not icon_path:
             raise AssertionError(

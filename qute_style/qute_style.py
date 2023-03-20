@@ -88,22 +88,46 @@ class QuteStyle(QProxyStyle):
     PALETTE_COLOR_NAMES = (
         # QPalette::Window: A general background color.
         # QPalette::WindowText: A general foreground color.
-        (QPalette.Normal, QPalette.WindowText, "foreground"),
-        (QPalette.Disabled, QPalette.WindowText, "fg_disabled"),
-        (QPalette.Inactive, QPalette.WindowText, "foreground"),
+        (
+            QPalette.ColorGroup.Normal,
+            QPalette.ColorRole.WindowText,
+            "foreground",
+        ),
+        (
+            QPalette.ColorGroup.Disabled,
+            QPalette.ColorRole.WindowText,
+            "fg_disabled",
+        ),
+        (
+            QPalette.ColorGroup.Inactive,
+            QPalette.ColorRole.WindowText,
+            "foreground",
+        ),
         # QPalette::Base: Used mostly as the background color for text entry
         # widgets, but can also be used for other painting - such as the
         # background of combobox drop down lists and toolbar handles.
         # It is usually white or another light color.
-        (QPalette.Normal, QPalette.Base, "dark_one"),
-        (QPalette.Disabled, QPalette.Base, "bg_disabled"),
-        (QPalette.Inactive, QPalette.Base, "dark_one"),
+        (QPalette.ColorGroup.Normal, QPalette.ColorRole.Base, "dark_one"),
+        (QPalette.ColorGroup.Disabled, QPalette.ColorRole.Base, "bg_disabled"),
+        (QPalette.ColorGroup.Inactive, QPalette.ColorRole.Base, "dark_one"),
         # QPalette::AlternateBase: Used as the alternate background color in
         # views with alternating row colors
         # (see QAbstractItemView::setAlternatingRowColors()).
-        (QPalette.Normal, QPalette.AlternateBase, "bg_elements"),
-        (QPalette.Disabled, QPalette.AlternateBase, "bg_disabled"),
-        (QPalette.Inactive, QPalette.AlternateBase, "bg_three"),
+        (
+            QPalette.ColorGroup.Normal,
+            QPalette.ColorRole.AlternateBase,
+            "bg_elements",
+        ),
+        (
+            QPalette.ColorGroup.Disabled,
+            QPalette.ColorRole.AlternateBase,
+            "bg_disabled",
+        ),
+        (
+            QPalette.ColorGroup.Inactive,
+            QPalette.ColorRole.AlternateBase,
+            "bg_three",
+        ),
         # QPalette::ToolTipBase: Used as the background color for QToolTip and
         # QWhatsThis. Tool tips use the Inactive color group of QPalette,
         # because tool tips are not active windows.
@@ -115,19 +139,31 @@ class QuteStyle(QProxyStyle):
         # QPalette::Text: The foreground color used with Base. This is usually
         # the same as the WindowText, in which case it must provide good
         # contrast with Window and Base.
-        (QPalette.Normal, QPalette.Text, "foreground"),
-        (QPalette.Disabled, QPalette.Text, "fg_disabled"),
-        (QPalette.Inactive, QPalette.Text, "foreground"),
+        (QPalette.ColorGroup.Normal, QPalette.ColorRole.Text, "foreground"),
+        (QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text, "fg_disabled"),
+        (QPalette.ColorGroup.Inactive, QPalette.ColorRole.Text, "foreground"),
         # QPalette::Button: The general button background color. This
         # background can be different from Window as some styles require a
         # different background color for buttons.
-        (QPalette.Normal, QPalette.Button, "bg_one"),
-        (QPalette.Disabled, QPalette.Button, "bg_two"),
-        (QPalette.Inactive, QPalette.Button, "bg_three"),
+        (QPalette.ColorGroup.Normal, QPalette.ColorRole.Button, "bg_one"),
+        (QPalette.ColorGroup.Disabled, QPalette.ColorRole.Button, "bg_two"),
+        (QPalette.ColorGroup.Inactive, QPalette.ColorRole.Button, "bg_three"),
         # QPalette::ButtonText: A foreground color used with the Button color.
-        (QPalette.Normal, QPalette.ButtonText, "foreground"),
-        (QPalette.Disabled, QPalette.ButtonText, "fg_disabled"),
-        (QPalette.Inactive, QPalette.ButtonText, "foreground"),
+        (
+            QPalette.ColorGroup.Normal,
+            QPalette.ColorRole.ButtonText,
+            "foreground",
+        ),
+        (
+            QPalette.ColorGroup.Disabled,
+            QPalette.ColorRole.ButtonText,
+            "fg_disabled",
+        ),
+        (
+            QPalette.ColorGroup.Inactive,
+            QPalette.ColorRole.ButtonText,
+            "foreground",
+        ),
         # QPalette::BrightText: A text color that is very different from
         # WindowText, and contrasts well with e.g. Dark. Typically, used for
         # text that needs to be drawn where Text or WindowText would give poor
@@ -137,14 +173,38 @@ class QuteStyle(QProxyStyle):
         # roles for lines, icons, etc.
         # QPalette::Highlight: A color to indicate a selected item or the
         # current item. By default, the highlight color is Qt::darkBlue.
-        (QPalette.Normal, QPalette.Highlight, "context_color"),
-        (QPalette.Disabled, QPalette.Highlight, "context_color"),
-        (QPalette.Inactive, QPalette.Highlight, "context_color"),
+        (
+            QPalette.ColorGroup.Normal,
+            QPalette.ColorRole.Highlight,
+            "context_color",
+        ),
+        (
+            QPalette.ColorGroup.Disabled,
+            QPalette.ColorRole.Highlight,
+            "context_color",
+        ),
+        (
+            QPalette.ColorGroup.Inactive,
+            QPalette.ColorRole.Highlight,
+            "context_color",
+        ),
         # QPalette::HighlightedText: A text color that contrasts with
         # Highlight. By default, the highlighted text color is Qt::white.
-        (QPalette.Normal, QPalette.HighlightedText, "foreground"),
-        (QPalette.Disabled, QPalette.HighlightedText, "fg_disabled"),
-        (QPalette.Inactive, QPalette.HighlightedText, "foreground"),
+        (
+            QPalette.ColorGroup.Normal,
+            QPalette.ColorRole.HighlightedText,
+            "foreground",
+        ),
+        (
+            QPalette.ColorGroup.Disabled,
+            QPalette.ColorRole.HighlightedText,
+            "fg_disabled",
+        ),
+        (
+            QPalette.ColorGroup.Inactive,
+            QPalette.ColorRole.HighlightedText,
+            "foreground",
+        ),
     )
 
     class QCheckBoxOptions:  # pylint: disable=too-few-public-methods
@@ -154,8 +214,8 @@ class QuteStyle(QProxyStyle):
         SPACER = 3
 
         ICON_PATH = {
-            Qt.PartiallyChecked: ":/svg_icons/partial_checked.svg",
-            Qt.Checked: ":/svg_icons/checked.svg",
+            Qt.CheckState.PartiallyChecked: ":/svg_icons/partial_checked.svg",
+            Qt.CheckState.Checked: ":/svg_icons/checked.svg",
         }
 
         @staticmethod
@@ -204,15 +264,18 @@ class QuteStyle(QProxyStyle):
         @staticmethod
         def toggle_x(option: QStyleOption) -> int:
             """Calculate x position of Toggle box."""
-            if option.direction == Qt.LeftToRight:
+            if option.direction == Qt.LayoutDirection.LeftToRight:
                 return 0
             # cast Qt.RightToLeft
-            return option.rect.width() - QuteStyle.ToggleOptions.BOX_WIDTH
+            return (
+                cast(int, option.rect.width())
+                - QuteStyle.ToggleOptions.BOX_WIDTH
+            )
 
         @staticmethod
         def label_x(option: QStyleOption) -> int:
             """Calculate x position of label."""
-            if option.direction == Qt.LeftToRight:
+            if option.direction == Qt.LayoutDirection.LeftToRight:
                 return (
                     QuteStyle.ToggleOptions.BOX_WIDTH
                     + QuteStyle.ToggleOptions.SPACER
@@ -306,16 +369,20 @@ class QuteStyle(QProxyStyle):
         widget: QWidget | None,
     ) -> None:
         option.text = option.fontMetrics.elidedText(
-            option.text, Qt.ElideRight, option.rect.width()
+            option.text, Qt.TextElideMode.ElideRight, option.rect.width()
         )
         # Qt will use the Normal color, no matter what (this is visible in
         # the Qt source code for QStyle::drawItemText). Therefore, we need
         # to set the correct text color for a disabled text element into
         # the QPalette.Normal role.
         if not option.state & QStyle.StateFlag.State_Enabled:
-            role = QPalette.WindowText
-            disabled_color = option.palette.color(QPalette.Disabled, role)
-            option.palette.setColor(QPalette.Normal, role, disabled_color)
+            role = QPalette.ColorRole.WindowText
+            disabled_color = option.palette.color(
+                QPalette.ColorGroup.Disabled, role
+            )
+            option.palette.setColor(
+                QPalette.ColorGroup.Normal, role, disabled_color
+            )
         super().drawControl(
             QStyle.ControlElement.CE_CheckBoxLabel, option, painter, widget
         )
@@ -358,7 +425,7 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw the Toggle's circle."""
         with painter_save(painter):
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QColor(QuteStyle.button_foreground(option)))
             painter.drawEllipse(
                 QuteStyle.ToggleOptions.toggle_x(option) + option.position,
@@ -373,7 +440,7 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw the Toggle's background."""
         with painter_save(painter):
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QColor(QuteStyle.button_background(option)))
             painter.drawRoundedRect(
                 QuteStyle.ToggleOptions.toggle_rect(option),
@@ -447,8 +514,8 @@ class QuteStyle(QProxyStyle):
         # Draw check mark if checkbox is checked. Note that State_NoChange
         # indeed is the QStyle.State for Qt.PartiallyChecked.
         if (
-            option.state & QStyle.StateFlag.State_On
-            or option.state & QStyle.StateFlag.State_NoChange
+            option.state & QStyle.StateFlag.State_On  # type: ignore
+            or option.state & QStyle.StateFlag.State_NoChange  # type: ignore
         ):
             QuteStyle._draw_checkbox_check(option, painter)
 
@@ -459,10 +526,10 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw the checkbox background rectangle."""
         with painter_save(painter):
-            painter.setRenderHint(QPainter.Antialiasing)
-            painter.setPen(Qt.NoPen)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QBrush(QuteStyle._cb_background_color(option)))
-            painter.drawRoundedRect(option.rect, 2, 2)
+            painter.drawRoundedRect(option.rect, 2, 2)  # type: ignore
 
     @staticmethod
     def _draw_checkbox_frame(
@@ -471,10 +538,12 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         # Draw the frame around the rectangle depending on mouse over
         with painter_save(painter):
-            painter.setRenderHint(QPainter.Antialiasing)
-            painter.setBrush(Qt.NoBrush)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.setPen(QPen(QuteStyle._cb_frame_color(option)))
-            painter.drawRoundedRect(option.rect.adjusted(1, 1, -1, -1), 1, 1)
+            painter.drawRoundedRect(
+                option.rect.adjusted(1, 1, -1, -1), 1, 1  # type: ignore
+            )
 
     @staticmethod
     def _draw_checkbox_check(
@@ -483,13 +552,13 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw the check of the checkbox."""
         state = (
-            Qt.Checked
-            if option.state & QStyle.StateFlag.State_On
-            else Qt.PartiallyChecked
+            Qt.CheckState.Checked
+            if option.state & QStyle.StateFlag.State_On  # type: ignore
+            else Qt.CheckState.PartiallyChecked
         )
         QuteStyle.draw_pixmap(
             painter,
-            option.rect.adjusted(1, 1, -1, -1),
+            option.rect.adjusted(1, 1, -1, -1),  # type: ignore
             QuteStyle.QCheckBoxOptions.ICON_PATH[state],
             QuteStyle.button_foreground(option).name(),
         )
@@ -499,24 +568,34 @@ class QuteStyle(QProxyStyle):
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the frame color of a checkbox."""
-        if not option.state & QStyle.StateFlag.State_Enabled:
-            role = QPalette.Window
-        elif option.state & QStyle.StateFlag.State_MouseOver:
-            role = QPalette.Highlight
+        if not option.state & QStyle.StateFlag.State_Enabled:  # type: ignore
+            role = QPalette.ColorRole.Window
+        elif option.state & QStyle.StateFlag.State_MouseOver:  # type: ignore
+            role = QPalette.ColorRole.Highlight
         else:
-            role = QPalette.WindowText
-        return option.palette.color(QPalette.Normal, role)
+            role = QPalette.ColorRole.WindowText
+        return cast(
+            QColor,
+            option.palette.color(  # type: ignore
+                QPalette.ColorGroup.Normal, role
+            ),
+        )
 
     @staticmethod
     def _cb_background_color(
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the background color of a checkbox."""
-        if option.state & QStyle.StateFlag.State_Enabled:
-            group = QPalette.Normal
+        if option.state & QStyle.StateFlag.State_Enabled:  # type: ignore
+            group = QPalette.ColorGroup.Normal
         else:
-            group = QPalette.Disabled
-        return option.palette.color(group, QPalette.AlternateBase)
+            group = QPalette.ColorGroup.Disabled
+        return cast(
+            QColor,
+            option.palette.color(  # type: ignore
+                group, QPalette.ColorRole.AlternateBase
+            ),
+        )
 
     def _panel_draw_item_view_item(
         self,
@@ -533,7 +612,10 @@ class QuteStyle(QProxyStyle):
         ):
             painter.fillRect(option.rect, brush)
         else:
-            if cast(QBrush, option.backgroundBrush).style() != Qt.NoBrush:
+            if (
+                cast(QBrush, option.backgroundBrush).style()
+                != Qt.BrushStyle.NoBrush
+            ):
                 old_brush_origin = painter.brushOrigin()
                 painter.setBrushOrigin(option.rect.topLeft())
                 painter.fillRect(option.rect, option.backgroundBrush)
@@ -559,12 +641,15 @@ class QuteStyle(QProxyStyle):
             return QBrush(QColor(get_color("context_hover")))
         if option.state & QStyle.StateFlag.State_Enabled:
             if option.state & QStyle.StateFlag.State_Active:
-                color_group = QPalette.Normal
+                color_group = QPalette.ColorGroup.Normal
             else:
-                color_group = QPalette.Inactive
+                color_group = QPalette.ColorGroup.Inactive
         else:
-            color_group = QPalette.Disabled
-        return option.palette.brush(color_group, QPalette.Highlight)
+            color_group = QPalette.ColorGroup.Disabled
+        return cast(
+            QBrush,
+            option.palette.brush(color_group, QPalette.ColorRole.Highlight),
+        )
 
     @staticmethod
     def draw_pixmap(
@@ -575,8 +660,8 @@ class QuteStyle(QProxyStyle):
         scale = painter.device().devicePixelRatio()
         pixmap = PixmapStore.inst().get_pixmap(
             path,
-            scale * rect.width(),
-            scale * rect.height(),
+            int(scale * rect.width()),
+            int(scale * rect.height()),
             color,
         )
         painter.drawPixmap(rect, pixmap)
@@ -589,20 +674,50 @@ class QuteStyle(QProxyStyle):
             option.state & QStyle.StateFlag.State_Selected
             or option.state & QStyle.StateFlag.State_MouseOver
         ):
-            return option.palette.color(QPalette.Normal, QPalette.ButtonText)
+            return cast(
+                QColor,
+                option.palette.color(
+                    QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
+                ),
+            )
         if option.state & QStyle.StateFlag.State_Enabled:
-            return option.palette.color(QPalette.Normal, QPalette.ButtonText)
-        return option.palette.color(QPalette.Disabled, QPalette.ButtonText)
+            return cast(
+                QColor,
+                option.palette.color(
+                    QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
+                ),
+            )
+        return cast(
+            QColor,
+            option.palette.color(
+                QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText
+            ),
+        )
 
     @staticmethod
     def button_background(option: QStyleOptionButton) -> QColor:
         """Return a button's background color depending on option."""
         if option.state & QStyle.StateFlag.State_On:
-            return option.palette.color(QPalette.Normal, QPalette.Highlight)
+            return cast(
+                QColor,
+                option.palette.color(
+                    QPalette.ColorGroup.Normal, QPalette.ColorRole.Highlight
+                ),
+            )
         return (
-            option.palette.color(QPalette.Normal, QPalette.AlternateBase)
+            cast(
+                QColor,
+                option.palette.color(
+                    QPalette.ColorGroup.Normal,
+                    QPalette.ColorRole.AlternateBase,
+                ),
+            )
             if option.state & QStyle.StateFlag.State_Enabled
-            else option.palette.color(
-                QPalette.Disabled, QPalette.AlternateBase
+            else cast(
+                QColor,
+                option.palette.color(
+                    QPalette.ColorGroup.Disabled,
+                    QPalette.ColorRole.AlternateBase,
+                ),
             )
         )

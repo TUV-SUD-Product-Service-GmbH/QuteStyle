@@ -142,7 +142,7 @@ class IconButton(QPushButton):
         self, event: QMouseEvent
     ) -> None:
         """Event triggered on mouse button press."""
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() is Qt.MouseButton.LeftButton:
             self._bg_color = self._bgs["pressed"]
             self._icon_color = "context_pressed"
             self._text_color = "context_pressed"

@@ -46,7 +46,7 @@ def test_add_item(
 ) -> None:
     """Test that add_item creates a properly configured QStandardItem."""
 
-    def call():
+    def call() -> None:
         combobox.addItem(random_string(), randint(0, 10), icon, color)
 
     if color and not icon:
@@ -56,7 +56,7 @@ def test_add_item(
         call()
         model = cast(QStandardItemModel, combobox.model())
         item = model.item(model.rowCount() - 1, 0)
-        assert bool(item.data(Qt.DecorationRole)) is bool(icon)
+        assert bool(item.data(Qt.ItemDataRole.DecorationRole)) is bool(icon)
 
 
 @pytest.mark.parametrize("mode", (False, True))
@@ -123,9 +123,13 @@ def test_popup_event_filter(
         # test if the popup is really shown. Therefore, we check that at least
         # the internal state and eventFilter work.
         pos = combobox.lineEdit().rect().center()
-        qtbot.mouseRelease(combobox.lineEdit(), Qt.LeftButton, pos=pos)
+        qtbot.mouseRelease(
+            combobox.lineEdit(), Qt.MouseButton.LeftButton, pos=pos
+        )
         assert combobox.popup_open is True
-        qtbot.mouseRelease(combobox.lineEdit(), Qt.LeftButton, pos=pos)
+        qtbot.mouseRelease(
+            combobox.lineEdit(), Qt.MouseButton.LeftButton, pos=pos
+        )
         assert combobox.popup_open is False
 
     assert not exceptions

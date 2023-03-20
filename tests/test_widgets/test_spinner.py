@@ -14,27 +14,23 @@ def test_spinner_properties(qtbot: QtBot) -> None:
     qtbot.addWidget(spinner)
 
     spinner.roundness = 1
-    spinner.fade = 2
+    spinner.trail_fade_percentage = 2
     spinner.number_of_lines = 3
     spinner.line_length = 4
     spinner.line_width = 5
     spinner.inner_radius = 6
-    spinner.speed = 7
-    spinner.minimum_trail_opacity = 8
-    spinner.trail_fade_percentage = 9
-    spinner.revolutions_per_second = 10
+    spinner.minimum_trail_opacity = 7
+    spinner.revolutions_per_second = 8
     spinner.color = QColor(1, 2, 3)
 
     assert spinner.roundness == 1
-    assert spinner.fade == 2
+    assert spinner.trail_fade_percentage == 2
     assert spinner.number_of_lines == 3
     assert spinner.line_length == 4
     assert spinner.line_width == 5
     assert spinner.inner_radius == 6
-    assert spinner.speed == 7
-    assert spinner.minimum_trail_opacity == 8
-    assert spinner.trail_fade_percentage == 9
-    assert spinner.revolutions_per_second == 10
+    assert spinner.minimum_trail_opacity == 7
+    assert spinner.revolutions_per_second == 8
     assert spinner.color == QColor(1, 2, 3)
 
 

@@ -6,7 +6,7 @@ import string
 import sys
 from pathlib import Path
 from random import choice, randint
-from typing import cast
+from typing import Generator, cast
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -65,7 +65,7 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
 
 @pytest.fixture(scope="session")
-def qapp():
+def qapp() -> Generator[QuteStyleTestApplication, None, None]:
     """
     Overwrite pytest's qapp fixture.
 
@@ -145,7 +145,7 @@ def fixture_style_option_view_item() -> QStyleOptionViewItem:
 
 @pytest.fixture(
     name="direction",
-    params=(Qt.LeftToRight, Qt.RightToLeft),
+    params=(Qt.LayoutDirection.LeftToRight, Qt.LayoutDirection.RightToLeft),
     ids=("Qt.LeftToRight", "Qt.RightToLeft"),
     scope="class",
 )

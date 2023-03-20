@@ -49,6 +49,6 @@ class DropLabel(QWidget):
         self, obj: QObject, event: QEvent
     ) -> bool:
         """Handle QResizeEvents from the parent widget."""
-        if event.type() == QEvent.Resize and obj is self.parent():
+        if event.type() == QEvent.Type.Resize and obj is self.parent():
             self.setFixedSize(cast(QResizeEvent, event).size())
         return False

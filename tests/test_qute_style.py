@@ -91,20 +91,22 @@ def test_draw_checkbox_label(
             style_option_button, QPainter(), None
         )
     option = calls[0][0][2]
-    role = QPalette.WindowText
-    disabled_color = option.palette.color(QPalette.Disabled, role).name()
+    role = QPalette.ColorRole.WindowText
+    disabled_color = option.palette.color(
+        QPalette.ColorGroup.Disabled, role
+    ).name()
     if state & QStyle.StateFlag.State_Enabled:
         assert (
             disabled_color
             == QuteStyle()
             .standardPalette()
-            .color(QPalette.Disabled, role)
+            .color(QPalette.ColorGroup.Disabled, role)
             .name()
         )
     else:
         assert (
             disabled_color
-            == option.palette.color(QPalette.Normal, role).name()
+            == option.palette.color(QPalette.ColorGroup.Normal, role).name()
         )
 
 
@@ -264,7 +266,7 @@ def fixture_painter() -> Generator[QPainter, None, None]:
     Since the QPainter does not take ownership of the QImage, it must be set
     into its own variable (so that it lives long enough).
     """
-    image = QImage(100, 100, QImage.Format_RGB32)
+    image = QImage(100, 100, QImage.Format.Format_RGB32)
     painter = QPainter(image)
     yield painter
     painter.end()
@@ -289,8 +291,8 @@ class TestDrawToggleCircle:
     @staticmethod
     def test_painter_reset(painter: QPainter) -> None:
         """Test that the painter is reset to its old values after painting."""
-        assert painter.brush().style() == Qt.NoBrush
-        assert painter.pen().style() == Qt.SolidLine
+        assert painter.brush().style() == Qt.BrushStyle.NoBrush
+        assert painter.pen().style() == Qt.PenStyle.SolidLine
 
     @staticmethod
     def test_x_pos(position: int, calls: CallList, toggle_x: int) -> None:
@@ -333,8 +335,8 @@ class TestDrawToggleBackground:
     @staticmethod
     def test_painter_reset(painter: QPainter) -> None:
         """Test that the painter is reset to its old values after painting."""
-        assert painter.brush().style() == Qt.NoBrush
-        assert painter.pen().style() == Qt.SolidLine
+        assert painter.brush().style() == Qt.BrushStyle.NoBrush
+        assert painter.pen().style() == Qt.PenStyle.SolidLine
 
     @staticmethod
     def test_toggle_rect(calls: CallList, rect: QRect) -> None:
@@ -461,12 +463,12 @@ class TestDrawCheckBoxFrame:
     @staticmethod
     def test_brush(painter: QPainter) -> None:
         """Check that the QBrush is set correctly."""
-        assert painter.brush().style() == Qt.NoBrush
+        assert painter.brush().style() == Qt.BrushStyle.NoBrush
 
     @staticmethod
     def test_anti_aliasing(painter: QPainter) -> None:
         """Test that Antialiasing is enabled."""
-        assert painter.renderHints() & QPainter.Antialiasing
+        assert painter.renderHints() & QPainter.RenderHint.Antialiasing
 
     @staticmethod
     def test_rect(
@@ -504,7 +506,7 @@ class TestDrawCheckBackground:
     @staticmethod
     def test_pen(painter: QPainter) -> None:
         """Check that the QPen is set correctly."""
-        assert painter.pen().style() == Qt.NoPen
+        assert painter.pen().style() == Qt.PenStyle.NoPen
 
     @staticmethod
     def test_brush(
@@ -518,7 +520,7 @@ class TestDrawCheckBackground:
     @staticmethod
     def test_anti_aliasing(painter: QPainter) -> None:
         """Test that Antialiasing is enabled."""
-        assert painter.renderHints() & QPainter.Antialiasing
+        assert painter.renderHints() & QPainter.RenderHint.Antialiasing
 
     @staticmethod
     def test_rect(

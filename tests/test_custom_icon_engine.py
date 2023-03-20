@@ -71,4 +71,4 @@ def test_custom_icon_engine_paint(
         assert new_pixmap.rect() == source
 
     monkeypatch.setattr(QPainter, "drawPixmap", mock_draw)
-    engine.paint(painter, rect, _=QIcon.Normal, __=QIcon.Off)
+    engine.paint(painter, rect, _=QIcon.Mode.Normal, __=QIcon.State.Off)

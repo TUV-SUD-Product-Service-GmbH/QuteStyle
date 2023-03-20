@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Type, TypeVar, cast
 
 from PySide6.QtCore import (
+    QByteArray,
     QEasingCurve,
     QLocale,
     QParallelAnimationGroup,
@@ -174,14 +175,14 @@ class QuteStyleMainWindow(
         right_app_layout.addWidget(CreditBar(self._app_data.app_version))
 
         self._grips: list[EdgeGrip | CornerGrip] = [
-            EdgeGrip(self, Qt.LeftEdge),
-            EdgeGrip(self, Qt.RightEdge),
-            EdgeGrip(self, Qt.TopEdge),
-            EdgeGrip(self, Qt.BottomEdge),
-            CornerGrip(self, Qt.TopLeftCorner),
-            CornerGrip(self, Qt.TopRightCorner),
-            CornerGrip(self, Qt.BottomLeftCorner),
-            CornerGrip(self, Qt.BottomRightCorner),
+            EdgeGrip(self, Qt.Edge.LeftEdge),
+            EdgeGrip(self, Qt.Edge.RightEdge),
+            EdgeGrip(self, Qt.Edge.TopEdge),
+            EdgeGrip(self, Qt.Edge.BottomEdge),
+            CornerGrip(self, Qt.Corner.TopLeftCorner),
+            CornerGrip(self, Qt.Corner.TopRightCorner),
+            CornerGrip(self, Qt.Corner.BottomLeftCorner),
+            CornerGrip(self, Qt.Corner.BottomRightCorner),
         ]
 
         for grip in self._grips:
@@ -203,14 +204,14 @@ class QuteStyleMainWindow(
         log.debug("Loading settings from registry")
         settings = QSettings()
         try:
-            self.restoreGeometry(settings.value("geometry"))
+            self.restoreGeometry(cast(QByteArray, settings.value("geometry")))
         except TypeError:
             log.warning(
                 "Could not restore geometry from: %s",
                 settings.value("geometry"),
             )
         try:
-            self.restoreState(settings.value("state"))
+            self.restoreState(cast(QByteArray, settings.value("state")))
         except TypeError:
             log.warning(
                 "Could not restore state from: %s", settings.value("state")
@@ -218,7 +219,7 @@ class QuteStyleMainWindow(
 
     def get_main_widget(self, widget: Type[MainWidgetT]) -> MainWidgetT | None:
         """Get main widget from content."""
-        return self._content.findChild(widget)
+        return self._content.findChild(widget)  # type: ignore[return-value]
 
     @Slot(QRect, name="window_geometry_changed")
     def window_geometry_changed(self, geometry: QRect) -> None:
@@ -313,8 +314,8 @@ class QuteStyleMainWindow(
         self.setWindowTitle(self._app_data.app_name)
 
         # Make the window borderless and transparent.
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Set the minimum overall size that is configured.
         self.setMinimumSize(self.MIN_SIZE)
@@ -511,7 +512,7 @@ class QuteStyleMainWindow(
         If the QFrame is opening, the method returns True, otherwise False.
         If no animation is in progress, the method returns None
         """
-        if self._group.state() == QParallelAnimationGroup.Running:
+        if self._group.state() == QParallelAnimationGroup.State.Running:
             for idx in range(self._group.animationCount()):
                 animation = cast(
                     QPropertyAnimation, self._group.animationAt(idx)
@@ -541,7 +542,7 @@ class QuteStyleMainWindow(
         animation.setEndValue(
             QuteStyleMainWindow.MAX_COLUMN_WIDTH if slide_out else 0
         )
-        animation.setEasingCurve(QEasingCurve.InOutQuart)
+        animation.setEasingCurve(QEasingCurve.Type.InOutQuart)
         return animation
 
     def _start_box_animation(self, left_open: bool, right_open: bool) -> None:

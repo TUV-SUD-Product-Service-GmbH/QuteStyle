@@ -134,7 +134,8 @@ class WaitingSpinner(QWidget):
         self._is_spinning = True
         self.show()
 
-        if self.parentWidget and self._disable_parent_when_spinning:
+        if self._disable_parent_when_spinning:
+            assert self.parentWidget()
             self.parentWidget().setEnabled(False)
 
         if not self._timer.isActive():

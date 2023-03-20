@@ -49,9 +49,9 @@ class CustomSplashScreen(QSplashScreen):
         size = QSize(350, 200)
         self.setFixedSize(size)
         pixmap = QPixmap(size)
-        pixmap.fill(Qt.transparent)
+        pixmap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         path = QPainterPath()
         path.addRoundedRect(QRectF(0, 0, size.width(), size.height()), 12, 12)
         painter.fillPath(path, QColor(background_color))
@@ -59,10 +59,12 @@ class CustomSplashScreen(QSplashScreen):
         # working solution to get the rounded corners to a splash screen
         self.setPixmap(pixmap)
         grid_layout = QGridLayout(self)
-        grid_layout.setAlignment(Qt.AlignHCenter)
+        grid_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         logo_svg = QSvgWidget(app_data.app_splash_icon, self)
         logo_svg.setFixedSize(QSize(140, 140))
-        grid_layout.addWidget(logo_svg, 0, 0, 1, 0, alignment=Qt.AlignCenter)
+        grid_layout.addWidget(
+            logo_svg, 0, 0, 1, 0, alignment=Qt.AlignmentFlag.AlignCenter
+        )
         grid_layout.addWidget(
             QLabel(f"Starting {app_data.app_name}. Please wait", self), 1, 0
         )

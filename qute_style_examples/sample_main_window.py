@@ -40,7 +40,12 @@ class SettingsWidget(SettingsBaseWidget):
         self.setLayout(layout)
         self.layout().addWidget(QLabel("Global settings"))
         self.layout().addItem(
-            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)
+            QSpacerItem(
+                0,
+                0,
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Expanding,
+            )
         )
         self._set_global_widget(self)
 

@@ -211,7 +211,7 @@ class HomePage(MainWidget):
         resource_path = ":/change_log_data.pickle"
         resource_file = QFile(resource_path)
         change_log_data: dict[str, dict[str, list[dict[str, str]]]] = {}
-        if resource_file.open(QIODevice.ReadOnly):
+        if resource_file.open(QIODevice.OpenModeFlag.ReadOnly):
             pickle_data = resource_file.readAll()
             change_log_data = pickle.loads(pickle_data.data())
             resource_file.close()
