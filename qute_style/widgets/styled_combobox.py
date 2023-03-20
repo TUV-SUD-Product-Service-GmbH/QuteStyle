@@ -263,15 +263,13 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             text = self._default_text
         return text
 
-    # pylint: disable=invalid-name
-    def addItem(  # type: ignore
+    def addItem(  # type: ignore # pylint: disable=invalid-name
         self,
         text: str,
         data: ItemData | None = None,
         icon_path: str | None = None,
         icon_color: str | None = None,
     ) -> None:
-        # pylint: enable=invalid-name
         """Add an Item to the Combobox."""
         if icon_color and not icon_path:
             raise AssertionError(

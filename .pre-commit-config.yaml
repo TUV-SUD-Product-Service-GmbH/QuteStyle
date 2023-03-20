@@ -65,11 +65,9 @@ repos:
     rev: v1.1.1
     hooks:
       - id: mypy
-        name: mypy
-        entry: mypy
-        language: system
         types: [ python ]
         args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini"]
+        additional_dependencies: [PySide6==6.4.2, pytest==7.2.0]
 
 
   # pydocstyle
