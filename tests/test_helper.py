@@ -5,6 +5,8 @@ import pytest
 from PySide6.QtWidgets import QApplication, QWidget
 
 from qute_style.helper import check_ide, create_tooltip, create_waiting_spinner
+from qute_style.qs_application import QuteStyleApplication
+from tests.conftest import QuteStyleTestApplication
 
 
 @pytest.mark.parametrize(
@@ -23,16 +25,15 @@ def test_check_ide(path: str, result: bool) -> None:
     sys.argv[0] = old_path
 
 
-def test_create_spinner() -> None:
+def test_create_spinner(qapp: QuteStyleApplication) -> None:
     """Test that a default waiting spinner is returned."""
-    app = QApplication()
+    assert qapp
     widget = QWidget()
     spinner = create_waiting_spinner(widget)
     assert spinner.number_of_lines == 28
     assert spinner.line_length == 20
     assert spinner.inner_radius == 15
     assert spinner.line_width == 2
-    app.exit()
 
 
 def test_create_tooltip() -> None:
