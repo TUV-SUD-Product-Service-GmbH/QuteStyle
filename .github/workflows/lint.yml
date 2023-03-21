@@ -1,4 +1,4 @@
-name: Pylint
+name: lint
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, unlabeled]
@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: Run Pylint
+    name: lint code
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,6 @@ jobs:
 
     - name: Analysing the code with pylint
       run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style
+
+    - name: Analysing the code with mypy
+      run: poetry run mypy --warn-redundant-casts --warn-unused-ignores --namespace-packages --explicit-package-bases --config-file dev_config/mypy.ini
