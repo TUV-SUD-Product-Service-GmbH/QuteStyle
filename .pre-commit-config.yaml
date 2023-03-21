@@ -82,7 +82,7 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-        args: [ "--warn-redundant-casts", "--warn-unused-ignores", "--namespace-packages", "--explicit-package-bases", "--config-file", "dev_config/mypy.ini"]
+        args: ["--config-file", "dev_config/mypy.ini"]
 
 # Should be activated once there is time to find unused code:
 #  - repo: https://github.com/PyCQA/bandit

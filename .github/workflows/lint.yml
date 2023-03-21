@@ -25,7 +25,7 @@ jobs:
       run: poetry install --no-root
 
     - name: Analysing the code with pylint
-      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style
+      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style qute_style_examples dev_scripts tests --ignore resources_cl.py
 
     - name: Analysing the code with mypy
-      run: poetry run mypy --warn-redundant-casts --warn-unused-ignores --namespace-packages --explicit-package-bases --config-file dev_config/mypy.ini
+      run: poetry run mypy --config-file dev_config/mypy.ini qute_style qute_style_examples dev_scripts tests --exclude resources_cl.py
