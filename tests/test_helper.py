@@ -2,11 +2,10 @@
 import sys
 
 import pytest
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QWidget
 
 from qute_style.helper import check_ide, create_tooltip, create_waiting_spinner
 from qute_style.qs_application import QuteStyleApplication
-from tests.conftest import QuteStyleTestApplication
 
 
 @pytest.mark.parametrize(

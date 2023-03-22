@@ -2,11 +2,10 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Union, cast
+from typing import Union
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from PySide6.QtCore import QBuffer, QByteArray, QIODevice
-from PySide6.QtGui import QColor, QPaintEvent, QPixmap
+from PySide6.QtGui import QColor, QPaintEvent
 from PySide6.QtWidgets import QWidget
 
 from qute_style.style import get_color
@@ -18,25 +17,6 @@ log = logging.getLogger("qute_style")
 def check_ide() -> bool:
     """Check if the application is run from the IDE."""
     return Path(sys.argv[0]).suffix == ".py"
-
-
-def encode_pixmap(pixmap: QPixmap) -> str:
-    """Encode a QPixmap to a Base64 str."""
-    byte_array = QByteArray()
-    buffer = QBuffer(byte_array)
-    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-    pixmap.save(buffer, "png")
-    return byte_array.toBase64().data().decode("utf-8")
-
-
-def decode_pixmap(pixmap_string: str) -> QPixmap:
-    """Decode a QPixmap from a Base64 str."""
-    byte_array = QByteArray.fromBase64(
-        cast(QByteArray, pixmap_string.encode("utf-8"))
-    )
-    qpixmap = QPixmap()
-    qpixmap.loadFromData(byte_array)
-    return qpixmap
 
 
 class StyledWaitingSpinner(WaitingSpinner):
