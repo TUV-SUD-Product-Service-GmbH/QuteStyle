@@ -1,6 +1,6 @@
 """Style handling for QuteStyleWindow."""
 import logging
-from typing import Optional
+from typing import Optional, cast
 
 from PySide6.QtCore import QRect, QSettings, QSize
 from PySide6.QtGui import QColor, QPainter, QPixmap
@@ -79,7 +79,7 @@ def get_current_style() -> str:
     """Return the currently set style."""
     global CURRENT_STYLE  # pylint: disable=global-statement
     if CURRENT_STYLE is None:
-        CURRENT_STYLE = QSettings().value("style", DEFAULT_STYLE)
+        CURRENT_STYLE = cast(str, QSettings().value("style", DEFAULT_STYLE))
         log.debug("Loaded current style from registry: %s", CURRENT_STYLE)
         if CURRENT_STYLE not in THEMES:
             log.warning("Invalid style stored in registry: %s", CURRENT_STYLE)

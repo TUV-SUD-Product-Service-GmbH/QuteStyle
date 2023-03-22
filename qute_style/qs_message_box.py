@@ -24,7 +24,7 @@ class QuteMessageBox(QMessageBox):
     ) -> None:
         """Init function."""
         super().__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMinimumSize(300, 300)
         self.setWindowTitle(title)
         self.setText(f"<h3>{title}</h3>\n{text}")
@@ -33,8 +33,8 @@ class QuteMessageBox(QMessageBox):
         # hint
         self.setWindowFlags(
             self.windowFlags()
-            | Qt.FramelessWindowHint
-            | Qt.WindowSystemMenuHint
+            | Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowSystemMenuHint
         )
 
         # Style the box with CSS. Set the border radius here.
@@ -70,7 +70,9 @@ class QuteMessageBox(QMessageBox):
         # but it does help get rid of the pixelated rounded corners.
         effect = QGraphicsDropShadowEffect()
         # The color should match the border color set in CSS.
-        effect.setColor(QApplication.palette().color(QPalette.Shadow))
+        effect.setColor(
+            QApplication.palette().color(QPalette.ColorRole.Shadow)
+        )
         effect.setBlurRadius(5)
         self.setGraphicsEffect(effect)
 
@@ -79,9 +81,7 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Optional[
-            QMessageBox.StandardButton
-        ] = QMessageBox.StandardButton.Ok,
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
@@ -101,9 +101,7 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Optional[
-            QMessageBox.StandardButton
-        ] = QMessageBox.StandardButton.Ok,
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
@@ -123,9 +121,7 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Optional[
-            QMessageBox.StandardButton
-        ] = QMessageBox.StandardButton.Ok,
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
@@ -145,9 +141,7 @@ class QuteMessageBox(QMessageBox):
         parent: Optional[QWidget],
         title: str,
         text: str,
-        buttons: Optional[
-            QMessageBox.StandardButton
-        ] = QMessageBox.StandardButton.Yes
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Yes
         | QMessageBox.StandardButton.No,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Yes
@@ -169,9 +163,7 @@ class QuteMessageBox(QMessageBox):
         title: str,
         text: str,
         icon: QMessageBox.Icon,
-        buttons: Optional[
-            QMessageBox.StandardButton
-        ] = QMessageBox.StandardButton.Ok,
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
         default_button: QMessageBox.StandardButton = (
             QMessageBox.StandardButton.Ok
         ),
@@ -189,16 +181,16 @@ class QuteMessageBox(QMessageBox):
         # then the mask would need to be set in resizeEvent().
         rect = QRect(QPoint(0, 0), msg_box.geometry().size())
         bitmap = QBitmap(rect.size())
-        bitmap.fill(QColor(Qt.color0))
+        bitmap.fill(QColor(Qt.GlobalColor.color0))
         painter = QPainter(bitmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(Qt.color1)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setBrush(Qt.GlobalColor.color1)
         # this radius should match the CSS radius
         painter.drawRoundedRect(
             rect,
             QuteMessageBox._radius,
             QuteMessageBox._radius,
-            Qt.AbsoluteSize,
+            Qt.SizeMode.AbsoluteSize,
         )
         painter.end()
         msg_box.setMask(bitmap)

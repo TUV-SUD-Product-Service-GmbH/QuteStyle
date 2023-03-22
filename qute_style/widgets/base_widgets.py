@@ -105,4 +105,4 @@ class SettingsBaseWidget(BaseWidget):
     def clear_widget(self) -> None:
         """Remove a widget from the settings if present."""
         if item := self._layout.itemAtPosition(1, 0):
-            item.widget().setParent(None)
+            item.widget().setParent(QWidget())

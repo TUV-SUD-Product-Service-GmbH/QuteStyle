@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 from PySide6.QtCore import (
     QEvent,
@@ -62,8 +62,9 @@ class TestWidget(MainWidget):
         menu.addAction(widget_action)
         menu.addSeparator()
         buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-            Qt.Horizontal,
+            QDialogButtonBox.StandardButton.Ok
+            | QDialogButtonBox.StandardButton.Cancel,
+            Qt.Orientation.Horizontal,
             menu,
         )
         buttons.setCenterButtons(True)
@@ -96,11 +97,11 @@ class TestWidget(MainWidget):
         self, obj: QObject, event: QEvent
     ) -> bool:
         """Filter and handle QDragEnterEvents and QDropEvents."""
-        if event.type() == QEvent.Drop and obj is self._ui.drop_widget:
+        if event.type() == QEvent.Type.Drop and obj is self._ui.drop_widget:
             self._handle_file_drop(cast(QDropEvent, event))
             return True
         if (
-            event.type() == QEvent.DragEnter
+            event.type() == QEvent.Type.DragEnter
             and cast(QDragEnterEvent, event).mimeData().hasUrls()
         ):
             return self._handle_drag_event(cast(QDragEnterEvent, event), obj)
@@ -128,7 +129,7 @@ class TestWidget(MainWidget):
 
         # Create a QTreeWidgetItem that displays the filename only.
         item = QTreeWidgetItem(self._ui.drop_widget, [path.name])
-        item.setData(0, Qt.UserRole, path)
+        item.setData(0, Qt.ItemDataRole.UserRole, path)
 
         # Get a QIcon for the file from OS and set it.
         item.setIcon(0, QFileIconProvider().icon(QFileInfo(str(path))))
@@ -141,10 +142,10 @@ class TestWidget(MainWidget):
     @Slot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
         """Change the orientation of the QSplitter."""
-        if self._ui.splitter.orientation() == Qt.Horizontal:
-            self._ui.splitter.setOrientation(Qt.Vertical)
+        if self._ui.splitter.orientation() == Qt.Orientation.Horizontal:
+            self._ui.splitter.setOrientation(Qt.Orientation.Vertical)
         else:
-            self._ui.splitter.setOrientation(Qt.Horizontal)
+            self._ui.splitter.setOrientation(Qt.Orientation.Horizontal)
 
     @Slot(name="on_widgets_disabled")
     def on_widgets_disabled(self) -> None:
@@ -166,26 +167,39 @@ class Model(QStringListModel):
         self._check_states: dict[str, Qt.CheckState] = {}
         super().__init__(data, parent)
 
-    def data(
-        self, index: QModelIndex, role: int = Qt.DisplayRole
-    ) -> Qt.CheckState:
+    def data(  # type: ignore[override]
+        self,
+        index: QModelIndex,
+        role: Qt.ItemDataRole = Qt.ItemDataRole.DisplayRole,
+    ) -> Any:
         """Return data for the given role and index."""
-        if role == Qt.CheckStateRole:
+        if role == Qt.ItemDataRole.CheckStateRole:
             return self._check_states[index.data()]
         return super().data(index, role)
 
-    def setData(  # pylint: disable=invalid-name
-        self, index: QModelIndex, value: Qt.CheckState, role: int = Qt.EditRole
+    # pylint: disable=invalid-name
+    def setData(  # type: ignore
+        self,
+        index: QModelIndex,
+        value: Qt.CheckState,
+        role: int = Qt.ItemDataRole.EditRole,
     ) -> bool:
+        # pylint: enable=invalid-name
         """Set data for the given role and index."""
-        if role == Qt.CheckStateRole:
+        if role == Qt.ItemDataRole.CheckStateRole:
             self._check_states[index.data()] = value
-            self.dataChanged.emit(index, index, [Qt.CheckStateRole])
+            self.dataChanged.emit(
+                index, index, [Qt.ItemDataRole.CheckStateRole]
+            )
         return super().setData(index, value, role)
 
-    def flags(self, _: QModelIndex) -> Qt.ItemFlags:
+    def flags(self, _: QModelIndex) -> Qt.ItemFlag:  # type: ignore[override]
         """Return the flags for the given index."""
-        return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
+        return (
+            Qt.ItemFlag.ItemIsEnabled
+            | Qt.ItemFlag.ItemIsUserCheckable
+            | Qt.ItemFlag.ItemIsSelectable
+        )
 
 
 class ModelViewWidget(MainWidget):
@@ -207,8 +221,10 @@ class ModelViewWidget(MainWidget):
             index = model.index(row)
             model.setData(
                 index,
-                Qt.Checked if row % 2 else Qt.Unchecked,  # alternate value
-                Qt.CheckStateRole,
+                Qt.CheckState.Checked
+                if row % 2
+                else Qt.CheckState.Unchecked,  # alternate value
+                Qt.ItemDataRole.CheckStateRole,
             )
         self._view.setModel(model)
 
@@ -226,7 +242,12 @@ class ModelViewWidget(MainWidget):
             self._settings_widget.layout().addWidget(QCheckBox("Activate 2"))
             self._settings_widget.layout().addWidget(QLabel("...", self))
             self._settings_widget.layout().addItem(
-                QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)
+                QSpacerItem(
+                    0,
+                    0,
+                    QSizePolicy.Policy.Expanding,
+                    QSizePolicy.Policy.Expanding,
+                )
             )
         return self._settings_widget
 

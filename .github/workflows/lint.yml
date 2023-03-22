@@ -1,4 +1,4 @@
-name: Pylint
+name: lint
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, unlabeled]
@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: Run Pylint
+    name: lint code
     runs-on: ubuntu-latest
 
     steps:
@@ -25,4 +25,7 @@ jobs:
       run: poetry install --no-root
 
     - name: Analysing the code with pylint
-      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style
+      run: poetry run pylint --rcfile=.pylintrc --recursive=y qute_style qute_style_examples dev_scripts tests --ignore resources_cl.py
+
+    - name: Analysing the code with mypy
+      run: poetry run mypy --config-file dev_config/mypy.ini qute_style qute_style_examples dev_scripts tests --exclude resources_cl.py

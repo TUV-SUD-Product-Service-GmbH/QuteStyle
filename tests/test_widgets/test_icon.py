@@ -4,7 +4,8 @@ from random import randint
 from typing import Iterator
 
 import pytest
-from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtCore import QRect
+from PySide6.QtGui import QPainter, QPaintEvent, QPixmap
 from pytestqt.qtbot import QtBot
 
 from qute_style.dev.mocks import CallList, check_call
@@ -103,7 +104,7 @@ class TestDraw:
         with check_call(Icon, "scale", scale, as_property=True, call_count=-1):
             with check_call(QPainter, "drawPixmap") as calls:
                 # Just pass None, the event isn't used.
-                icon.paintEvent(None)
+                icon.paintEvent(QPaintEvent(QRect()))
         yield calls
 
     @staticmethod
