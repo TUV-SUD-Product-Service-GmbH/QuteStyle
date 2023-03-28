@@ -71,7 +71,7 @@ class ToggleOptionButton(  # pylint: disable=too-few-public-methods
 
 
 class QuteStyle(QProxyStyle):
-    """Custom style for a TSL Style application."""
+    """Custom style for a Qute Style application."""
 
     # Custom ControlElement for drawControl method.
     CE_Toggle = QStyle.ControlElement(QStyle.ControlElement.CE_CustomBase + 1)

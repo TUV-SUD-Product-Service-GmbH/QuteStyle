@@ -147,7 +147,9 @@ class TitleBar(QFrame):
             return True
         if event.type() == QEvent.Type.MouseMove:
             if not self._double_click_in_progress:
-                self.move_window.emit(cast(QMouseEvent, event).globalPos())
+                self.move_window.emit(
+                    cast(QMouseEvent, event).globalPosition().toPoint()
+                )
             return True
         return False
 

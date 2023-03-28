@@ -313,13 +313,13 @@ def test_maximize_mode_setting_after_restart(qtbot: QtBot) -> None:
     window.close()
 
     window = create_new_main_window(qtbot, StyledMainWindow)
-    assert window.isMaximized()
+    assert window.isFullScreen()
 
     window.showNormal()
     window.close()
 
     window = create_new_main_window(qtbot, StyledMainWindow)
-    assert not window.isMaximized()
+    assert not window.isFullScreen()
 
 
 def test_maximize_mode(qtbot: QtBot) -> None:
@@ -332,7 +332,7 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     rect = screen.availableGeometry()
     log.debug("Available Geometry: %d x %d", rect.width(), rect.height())
 
-    assert window.isMaximized()
+    assert window.isFullScreen()
     assert window._title_bar.maximize_button.tooltip_text == "Verkleinern"
     assert window.width() == rect.width()
     assert window.height() == rect.height()
@@ -342,7 +342,7 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     qtbot.mouseClick(
         window._title_bar.maximize_button, Qt.MouseButton.LeftButton
     )
-    assert not window.isMaximized()
+    assert not window.isFullScreen()
     assert window._title_bar.maximize_button.tooltip_text == "Maximieren"
     for grip in window._grips:
         assert grip.isEnabled()
@@ -350,7 +350,7 @@ def test_maximize_mode(qtbot: QtBot) -> None:
     qtbot.mouseClick(
         window._title_bar.maximize_button, Qt.MouseButton.LeftButton
     )
-    assert window.isMaximized()
+    assert window.isFullScreen()
 
     window.showFullScreen()
     assert window.isFullScreen()
@@ -374,7 +374,7 @@ def test_maximize_event_handling(qtbot: QtBot) -> None:
             QEvent(QEvent.Type.MouseButtonDblClick),
         )
         assert signal.signal_triggered
-    assert window.isMaximized()
+    assert window.isFullScreen()
 
     # try to send move event while mouse double click still not finished
     with qtbot.waitSignal(
