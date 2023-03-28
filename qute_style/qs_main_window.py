@@ -413,7 +413,7 @@ class QuteStyleMainWindow(
         pos is the position at which the QMouseEvent triggering the move
         occurred.
         """
-        if self.isMaximized():
+        if self.isMaximized() or self.isFullScreen():
             # Show the window normal
             self.showNormal()
 
