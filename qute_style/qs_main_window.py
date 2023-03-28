@@ -43,7 +43,9 @@ from qute_style.widgets.left_column import LeftColumn
 from qute_style.widgets.left_menu import LeftMenu
 from qute_style.widgets.title_bar import TitleBar
 
-log = logging.getLogger(f"tsl.{__name__}")  # pylint: disable=invalid-name
+log = logging.getLogger(  # pylint: disable=invalid-name
+    f"qute_style.{__name__}"
+)
 
 
 @dataclass
@@ -251,7 +253,7 @@ class QuteStyleMainWindow(
 
         The method creates a QFrame that contains two widgets:
         1. A QStackedWidget that contains all the widgets that are accessible
-        from the menu (as defined in TslMainGui.MAIN_WIDGET_CLASS
+        from the menu (as defined in QuteMainGui.MAIN_WIDGET_CLASS
         2. A QFrame with the widget that is used as the right column.
         """
         content_area_frame = QFrame()
@@ -294,7 +296,7 @@ class QuteStyleMainWindow(
         This method creates a QFrame that is opened/closed with a button in the
         TitleBar. Therefore it's initial width is 0. The frame contains a
         layout with a margin of 5 pixels which contains the widget for the
-        right column (as defined in TslMainGui.RIGHT_WIDGET_CLASS).
+        right column (as defined in QuteMainGui.RIGHT_WIDGET_CLASS).
         """
         right_column_frame = QFrame()
         right_column_frame.setObjectName("bg_two_frame")
@@ -433,7 +435,7 @@ class QuteStyleMainWindow(
     @Slot(name="maximize")
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
-        if self.isMaximized():
+        if self.isMaximized() or self.isFullScreen():
             self.showNormal()
         else:
             self.showMaximized()
@@ -455,8 +457,7 @@ class QuteStyleMainWindow(
     def showMaximized(self) -> None:  # pylint: disable=invalid-name
         """Overwrite showMaximized."""
         log.debug("Show window maximized")
-        self._show_maximized_layout()
-        super().showMaximized()
+        self.showFullScreen()
 
     def showNormal(self) -> None:  # pylint: disable=invalid-name
         """Overwrite showNormal."""
