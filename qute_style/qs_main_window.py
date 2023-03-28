@@ -457,6 +457,8 @@ class QuteStyleMainWindow(
     def showMaximized(self) -> None:  # pylint: disable=invalid-name
         """Overwrite showMaximized."""
         log.debug("Show window maximized")
+        # For a QS application, maximize is the same as fullscreen, because
+        # the os is not allowed to attach a generic titlebar to the window.
         self.showFullScreen()
 
     def showNormal(self) -> None:  # pylint: disable=invalid-name
