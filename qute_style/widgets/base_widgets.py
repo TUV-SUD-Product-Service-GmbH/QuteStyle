@@ -25,10 +25,6 @@ class MainWidget(BaseWidget):
 
     shutdown_completed = Signal(QWidget, name="shutdown_completed")
 
-    def __init__(self, parent: QWidget | None = None) -> None:
-        """Init the BaseWidget for a Widget in QuteStyle."""
-        super().__init__(parent)
-
     def __repr__(self) -> str:
         """Return a str representation for the MainWidget."""
         return f"<{self.__class__} {self.NAME} {id(self)}>"
