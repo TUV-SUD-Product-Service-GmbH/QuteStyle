@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import cast
 
-from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 log = logging.getLogger(
