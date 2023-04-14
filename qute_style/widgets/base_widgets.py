@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import cast
 
-from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
 
 log = logging.getLogger(
@@ -25,32 +25,28 @@ class MainWidget(BaseWidget):
 
     shutdown_completed = Signal(QWidget, name="shutdown_completed")
 
-    def __init__(self, parent: QWidget | None = None) -> None:
-        """Init the BaseWidget for a Widget in QuteStyle."""
-        self._thread: QThread | None = None
-        super().__init__(parent)
-
     def __repr__(self) -> str:
         """Return a str representation for the MainWidget."""
         return f"<{self.__class__} {self.NAME} {id(self)}>"
 
     def shutdown(self) -> None:
-        """Shutdown the application."""
+        """
+        Shutdown the application.
+
+        Can be overriden in case some special actions (finish threads, ...) are
+        needed to shutdown the widget. At the end shutdown_completed signal
+        must be emitted.
+        """
         log.debug("Shutting down tab %s", self.NAME)
-        if self._thread is not None and self._thread.isRunning():
-            log.debug("Thread is in running state %s", self.NAME)
-            # Disconnect the current handlers before attaching a new slot.
-            # In case of nav_loader a new thread would be started in the
-            # original finished handler which will then lead to an error
-            # when closing the app because this thread is still running.
-            # Restarting the app in this case fails.
-            self._thread.finished.disconnect()
-            self._thread.finished.connect(self.on_thread_finished)
-        else:
-            self.on_thread_finished()
+        self.shutdown_completed.emit(self)
 
     def store_settings(self) -> None:  # pragma: no cover
-        """Store the settings."""
+        """
+        Store the settings.
+
+        Can be overriden to store widget based information when the application
+        is closed.
+        """
 
     @property
     def settings_widget(
@@ -58,12 +54,6 @@ class MainWidget(BaseWidget):
     ) -> None | QWidget:
         """Get the settings widget. Implemented by custom classes."""
         return None
-
-    @Slot(name="on_thread_finished")
-    def on_thread_finished(self) -> None:
-        """Handle the shutdown when the thread has finished."""
-        log.debug("On thread finished base class %s", self.NAME)
-        self.shutdown_completed.emit(self)
 
     def request_shutdown(self) -> bool:
         """
