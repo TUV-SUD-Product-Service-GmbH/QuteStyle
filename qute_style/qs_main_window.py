@@ -734,7 +734,11 @@ class QuteStyleMainWindow(
             widget.shutdown()
 
     def on_widget_shutdown(self, widget: MainWidget) -> None:
-        """Handle a completed widget shutdown."""
+        """
+        Handle a completed widget shutdown.
+
+        If all widgets have shutdown the application is closed.
+        """
         log.debug("Widget completed shutdown: %s", widget)
         self._content.removeWidget(widget)
         if not self._content.count():
