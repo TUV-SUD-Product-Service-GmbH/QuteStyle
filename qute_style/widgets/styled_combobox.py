@@ -117,10 +117,10 @@ class StyledComboBox(QComboBox):
 class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     """Combobox that displays a list of items to be checked."""
 
-    dataChanged = Signal(name="dataChanged")
+    dataChanged = Signal(dict, name="dataChanged")
 
     def __init__(self, parent: QWidget | None = None) -> None:
-        """Create a new BatchCombobox."""
+        """Create a new CheckableComboBox."""
         super().__init__(parent)
 
         # default text that is shown when nothing is selected
@@ -136,12 +136,12 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         # Update the text when an item is toggled
         self.model().dataChanged.connect(self.handle_data_change)
 
+        # Prevent popup from closing when clicking on an item
+        self.view().viewport().installEventFilter(self)
+
         # Hide and show popup when clicking the line edit
         self.lineEdit().installEventFilter(self)
         self.popup_open = False
-
-        # Prevent popup from closing when clicking on an item
-        self.view().viewport().installEventFilter(self)
 
         # add some spacing between the items
         cast(QListView, self.view()).setSpacing(2)
@@ -212,7 +212,10 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         name="handle_data_change",
     )
     def handle_data_change(
-        self, start: QModelIndex, end: QModelIndex, roles: list[int]
+        self,
+        start: QModelIndex,
+        end: QModelIndex,
+        roles: list[Qt.ItemDataRole],
     ) -> None:
         """Handle a data change event to handle single_mode."""
         if (
@@ -233,7 +236,12 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                         Qt.ItemDataRole.CheckStateRole,
                     )
         self.update_text()
-        self.dataChanged.emit()
+
+        current_state: dict[str | int, Qt.CheckState] = {
+            self.model().item(i).data(): (self.model().item(i).checkState())
+            for i in range(self.model().rowCount())
+        }
+        self.dataChanged.emit(current_state)
 
     def update_text(self) -> None:
         """Update the texts."""
@@ -315,3 +323,88 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                 if data in item_ids
                 else Qt.CheckState.Unchecked
             )
+
+
+class SelectAllComboBox(CheckableComboBox[str | int], Generic[ItemData]):
+    """CheckableComboBox that has an entry that alters the whole selection."""
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        """Create a new SelectAllComboBox."""
+        super().__init__(parent)
+        self.addItem(self.tr("Alles auswählen"))
+        self.model().item(0).setAutoTristate(True)
+        self.insertSeparator(1)
+
+    def initialize_content(self) -> None:
+        """Select or deselect all items based on "select all" item."""
+        self.handle_data_change(
+            self.model().index(0, 0, QModelIndex()),
+            self.model().index(0, 0, QModelIndex()),
+            [Qt.ItemDataRole.CheckStateRole],
+        )
+
+    @Slot(
+        QModelIndex,
+        QModelIndex,
+        "QVector<int>",  # type: ignore
+        name="handle_data_change",
+    )
+    def handle_data_change(
+        self,
+        start: QModelIndex,
+        end: QModelIndex,
+        roles: list[Qt.ItemDataRole],
+    ) -> None:
+        """Handle click on "Select all"."""
+        select_all_item = self.model().item(0)
+        self.model().blockSignals(True)
+        # handle how the select_all_item affects all other items
+        if start == self.model().index(0, 0, QModelIndex()):
+            if select_all_item.checkState() == Qt.CheckState.Checked:
+                log.debug("Selecting all items.")
+                for idx in range(2, self.model().rowCount()):
+                    self.model().item(idx).setCheckState(Qt.CheckState.Checked)
+            elif select_all_item.checkState() == Qt.CheckState.Unchecked:
+                log.debug("Deselecting all items.")
+                for idx in range(2, self.model().rowCount()):
+                    self.model().item(idx).setCheckState(
+                        Qt.CheckState.Unchecked
+                    )
+            elif (
+                select_all_item.checkState() == Qt.CheckState.PartiallyChecked
+            ):
+                return
+        # handle how all other items affect the select_all_item
+        elif all(
+            self.model().item(idx).checkState() == Qt.CheckState.Checked
+            for idx in range(2, self.model().rowCount())
+        ):
+            select_all_item.setCheckState(Qt.CheckState.Checked)
+        elif all(
+            self.model().item(idx).checkState() == Qt.CheckState.Unchecked
+            for idx in range(2, self.model().rowCount())
+        ):
+            select_all_item.setCheckState(Qt.CheckState.Unchecked)
+        else:
+            select_all_item.setCheckState(Qt.CheckState.PartiallyChecked)
+        self.model().blockSignals(False)
+        super().handle_data_change(
+            self.model().index(2, 0, QModelIndex()), end, roles
+        )
+
+    def _get_text(self) -> str:
+        """Return the text that is shown at the top of the combobox."""
+        texts = [
+            str(cast(QStandardItemModel, self.model()).item(idx).data())
+            for idx in range(2, self.model().rowCount())
+            if cast(QStandardItemModel, self.model()).item(idx).checkState()
+            == Qt.CheckState.Checked
+        ]
+
+        text = ", ".join(texts)
+        # set to no index otherwise the state icon is displayed from
+        # the first item in the combo box text which is selected by default
+        self.setCurrentIndex(-1)
+        if not text:
+            text = self._default_text
+        return text

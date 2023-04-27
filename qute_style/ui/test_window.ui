@@ -23,47 +23,7 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="9" column="1">
-       <widget class="QSlider" name="horizontalSlider">
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>30</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QSpinBox" name="spinBox"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Styled ComboBox</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Test QProgressBar:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QScrollBar" name="horizontalScrollBar">
-        <property name="value">
-         <number>25</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
+      <item row="6" column="0" colspan="2">
        <widget class="QLineEdit" name="lineEdit">
         <property name="text">
          <string>test</string>
@@ -73,25 +33,42 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="10" column="1">
+       <widget class="QScrollBar" name="horizontalScrollBar">
+        <property name="value">
+         <number>25</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Test QProgressBar:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" colspan="2">
+       <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+      </item>
+      <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Transparent ComboBox</string>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="10" column="0">
        <widget class="QDial" name="dial">
         <property name="value">
          <number>30</number>
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="2">
-       <widget class="QDateTimeEdit" name="dateTimeEdit"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="StyledComboBox" name="transparent_combobox">
+      <item row="0" column="1">
+       <widget class="StyledComboBox" name="styled_combobox">
         <item>
          <property name="text">
           <string>New Item</string>
@@ -109,8 +86,8 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="StyledComboBox" name="styled_combobox">
+      <item row="3" column="1">
+       <widget class="StyledComboBox" name="transparent_combobox">
         <item>
          <property name="text">
           <string>New Item</string>
@@ -137,6 +114,39 @@
       </item>
       <item row="1" column="1">
        <widget class="TestComboBox" name="checkable_combobox"/>
+      </item>
+      <item row="11" column="1">
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="2">
+       <widget class="QSpinBox" name="spinBox"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Styled ComboBox</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>SelectAll ComboBox</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="SelectAllTestComboBox" name="comboBox"/>
       </item>
      </layout>
     </widget>
@@ -660,6 +670,11 @@ p, li { white-space: pre-wrap; }
   </customwidget>
   <customwidget>
    <class>TestComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qute_style_examples.sample_classes</header>
+  </customwidget>
+  <customwidget>
+   <class>SelectAllTestComboBox</class>
    <extends>QComboBox</extends>
    <header>qute_style_examples.sample_classes</header>
   </customwidget>
