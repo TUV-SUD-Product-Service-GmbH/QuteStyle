@@ -61,6 +61,10 @@ class StyledComboBox(QComboBox):
         self.view().window().setAttribute(
             Qt.WidgetAttribute.WA_TranslucentBackground
         )
+        # stop combobox contents from limiting width of whole application
+        self.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
 
     def paintEvent(  # pylint: disable=invalid-name
         self, event: QtGui.QPaintEvent
