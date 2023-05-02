@@ -74,7 +74,10 @@ from PySide6.QtWidgets import (
 from qute_style.widgets.icon_button import IconButton
 from qute_style.widgets.styled_combobox import StyledComboBox
 from qute_style.widgets.toggle import Toggle
-from qute_style_examples.sample_classes import TestComboBox
+from qute_style_examples.sample_classes import (
+    SelectAllTestComboBox,
+    TestComboBox,
+)
 
 
 class Ui_test_widget(object):
@@ -89,65 +92,39 @@ class Ui_test_widget(object):
         self.groupBox_3.setCheckable(False)
         self.gridLayout = QGridLayout(self.groupBox_3)
         self.gridLayout.setObjectName("gridLayout")
-        self.horizontalSlider = QSlider(self.groupBox_3)
-        self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.setMaximum(100)
-        self.horizontalSlider.setValue(30)
-        self.horizontalSlider.setOrientation(Qt.Horizontal)
+        self.lineEdit = QLineEdit(self.groupBox_3)
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setEchoMode(QLineEdit.Normal)
 
-        self.gridLayout.addWidget(self.horizontalSlider, 9, 1, 1, 1)
-
-        self.spinBox = QSpinBox(self.groupBox_3)
-        self.spinBox.setObjectName("spinBox")
-
-        self.gridLayout.addWidget(self.spinBox, 5, 0, 1, 2)
-
-        self.label = QLabel(self.groupBox_3)
-        self.label.setObjectName("label")
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.label_3 = QLabel(self.groupBox_3)
-        self.label_3.setObjectName("label_3")
-
-        self.gridLayout.addWidget(self.label_3, 9, 0, 1, 1)
+        self.gridLayout.addWidget(self.lineEdit, 6, 0, 1, 2)
 
         self.horizontalScrollBar = QScrollBar(self.groupBox_3)
         self.horizontalScrollBar.setObjectName("horizontalScrollBar")
         self.horizontalScrollBar.setValue(25)
         self.horizontalScrollBar.setOrientation(Qt.Horizontal)
 
-        self.gridLayout.addWidget(self.horizontalScrollBar, 8, 1, 1, 1)
+        self.gridLayout.addWidget(self.horizontalScrollBar, 10, 1, 1, 1)
 
-        self.lineEdit = QLineEdit(self.groupBox_3)
-        self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setEchoMode(QLineEdit.Normal)
+        self.label_3 = QLabel(self.groupBox_3)
+        self.label_3.setObjectName("label_3")
 
-        self.gridLayout.addWidget(self.lineEdit, 4, 0, 1, 2)
+        self.gridLayout.addWidget(self.label_3, 11, 0, 1, 1)
+
+        self.dateTimeEdit = QDateTimeEdit(self.groupBox_3)
+        self.dateTimeEdit.setObjectName("dateTimeEdit")
+
+        self.gridLayout.addWidget(self.dateTimeEdit, 8, 0, 1, 2)
 
         self.label_2 = QLabel(self.groupBox_3)
         self.label_2.setObjectName("label_2")
 
-        self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
 
         self.dial = QDial(self.groupBox_3)
         self.dial.setObjectName("dial")
         self.dial.setValue(30)
 
-        self.gridLayout.addWidget(self.dial, 8, 0, 1, 1)
-
-        self.dateTimeEdit = QDateTimeEdit(self.groupBox_3)
-        self.dateTimeEdit.setObjectName("dateTimeEdit")
-
-        self.gridLayout.addWidget(self.dateTimeEdit, 6, 0, 1, 2)
-
-        self.transparent_combobox = StyledComboBox(self.groupBox_3)
-        self.transparent_combobox.addItem("")
-        self.transparent_combobox.addItem("")
-        self.transparent_combobox.addItem("")
-        self.transparent_combobox.setObjectName("transparent_combobox")
-
-        self.gridLayout.addWidget(self.transparent_combobox, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.dial, 10, 0, 1, 1)
 
         self.styled_combobox = StyledComboBox(self.groupBox_3)
         self.styled_combobox.addItem("")
@@ -156,6 +133,14 @@ class Ui_test_widget(object):
         self.styled_combobox.setObjectName("styled_combobox")
 
         self.gridLayout.addWidget(self.styled_combobox, 0, 1, 1, 1)
+
+        self.transparent_combobox = StyledComboBox(self.groupBox_3)
+        self.transparent_combobox.addItem("")
+        self.transparent_combobox.addItem("")
+        self.transparent_combobox.addItem("")
+        self.transparent_combobox.setObjectName("transparent_combobox")
+
+        self.gridLayout.addWidget(self.transparent_combobox, 3, 1, 1, 1)
 
         self.label_4 = QLabel(self.groupBox_3)
         self.label_4.setObjectName("label_4")
@@ -166,6 +151,34 @@ class Ui_test_widget(object):
         self.checkable_combobox.setObjectName("checkable_combobox")
 
         self.gridLayout.addWidget(self.checkable_combobox, 1, 1, 1, 1)
+
+        self.horizontalSlider = QSlider(self.groupBox_3)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.setMaximum(100)
+        self.horizontalSlider.setValue(30)
+        self.horizontalSlider.setOrientation(Qt.Horizontal)
+
+        self.gridLayout.addWidget(self.horizontalSlider, 11, 1, 1, 1)
+
+        self.spinBox = QSpinBox(self.groupBox_3)
+        self.spinBox.setObjectName("spinBox")
+
+        self.gridLayout.addWidget(self.spinBox, 7, 0, 1, 2)
+
+        self.label = QLabel(self.groupBox_3)
+        self.label.setObjectName("label")
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
+        self.label_5 = QLabel(self.groupBox_3)
+        self.label_5.setObjectName("label_5")
+
+        self.gridLayout.addWidget(self.label_5, 2, 0, 1, 1)
+
+        self.comboBox = SelectAllTestComboBox(self.groupBox_3)
+        self.comboBox.setObjectName("comboBox")
+
+        self.gridLayout.addWidget(self.comboBox, 2, 1, 1, 1)
 
         self.gridLayout_2.addWidget(self.groupBox_3, 4, 1, 1, 1)
 
@@ -458,8 +471,6 @@ class Ui_test_widget(object):
         self.pushButton_4.setDefault(False)
         self.tabWidget.setCurrentIndex(4)
 
-        QMetaObject.connectSlotsByName(test_widget)
-
     # setupUi
 
     def retranslateUi(self, test_widget):
@@ -469,45 +480,50 @@ class Ui_test_widget(object):
         self.groupBox_3.setTitle(
             QCoreApplication.translate("test_widget", "GroupBox", None)
         )
-        self.label.setText(
-            QCoreApplication.translate("test_widget", "Styled ComboBox", None)
+        self.lineEdit.setText(
+            QCoreApplication.translate("test_widget", "test", None)
         )
         self.label_3.setText(
             QCoreApplication.translate(
                 "test_widget", "Test QProgressBar:", None
             )
         )
-        self.lineEdit.setText(
-            QCoreApplication.translate("test_widget", "test", None)
-        )
         self.label_2.setText(
             QCoreApplication.translate(
                 "test_widget", "Transparent ComboBox", None
             )
         )
-        self.transparent_combobox.setItemText(
+        self.styled_combobox.setItemText(
             0, QCoreApplication.translate("test_widget", "New Item", None)
         )
-        self.transparent_combobox.setItemText(
+        self.styled_combobox.setItemText(
             1, QCoreApplication.translate("test_widget", "New Item 2", None)
         )
-        self.transparent_combobox.setItemText(
+        self.styled_combobox.setItemText(
             2, QCoreApplication.translate("test_widget", "New Item 3", None)
         )
 
-        self.styled_combobox.setItemText(
+        self.transparent_combobox.setItemText(
             0, QCoreApplication.translate("test_widget", "New Item", None)
         )
-        self.styled_combobox.setItemText(
+        self.transparent_combobox.setItemText(
             1, QCoreApplication.translate("test_widget", "New Item 2", None)
         )
-        self.styled_combobox.setItemText(
+        self.transparent_combobox.setItemText(
             2, QCoreApplication.translate("test_widget", "New Item 3", None)
         )
 
         self.label_4.setText(
             QCoreApplication.translate(
                 "test_widget", "Checkable ComboBox", None
+            )
+        )
+        self.label.setText(
+            QCoreApplication.translate("test_widget", "Styled ComboBox", None)
+        )
+        self.label_5.setText(
+            QCoreApplication.translate(
+                "test_widget", "SelectAll ComboBox", None
             )
         )
         self.groupBox_2.setTitle(

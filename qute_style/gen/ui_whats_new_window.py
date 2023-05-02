@@ -119,8 +119,6 @@ class Ui_whats_new_window(object):
 
         self.retranslateUi(whats_new_window)
 
-        QMetaObject.connectSlotsByName(whats_new_window)
-
     # setupUi
 
     def retranslateUi(self, whats_new_window):
