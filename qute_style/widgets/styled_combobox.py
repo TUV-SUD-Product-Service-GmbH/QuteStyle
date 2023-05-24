@@ -240,12 +240,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                         Qt.ItemDataRole.CheckStateRole,
                     )
         self.update_text()
-
-        current_state: dict[str | int, Qt.CheckState] = {
-            self.model().item(i).data(): (self.model().item(i).checkState())
-            for i in range(self.model().rowCount())
-        }
-        self.dataChanged.emit(current_state)
+        self.send_current_state()
 
     def update_text(self) -> None:
         """Update the texts."""
@@ -257,6 +252,15 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             text, Qt.TextElideMode.ElideRight, self.lineEdit().width()
         )
         self.lineEdit().setText(elided_text)
+
+    def send_current_state(self) -> None:
+        """Emit the current state via dataChanged."""
+        current_state: dict[str | int, Qt.CheckState] = {
+            self.model().item(i).data(): (self.model().item(i).checkState())
+            for i in range(self.model().rowCount())
+        }
+        self.dataChanged.emit(current_state)
+
 
     def _get_text(self) -> str:
         """Return the text that is shown at the top of the combobox."""
