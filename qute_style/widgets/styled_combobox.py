@@ -261,7 +261,6 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         }
         self.dataChanged.emit(current_state)
 
-
     def _get_text(self) -> str:
         """Return the text that is shown at the top of the combobox."""
         texts = [
