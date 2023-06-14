@@ -282,9 +282,12 @@ class HomePage(MainWidget):
 
         row = 0
         for version_info, log_data_dict in change_log_data.items():
-            label = QLabel(
+            version_info = (
                 f"V {version_info.version} - {version_info.release_date}"
+                if version_info.release_date
+                else f"V {version_info.version}"
             )
+            label = QLabel(version_info)
             label.setObjectName("heading1_label")
             label.setMinimumHeight(30)
             grid_layout.addWidget(label, row, 1, 1, 2)
