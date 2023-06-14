@@ -104,8 +104,7 @@ def _parse_meta_info(file: Path) -> str:
     """Parse the version meta information from a JSON file."""
     with file.open(encoding="utf-8") as handle:
         entry = json.loads(handle.read())
-    release_date = _parse_str(entry, "release_date")
-    return release_date
+    return _parse_str(entry, "release_date")
 
 
 def _parse_change_log(file: Path) -> tuple[str, dict[str, str]]:
