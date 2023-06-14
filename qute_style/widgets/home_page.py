@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from qute_style.dev.dev_functions import VersionInfo
 from qute_style.style import THEMES, _create_theme_drawing, log
 from qute_style.widgets.base_widgets import MainWidget
 from qute_style.widgets.icon import Icon
@@ -210,7 +211,9 @@ class HomePage(MainWidget):
         """Create the version history."""
         resource_path = ":/change_log_data.pickle"
         resource_file = QFile(resource_path)
-        change_log_data: dict[str, dict[str, list[dict[str, str]]]] = {}
+        change_log_data: dict[
+            VersionInfo, dict[str, list[dict[str, str]]]
+        ] = {}
         if resource_file.open(QIODevice.OpenModeFlag.ReadOnly):
             pickle_data = resource_file.readAll()
             change_log_data = pickle.loads(pickle_data.data())
@@ -247,7 +250,7 @@ class HomePage(MainWidget):
     def fill_version_info(
         self,
         grid_layout: QGridLayout,
-        change_log_data: dict[str, dict[str, list[dict[str, str]]]],
+        change_log_data: dict[VersionInfo, dict[str, list[dict[str, str]]]],
         visible_widgets: list[Type[MainWidget]],
     ) -> None:
         """Set up version grid from change_log_data."""
@@ -278,8 +281,10 @@ class HomePage(MainWidget):
         )
 
         row = 0
-        for version, log_data_dict in change_log_data.items():
-            label = QLabel(f"V {version}")
+        for version_info, log_data_dict in change_log_data.items():
+            label = QLabel(
+                f"V {version_info.version} - {version_info.release_date}"
+            )
             label.setObjectName("heading1_label")
             label.setMinimumHeight(30)
             grid_layout.addWidget(label, row, 1, 1, 2)
