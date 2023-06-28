@@ -10,7 +10,7 @@ import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 
 def compile_ui_files(src_folders: list[Path]) -> None:
@@ -70,22 +70,41 @@ def list_dd() -> dict[Any, list[Any]]:
     return defaultdict(list)
 
 
+class VersionInfo(NamedTuple):
+    """Version information."""
+
+    version: str
+    release_date: str
+
+
 def get_change_log_data(
     app_name: str,
     change_log_path: Path,
-) -> dict[str, WidgetLogInfo]:
+) -> dict[VersionInfo, WidgetLogInfo]:
     """Read in all the changelog data per version."""
     print("Get changelog data")
-    change_log_data: dict[str, WidgetLogInfo] = defaultdict(list_dd)
+    change_log_data: dict[VersionInfo, WidgetLogInfo] = defaultdict(list_dd)
     sorted_directories = get_sorted_version_directories(change_log_path)
     for version in sorted_directories:
-        for file in version.glob("*.json"):
+        release_date = ""
+        if Path(version / "meta.json").exists():
+            release_date = _parse_meta_info(version / "meta.json")
+        for file in version.glob("*[!meta].json"):
             try:
                 widget, texts = _parse_change_log(file)
             except NotImplementedError:
                 continue
-            change_log_data[version.name][widget or app_name].append(texts)
+            change_log_data[VersionInfo(version.name, release_date)][
+                widget or app_name
+            ].append(texts)
     return dict(change_log_data)
+
+
+def _parse_meta_info(file: Path) -> str:
+    """Parse the version meta information from a JSON file."""
+    with file.open(encoding="utf-8") as handle:
+        entry = json.loads(handle.read())
+    return _parse_str(entry, "release_date")
 
 
 def _parse_change_log(file: Path) -> tuple[str, dict[str, str]]:
@@ -122,7 +141,7 @@ def _parse_str(entry: dict[Any, Any], key: str) -> str:
 def _create_resource_file(  # pylint: disable=too-many-locals
     resource_file_path: Path,
     change_log_path: Path,
-    change_log_data: dict[str, WidgetLogInfo],
+    change_log_data: dict[VersionInfo, WidgetLogInfo],
 ) -> None:
     """Create the resource file from data."""
     print("Creating new resources.qrc")
