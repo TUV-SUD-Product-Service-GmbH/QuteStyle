@@ -105,11 +105,14 @@ class QuteStyleMainWindow(
     # Signal that is emitted when the window has shut down.
     shutdown_complete = Signal(name="shutdown_complete")
 
+    LANG_CODE: str | None = None
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         app_data: AppData,
         force_whats_new: bool = False,
         registry_reset: bool = False,
+        load_last_used_widget: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new QuteStyleMainWindow."""
@@ -184,13 +187,21 @@ class QuteStyleMainWindow(
             CornerGrip(self, Qt.Corner.BottomLeftCorner),
             CornerGrip(self, Qt.Corner.BottomRightCorner),
         ]
-
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
-
-        # Activate the first widget to be visible by default.
-        if self.MAIN_WIDGET_CLASSES:
-            self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
+        startup_widget: Type[MainWidget] | None = None
+        last_used_widget = QSettings().value("last_used_widget")
+        if (
+            load_last_used_widget
+            and last_used_widget
+            and last_used_widget in self.MAIN_WIDGET_CLASSES
+        ):
+            startup_widget = cast(Type[MainWidget], last_used_widget)
+        elif self.MAIN_WIDGET_CLASSES:
+            # Activate the first widget to be visible by default.
+            startup_widget = self.MAIN_WIDGET_CLASSES[0]
+        if startup_widget:
+            self.on_main_widget(startup_widget)
 
     MainWidgetT = TypeVar("MainWidgetT", bound=MainWidget)
 
@@ -228,13 +239,14 @@ class QuteStyleMainWindow(
 
     WidgetT = TypeVar("WidgetT", MainWidget, BaseWidget)
 
-    @staticmethod
-    def get_app_language() -> str:
+    @classmethod
+    def get_app_language(cls) -> str:
         """Get the currently set language to use for the ui."""
-        sys_lang = QLocale().system().name()[:2]
-        lang = QSettings().value("lang", sys_lang)
-        assert isinstance(lang, str)
-        return lang
+        if not cls.LANG_CODE:
+            sys_lang = QLocale().system().name()[:2]
+            cls.LANG_CODE = cast(str, QSettings().value("lang", sys_lang))
+            assert isinstance(cls.LANG_CODE, str)
+        return cls.LANG_CODE
 
     @staticmethod
     def _get_widgets_to_display(
@@ -708,6 +720,11 @@ class QuteStyleMainWindow(
         settings = QSettings()
         settings.setValue("state", self.saveState())
         settings.setValue("geometry", self.saveGeometry())
+        current_widget = cast(
+            Type[MainWidget],
+            type(self._content.currentWidget()),
+        )
+        settings.setValue("last_used_widget", current_widget)
         log.debug("Finished writing settings to registry")
 
     @Slot(QCloseEvent, name="closeEvent")
