@@ -187,21 +187,21 @@ class QuteStyleMainWindow(
             CornerGrip(self, Qt.Corner.BottomLeftCorner),
             CornerGrip(self, Qt.Corner.BottomRightCorner),
         ]
-
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
-
-        used_widget = QSettings().value("used_widget")
+        startup_widget: Type[MainWidget] | None = None
+        last_used_widget = QSettings().value("last_used_widget")
         if (
             load_last_used_widget
-            and used_widget
-            and used_widget in self.MAIN_WIDGET_CLASSES
+            and last_used_widget
+            and last_used_widget in self.MAIN_WIDGET_CLASSES
         ):
-            self.on_main_widget(used_widget)
-        else:
+            startup_widget = last_used_widget
+        elif self.MAIN_WIDGET_CLASSES:
             # Activate the first widget to be visible by default.
-            if self.MAIN_WIDGET_CLASSES:
-                self.on_main_widget(self.MAIN_WIDGET_CLASSES[0])
+            startup_widget = self.MAIN_WIDGET_CLASSES[0]
+        if startup_widget:
+            self.on_main_widget(startup_widget)
 
     MainWidgetT = TypeVar("MainWidgetT", bound=MainWidget)
 
@@ -724,7 +724,7 @@ class QuteStyleMainWindow(
             Type[MainWidget],
             type(self._content.currentWidget()),
         )
-        settings.setValue("used_widget", current_widget)
+        settings.setValue("last_used_widget", current_widget)
         log.debug("Finished writing settings to registry")
 
     @Slot(QCloseEvent, name="closeEvent")

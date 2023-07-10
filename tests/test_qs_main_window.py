@@ -133,10 +133,14 @@ class EmptyWindowStyled(QuteStyleMainWindow):
 def create_new_main_window(
     qtbot: QtBot,
     window_class: Type[QuteStyleMainWindow],
+    load_last_widget: bool = False,
 ) -> QuteStyleMainWindow:
     """Create and show a new QuteStyleMainWindow."""
     widget = window_class(
-        AppData("TestApp", "1.0.0", ":/svg_icons/no_icon.svg")
+        AppData("TestApp", "1.0.0", ":/svg_icons/no_icon.svg"),
+        False,
+        False,
+        load_last_widget,
     )
     qtbot.addWidget(widget)
     widget.show()
@@ -434,3 +438,17 @@ def test_on_left_column_settings(qtbot: QtBot) -> None:
 
     with check_call(LeftColumn, "handle_settings_display"):
         window.on_left_column(UpperLeftColumn)
+
+
+@pytest.mark.parametrize("load_last_widget", [True, False])
+def test_load_last_used_widget(qtbot: QtBot, load_last_widget: bool) -> None:
+    """Test load last used widget."""
+    window = create_new_main_window(qtbot, StyledMainWindow, load_last_widget)
+    window.on_main_widget(MainVisible)
+    window.close()
+    window = create_new_main_window(qtbot, StyledMainWindow, load_last_widget)
+    current_widget = cast(
+        Type[MainWidget],
+        type(window._content.currentWidget()),
+    )
+    assert current_widget is MainVisible if load_last_widget else MainTest
