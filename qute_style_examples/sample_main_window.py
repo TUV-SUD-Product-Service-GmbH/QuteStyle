@@ -82,7 +82,7 @@ class StyledMainWindow(QuteStyleMainWindow):
 
     MIN_SIZE = QSize(800, 600)
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         app_data: AppData,
         registry_reset: bool = False,
