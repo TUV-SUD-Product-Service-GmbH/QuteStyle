@@ -5,7 +5,7 @@ from typing import List, Type, Union, cast
 
 import pytest
 from PySide6 import QtWidgets
-from PySide6.QtCore import QEvent, QPointF, Qt
+from PySide6.QtCore import QEvent, QPointF, Qt, QLocale
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
@@ -452,3 +452,11 @@ def test_load_last_used_widget(qtbot: QtBot, load_last_widget: bool) -> None:
         type(window._content.currentWidget()),
     )
     assert current_widget is MainVisible if load_last_widget else MainTest
+
+
+def test_get_app_lang(qtbot: QtBot) -> None:
+    """Test get app language."""
+    assert QuteStyleMainWindow.LANG_CODE is None
+    assert (
+        QuteStyleMainWindow.get_app_language() == QLocale().system().name()[:2]
+    )
