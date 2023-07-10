@@ -454,7 +454,7 @@ def test_load_last_used_widget(qtbot: QtBot, load_last_widget: bool) -> None:
     assert current_widget is MainVisible if load_last_widget else MainTest
 
 
-def test_get_app_lang(qtbot: QtBot) -> None:
+def test_get_app_lang() -> None:
     """Test get app language."""
     assert QuteStyleMainWindow.LANG_CODE is None
     assert (
