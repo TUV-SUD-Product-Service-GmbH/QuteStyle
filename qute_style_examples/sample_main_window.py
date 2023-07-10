@@ -87,6 +87,7 @@ class StyledMainWindow(QuteStyleMainWindow):
         app_data: AppData,
         registry_reset: bool = False,
         force_whats_new: bool = False,
+        load_last_used_widget: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         """Create a new StyledMainWindow."""
@@ -94,6 +95,7 @@ class StyledMainWindow(QuteStyleMainWindow):
             app_data,
             force_whats_new,
             registry_reset,
+            load_last_used_widget,
             parent,
         )
         self._left_column.widget(InfoWidget).switch_style.connect(
