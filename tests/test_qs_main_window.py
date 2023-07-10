@@ -5,7 +5,7 @@ from typing import List, Type, Union, cast
 
 import pytest
 from PySide6 import QtWidgets
-from PySide6.QtCore import QEvent, QPointF, Qt, QLocale
+from PySide6.QtCore import QEvent, QLocale, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication
 from pytestqt.qtbot import QtBot
