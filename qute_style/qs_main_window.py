@@ -196,7 +196,7 @@ class QuteStyleMainWindow(
             and last_used_widget
             and last_used_widget in self.MAIN_WIDGET_CLASSES
         ):
-            startup_widget = last_used_widget
+            startup_widget = cast(Type[MainWidget], last_used_widget)
         elif self.MAIN_WIDGET_CLASSES:
             # Activate the first widget to be visible by default.
             startup_widget = self.MAIN_WIDGET_CLASSES[0]
@@ -244,7 +244,7 @@ class QuteStyleMainWindow(
         """Get the currently set language to use for the ui."""
         if not cls.LANG_CODE:
             sys_lang = QLocale().system().name()[:2]
-            cls.LANG_CODE = QSettings().value("lang", sys_lang)
+            cls.LANG_CODE = cast(str, QSettings().value("lang", sys_lang))
             assert isinstance(cls.LANG_CODE, str)
         return cls.LANG_CODE
 
