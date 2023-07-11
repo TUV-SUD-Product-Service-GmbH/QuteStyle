@@ -45,9 +45,9 @@ class IconButton(QPushButton):
     ) -> None:
         """Create a new IconButton."""
         if text:
-            super().__init__(text=text, parent=parent)
+            super().__init__(text, parent)
         else:
-            super().__init__(parent=parent)
+            super().__init__(parent)
         self._bgs = bgs or BackgroundColorNames(
             hovering="bg_elements",
             background="transparent",
