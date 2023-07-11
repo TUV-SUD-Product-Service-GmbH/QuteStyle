@@ -43,7 +43,9 @@ from qute_style.widgets.left_column import LeftColumn
 from qute_style.widgets.left_menu import LeftMenu
 from qute_style.widgets.title_bar import TitleBar
 
-log = logging.getLogger(f"qute_style.{__name__}")  # pylint: disable=invalid-name
+log = logging.getLogger(
+    f"qute_style.{__name__}"
+)  # pylint: disable=invalid-name
 
 
 @dataclass
@@ -589,8 +591,8 @@ class QuteStyleMainWindow(
         self, event: QMouseEvent
     ) -> None:
         """Event triggered on mouse button press."""
-        log.debug("Storing last click at %s", event.globalPos())
-        self.last_move_pos = event.globalPos()
+        self.last_move_pos = event.globalPosition().toPoint()
+        log.debug("Storing last click at %s", self.last_move_pos)
 
     @Slot(type, name="on_main_widget")
     def on_main_widget(self, widget_class: Type[MainWidget]) -> None:
@@ -614,7 +616,7 @@ class QuteStyleMainWindow(
                         widget.settings_widget, widget.ICON
                     )
                 return
-        raise ValueError("Could not find widget {widget_class}")
+        raise ValueError(f"Could not find widget {widget_class}")
 
     @Slot(type, name="on_right_column")
     def on_right_column(self, widget_class: Type[BaseWidget]) -> None:
