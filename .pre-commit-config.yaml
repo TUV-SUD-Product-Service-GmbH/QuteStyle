@@ -1,6 +1,6 @@
 ci:
   autofix_prs: false
-  skip: [ 'pylint', 'mypy' ]
+  skip: [ 'mypy' ]
 
 repos:
   - repo: https://github.com/pycqa/isort

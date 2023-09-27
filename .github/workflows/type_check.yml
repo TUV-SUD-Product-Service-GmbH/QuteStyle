@@ -1,4 +1,4 @@
-name: lint
+name: type_check
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, unlabeled]
@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  lint:
-    name: lint code
+  type_check:
+    name: check code
     runs-on: ubuntu-latest
 
     steps:
