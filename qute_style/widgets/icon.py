@@ -1,5 +1,5 @@
 """Icon that can be painted in any given color."""
-from typing import Union, cast
+from typing import cast
 
 from PySide6 import QtGui
 from PySide6.QtGui import QPainter, QPixmap
@@ -15,7 +15,7 @@ class Icon(QWidget):
     DEFAULT_ICON_PATH = ":/svg_icons/no_icon.svg"
 
     def __init__(
-        self, radius: int = 20, color_name: Union[str, None] = "foreground"
+        self, radius: int = 20, color_name: str | None = "foreground"
     ) -> None:
         """Create a new Icon."""
         super().__init__()
@@ -37,9 +37,7 @@ class Icon(QWidget):
         # At this point, there must be a QApplication
         return cast(QApplication, QApplication.instance()).devicePixelRatio()
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, _: QtGui.QPaintEvent
-    ) -> None:
+    def paintEvent(self, _: QtGui.QPaintEvent) -> None:  # noqa: N802
         """Override QWidget.paintEvent to draw pixmap."""
         pixmap = self._get_pixmap()
         xy_pos = (self.height() - pixmap.height()) // 2

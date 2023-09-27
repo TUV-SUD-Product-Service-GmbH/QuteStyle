@@ -1,6 +1,6 @@
 """Top bar with system buttons and extra menu."""
 import logging
-from typing import Type, cast
+from typing import cast
 
 from PySide6.QtCore import QEvent, QObject, QPoint, Qt, Signal, Slot
 from PySide6.QtGui import QMouseEvent
@@ -24,11 +24,11 @@ class TitleBar(QFrame):
     maximize = Signal(name="maximize")
     move_window = Signal(QPoint, name="move")
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         parent: QWidget,
         app_parent: QWidget,
-        right_widget_classes: list[Type[BaseWidget]],
+        right_widget_classes: list[type[BaseWidget]],
         name: str,
         logo: str,
         debug_text: str = "",
@@ -123,9 +123,7 @@ class TitleBar(QFrame):
         """Set the title bar text."""
         self._title_label.setText(text)
 
-    def eventFilter(  # pylint: disable=invalid-name
-        self, obj: QObject, event: QEvent
-    ) -> bool:
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:  # noqa: N802
         """
         Handle mouse events.
 
@@ -171,14 +169,14 @@ class TitleBar(QFrame):
 
     def set_button_active(
         self,
-        widget_class: Type[BaseWidget],
+        widget_class: type[BaseWidget],
         active: bool,
     ) -> None:
         """Set the button for the given widget active/inactive."""
         button = self._button(widget_class)
         button.set_active(active)
 
-    def _button(self, widget_class: Type[BaseWidget]) -> TitleButton:
+    def _button(self, widget_class: type[BaseWidget]) -> TitleButton:
         """Return the button for the given widget class."""
         for btn in self.findChildren(TitleButton):
             if btn.widget_class == widget_class:

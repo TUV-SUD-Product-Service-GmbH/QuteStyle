@@ -1,6 +1,6 @@
 """Style handling for QuteStyleWindow."""
 import logging
-from typing import Optional, cast
+from typing import cast
 
 from PySide6.QtCore import QRect, QSettings, QSize
 from PySide6.QtGui import QColor, QPainter, QPixmap
@@ -14,7 +14,7 @@ log = logging.getLogger(
 # default style will only require changes in the lib.
 DEFAULT_STYLE = "Darcula"
 
-CURRENT_STYLE: Optional[str] = None
+CURRENT_STYLE: str | None = None
 
 
 def _create_theme_drawing(
@@ -77,7 +77,7 @@ def _create_theme_drawing(
 
 def get_current_style() -> str:
     """Return the currently set style."""
-    global CURRENT_STYLE  # pylint: disable=global-statement
+    global CURRENT_STYLE  # noqa: PLW0603
     if CURRENT_STYLE is None:
         CURRENT_STYLE = cast(str, QSettings().value("style", DEFAULT_STYLE))
         log.debug("Loaded current style from registry: %s", CURRENT_STYLE)
@@ -96,7 +96,7 @@ def set_current_style(style: str) -> None:
     set CURRENT_STYLE to be used as a lazy variable.
     """
     log.debug("Setting current style to %s", style)
-    global CURRENT_STYLE  # pylint: disable=global-statement
+    global CURRENT_STYLE  # noqa: PLW0603
     CURRENT_STYLE = style
     QSettings().setValue("style", style)
 

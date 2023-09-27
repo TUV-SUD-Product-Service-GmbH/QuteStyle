@@ -1,6 +1,7 @@
 """Left Menu containing the widget selection."""
 import logging
-from typing import TYPE_CHECKING, Any, Iterable, Type, TypedDict, cast
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, Signal, Slot
 from PySide6.QtWidgets import (
@@ -45,8 +46,8 @@ class LeftMenu(QWidget):
         self,
         parent: QWidget,
         app_parent: QWidget,
-        main_widgets: list[Type[MainWidget]],
-        left_column_widgets: list[Type[BaseWidget]],
+        main_widgets: list[type[MainWidget]],
+        left_column_widgets: list[type[BaseWidget]],
     ) -> None:
         """Create a new LeftMenu."""
         super().__init__()
@@ -109,7 +110,7 @@ class LeftMenu(QWidget):
         def parent(self) -> QWidget:
             """Override base class method for correct type hint."""
 
-    def _add_main_widgets(self, widgets: Iterable[Type[MainWidget]]) -> None:
+    def _add_main_widgets(self, widgets: Iterable[type[MainWidget]]) -> None:
         """Create the widgets and add them to the main area."""
         for widget_class in widgets:
             button = LeftMenuButton(
@@ -154,7 +155,7 @@ class LeftMenu(QWidget):
         self._middle_layout.setSpacing(1)
         widget.setLayout(self._middle_layout)
 
-    def _add_bottom_widgets(self, widgets: Iterable[Type[BaseWidget]]) -> None:
+    def _add_bottom_widgets(self, widgets: Iterable[type[BaseWidget]]) -> None:
         """Create the widgets and add them to the column."""
         for widget_class in widgets:
             button = LeftMenuButton(
@@ -209,7 +210,7 @@ class LeftMenu(QWidget):
         self._animation.start()
 
     def _button(
-        self, widget_class: Type[BaseWidgetType]
+        self, widget_class: type[BaseWidgetType]
     ) -> LeftMenuButton[BaseWidgetType]:
         """Return the button for the given widget class."""
         for btn in self.findChildren(LeftMenuButton):
@@ -221,7 +222,7 @@ class LeftMenu(QWidget):
 
     def set_button_active(
         self,
-        widget_class: Type[BaseWidgetType],
+        widget_class: type[BaseWidgetType],
         active: bool,
     ) -> None:
         """Set the button for the given widget active/inactive."""

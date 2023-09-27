@@ -25,7 +25,7 @@ def test_get_current_style() -> None:
 @pytest.mark.style
 def test_set_and_get_current_style() -> None:
     """Test setting and getting the current style."""
-    style = list(THEMES.keys())[0]
+    style = next(iter(THEMES.keys()))
     set_current_style(style)
     assert get_current_style() == style
 

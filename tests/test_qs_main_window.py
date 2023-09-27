@@ -1,7 +1,7 @@
 """Tests for the QuteStyleMainWindow."""
 # pylint: disable=protected-access
 import logging
-from typing import List, Type, Union, cast
+from typing import cast
 
 import pytest
 from PySide6 import QtWidgets
@@ -111,14 +111,14 @@ class LeftColumnEmptyWindowStyled(QuteStyleMainWindow):
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
     RIGHT_WIDGET_CLASSES = [RightColumn, SecondRightColumn]
-    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
+    LEFT_WIDGET_CLASSES: list[type[BaseWidget]] = []
 
 
 class RightColumnEmptyWindowStyled(QuteStyleMainWindow):
     """QuteStyleMainWindow without right column widgets."""
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
-    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
+    RIGHT_WIDGET_CLASSES: list[type[BaseWidget]] = []
     LEFT_WIDGET_CLASSES = [UpperLeftColumn, LowerLeftColumn]
 
 
@@ -126,13 +126,13 @@ class EmptyWindowStyled(QuteStyleMainWindow):
     """QuteStyleMainWindow without any column widgets."""
 
     MAIN_WIDGET_CLASSES = [MainTest, MainVisible, MainInvisible]
-    RIGHT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
-    LEFT_WIDGET_CLASSES: List[Type[BaseWidget]] = []
+    RIGHT_WIDGET_CLASSES: list[type[BaseWidget]] = []
+    LEFT_WIDGET_CLASSES: list[type[BaseWidget]] = []
 
 
 def create_new_main_window(
     qtbot: QtBot,
-    window_class: Type[QuteStyleMainWindow],
+    window_class: type[QuteStyleMainWindow],
     load_last_widget: bool = False,
 ) -> QuteStyleMainWindow:
     """Create and show a new QuteStyleMainWindow."""
@@ -185,7 +185,7 @@ def test_opening_left(qtbot: QtBot) -> None:
 )
 def test_opening_right(
     qtbot: QtBot,
-    window_type: Type[QuteStyleMainWindow],
+    window_type: type[QuteStyleMainWindow],
 ) -> None:
     """Test opening and closing of right columns."""
     window = create_new_main_window(qtbot, window_type)
@@ -251,7 +251,7 @@ def test_switch_left_column(qtbot: QtBot) -> None:
 )
 def test_close_left_column(
     qtbot: QtBot,
-    window_type: Type[QuteStyleMainWindow],
+    window_type: type[QuteStyleMainWindow],
 ) -> None:
     """Test closing the column with the close button."""
     window = create_new_main_window(qtbot, window_type)
@@ -278,12 +278,9 @@ def test_close_left_column(
 )
 def test_no_widget_on_column(
     qtbot: QtBot,
-    window_type: Type[
-        Union[
-            StyledMainWindow,
-            RightColumnEmptyWindowStyled,
-            LeftColumnEmptyWindowStyled,
-        ]
+    window_type: type[
+        StyledMainWindow
+        | (RightColumnEmptyWindowStyled | LeftColumnEmptyWindowStyled)
     ],
 ) -> None:
     """Test that QuteStyleMainWindow works with empty left or right column."""
@@ -448,7 +445,7 @@ def test_load_last_used_widget(qtbot: QtBot, load_last_widget: bool) -> None:
     window.close()
     window = create_new_main_window(qtbot, StyledMainWindow, load_last_widget)
     current_widget = cast(
-        Type[MainWidget],
+        type[MainWidget],
         type(window._content.currentWidget()),
     )
     assert current_widget is MainVisible if load_last_widget else MainTest

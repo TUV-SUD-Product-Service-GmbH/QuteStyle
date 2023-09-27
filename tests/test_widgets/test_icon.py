@@ -1,7 +1,7 @@
 """Tests for Icon."""
 # pylint: disable=protected-access
+from collections.abc import Iterator
 from random import randint
-from typing import Iterator
 
 import pytest
 from PySide6.QtCore import QRect
@@ -101,10 +101,11 @@ class TestDraw:
         icon: Icon, scale: float
     ) -> Iterator[CallList]:
         """Test that the QPixmap is drawn correctly."""
-        with check_call(Icon, "scale", scale, as_property=True, call_count=-1):
-            with check_call(QPainter, "drawPixmap") as calls:
-                # Just pass None, the event isn't used.
-                icon.paintEvent(QPaintEvent(QRect()))
+        with check_call(
+            Icon, "scale", scale, as_property=True, call_count=-1
+        ), check_call(QPainter, "drawPixmap") as calls:
+            # Just pass None, the event isn't used.
+            icon.paintEvent(QPaintEvent(QRect()))
         yield calls
 
     @staticmethod

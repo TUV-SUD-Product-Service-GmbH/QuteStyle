@@ -39,9 +39,7 @@ class CornerGrip(QSizeGrip):
         elif self._position == Qt.Corner.BottomRightCorner:
             self.move(self.parent().width() - 20, self.parent().height() - 20)
 
-    def mousePressEvent(  # pylint: disable=invalid-name
-        self, _: QMouseEvent
-    ) -> None:
+    def mousePressEvent(self, _: QMouseEvent) -> None:  # noqa: N802
         """
         Override the mousePressEvent.
 
@@ -51,9 +49,7 @@ class CornerGrip(QSizeGrip):
         """
         log.debug("Mouse press event")
 
-    def mouseMoveEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """
         Handle a mouse move event to resize the grip.
 
@@ -149,9 +145,7 @@ class EdgeGrip(QWidget):
         elif self._position == Qt.Edge.RightEdge:
             self.setGeometry(width - 15, 10, 10, height)
 
-    def mouseMoveEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """
         Handle a mouse move event to resize the grip.
 

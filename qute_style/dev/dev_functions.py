@@ -7,7 +7,7 @@ import pickle
 import re
 import subprocess
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElTree
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -154,9 +154,9 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     change_log_data_path = resource_file_path / "change_log_data.pickle"
     with change_log_data_path.open("wb") as handle:
         pickle.dump(change_log_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    rcc = ET.Element("RCC")
-    qrc = ET.SubElement(rcc, "qresource")
-    ET.SubElement(qrc, "file").text = "change_log_data.pickle"
+    rcc = ElTree.Element("RCC")
+    qrc = ElTree.SubElement(rcc, "qresource")
+    ElTree.SubElement(qrc, "file").text = "change_log_data.pickle"
 
     # store added images in the resource file. Images are extracted from text
     # and text_en
@@ -171,10 +171,10 @@ def _create_resource_file(  # pylint: disable=too-many-locals
 
     for image in added_images:
         image_path = Path(change_log_path).joinpath(image)
-        ET.SubElement(qrc, "file", {"alias": image}).text = str(
+        ElTree.SubElement(qrc, "file", {"alias": image}).text = str(
             image_path.relative_to(resource_file_path)
         )
-    tree = ET.ElementTree(rcc)
+    tree = ElTree.ElementTree(rcc)
     tree.write(resource_file)
 
     print("Generating resource_rc.py with new resources.qrc")

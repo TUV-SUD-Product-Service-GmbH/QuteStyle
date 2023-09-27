@@ -1,5 +1,5 @@
 """QuteStyledMessageBox definition for custom Darcula style."""
-from typing import Optional, cast
+from typing import cast
 
 from PySide6.QtCore import QPoint, QRect, Qt
 from PySide6.QtGui import QBitmap, QColor, QPainter, QPalette
@@ -20,7 +20,7 @@ class QuteMessageBox(QMessageBox):
     _radius = 12
 
     def __init__(
-        self, parent: Optional[QWidget] = None, title: str = "", text: str = ""
+        self, parent: QWidget | None = None, title: str = "", text: str = ""
     ) -> None:
         """Init function."""
         super().__init__(parent)
@@ -78,7 +78,7 @@ class QuteMessageBox(QMessageBox):
 
     @staticmethod
     def information(
-        parent: Optional[QWidget],
+        parent: QWidget | None,
         title: str,
         text: str,
         buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
@@ -98,7 +98,7 @@ class QuteMessageBox(QMessageBox):
 
     @staticmethod
     def warning(
-        parent: Optional[QWidget],
+        parent: QWidget | None,
         title: str,
         text: str,
         buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
@@ -118,7 +118,7 @@ class QuteMessageBox(QMessageBox):
 
     @staticmethod
     def critical(
-        parent: Optional[QWidget],
+        parent: QWidget | None,
         title: str,
         text: str,
         buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
@@ -138,7 +138,7 @@ class QuteMessageBox(QMessageBox):
 
     @staticmethod
     def question(
-        parent: Optional[QWidget],
+        parent: QWidget | None,
         title: str,
         text: str,
         buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Yes
@@ -158,8 +158,8 @@ class QuteMessageBox(QMessageBox):
         )
 
     @staticmethod
-    def _show_message_box(  # pylint: disable=too-many-arguments
-        parent: Optional[QWidget],
+    def _show_message_box(  # noqa: PLR0913
+        parent: QWidget | None,
         title: str,
         text: str,
         icon: QMessageBox.Icon,

@@ -12,7 +12,6 @@ def create_show_test_combobox(
     qtbot: QtBot, single_mode: bool = False
 ) -> TestComboBox:
     """Create, register, show and return a new TestComboBox."""
-
     combobox = TestComboBox()
     combobox.single_mode = single_mode
     qtbot.addWidget(combobox)
@@ -23,7 +22,6 @@ def create_show_test_combobox(
 
 def create_show_select_all_combobox(qtbot: QtBot) -> SelectAllTestComboBox:
     """Create, register, show and return a new SelectAllTestComboBox."""
-
     combobox = SelectAllTestComboBox()
     qtbot.addWidget(combobox)
     combobox.show()

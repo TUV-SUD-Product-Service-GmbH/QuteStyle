@@ -35,7 +35,7 @@ class IconButton(QPushButton):
     FIXED_HEIGHT: int = 36
     FIXED_WIDTH: int | None = 36
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         parent: QWidget | None = None,
         icon_path: str = ":/svg_icons/no_icon.svg",
@@ -81,7 +81,7 @@ class IconButton(QPushButton):
             self.setFixedWidth(QWIDGETSIZE_MAX)
         self.setFixedHeight(self.FIXED_HEIGHT)
 
-    def setText(self, text: str) -> None:  # pylint: disable=invalid-name
+    def setText(self, text: str) -> None:  # noqa: N802
         """Set the text on the button."""
         super().setText(text)
         self.set_sizes()
@@ -98,9 +98,7 @@ class IconButton(QPushButton):
         self._is_active = active
         self.update()
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, _: QPaintEvent
-    ) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # noqa: N802
         """Customize painting of the button and icon."""
         painter = QPainter()
         painter.begin(self)
@@ -122,7 +120,7 @@ class IconButton(QPushButton):
         self._text_paint(painter, QColor(text_color))
         painter.end()
 
-    def enterEvent(self, _: QEvent) -> None:  # pylint: disable=invalid-name
+    def enterEvent(self, _: QEvent) -> None:  # noqa: N802
         """Change style on mouse entering the button area."""
         if self.isEnabled() and not self._is_active:
             self._bg_color = self._bgs["hovering"]
@@ -130,7 +128,7 @@ class IconButton(QPushButton):
             self._text_color = "foreground"
             self.update()
 
-    def leaveEvent(self, _: QEvent) -> None:  # pylint: disable=invalid-name
+    def leaveEvent(self, _: QEvent) -> None:  # noqa: N802
         """Change style on mouse leaving the button area."""
         if not self._is_active:
             self._bg_color = self._bgs["background"]
@@ -138,9 +136,7 @@ class IconButton(QPushButton):
             self._text_color = "foreground"
             self.update()
 
-    def mousePressEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """Event triggered on mouse button press."""
         if event.button() is Qt.MouseButton.LeftButton:
             self._bg_color = self._bgs["pressed"]
@@ -150,9 +146,7 @@ class IconButton(QPushButton):
             self.setFocus()
             self.clicked.emit()
 
-    def mouseReleaseEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """Event triggered on mouse button release."""
         if event.button() == Qt.MouseButton.LeftButton:
             self._bg_color = self._bgs["released"]

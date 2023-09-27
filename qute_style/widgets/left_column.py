@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Type, TypeVar, cast
+from typing import TypeVar, cast
 
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
@@ -34,7 +34,7 @@ class LeftColumn(QWidget):
     def __init__(
         self,
         app_parent: QWidget,
-        widget_types: list[Type[BaseWidget]],
+        widget_types: list[type[BaseWidget]],
         parent: QWidget | None = None,
     ):
         """Create a new LeftColumn."""
@@ -69,7 +69,7 @@ class LeftColumn(QWidget):
     @staticmethod
     def create_content_frame(
         base_layout: QLayout,
-        widget_types: list[Type[BaseWidget]],
+        widget_types: list[type[BaseWidget]],
     ) -> tuple[QStackedWidget, list[BaseWidget]]:
         """
         Create the content QFrame and add it to the given layout.
@@ -165,7 +165,7 @@ class LeftColumn(QWidget):
                 current_widget.add_widget(settings_widget)
                 self._icon.set_icon(icon)
 
-    def set_column_widget(self, widget_type: Type[BaseWidget]) -> None:
+    def set_column_widget(self, widget_type: type[BaseWidget]) -> None:
         """Set left column pages."""
         log.debug("Setting current widget to: %s", widget_type)
         widget = self.widget(widget_type)
@@ -173,7 +173,7 @@ class LeftColumn(QWidget):
         self._title_label.setText(widget.NAME)
         self._icon.set_icon(widget.ICON)
 
-    def widget(self, widget_type: Type[BaseWidgetT]) -> BaseWidgetT:
+    def widget(self, widget_type: type[BaseWidgetT]) -> BaseWidgetT:
         """Get the widget of the given type."""
         for widget in self._widgets:
             if isinstance(widget, widget_type):
@@ -182,9 +182,9 @@ class LeftColumn(QWidget):
             f"Could not find widget {widget_type}"
         )
 
-    def current_widget_type(self) -> Type[BaseWidget] | None:
+    def current_widget_type(self) -> type[BaseWidget] | None:
         """Return the currently active widget class."""
         if widget := self._stacked_widget.currentWidget():
-            return cast(Type[BaseWidget], type(widget))
+            return cast(type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None

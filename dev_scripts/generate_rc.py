@@ -1,7 +1,7 @@
 """Script to compile resources into python file."""
 import os
 import subprocess
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElTree
 from pathlib import Path
 
 if __name__ == "__main__":
@@ -17,14 +17,14 @@ if __name__ == "__main__":
 
     print("Creating new resources.qrc")
 
-    RCC = ET.Element("RCC")
-    QRC = ET.SubElement(RCC, "qresource")
+    RCC = ElTree.Element("RCC")
+    QRC = ElTree.SubElement(RCC, "qresource")
     for folder in DIRS:
         for file in folder.iterdir():
             relative_path = file.relative_to(RCS).as_posix()
-            ET.SubElement(QRC, "file").text = str(relative_path)
+            ElTree.SubElement(QRC, "file").text = str(relative_path)
 
-    TREE = ET.ElementTree(RCC)
+    TREE = ElTree.ElementTree(RCC)
     TREE.write(QRC_FILE)
 
     print("Generating resource_rc.py with new resources.qrc")

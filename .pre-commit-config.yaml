@@ -36,44 +36,12 @@ repos:
         args: [--branch, master]
       - id: requirements-txt-fixer
 
-  -   repo: https://github.com/pre-commit/pygrep-hooks
-      rev: v1.10.0
-      hooks:
-      - id: python-check-blanket-noqa
-      - id: python-check-mock-methods
-      - id: python-no-eval
-      - id: python-no-log-warn
-      - id: python-use-type-annotations
-
-  # flake8
-  - repo: https://github.com/pycqa/flake8
-    rev: '6.1.0'
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.291
     hooks:
-    -   id: flake8
-        exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py"
-        args: # arguments to configure flake8
-          - "--max-line-length=79"
-          - "--max-complexity=18"
-          # E722 (bare except) is handled by pylint
-          # W503 (line break before binary operator) that's what black does.
-          # C901 complexity is handled by pylint
-          # E402 module level import not at top of file (done by pylint)
-          - "--ignore=E722,W503,C901,E402"
-        types: [ python ]
-
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
-        exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py|__init__.py"
-
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [ python ]
+      - id: ruff
+        name: ruff
+        args: [ --fix, --exit-non-zero-on-fix ]
 
   - repo: local
     hooks:
@@ -83,9 +51,3 @@ repos:
         language: system
         types: [ python ]
         args: ["--config-file", "dev_config/mypy.ini"]
-
-# Should be activated once there is time to find unused code:
-#  - repo: https://github.com/PyCQA/bandit
-#    rev: '1.7.0'
-#    hooks:
-#      - id: bandit

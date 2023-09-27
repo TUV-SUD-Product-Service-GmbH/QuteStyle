@@ -110,7 +110,7 @@ class ColorManager(BaseWidget):
 
         self._widgets = []
 
-        for idx, key in enumerate(sorted(THEMES[list(THEMES.keys())[0]])):
+        for idx, key in enumerate(sorted(THEMES[next(iter(THEMES.keys()))])):
             log.debug("Adding row for key %s", key)
             grid_layout.addWidget(QLabel(key), idx, 0)
             widget = ColorWidget(key, "", scroll_area)
@@ -130,9 +130,7 @@ class ColorManager(BaseWidget):
         self.update_style()
         self.set_code()
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, event: QPaintEvent
-    ) -> None:
+    def paintEvent(self, event: QPaintEvent) -> None:  # noqa: N802
         """Check if the style has changed."""
         if self._current_style != get_current_style():
             log.debug("Updating colors to style: %s", self._current_style)

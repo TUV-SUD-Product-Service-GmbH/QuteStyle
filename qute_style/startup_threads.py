@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Type
 
 from PySide6.QtCore import QThread
 
@@ -17,7 +16,7 @@ log = logging.getLogger(
 class StartupThread(QThread):
     """StartupThread base class."""
 
-    START_DEPENDS_ON: tuple[Type[StartupThread], ...] = ()
+    START_DEPENDS_ON: tuple[type[StartupThread], ...] = ()
 
     # Each startup thread must have a unique priority for its exit function.
     # The exit function of the thread with the lowest priority is executed

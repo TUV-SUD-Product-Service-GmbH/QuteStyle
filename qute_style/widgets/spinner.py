@@ -36,11 +36,10 @@ from PySide6.QtGui import QColor, QPainter, QPaintEvent
 from PySide6.QtWidgets import QWidget
 
 
-# pylint: disable=too-many-instance-attributes,too-many-arguments
 class WaitingSpinner(QWidget):
     """WaitingSpinner is a highly configurable, custom spinner widget."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         parent: QWidget,
         center_on_parent: bool = True,
@@ -82,9 +81,7 @@ class WaitingSpinner(QWidget):
         self.setWindowModality(modality)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, _: QPaintEvent
-    ) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # noqa: N802
         """Paint the WaitingSpinner."""
         self._update_position()
         painter = QPainter(self)

@@ -2,8 +2,6 @@
 # pylint: disable=protected-access
 from __future__ import annotations
 
-from typing import Type
-
 import pytest
 from _pytest.fixtures import SubRequest
 from PySide6.QtWidgets import QWidget
@@ -49,7 +47,7 @@ def fixture_settings_widget(
 def test_handle_settings_display(
     left_column: LeftColumn,
     settings_widget: QWidget,
-    column_widget: Type[BaseWidget],
+    column_widget: type[BaseWidget],
     result: int,
 ) -> None:
     """

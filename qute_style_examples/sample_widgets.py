@@ -93,9 +93,7 @@ class TestWidget(MainWidget):
             if hasattr(cast(QWidget, child), "toolTip"):
                 cast(QWidget, child).setToolTip(create_tooltip(title, text))
 
-    def eventFilter(  # pylint: disable=invalid-name
-        self, obj: QObject, event: QEvent
-    ) -> bool:
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:  # noqa: N802
         """Filter and handle QDragEnterEvents and QDropEvents."""
         if event.type() == QEvent.Type.Drop and obj is self._ui.drop_widget:
             self._handle_file_drop(cast(QDropEvent, event))
@@ -177,8 +175,7 @@ class Model(QStringListModel):
             return self._check_states[index.data()]
         return super().data(index, role)
 
-    # pylint: disable=invalid-name
-    def setData(  # type: ignore
+    def setData(  # type: ignore # noqa: N802
         self,
         index: QModelIndex,
         value: Qt.CheckState,

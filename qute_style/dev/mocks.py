@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import contextlib
 import logging
+from collections.abc import Callable, Generator
 from types import ModuleType
-from typing import Any, Callable, Generator, Type, overload
+from typing import Any, overload
 
 from _pytest.monkeypatch import MonkeyPatch
 from mypy_extensions import KwArg, VarArg
@@ -44,7 +45,7 @@ def _mp_message_dialog(
     monkeypatch: MonkeyPatch,
     method: str = "warning",
     return_value: QMessageBox.StandardButton | None = None,
-    mock_class: Type[QMessageBox] = QMessageBox,
+    mock_class: type[QMessageBox] = QMessageBox,
 ) -> CallList:
     """Mock a QMessageDialog and return a list with the call's arguments."""
     return _mp_call(monkeypatch, mock_class, method, return_value, False)
@@ -54,7 +55,7 @@ def _mp_message_dialog(
 @contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
-    mock_class: Type[Any] | ModuleType,
+    mock_class: type[Any] | ModuleType,
     method: str,
     return_value: Any,
     as_property: bool,
@@ -75,7 +76,7 @@ def _mp_call(
 
 def _mp_call(
     monkeypatch: MonkeyPatch,
-    mock_class: Type[Any] | ModuleType | str,
+    mock_class: type[Any] | ModuleType | str,
     method: str | Any,
     return_value: Any,
     as_property: bool = False,
@@ -174,8 +175,8 @@ def mock_qute_message_dialog(
 
 
 @contextlib.contextmanager
-def check_call(  # pylint: disable=too-many-arguments
-    mock_class: Type[Any] | ModuleType,
+def check_call(  # noqa: PLR0913
+    mock_class: type[Any] | ModuleType,
     method: str,
     return_value: Any = None,
     call_args_list: list[tuple[Any, ...]] | None = None,
@@ -217,7 +218,7 @@ def check_call(  # pylint: disable=too-many-arguments
 # Duplicate the code because overloading is a mess due to this bug:
 # https://github.com/python/mypy/issues/11373
 @contextlib.contextmanager
-def check_call_str(  # pylint: disable=too-many-arguments
+def check_call_str(  # noqa: PLR0913
     mock_class: str,
     return_value: Any = None,
     call_args_list: list[tuple[Any, ...]] | None = None,
