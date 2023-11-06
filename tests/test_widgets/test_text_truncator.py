@@ -1,6 +1,6 @@
 """Tests for the TextTruncator."""
 import pytest
-from PySide6.QtGui import QFont, QFontMetrics, QStaticText
+from PySide6.QtGui import QFont, QFontMetrics
 
 from qute_style.widgets.text_truncator import TextTruncator
 
