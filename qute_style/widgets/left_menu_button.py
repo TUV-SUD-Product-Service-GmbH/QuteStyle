@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, Type
+from typing import Generic
 
 from PySide6.QtCore import QEvent, QPoint, QRect, Qt
 from PySide6.QtGui import QColor, QMouseEvent, QPainter, QPaintEvent, QPixmap
@@ -28,13 +28,13 @@ class LeftMenuButton(
     FIXED_WIDTH = None
     FIXED_HEIGHT = 50
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         app_parent: QWidget,
         text: str,
         tooltip_text: str,
         icon_path: str,
-        widget_class: Type[BaseWidgetType] | None,
+        widget_class: type[BaseWidgetType] | None,
         margin: float = 0.4,
     ) -> None:
         """Create a new LeftMenuButton."""
@@ -66,7 +66,7 @@ class LeftMenuButton(
         name = self.widget_class.__name__ if self.widget_class else None
         return f"<LeftMenuButton '{self.text()} {name}'>"
 
-    def paintEvent(self, _: QPaintEvent) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # noqa: N802
         """Handle a paint event for the MenuButton."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -160,9 +160,7 @@ class LeftMenuButton(
         root_painter.drawPixmap(self.visible_width() - 5, 0, self.active_menu)
         painter.end()
 
-    def enterEvent(  # pylint: disable=invalid-name
-        self, event: QEvent
-    ) -> None:
+    def enterEvent(self, event: QEvent) -> None:  # noqa: N802
         """Change style on mouse entering the button area."""
         if (
             self.visible_width() == LeftMenuButton.FIXED_HEIGHT
@@ -172,9 +170,7 @@ class LeftMenuButton(
             self.move_tooltip()
         IconButton.enterEvent(self, event)
 
-    def mousePressEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """Event triggered on mouse button press."""
         self._tooltip.hide()
         super().mousePressEvent(event)

@@ -1,6 +1,5 @@
 """Tests for QS application."""
 from copy import copy
-from typing import List, Type
 
 import pytest
 from PySide6.QtCore import QEventLoop, QThread, QTimer
@@ -111,7 +110,7 @@ def test_startup_thread_configuration_with_prio_0(
 
 
 def restart_app_instance(
-    qapp: QuteStyleApplication, startup_threads: List[Type[StartupThread]]
+    qapp: QuteStyleApplication, startup_threads: list[type[StartupThread]]
 ) -> None:
     """Reset the given QApp instance to reset ."""
     qapp.STARTUP_THREADS = startup_threads
@@ -173,15 +172,13 @@ def test_threads_with_dependency(qapp: QuteStyleApplication) -> None:
 
 def test_exit_function(qapp: QuteStyleApplication) -> None:
     """Test exit function call."""
-    with check_call(QThread, "start", None, call_count=2):
-        with check_call(QApplication, "quit", None, call_count=1):
-            # sample thread 5 has a lower priority than SampleThread4.
-            # Thus it's exit function is called
-            with check_call(
-                SampleThread5, "exit_function", None, call_count=1
-            ):
-                restart_app_instance(qapp, [SampleThread4, SampleThread5])
-                assert len(qapp._threads_running) == 2
-                assert not qapp._threads_to_run
-                qapp._threads_running[0].finished.emit()
-                qapp._threads_running[0].finished.emit()
+    # sample thread 5 has a lower priority than SampleThread4.
+    # Thus it's exit function is called
+    with check_call(QThread, "start", None, call_count=2), check_call(
+        QApplication, "quit", None, call_count=1
+    ), check_call(SampleThread5, "exit_function", None, call_count=1):
+        restart_app_instance(qapp, [SampleThread4, SampleThread5])
+        assert len(qapp._threads_running) == 2
+        assert not qapp._threads_to_run
+        qapp._threads_running[0].finished.emit()
+        qapp._threads_running[0].finished.emit()

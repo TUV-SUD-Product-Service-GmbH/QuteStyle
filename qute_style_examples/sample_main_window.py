@@ -25,9 +25,7 @@ from qute_style_examples.sample_widgets import (
     TestWidget,
 )
 
-log = logging.getLogger(
-    f"qute_style.{__name__}"
-)  # pylint: disable=invalid-name
+log = logging.getLogger(f"qute_style.{__name__}")
 
 
 class SettingsWidget(SettingsBaseWidget):
@@ -82,7 +80,7 @@ class StyledMainWindow(QuteStyleMainWindow):
 
     MIN_SIZE = QSize(800, 600)
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         app_data: AppData,
         registry_reset: bool = False,

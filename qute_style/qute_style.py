@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import contextlib
 import logging
-from typing import Generator, cast
+from collections.abc import Generator
+from typing import cast
 
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPen
@@ -307,7 +308,7 @@ class QuteStyle(QProxyStyle):
                 QuteStyle.ToggleOptions.BOX_HEIGHT,
             )
 
-    def standardPalette(  # pylint: disable=invalid-name
+    def standardPalette(  # noqa: N802
         self,
     ) -> QPalette:
         """Return the QStyle's standard QPalette."""
@@ -325,7 +326,7 @@ class QuteStyle(QProxyStyle):
             palette.setColor(group, role, QColor(get_color(name)))
         return palette
 
-    def drawControl(  # pylint: disable=invalid-name
+    def drawControl(  # noqa: N802
         self,
         element: QStyle.ControlElement,
         option: QStyleOption,
@@ -343,10 +344,11 @@ class QuteStyle(QProxyStyle):
             ):
                 self._draw_checkbox(option, painter, widget)
                 return
-        elif element == QStyle.ControlElement.CE_CheckBoxLabel:
-            if isinstance(option, QStyleOptionButton):
-                self._draw_check_box_label(option, painter, widget)
-                return
+        elif element == QStyle.ControlElement.CE_CheckBoxLabel and isinstance(
+            option, QStyleOptionButton
+        ):
+            self._draw_check_box_label(option, painter, widget)
+            return
         super().drawControl(element, option, painter, widget)
 
     def _draw_checkbox(
@@ -448,7 +450,7 @@ class QuteStyle(QProxyStyle):
                 QuteStyle.ToggleOptions.BACKGROUND_RECT_RADIUS,
             )
 
-    def drawPrimitive(  # pylint: disable=invalid-name
+    def drawPrimitive(  # noqa: N802
         self,
         element: QStyle.PrimitiveElement,
         option: QStyleOption,
@@ -466,7 +468,7 @@ class QuteStyle(QProxyStyle):
                 self._panel_draw_item_view_item(option, painter, widget)
                 return
         elif element == self.PrimitiveElement.PE_IndicatorCheckBox:
-            if isinstance(option, (QStyleOptionButton, QStyleOptionViewItem)):
+            if isinstance(option, QStyleOptionButton | QStyleOptionViewItem):
                 self._draw_primitive_indicator_checkbox(option, painter)
                 return
         elif element == self.PrimitiveElement.PE_IndicatorBranch:

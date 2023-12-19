@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Type
 
 from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QWidget
@@ -22,14 +21,14 @@ class TitleButton(IconTooltipButton[BaseWidget]):
     FIXED_WIDTH = 30
     FIXED_HEIGHT = 30
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
         parent: QWidget | None = None,
         bgs: BackgroundColorNames | None = None,
-        widget_class: Type[BaseWidget] | None = None,
+        widget_class: type[BaseWidget] | None = None,
         margin: float = 0.5,
     ) -> None:
         """Create a new TitleButton."""

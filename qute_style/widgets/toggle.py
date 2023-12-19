@@ -60,15 +60,13 @@ class Toggle(QCheckBox):
         self._animation.setDuration(QuteStyle.ToggleOptions.ANIM_DURATION)
         self.stateChanged.connect(self.setup_animation)
 
-    def setTristate(  # pylint: disable=invalid-name
-        self, on: bool = True  # pylint: disable=invalid-name
-    ) -> None:
+    def setTristate(self, on: bool = True) -> None:  # noqa: N802
         """Override setTristate to ensure it's never set."""
         if on:
             raise ValueError("Toggle cannot use tristate.")
         super().setTristate(on)
 
-    def sizeHint(self) -> QSize:  # pylint: disable=invalid-name
+    def sizeHint(self) -> QSize:  # noqa: N802
         """Return the size hint."""
         width = QuteStyle.ToggleOptions.BOX_WIDTH
         if self.text():
@@ -107,15 +105,11 @@ class Toggle(QCheckBox):
         self._animation.setEndValue(end)
         self._animation.start()
 
-    def hitButton(  # pylint: disable=invalid-name
-        self, pos: QPoint | QPoint
-    ) -> bool:
+    def hitButton(self, pos: QPoint | QPoint) -> bool:  # noqa: N802
         """States if checkbox was hit."""
         return self.contentsRect().contains(pos)
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, _: QPaintEvent
-    ) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # noqa: N802
         """Draw toggle switch."""
         painter = QStylePainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)

@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 import operator
 from copy import copy
-from typing import Type
 
 from PySide6 import QtCore
 from PySide6.QtCore import QRectF, QSize, Qt, Slot
@@ -74,16 +73,12 @@ class CustomSplashScreen(QSplashScreen):
         self._spinner.start()
         grid_layout.addWidget(label, 1, 1)
 
-    def closeEvent(  # pylint: disable=invalid-name
-        self, close_event: QCloseEvent
-    ) -> None:
+    def closeEvent(self, close_event: QCloseEvent) -> None:  # noqa: N802
         """Handle close event."""
         self._spinner.stop()
         super().closeEvent(close_event)
 
-    def mousePressEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """Disable default "click-to-dismiss" behaviour."""
 
 
@@ -92,9 +87,9 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
 ):
     """QuteStyleApplication."""
 
-    MAIN_WINDOW_CLASS: Type[CustomMainWindow]
+    MAIN_WINDOW_CLASS: type[CustomMainWindow]
 
-    STARTUP_THREADS: list[Type[StartupThread]] = []
+    STARTUP_THREADS: list[type[StartupThread]] = []
 
     APP_DATA: AppData
 
@@ -119,7 +114,7 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
             self._splash_screen = None
         self._main_window: QMainWindow | None = None
 
-        self._threads_to_run: list[Type[StartupThread]] = copy(
+        self._threads_to_run: list[type[StartupThread]] = copy(
             self.STARTUP_THREADS
         )
 

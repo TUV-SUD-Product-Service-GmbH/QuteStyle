@@ -66,9 +66,7 @@ class StyledComboBox(QComboBox):
             QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
         )
 
-    def paintEvent(  # pylint: disable=invalid-name
-        self, event: QtGui.QPaintEvent
-    ) -> None:
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:  # noqa: N802
         """Overwrite method to draw custom arrow."""
         # Draw ComboBox like defined in style sheet
         super().paintEvent(event)
@@ -121,7 +119,7 @@ class StyledComboBox(QComboBox):
 class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     """Combobox that displays a list of items to be checked."""
 
-    dataChanged = Signal(dict, name="dataChanged")
+    dataChanged = Signal(dict, name="dataChanged")  # noqa: N815
 
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new CheckableComboBox."""
@@ -161,16 +159,12 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         log.debug("Setting single mode to %s", single_mode)
         self._single = single_mode
 
-    def resizeEvent(  # pylint: disable=invalid-name
-        self, event: QResizeEvent
-    ) -> None:
+    def resizeEvent(self, event: QResizeEvent) -> None:  # noqa: N802
         """Recompute text when CheckableCombobox is resized."""
         super().resizeEvent(event)
         self.update_text()
 
-    def eventFilter(  # pylint: disable=invalid-name
-        self, obj: QObject, event: QEvent
-    ) -> bool:
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:  # noqa: N802
         """Filter events to show popup and set check states."""
         if event.type() == QEvent.Type.MouseButtonRelease:
             event = cast(QMouseEvent, event)
@@ -194,7 +188,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                     return True
         return False
 
-    def hidePopup(self) -> None:  # pylint: disable=invalid-name
+    def hidePopup(self) -> None:  # noqa: N802
         """Set the state correctly when the popup is hidden from outside."""
         log.debug("Hiding popup")
         self.popup_open = False
@@ -278,7 +272,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
             text = self._default_text
         return text
 
-    def addItem(  # type: ignore # pylint: disable=invalid-name
+    def addItem(  # type: ignore # noqa: N802
         self,
         text: str,
         data: ItemData | None = None,

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Type, TypeVar, cast
+from typing import TypeVar, cast
 
 from PySide6.QtCore import (
     QByteArray,
@@ -91,13 +91,13 @@ class QuteStyleMainWindow(
 
     # Widgets that will be shown in the center content and which are
     # accessible from the main menu on the left side.
-    MAIN_WIDGET_CLASSES: list[Type[MainWidget]]
+    MAIN_WIDGET_CLASSES: list[type[MainWidget]]
 
     # Widgets that are shown in the right column.
-    RIGHT_WIDGET_CLASSES: list[Type[BaseWidget]]
+    RIGHT_WIDGET_CLASSES: list[type[BaseWidget]]
 
     # Widgets that are shown in the left column.
-    LEFT_WIDGET_CLASSES: list[Type[BaseWidget]]
+    LEFT_WIDGET_CLASSES: list[type[BaseWidget]]
 
     MIN_SIZE: QSize = QSize(0, 0)
 
@@ -109,7 +109,7 @@ class QuteStyleMainWindow(
 
     LANG_CODE: str | None = None
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         app_data: AppData,
         force_whats_new: bool = False,
@@ -191,14 +191,14 @@ class QuteStyleMainWindow(
         ]
         for grip in self._grips:
             grip.window_geometry_changed.connect(self.window_geometry_changed)
-        startup_widget: Type[MainWidget] | None = None
+        startup_widget: type[MainWidget] | None = None
         last_used_widget = QSettings().value("last_used_widget")
         if (
             load_last_used_widget
             and last_used_widget
             and last_used_widget in self.MAIN_WIDGET_CLASSES
         ):
-            startup_widget = cast(Type[MainWidget], last_used_widget)
+            startup_widget = cast(type[MainWidget], last_used_widget)
         elif self.MAIN_WIDGET_CLASSES:
             # Activate the first widget to be visible by default.
             startup_widget = self.MAIN_WIDGET_CLASSES[0]
@@ -230,7 +230,7 @@ class QuteStyleMainWindow(
                 "Could not restore state from: %s", settings.value("state")
             )
 
-    def get_main_widget(self, widget: Type[MainWidgetT]) -> MainWidgetT | None:
+    def get_main_widget(self, widget: type[MainWidgetT]) -> MainWidgetT | None:
         """Get main widget from content."""
         return self._content.findChild(widget)  # type: ignore[return-value]
 
@@ -252,8 +252,8 @@ class QuteStyleMainWindow(
 
     @staticmethod
     def _get_widgets_to_display(
-        widgets: list[Type[WidgetT]],
-    ) -> list[Type[WidgetT]]:
+        widgets: list[type[WidgetT]],
+    ) -> list[type[WidgetT]]:
         """Reimplement to restrict access to certain widgets."""
         return widgets
 
@@ -452,7 +452,7 @@ class QuteStyleMainWindow(
         else:
             self.showMaximized()
 
-    def showEvent(self, _: QShowEvent) -> None:  # pylint: disable=invalid-name
+    def showEvent(self, _: QShowEvent) -> None:  # noqa: N802
         """Listen to QShowEvents to get initial window state."""
         if self.isMaximized() or self.isFullScreen():
             log.debug("Window started in maximized/fullscreen mode")
@@ -460,19 +460,19 @@ class QuteStyleMainWindow(
         else:
             self._show_normal_layout()
 
-    def showFullScreen(self) -> None:  # pylint: disable=invalid-name
+    def showFullScreen(self) -> None:  # noqa: N802
         """Overwrite showFullScreen."""
         log.debug("Show window fullscreen")
         self._show_maximized_layout()
         super().showFullScreen()
 
-    def showMaximized(self) -> None:  # pylint: disable=invalid-name
+    def showMaximized(self) -> None:  # noqa: N802
         """Overwrite showMaximized."""
         log.debug("Show window maximized")
         self._show_maximized_layout()
         super().showMaximized()
 
-    def showNormal(self) -> None:  # pylint: disable=invalid-name
+    def showNormal(self) -> None:  # noqa: N802
         """Overwrite showNormal."""
         log.debug("Show window normal")
         self._show_normal_layout()
@@ -579,26 +579,22 @@ class QuteStyleMainWindow(
 
         self._group.start()
 
-    def resizeEvent(  # pylint: disable=invalid-name
-        self, event: QResizeEvent
-    ) -> None:
+    def resizeEvent(self, event: QResizeEvent) -> None:  # noqa: N802
         """List to QResizeEvents to adapt position of grips."""
         super().resizeEvent(event)
         for grip in self._grips:
             grip.adapt()
 
-    def mousePressEvent(  # pylint: disable=invalid-name
-        self, event: QMouseEvent
-    ) -> None:
+    def mousePressEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """Event triggered on mouse button press."""
         self.last_move_pos = event.globalPosition().toPoint()
         log.debug("Storing last click at %s", self.last_move_pos)
 
     @Slot(type, name="on_main_widget")
-    def on_main_widget(self, widget_class: Type[MainWidget]) -> None:
+    def on_main_widget(self, widget_class: type[MainWidget]) -> None:
         """Handle display of the main widget that is of the given type."""
         current_widget = cast(
-            Type[MainWidget],
+            type[MainWidget],
             type(self._content.currentWidget()),
         )
         self._left_menu.set_button_active(current_widget, False)
@@ -619,7 +615,7 @@ class QuteStyleMainWindow(
         raise ValueError(f"Could not find widget {widget_class}")
 
     @Slot(type, name="on_right_column")
-    def on_right_column(self, widget_class: Type[BaseWidget]) -> None:
+    def on_right_column(self, widget_class: type[BaseWidget]) -> None:
         """Handle a click on the button for the right column."""
         right_widget_type = self.right_widget_type()
         left_widget_type = self._left_column.current_widget_type()
@@ -658,15 +654,15 @@ class QuteStyleMainWindow(
             # Set the button to the opposite state.
             self._title_bar.set_button_active(widget_class, not visible)
 
-    def right_widget_type(self) -> Type[BaseWidget] | None:
+    def right_widget_type(self) -> type[BaseWidget] | None:
         """Return the type of the right widget."""
         if widget := self._right_content.currentWidget():
-            return cast(Type[BaseWidget], type(widget))
+            return cast(type[BaseWidget], type(widget))
         # Return None explicitly instead of <class NoneType>
         return None
 
     @Slot(type, name="on_left_column")
-    def on_left_column(self, widget_class: Type[BaseWidget]) -> None:
+    def on_left_column(self, widget_class: type[BaseWidget]) -> None:
         """Handle a click on the button for the left column."""
         right_widget_type = self.right_widget_type()
         left_widget_type = self._left_column.current_widget_type()
@@ -711,7 +707,7 @@ class QuteStyleMainWindow(
         """Handle a click on the button for the left column."""
         # if the column was opened before, a widget must be set.
         widget_class = cast(
-            Type[BaseWidget], self._left_column.current_widget_type()
+            type[BaseWidget], self._left_column.current_widget_type()
         )
         self._left_menu.set_button_active(widget_class, False)
         self._start_box_animation(False, False)
@@ -723,16 +719,14 @@ class QuteStyleMainWindow(
         settings.setValue("state", self.saveState())
         settings.setValue("geometry", self.saveGeometry())
         current_widget = cast(
-            Type[MainWidget],
+            type[MainWidget],
             type(self._content.currentWidget()),
         )
         settings.setValue("last_used_widget", current_widget)
         log.debug("Finished writing settings to registry")
 
     @Slot(QCloseEvent, name="closeEvent")
-    def closeEvent(  # pylint: disable=invalid-name
-        self, close_event: QCloseEvent
-    ) -> None:
+    def closeEvent(self, close_event: QCloseEvent) -> None:  # noqa: N802
         """Handle a close event."""
         widgets = [
             cast(MainWidget, self._content.widget(idx))

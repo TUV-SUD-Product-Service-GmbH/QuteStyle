@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, Optional, Type, TypeVar
+from typing import Generic, TypeVar
 
 from PySide6.QtCore import QEvent, QPoint
 from PySide6.QtWidgets import QWidget
@@ -16,21 +16,21 @@ log = logging.getLogger(
 )  # pylint: disable=invalid-name
 
 BaseWidgetType = TypeVar(  # pylint: disable=invalid-name
-    "BaseWidgetType", bound=Optional[BaseWidget]
+    "BaseWidgetType", bound=BaseWidget | None
 )
 
 
 class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
     """IconButton that provides a tooltip."""
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # noqa: PLR0913
         self,
         app_parent: QWidget,
         tooltip_text: str,
         icon_path: str,
         bgs: BackgroundColorNames | None = None,
         text: str | None = None,
-        widget_class: Type[BaseWidgetType] | None = None,
+        widget_class: type[BaseWidgetType] | None = None,
         margin: float = 0.4,
         parent: QWidget | None = None,
     ) -> None:
@@ -40,7 +40,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         # App is needed to show the tooltip outside the button's rect.
         self._app_parent = app_parent
 
-        self._widget_class: Type[BaseWidgetType] | None = widget_class
+        self._widget_class: type[BaseWidgetType] | None = widget_class
 
         self._tooltip = ToolTip(
             app_parent,
@@ -68,7 +68,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
     @property
     def widget_class(
         self,
-    ) -> Type[BaseWidgetType] | None:
+    ) -> type[BaseWidgetType] | None:
         """Return the widget class the button will trigger."""
         return self._widget_class
 
@@ -76,9 +76,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         """Get the tooltip coordinates from the given position."""
         raise NotImplementedError("Child class must implement this")
 
-    def enterEvent(  # pylint: disable=invalid-name
-        self, event: QEvent
-    ) -> None:
+    def enterEvent(self, event: QEvent) -> None:  # noqa: N802
         """Change style on mouse entering the button area."""
         self.move_tooltip()
         super().enterEvent(event)
@@ -98,9 +96,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         self._tooltip.move(pos_x, pos_y)
         self._tooltip.show()
 
-    def leaveEvent(  # pylint: disable=invalid-name
-        self, event: QEvent
-    ) -> None:
+    def leaveEvent(self, event: QEvent) -> None:  # noqa: N802
         """Change style on mouse entering the button area."""
         self._tooltip.hide()
         super().leaveEvent(event)

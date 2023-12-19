@@ -4,9 +4,10 @@ from __future__ import annotations
 import logging
 import string
 import sys
+from collections.abc import Generator
 from pathlib import Path
 from random import choice, randint
-from typing import Generator, cast
+from typing import cast
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -24,9 +25,7 @@ from qute_style.qs_main_window import AppData
 from qute_style.qute_style import QuteStyle, ToggleOptionButton
 from tests.test_qs_main_window import EmptyWindowStyled
 
-log = logging.getLogger(  # pylint: disable=invalid-name
-    ".".join(["tests", __name__])
-)
+log = logging.getLogger(f"tests.{__name__}")  # pylint: disable=invalid-name
 
 TFPATH = Path("tests") / "test_files"
 

@@ -45,9 +45,7 @@ class DropLabel(QWidget):
         self.setFixedSize(parent.size())
         parent.installEventFilter(self)
 
-    def eventFilter(  # pylint: disable=invalid-name
-        self, obj: QObject, event: QEvent
-    ) -> bool:
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:  # noqa: N802
         """Handle QResizeEvents from the parent widget."""
         if event.type() == QEvent.Type.Resize and obj is self.parent():
             self.setFixedSize(cast(QResizeEvent, event).size())

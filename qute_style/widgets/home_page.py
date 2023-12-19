@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import pickle
+from collections.abc import Callable
 from enum import IntEnum
-from typing import Callable, Type, cast
+from typing import cast
 
 from PySide6.QtCore import (
     QEasingCurve,
@@ -97,12 +98,12 @@ class HomePage(MainWidget):
     def __init__(
         self,
         app_info: tuple[str, str, str],
-        visible_widgets: list[Type[MainWidget]],
+        visible_widgets: list[type[MainWidget]],
         parent: QWidget | None = None,
     ) -> None:
         """Init Homepage."""
         super().__init__(parent)
-        self._visible_widgets: list[Type[MainWidget]] = visible_widgets
+        self._visible_widgets: list[type[MainWidget]] = visible_widgets
         self._app_name, self._app_logo, self._app_lang = app_info
         self._widget_stack = StackedWidget()
         self._select_buttons: dict[int, QPushButton] = {}
@@ -251,7 +252,7 @@ class HomePage(MainWidget):
         self,
         grid_layout: QGridLayout,
         change_log_data: dict[VersionInfo, dict[str, list[dict[str, str]]]],
-        visible_widgets: list[Type[MainWidget]],
+        visible_widgets: list[type[MainWidget]],
     ) -> None:
         """Set up version grid from change_log_data."""
         log.debug("Fill version grid")
@@ -305,8 +306,8 @@ class HomePage(MainWidget):
                     row,
                     (w_name, w_icon),
                     [
-                        dict[self._app_lang]
-                        for dict in log_data_dict[self._app_name]
+                        entry[self._app_lang]
+                        for entry in log_data_dict[self._app_name]
                     ],
                 )
 
@@ -323,8 +324,8 @@ class HomePage(MainWidget):
                     row,
                     (w_name, w_icon),
                     [
-                        dict[self._app_lang]
-                        for dict in log_data_dict[widget.__name__]
+                        entry[self._app_lang]
+                        for entry in log_data_dict[widget.__name__]
                     ],
                 )
 

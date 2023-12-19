@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Generator
 from random import randint
-from typing import Generator
 
 import pytest
 from _pytest.fixtures import SubRequest
@@ -72,11 +72,12 @@ def test_draw_control(element: QStyle.ControlElement) -> None:
 
 def test_draw_check_box(style_option_button: QStyleOptionButton) -> None:
     """Test that drawing a QCheckBox draws the indicator and the label."""
-    with check_call(QuteStyle, "_draw_indicator_checkbox"):
-        with check_call(QuteStyle, "drawControl") as draw_control_calls:
-            QuteStyle()._draw_checkbox(
-                style_option_button, QPainter(), QCheckBox()
-            )
+    with check_call(QuteStyle, "_draw_indicator_checkbox"), check_call(
+        QuteStyle, "drawControl"
+    ) as draw_control_calls:
+        QuteStyle()._draw_checkbox(
+            style_option_button, QPainter(), QCheckBox()
+        )
     assert (
         draw_control_calls[0][0][1] == QStyle.ControlElement.CE_CheckBoxLabel
     )
@@ -127,11 +128,12 @@ class TestDrawIndicatorCheckbox:
         rect: QRect, style_option_button: QStyleOptionButton
     ) -> CallList:
         """Call the method and return the calls to drawPrimitive."""
-        with check_call(QProxyStyle, "subElementRect", rect):
-            with check_call(QuteStyle, "drawPrimitive") as calls:
-                QuteStyle()._draw_indicator_checkbox(
-                    style_option_button, QPainter(), QWidget()
-                )
+        with check_call(QProxyStyle, "subElementRect", rect), check_call(
+            QuteStyle, "drawPrimitive"
+        ) as calls:
+            QuteStyle()._draw_indicator_checkbox(
+                style_option_button, QPainter(), QWidget()
+            )
         return calls
 
     @staticmethod
@@ -219,16 +221,15 @@ def test_draw_branches(
                 if option.state
                 == option.state & QStyle.StateFlag.State_Children
                 else 0,
+            ), check_call(
+                QuteStyle,
+                "draw_pixmap",
+                call_count=1
+                if option.state
+                == option.state & QStyle.StateFlag.State_Children
+                else 0,
             ):
-                with check_call(
-                    QuteStyle,
-                    "draw_pixmap",
-                    call_count=1
-                    if option.state
-                    == option.state & QStyle.StateFlag.State_Children
-                    else 0,
-                ):
-                    qute_style._draw_branch(option, painter)
+                qute_style._draw_branch(option, painter)
         assert not exceptions
 
 
@@ -236,14 +237,10 @@ def test_draw_toggle(
     toggle_option_button: ToggleOptionButton, text: str | None
 ) -> None:
     """Test that a Toggle is drawn correctly."""
-    with check_call(QuteStyle, "_draw_toggle_background"):
-        with check_call(QuteStyle, "_draw_toggle_circle"):
-            with check_call(
-                QProxyStyle, "drawControl", call_count=1 if text else 0
-            ):
-                QuteStyle()._draw_toggle(
-                    toggle_option_button, QPainter(), None
-                )
+    with check_call(QuteStyle, "_draw_toggle_background"), check_call(
+        QuteStyle, "_draw_toggle_circle"
+    ), check_call(QProxyStyle, "drawControl", call_count=1 if text else 0):
+        QuteStyle()._draw_toggle(toggle_option_button, QPainter(), None)
 
 
 @pytest.fixture(name="toggle_x", scope="class")
@@ -283,9 +280,10 @@ class TestDrawToggleCircle:
         toggle_x: int,
     ) -> CallList:
         """Call the method and return the calls to drawPrimitive."""
-        with check_call(QuteStyle.ToggleOptions, "toggle_x", toggle_x):
-            with check_call(QPainter, "drawEllipse") as calls:
-                QuteStyle()._draw_toggle_circle(toggle_option_button, painter)
+        with check_call(
+            QuteStyle.ToggleOptions, "toggle_x", toggle_x
+        ), check_call(QPainter, "drawEllipse") as calls:
+            QuteStyle()._draw_toggle_circle(toggle_option_button, painter)
         return calls
 
     @staticmethod
@@ -325,11 +323,10 @@ class TestDrawToggleBackground:
         painter: QPainter,
     ) -> CallList:
         """Call the method and return the calls to drawPrimitive."""
-        with check_call(QuteStyle.ToggleOptions, "toggle_rect", rect):
-            with check_call(QPainter, "drawRoundedRect") as calls:
-                QuteStyle()._draw_toggle_background(
-                    toggle_option_button, painter
-                )
+        with check_call(
+            QuteStyle.ToggleOptions, "toggle_rect", rect
+        ), check_call(QPainter, "drawRoundedRect") as calls:
+            QuteStyle()._draw_toggle_background(toggle_option_button, painter)
         return calls
 
     @staticmethod
@@ -408,20 +405,21 @@ def test_draw_primitive_indicator_checkbox(
     style_option_button: QStyleOptionButton, state: QStyle.StateFlag
 ) -> None:
     """Test that primitive indicator checkbox is drawn correctly."""
-    with check_call(QuteStyle, "_draw_checkbox_background"):
-        with check_call(QuteStyle, "_draw_checkbox_frame"):
-            draw_check = (
-                state & QStyle.StateFlag.State_On
-                or state & QStyle.StateFlag.State_NoChange
+    with check_call(QuteStyle, "_draw_checkbox_background"), check_call(
+        QuteStyle, "_draw_checkbox_frame"
+    ):
+        draw_check = (
+            state & QStyle.StateFlag.State_On
+            or state & QStyle.StateFlag.State_NoChange
+        )
+        with check_call(
+            QuteStyle,
+            "_draw_checkbox_check",
+            call_count=1 if draw_check else 0,
+        ):
+            QuteStyle._draw_primitive_indicator_checkbox(
+                style_option_button, QPainter()
             )
-            with check_call(
-                QuteStyle,
-                "_draw_checkbox_check",
-                call_count=1 if draw_check else 0,
-            ):
-                QuteStyle._draw_primitive_indicator_checkbox(
-                    style_option_button, QPainter()
-                )
 
 
 @contextlib.contextmanager
@@ -446,9 +444,8 @@ class TestDrawCheckBoxFrame:
         """Test drawing a checkbox's frame."""
         with check_call_str(
             "qute_style.qute_style.painter_save", painter_save_mock
-        ):
-            with check_call(QPainter, "drawRoundedRect") as calls:
-                QuteStyle()._draw_checkbox_frame(style_option_button, painter)
+        ), check_call(QPainter, "drawRoundedRect") as calls:
+            QuteStyle()._draw_checkbox_frame(style_option_button, painter)
         return calls
 
     @staticmethod
@@ -496,11 +493,8 @@ class TestDrawCheckBackground:
         """Test drawing a checkbox's background."""
         with check_call_str(
             "qute_style.qute_style.painter_save", painter_save_mock
-        ):
-            with check_call(QPainter, "drawRoundedRect") as calls:
-                QuteStyle()._draw_checkbox_background(
-                    style_option_button, painter
-                )
+        ), check_call(QPainter, "drawRoundedRect") as calls:
+            QuteStyle()._draw_checkbox_background(style_option_button, painter)
         return calls
 
     @staticmethod

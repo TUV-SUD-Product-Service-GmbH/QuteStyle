@@ -2,7 +2,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Union
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from PySide6.QtGui import QColor, QPaintEvent
@@ -22,7 +21,7 @@ def check_ide() -> bool:
 class StyledWaitingSpinner(WaitingSpinner):
     """Styled Version of QWaitingSpinner."""
 
-    def paintEvent(self, _: QPaintEvent) -> None:
+    def paintEvent(self, _: QPaintEvent) -> None:  # noqa: N802
         """Overwrite method to change color of spinner."""
         self._color = QColor(get_color("context_color"))
         super().paintEvent(_)
@@ -44,7 +43,7 @@ def create_waiting_spinner(
     return spinner
 
 
-def create_tooltip(title: str, description: Union[str, list[str]]) -> str:
+def create_tooltip(title: str, description: str | list[str]) -> str:
     """Create a tooltip as HTML str."""
     top = Element("div")
     first = SubElement(top, "p")
