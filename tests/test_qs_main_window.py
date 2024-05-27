@@ -1,4 +1,5 @@
 """Tests for the QuteStyleMainWindow."""
+
 # pylint: disable=protected-access
 import logging
 from typing import cast

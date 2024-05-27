@@ -1,4 +1,5 @@
 """TextTruncator is a widget that is able to truncate and store texts."""
+
 from __future__ import annotations
 
 from collections import defaultdict

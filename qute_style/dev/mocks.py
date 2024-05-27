@@ -7,6 +7,7 @@ well as to check if the method was called (or not).
 To mock QMessageDialogs one can use `mock_q_message_dialog` to check the
 correct call.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -48,7 +49,7 @@ def _mp_message_dialog(
     mock_class: type[QMessageBox] = QMessageBox,
 ) -> CallList:
     """Mock a QMessageDialog and return a list with the call's arguments."""
-    return _mp_call(monkeypatch, mock_class, method, return_value, False)
+    return _mp_call(monkeypatch, mock_class, method, return_value, False)  # type: ignore
 
 
 @overload
@@ -59,8 +60,7 @@ def _mp_call(
     method: str,
     return_value: Any,
     as_property: bool,
-) -> CallList:
-    ...
+) -> CallList: ...
 
 
 @overload
@@ -70,8 +70,7 @@ def _mp_call(
     mock_class: str,
     method: Any,  # return value in this case
     return_value: bool,  # as_property in this case
-) -> CallList:
-    ...
+) -> CallList: ...
 
 
 def _mp_call(
@@ -101,9 +100,9 @@ def _mp_call(
 
     # first case handles class + method, second one mock as str
     if as_property or (isinstance(mock_class, str) and return_value):
-        callback: Callable[
-            [VarArg(Any), KwArg(Any)], Any
-        ] | property = property(func_call)
+        callback: Callable[[VarArg(Any), KwArg(Any)], Any] | property = (
+            property(func_call)
+        )
     else:
         callback = func_call
 

@@ -1,4 +1,5 @@
 """QuteStyle Library - helper: useful functions for QuteStyle tools."""
+
 import logging
 import sys
 from pathlib import Path

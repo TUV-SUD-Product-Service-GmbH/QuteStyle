@@ -1,4 +1,5 @@
 """Convert every ui-file in qute_style/ui to a py-file in qute_style/gen."""
+
 import os
 from pathlib import Path
 

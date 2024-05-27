@@ -1,4 +1,5 @@
 """Sample widgets."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -218,9 +219,11 @@ class ModelViewWidget(MainWidget):
             index = model.index(row)
             model.setData(
                 index,
-                Qt.CheckState.Checked
-                if row % 2
-                else Qt.CheckState.Unchecked,  # alternate value
+                (
+                    Qt.CheckState.Checked
+                    if row % 2
+                    else Qt.CheckState.Unchecked
+                ),  # alternate value
                 Qt.ItemDataRole.CheckStateRole,
             )
         self._view.setModel(model)

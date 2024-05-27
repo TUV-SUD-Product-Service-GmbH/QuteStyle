@@ -1,4 +1,5 @@
 """Container widget."""
+
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QWidget
 
 

@@ -1,4 +1,5 @@
 """Top bar with system buttons and extra menu."""
+
 import logging
 from typing import cast
 

@@ -1,4 +1,5 @@
 """Tests for the Checkable Combobox."""
+
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 

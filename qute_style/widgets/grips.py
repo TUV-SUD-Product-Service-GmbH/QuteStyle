@@ -1,4 +1,5 @@
 """Custom widgets for grips to resize the application."""
+
 import logging
 from typing import TYPE_CHECKING
 

@@ -1,4 +1,5 @@
 """HomePage for qute_style Apps."""
+
 from __future__ import annotations
 
 import pickle
@@ -212,9 +213,9 @@ class HomePage(MainWidget):
         """Create the version history."""
         resource_path = ":/change_log_data.pickle"
         resource_file = QFile(resource_path)
-        change_log_data: dict[
-            VersionInfo, dict[str, list[dict[str, str]]]
-        ] = {}
+        change_log_data: dict[VersionInfo, dict[str, list[dict[str, str]]]] = (
+            {}
+        )
         if resource_file.open(QIODevice.OpenModeFlag.ReadOnly):
             pickle_data = resource_file.readAll()
             change_log_data = pickle.loads(pickle_data.data())

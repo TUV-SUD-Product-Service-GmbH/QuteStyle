@@ -1,4 +1,5 @@
 """Custom qute_style (QStyle)."""
+
 from __future__ import annotations
 
 import contextlib

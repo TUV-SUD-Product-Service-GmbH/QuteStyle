@@ -1,4 +1,5 @@
 """IconButton that provides a tooltip."""
+
 from __future__ import annotations
 
 import logging

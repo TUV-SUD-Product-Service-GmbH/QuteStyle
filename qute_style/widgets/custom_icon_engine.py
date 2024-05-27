@@ -1,4 +1,5 @@
 """IconEngine to paint icons in any given color."""
+
 from __future__ import annotations
 
 import logging
@@ -72,9 +73,9 @@ class PixmapStore:
 
     INST: PixmapStore | None = None
     # _pixmap[path][width, height][color]
-    _pixmaps: dict[
-        str, dict[tuple[int, int], dict[str | None, QPixmap]]
-    ] = defaultdict(lambda: defaultdict(dict))
+    _pixmaps: dict[str, dict[tuple[int, int], dict[str | None, QPixmap]]] = (
+        defaultdict(lambda: defaultdict(dict))
+    )
 
     def __init__(self) -> None:
         """Create a new PixmapStore instance."""
