@@ -52,7 +52,7 @@ def _mp_message_dialog(
     return _mp_call(monkeypatch, mock_class, method, return_value, False)  # type: ignore
 
 
-@overload
+@overload  # type: ignore
 @contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
@@ -63,7 +63,7 @@ def _mp_call(
 ) -> CallList: ...
 
 
-@overload
+@overload  # type: ignore
 @contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
@@ -73,7 +73,7 @@ def _mp_call(
 ) -> CallList: ...
 
 
-def _mp_call(
+def _mp_call(  # type: ignore
     monkeypatch: MonkeyPatch,
     mock_class: type[Any] | ModuleType | str,
     method: str | Any,
@@ -205,7 +205,7 @@ def check_call(  # noqa: PLR0913
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(
+    calls: CallList = _mp_call(  # type: ignore
         monkeypatch, mock_class, method, return_value, as_property
     )
     yield calls
@@ -237,7 +237,9 @@ def check_call_str(  # noqa: PLR0913
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(monkeypatch, mock_class, return_value, as_property)
+    calls: CallList = _mp_call(  # type: ignore
+        monkeypatch, mock_class, return_value, as_property
+    )
     yield calls
     m_name = mock_class
     assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)
