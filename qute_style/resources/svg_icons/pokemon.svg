@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 20 20"
+   height="56"
+   viewBox="0 0 23.333333 23.333333"
+   width="56"
+   fill="#000000"
+   version="1.1"
+   id="svg290"
+   sodipodi:docname="catching_pokemon_48dp.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs294" />
+  <sodipodi:namedview
+     id="namedview292"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="21.395833"
+     inkscape:cx="23.976631"
+     inkscape:cy="20.237585"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg290" />
+  <rect
+     fill="none"
+     height="20"
+     width="20"
+     id="rect286"
+     x="0"
+     y="0" />
+  <path
+     d="m 14.94109,11.655307 c 0,1.789367 -1.457468,3.246835 -3.246835,3.246835 -1.7893669,0 -3.2468354,-1.457468 -3.2468354,-3.246835 0,-1.7893675 1.4574685,-3.2468357 3.2468354,-3.2468357 1.789367,0 3.246835,1.4574682 3.246835,3.2468357 z m 8.297469,0 c 0,6.378228 -5.166076,11.544304 -11.544304,11.544304 -6.3782278,0 -11.54430368,-5.166076 -11.54430368,-11.544304 0,-6.3782281 5.16607588,-11.54430406 11.54430368,-11.54430406 6.378228,0 11.544304,5.16607596 11.544304,11.54430406 z m -2.164557,0 h -4.689874 c 0,-2.5830382 -2.106835,-4.6898737 -4.689873,-4.6898737 -2.5830379,0 -4.6898733,2.1068355 -4.6898733,4.6898737 H 2.3145083 c 0,5.166076 4.2136708,9.379747 9.3797467,9.379747 5.166076,0 9.379747,-4.213671 9.379747,-9.379747 z"
+     id="path288"
+     style="stroke-width:1.44304" />
+</svg>

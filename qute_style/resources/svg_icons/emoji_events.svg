@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 20 20"
+   height="56"
+   viewBox="0 0 23.333333 23.333333"
+   width="56"
+   fill="#000000"
+   version="1.1"
+   id="svg491"
+   sodipodi:docname="emoji_events_48dp.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs495" />
+  <sodipodi:namedview
+     id="namedview493"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="10.697917"
+     inkscape:cx="8.1324245"
+     inkscape:cy="25.332035"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg491" />
+  <g
+     id="g483">
+    <rect
+       fill="none"
+       height="20"
+       width="20"
+       id="rect481"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     id="g489"
+     transform="matrix(1.8925673,0,0,1.8925673,-7.2898409,-8.2018823)">
+    <g
+       id="g485" />
+    <path
+       d="M 15,6 H 13 C 13,5.45 12.55,5 12,5 H 8 C 7.45,5 7,5.45 7,6 H 5 C 4.45,6 4,6.45 4,7 v 1 c 0,1.66 1.34,3 3,3 h 0.18 c 0.36,1.01 1.24,1.77 2.32,1.95 V 15 h -2 C 7.22,15 7,15.22 7,15.5 7,15.78 7.22,16 7.5,16 h 2 1 2 C 12.78,16 13,15.78 13,15.5 13,15.22 12.78,15 12.5,15 h -2 V 12.95 C 11.58,12.77 12.46,12.01 12.82,11 H 13 c 1.66,0 3,-1.34 3,-3 V 7 C 16,6.45 15.55,6 15,6 Z M 7,10 C 5.9,10 5,9.1 5,8 V 7 h 2 z m 8,-2 c 0,1.1 -0.9,2 -2,2 V 7 h 2 z"
+       id="path487" />
+  </g>
+</svg>

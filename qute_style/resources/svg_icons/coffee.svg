@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 24 24"
+   height="56"
+   viewBox="0 0 28 28"
+   width="56"
+   fill="#000000"
+   version="1.1"
+   id="svg357"
+   sodipodi:docname="coffee_48dp.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs361" />
+  <sodipodi:namedview
+     id="namedview359"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="15.129139"
+     inkscape:cx="23.068068"
+     inkscape:cy="28.620267"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg357" />
+  <g
+     id="g351">
+    <path
+       d="M 0,0 H 24 V 24 H 0 Z"
+       fill="none"
+       id="path349" />
+  </g>
+  <g
+     id="g355"
+     transform="matrix(1.4883879,0,0,1.4883879,-5.1262373,-3.9438245)">
+    <path
+       d="M 18.5,3 H 6 C 4.9,3 4,3.9 4,5 v 5.71 C 4,14.54 6.95,17.89 10.78,18 14.74,18.12 18,14.94 18,11 v -1 h 0.5 C 20.43,10 22,8.43 22,6.5 22,4.57 20.43,3 18.5,3 Z M 16,5 V 8 H 6 V 5 Z m 2.5,3 H 18 V 5 h 0.5 C 19.33,5 20,5.67 20,6.5 20,7.33 19.33,8 18.5,8 Z M 5,19 h 14 c 0.55,0 1,0.45 1,1 v 0 c 0,0.55 -0.45,1 -1,1 H 5 C 4.45,21 4,20.55 4,20 v 0 c 0,-0.55 0.45,-1 1,-1 z"
+       id="path353" />
+  </g>
+</svg>
