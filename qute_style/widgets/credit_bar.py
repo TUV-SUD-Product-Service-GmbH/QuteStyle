@@ -1,4 +1,5 @@
 """Credit bar with copyright text on the left and version on the right."""
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QFrame,

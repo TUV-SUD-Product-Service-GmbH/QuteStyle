@@ -1,4 +1,5 @@
 """Tests for StyledComboBox and CheckableComboBox."""
+
 from __future__ import annotations
 
 from random import randint

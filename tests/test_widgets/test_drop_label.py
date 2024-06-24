@@ -1,4 +1,5 @@
 """Test for drop label."""
+
 from typing import cast
 
 from PySide6.QtWidgets import QLabel, QWidget

@@ -1,4 +1,5 @@
 """Tests for QS application."""
+
 from copy import copy
 
 import pytest

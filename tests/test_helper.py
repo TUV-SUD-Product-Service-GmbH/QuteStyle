@@ -1,4 +1,5 @@
 """Test helper methods."""
+
 import sys
 
 import pytest

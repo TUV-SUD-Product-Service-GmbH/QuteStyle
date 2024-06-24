@@ -7,6 +7,7 @@ well as to check if the method was called (or not).
 To mock QMessageDialogs one can use `mock_q_message_dialog` to check the
 correct call.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -48,10 +49,10 @@ def _mp_message_dialog(
     mock_class: type[QMessageBox] = QMessageBox,
 ) -> CallList:
     """Mock a QMessageDialog and return a list with the call's arguments."""
-    return _mp_call(monkeypatch, mock_class, method, return_value, False)
+    return _mp_call(monkeypatch, mock_class, method, return_value, False)  # type: ignore
 
 
-@overload
+@overload  # type: ignore
 @contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
@@ -59,22 +60,20 @@ def _mp_call(
     method: str,
     return_value: Any,
     as_property: bool,
-) -> CallList:
-    ...
+) -> CallList: ...
 
 
-@overload
+@overload  # type: ignore
 @contextlib.contextmanager
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: str,
     method: Any,  # return value in this case
     return_value: bool,  # as_property in this case
-) -> CallList:
-    ...
+) -> CallList: ...
 
 
-def _mp_call(
+def _mp_call(  # type: ignore
     monkeypatch: MonkeyPatch,
     mock_class: type[Any] | ModuleType | str,
     method: str | Any,
@@ -101,9 +100,9 @@ def _mp_call(
 
     # first case handles class + method, second one mock as str
     if as_property or (isinstance(mock_class, str) and return_value):
-        callback: Callable[
-            [VarArg(Any), KwArg(Any)], Any
-        ] | property = property(func_call)
+        callback: Callable[[VarArg(Any), KwArg(Any)], Any] | property = (
+            property(func_call)
+        )
     else:
         callback = func_call
 
@@ -206,7 +205,7 @@ def check_call(  # noqa: PLR0913
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(
+    calls: CallList = _mp_call(  # type: ignore
         monkeypatch, mock_class, method, return_value, as_property
     )
     yield calls
@@ -238,7 +237,9 @@ def check_call_str(  # noqa: PLR0913
         "(list/dict if empty)"
     )
     monkeypatch = MonkeyPatch()
-    calls = _mp_call(monkeypatch, mock_class, return_value, as_property)
+    calls: CallList = _mp_call(  # type: ignore
+        monkeypatch, mock_class, return_value, as_property
+    )
     yield calls
     m_name = mock_class
     assert_calls(call_count, call_args_list, call_kwargs_list, calls, m_name)

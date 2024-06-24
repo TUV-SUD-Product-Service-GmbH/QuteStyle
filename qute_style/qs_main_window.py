@@ -1,4 +1,5 @@
 """QuteStyleMainWindow definition for custom Darcula style."""
+
 from __future__ import annotations
 
 import logging
@@ -162,7 +163,7 @@ class QuteStyleMainWindow(
         # the main content and the right column.
         right_app_frame = QFrame()
         right_app_layout = QVBoxLayout(right_app_frame)
-        right_app_layout.setContentsMargins(3, 7, 7, 3)
+        right_app_layout.setContentsMargins(3, 5, 5, 5)
         right_app_layout.setSpacing(6)
         self._background.layout().addWidget(right_app_frame)
 

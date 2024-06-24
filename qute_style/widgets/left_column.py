@@ -1,4 +1,5 @@
 """Widget that contains the widgets of the left column."""
+
 from __future__ import annotations
 
 import logging

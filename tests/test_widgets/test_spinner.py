@@ -1,4 +1,5 @@
 """Test for spinner widget."""
+
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot

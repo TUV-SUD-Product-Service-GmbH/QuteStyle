@@ -1,4 +1,5 @@
 """Tests for LeftColumn."""
+
 # pylint: disable=protected-access
 from __future__ import annotations
 

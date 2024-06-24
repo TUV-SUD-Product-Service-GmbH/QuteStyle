@@ -1,4 +1,5 @@
 """Toggle button (custom checkbox)."""
+
 from __future__ import annotations
 
 import logging
@@ -122,7 +123,7 @@ class Toggle(QCheckBox):
             option.state |= (  # pylint: disable=no-member
                 QStyle.StateFlag.State_On
             )
-        option.position = self.position  # type: ignore[assignment]
+        option.position = self._position
 
         painter.drawControl(QuteStyle.CE_Toggle, option)
         painter.end()

@@ -1,4 +1,5 @@
 """Tests for IconButton and Icon."""
+
 # pylint: disable=protected-access
 
 from _pytest.monkeypatch import MonkeyPatch

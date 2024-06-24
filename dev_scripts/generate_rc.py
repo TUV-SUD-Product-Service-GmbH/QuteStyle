@@ -1,4 +1,5 @@
 """Script to compile resources into python file."""
+
 import os
 import subprocess
 import xml.etree.ElementTree as ElTree
