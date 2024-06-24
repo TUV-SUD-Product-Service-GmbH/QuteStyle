@@ -1,4 +1,5 @@
 """Test script to validate QuteStyle app."""
+
 from __future__ import annotations
 
 import logging

@@ -1,4 +1,5 @@
 """Icon that can be painted in any given color."""
+
 from typing import cast
 
 from PySide6 import QtGui

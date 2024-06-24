@@ -1,4 +1,5 @@
 """Styled main window sample."""
+
 from __future__ import annotations
 
 import logging

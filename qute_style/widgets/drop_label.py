@@ -4,6 +4,7 @@ Labels to show information about a file drop area.
 The label is shown as long as no files have been dragged
 onto the underlying widget.
 """
+
 from typing import cast
 
 from PySide6.QtCore import QEvent, QObject, Qt

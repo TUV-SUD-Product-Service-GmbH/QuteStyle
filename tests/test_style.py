@@ -1,4 +1,5 @@
 """Test for style handling."""
+
 import re
 
 import pytest

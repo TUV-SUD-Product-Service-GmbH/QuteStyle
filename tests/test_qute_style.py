@@ -1,4 +1,5 @@
 """Tests for qute_style."""
+
 # pylint: disable=protected-access
 from __future__ import annotations
 
@@ -217,17 +218,21 @@ def test_draw_branches(
             with check_call(
                 QuteStyle,
                 "_get_branch_color",
-                call_count=1
-                if option.state
-                == option.state & QStyle.StateFlag.State_Children
-                else 0,
+                call_count=(
+                    1
+                    if option.state
+                    == option.state & QStyle.StateFlag.State_Children
+                    else 0
+                ),
             ), check_call(
                 QuteStyle,
                 "draw_pixmap",
-                call_count=1
-                if option.state
-                == option.state & QStyle.StateFlag.State_Children
-                else 0,
+                call_count=(
+                    1
+                    if option.state
+                    == option.state & QStyle.StateFlag.State_Children
+                    else 0
+                ),
             ):
                 qute_style._draw_branch(option, painter)
         assert not exceptions

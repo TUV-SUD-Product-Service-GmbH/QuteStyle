@@ -1,4 +1,5 @@
 """Tests for homepage."""
+
 # pylint: disable=protected-access
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QFontMetrics

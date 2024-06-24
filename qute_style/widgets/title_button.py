@@ -1,4 +1,5 @@
 """Button on the custom TitleBar."""
+
 from __future__ import annotations
 
 import logging

@@ -1,4 +1,5 @@
 """Configuration for unit tests with pytest."""
+
 from __future__ import annotations
 
 import logging

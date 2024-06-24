@@ -1,4 +1,5 @@
 """Style handling for QuteStyleWindow."""
+
 import logging
 from typing import cast
 

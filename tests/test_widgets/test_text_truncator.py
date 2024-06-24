@@ -1,4 +1,5 @@
 """Tests for the TextTruncator."""
+
 import pytest
 from PySide6.QtGui import QFont, QFontMetrics
 

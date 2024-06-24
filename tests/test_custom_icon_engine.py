@@ -1,4 +1,5 @@
 """Tests for CustomIconEngine and PixmapStore."""
+
 from _pytest.monkeypatch import MonkeyPatch
 from PySide6.QtCore import QRect, QSize
 from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap

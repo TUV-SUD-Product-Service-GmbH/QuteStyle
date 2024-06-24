@@ -1,4 +1,5 @@
 """ColorManager for live editing of colors."""
+
 from __future__ import annotations
 
 import json

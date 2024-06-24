@@ -1,4 +1,5 @@
 """Configuration for widget tests."""
+
 from random import choice, randint
 
 import pytest

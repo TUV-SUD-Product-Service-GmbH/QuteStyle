@@ -1,4 +1,5 @@
 """Setup script for QuteStyle library."""
+
 import importlib.metadata
 
 from setuptools import setup

@@ -1,4 +1,5 @@
 """Tests for Icon."""
+
 # pylint: disable=protected-access
 from collections.abc import Iterator
 from random import randint
