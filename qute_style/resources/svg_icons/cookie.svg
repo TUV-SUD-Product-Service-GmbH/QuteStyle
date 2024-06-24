@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 20 20"
+   height="56"
+   viewBox="0 0 23.333333 23.333333"
+   width="56"
+   fill="#000000"
+   version="1.1"
+   id="svg386"
+   sodipodi:docname="cookie_48dp.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs390" />
+  <sodipodi:namedview
+     id="namedview388"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="10.697917"
+     inkscape:cx="10.282376"
+     inkscape:cy="25.986368"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg386" />
+  <g
+     id="g378">
+    <rect
+       fill="none"
+       height="20"
+       width="20"
+       id="rect376"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     id="g384"
+     transform="matrix(1.4230194,0,0,1.4230194,-2.5987165,-2.5510582)">
+    <g
+       id="g382">
+      <path
+         d="M 17.6,9.16 C 16.49,8.95 15.44,7.9 15.6,6.57 15.64,6.23 15.39,5.95 15.05,5.98 13.12,6.15 11.49,4.54 11.61,2.61 11.63,2.36 11.47,2.13 11.23,2.09 5.69,1.2 2,5.85 2,10 c 0,4.42 3.58,8 8,8 4.56,0 8.2,-3.81 7.99,-8.37 C 17.98,9.41 17.82,9.2 17.6,9.16 Z M 6.75,12.5 C 6.06,12.5 5.5,11.94 5.5,11.25 5.5,10.56 6.06,10 6.75,10 7.44,10 8,10.56 8,11.25 8,11.94 7.44,12.5 6.75,12.5 Z m 2,-4 C 8.06,8.5 7.5,7.94 7.5,7.25 7.5,6.56 8.06,6 8.75,6 9.44,6 10,6.56 10,7.25 10,7.94 9.44,8.5 8.75,8.5 Z m 3.75,4.75 c -0.41,0 -0.75,-0.34 -0.75,-0.75 0,-0.41 0.34,-0.75 0.75,-0.75 0.41,0 0.75,0.34 0.75,0.75 0,0.41 -0.33,0.75 -0.75,0.75 z"
+         id="path380" />
+    </g>
+  </g>
+</svg>
