@@ -214,9 +214,12 @@ class LeftMenu(QWidget):
         self, widget_class: type[BaseWidgetType]
     ) -> LeftMenuButton[BaseWidgetType]:
         """Return the button for the given widget class."""
-        for btn in self.findChildren(LeftMenuButton):
+        for btn in cast(
+            Iterable[LeftMenuButton[BaseWidgetType]],
+            self.findChildren(LeftMenuButton),
+        ):
             if btn.widget_class == widget_class:
-                return cast(LeftMenuButton[BaseWidgetType], btn)
+                return btn
         raise ValueError(  # pragma: no cover
             f"Could not find button for widget: {widget_class}"
         )

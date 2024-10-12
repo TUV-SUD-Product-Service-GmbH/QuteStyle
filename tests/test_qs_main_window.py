@@ -5,6 +5,7 @@ import logging
 from typing import cast
 
 import pytest
+from mypy.server.objgraph import Iterable
 from PySide6 import QtWidgets
 from PySide6.QtCore import QEvent, QLocale, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
@@ -288,12 +289,17 @@ def test_no_widget_on_column(
     window = create_new_main_window(qtbot, window_type)
 
     if not window.RIGHT_WIDGET_CLASSES:
-        for title_button in window._title_bar.findChildren(TitleButton):
+        for title_button in cast(
+            Iterable[TitleButton], window._title_bar.findChildren(TitleButton)
+        ):
             assert title_button.widget_class is None
 
     if not window.LEFT_WIDGET_CLASSES:
         assert window._left_menu._bottom_layout.count() == 0
-        for left_button in window._left_menu.findChildren(LeftMenuButton):
+        for left_button in cast(
+            Iterable[LeftMenuButton],  # type: ignore[type-arg]
+            window._left_menu.findChildren(LeftMenuButton),
+        ):
             assert (
                 left_button.widget_class is None
                 or left_button.widget_class in window.MAIN_WIDGET_CLASSES
