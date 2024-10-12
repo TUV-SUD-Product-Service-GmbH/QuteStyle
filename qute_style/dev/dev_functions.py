@@ -149,7 +149,7 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     print("Creating new resources.qrc")
     resource_file = resource_file_path / "resources.qrc"
     resource_py = resource_file_path / "resources_cl.py"
-    # resource_file.unlink(True)
+    resource_file.unlink(True)
 
     # Store the changelog data (serialize)
     print("Store the changelog data ")
