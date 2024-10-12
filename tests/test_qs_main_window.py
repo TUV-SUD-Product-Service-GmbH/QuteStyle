@@ -2,10 +2,10 @@
 
 # pylint: disable=protected-access
 import logging
+from collections.abc import Iterable
 from typing import cast
 
 import pytest
-from mypy.server.objgraph import Iterable
 from PySide6 import QtWidgets
 from PySide6.QtCore import QEvent, QLocale, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
