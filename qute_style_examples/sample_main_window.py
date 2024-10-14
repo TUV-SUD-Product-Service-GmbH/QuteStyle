@@ -81,7 +81,7 @@ class StyledMainWindow(QuteStyleMainWindow):
 
     MIN_SIZE = QSize(800, 600)
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         app_data: AppData,
         registry_reset: bool = False,

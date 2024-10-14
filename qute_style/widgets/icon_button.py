@@ -36,7 +36,7 @@ class IconButton(QPushButton):
     FIXED_HEIGHT: int = 36
     FIXED_WIDTH: int | None = 36
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         parent: QWidget | None = None,
         icon_path: str = ":/svg_icons/no_icon.svg",

@@ -49,7 +49,7 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         )
         self._tooltip.hide()
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # type: ignore[override]
         """Return a str representation of the object."""
         class_name = (
             self._widget_class.__name__ if self._widget_class else "None"
@@ -91,7 +91,9 @@ class IconTooltipButton(IconButton, Generic[BaseWidgetType]):
         pos = self._app_parent.mapFromGlobal(global_pos)
         # FORMAT POSITION
         # Adjust _tooltip position with offset
-        pos_x, pos_y = self._get_tooltip_coords(pos)
+        # is valid overload, see:
+        # https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html
+        pos_x, pos_y = self._get_tooltip_coords(pos)  # type: ignore
         # SET POSITION TO WIDGET
         # Move _tooltip position
         self._tooltip.move(pos_x, pos_y)

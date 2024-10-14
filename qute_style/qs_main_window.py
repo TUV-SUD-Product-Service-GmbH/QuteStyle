@@ -110,7 +110,7 @@ class QuteStyleMainWindow(
 
     LANG_CODE: str | None = None
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         app_data: AppData,
         force_whats_new: bool = False,
@@ -233,7 +233,7 @@ class QuteStyleMainWindow(
 
     def get_main_widget(self, widget: type[MainWidgetT]) -> MainWidgetT | None:
         """Get main widget from content."""
-        return self._content.findChild(widget)  # type: ignore[return-value]
+        return self._content.findChild(widget)
 
     @Slot(QRect, name="window_geometry_changed")
     def window_geometry_changed(self, geometry: QRect) -> None:

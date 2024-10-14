@@ -26,7 +26,7 @@ class MainWidget(BaseWidget):
 
     shutdown_completed = Signal(QWidget, name="shutdown_completed")
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # type: ignore[override]
         """Return a str representation for the MainWidget."""
         return f"<{self.__class__} {self.NAME} {id(self)}>"
 
@@ -96,4 +96,4 @@ class SettingsBaseWidget(BaseWidget):
     def clear_widget(self) -> None:
         """Remove a widget from the settings if present."""
         if item := self._layout.itemAtPosition(1, 0):
-            item.widget().setParent(None)  # type: ignore[call-overload]
+            item.widget().setParent(None)

@@ -62,7 +62,7 @@ class LeftMenuButton(
         self._is_active_tab = False
         self._is_toggle_active = False
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # type: ignore[override]
         """Return a representation for the LeftMenuButton."""
         name = self.widget_class.__name__ if self.widget_class else None
         return f"<LeftMenuButton '{self.text()} {name}'>"

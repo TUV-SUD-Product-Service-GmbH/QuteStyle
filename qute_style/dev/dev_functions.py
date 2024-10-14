@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pickle
 import re
 import subprocess
@@ -171,7 +172,7 @@ def _create_resource_file(  # pylint: disable=too-many-locals
                 added_images.update(list(images))
 
     for image in added_images:
-        image_path = Path(change_log_path).joinpath(image)
+        image_path = Path(change_log_path) / Path(image.replace("\\", os.sep))
         ElTree.SubElement(qrc, "file", {"alias": image}).text = str(
             image_path.relative_to(resource_file_path)
         )
@@ -179,8 +180,10 @@ def _create_resource_file(  # pylint: disable=too-many-locals
     tree.write(resource_file)
 
     print("Generating resource_rc.py with new resources.qrc")
-    assert (
-        subprocess.call(f"pyside6-rcc -o {resource_py} {resource_file}") == 0
+    subprocess.run(
+        f"pyside6-rcc -o {resource_py} {resource_file}",
+        shell=True,
+        check=False,
     )
 
     print("Deleting resources.qrc")

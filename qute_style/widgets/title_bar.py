@@ -1,6 +1,7 @@
 """Top bar with system buttons and extra menu."""
 
 import logging
+from collections.abc import Iterable
 from typing import cast
 
 from PySide6.QtCore import QEvent, QObject, QPoint, Qt, Signal, Slot
@@ -179,9 +180,9 @@ class TitleBar(QFrame):
 
     def _button(self, widget_class: type[BaseWidget]) -> TitleButton:
         """Return the button for the given widget class."""
-        for btn in self.findChildren(TitleButton):
+        for btn in cast(Iterable[TitleButton], self.findChildren(TitleButton)):
             if btn.widget_class == widget_class:
-                return cast(TitleButton, btn)
+                return btn
         raise ValueError(  # pragma: no cover
             f"Could not find button for widget: {widget_class}"
         )
