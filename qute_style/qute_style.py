@@ -571,11 +571,7 @@ class QuteStyle(QProxyStyle):
             role = QPalette.ColorRole.Highlight
         else:
             role = QPalette.ColorRole.WindowText
-        return (
-            option.palette.color(  # type: ignore
-                QPalette.ColorGroup.Normal, role
-            )
-        )
+        return option.palette.color(QPalette.ColorGroup.Normal, role)
 
     @staticmethod
     def _cb_background_color(
@@ -586,11 +582,7 @@ class QuteStyle(QProxyStyle):
             group = QPalette.ColorGroup.Normal
         else:
             group = QPalette.ColorGroup.Disabled
-        return (
-            option.palette.color(  # type: ignore
-                group, QPalette.ColorRole.AlternateBase
-            )
-        )
+        return option.palette.color(group, QPalette.ColorRole.AlternateBase)
 
     def _panel_draw_item_view_item(
         self,
