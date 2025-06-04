@@ -4,7 +4,7 @@ import logging
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any, TypedDict, cast
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, Signal, Slot
+from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, Signal
 from PySide6.QtWidgets import (
     QFrame,
     QScrollArea,
@@ -169,21 +169,18 @@ class LeftMenu(QWidget):
             button.clicked.connect(self.on_left_column_button)
             self._bottom_layout.addWidget(button)
 
-    @Slot(name="on_left_column_button")
     def on_left_column_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting bottom_button_clicked for class %s", widget_class)
         self.bottom_button_clicked.emit(widget_class)
 
-    @Slot(name="on_main_page_button")
     def on_main_page_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(LeftMenuButton[Any], self.sender()).widget_class
         log.debug("Emitting top_button_clicked for class %s", widget_class)
         self.top_button_clicked.emit(widget_class)
 
-    @Slot(name="toggle_animation")
     def toggle_animation(self) -> None:
         """
         Toggle the animation (closing/opening the menu).

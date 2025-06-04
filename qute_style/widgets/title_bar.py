@@ -4,7 +4,7 @@ import logging
 from collections.abc import Iterable
 from typing import cast
 
-from PySide6.QtCore import QEvent, QObject, QPoint, Qt, Signal, Slot
+from PySide6.QtCore import QEvent, QObject, QPoint, Qt, Signal
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QSizePolicy, QWidget
 
@@ -162,7 +162,6 @@ class TitleBar(QFrame):
         else:
             self.maximize_button.tooltip_text = self.tr("Maximieren")
 
-    @Slot(name="on_right_column_button")
     def on_right_column_button(self) -> None:
         """Handle a click on one of the buttons for left column widgets."""
         widget_class = cast(TitleButton, self.sender()).widget_class

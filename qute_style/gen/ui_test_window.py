@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'test_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -44,8 +44,10 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
+    QDateEdit,
     QDateTimeEdit,
     QDial,
+    QDoubleSpinBox,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
@@ -84,7 +86,7 @@ class Ui_test_widget(object):
     def setupUi(self, test_widget):
         if not test_widget.objectName():
             test_widget.setObjectName("test_widget")
-        test_widget.resize(1219, 886)
+        test_widget.resize(1121, 1045)
         self.gridLayout_2 = QGridLayout(test_widget)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.groupBox_3 = QGroupBox(test_widget)
@@ -94,37 +96,14 @@ class Ui_test_widget(object):
         self.gridLayout.setObjectName("gridLayout")
         self.lineEdit = QLineEdit(self.groupBox_3)
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setEchoMode(QLineEdit.Normal)
+        self.lineEdit.setEchoMode(QLineEdit.EchoMode.Normal)
 
         self.gridLayout.addWidget(self.lineEdit, 6, 0, 1, 2)
 
-        self.horizontalScrollBar = QScrollBar(self.groupBox_3)
-        self.horizontalScrollBar.setObjectName("horizontalScrollBar")
-        self.horizontalScrollBar.setValue(25)
-        self.horizontalScrollBar.setOrientation(Qt.Horizontal)
+        self.checkable_combobox = TestComboBox(self.groupBox_3)
+        self.checkable_combobox.setObjectName("checkable_combobox")
 
-        self.gridLayout.addWidget(self.horizontalScrollBar, 10, 1, 1, 1)
-
-        self.label_3 = QLabel(self.groupBox_3)
-        self.label_3.setObjectName("label_3")
-
-        self.gridLayout.addWidget(self.label_3, 11, 0, 1, 1)
-
-        self.dateTimeEdit = QDateTimeEdit(self.groupBox_3)
-        self.dateTimeEdit.setObjectName("dateTimeEdit")
-
-        self.gridLayout.addWidget(self.dateTimeEdit, 8, 0, 1, 2)
-
-        self.label_2 = QLabel(self.groupBox_3)
-        self.label_2.setObjectName("label_2")
-
-        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
-
-        self.dial = QDial(self.groupBox_3)
-        self.dial.setObjectName("dial")
-        self.dial.setValue(30)
-
-        self.gridLayout.addWidget(self.dial, 10, 0, 1, 1)
+        self.gridLayout.addWidget(self.checkable_combobox, 1, 1, 1, 1)
 
         self.styled_combobox = StyledComboBox(self.groupBox_3)
         self.styled_combobox.addItem("")
@@ -134,6 +113,29 @@ class Ui_test_widget(object):
 
         self.gridLayout.addWidget(self.styled_combobox, 0, 1, 1, 1)
 
+        self.label_4 = QLabel(self.groupBox_3)
+        self.label_4.setObjectName("label_4")
+
+        self.gridLayout.addWidget(self.label_4, 1, 0, 1, 1)
+
+        self.horizontalSlider = QSlider(self.groupBox_3)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.setMaximum(100)
+        self.horizontalSlider.setValue(30)
+        self.horizontalSlider.setOrientation(Qt.Orientation.Horizontal)
+
+        self.gridLayout.addWidget(self.horizontalSlider, 18, 1, 1, 1)
+
+        self.label_5 = QLabel(self.groupBox_3)
+        self.label_5.setObjectName("label_5")
+
+        self.gridLayout.addWidget(self.label_5, 2, 0, 1, 1)
+
+        self.label = QLabel(self.groupBox_3)
+        self.label.setObjectName("label")
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
         self.transparent_combobox = StyledComboBox(self.groupBox_3)
         self.transparent_combobox.addItem("")
         self.transparent_combobox.addItem("")
@@ -142,173 +144,55 @@ class Ui_test_widget(object):
 
         self.gridLayout.addWidget(self.transparent_combobox, 3, 1, 1, 1)
 
-        self.label_4 = QLabel(self.groupBox_3)
-        self.label_4.setObjectName("label_4")
+        self.label_3 = QLabel(self.groupBox_3)
+        self.label_3.setObjectName("label_3")
 
-        self.gridLayout.addWidget(self.label_4, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_3, 18, 0, 1, 1)
 
-        self.checkable_combobox = TestComboBox(self.groupBox_3)
-        self.checkable_combobox.setObjectName("checkable_combobox")
+        self.dial = QDial(self.groupBox_3)
+        self.dial.setObjectName("dial")
+        self.dial.setValue(30)
 
-        self.gridLayout.addWidget(self.checkable_combobox, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.dial, 17, 0, 1, 1)
 
-        self.horizontalSlider = QSlider(self.groupBox_3)
-        self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.setMaximum(100)
-        self.horizontalSlider.setValue(30)
-        self.horizontalSlider.setOrientation(Qt.Horizontal)
+        self.horizontalScrollBar = QScrollBar(self.groupBox_3)
+        self.horizontalScrollBar.setObjectName("horizontalScrollBar")
+        self.horizontalScrollBar.setValue(25)
+        self.horizontalScrollBar.setOrientation(Qt.Orientation.Horizontal)
 
-        self.gridLayout.addWidget(self.horizontalSlider, 11, 1, 1, 1)
+        self.gridLayout.addWidget(self.horizontalScrollBar, 17, 1, 1, 1)
 
         self.spinBox = QSpinBox(self.groupBox_3)
         self.spinBox.setObjectName("spinBox")
 
-        self.gridLayout.addWidget(self.spinBox, 7, 0, 1, 2)
+        self.gridLayout.addWidget(self.spinBox, 9, 0, 1, 1)
 
-        self.label = QLabel(self.groupBox_3)
-        self.label.setObjectName("label")
+        self.label_2 = QLabel(self.groupBox_3)
+        self.label_2.setObjectName("label_2")
 
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.label_5 = QLabel(self.groupBox_3)
-        self.label_5.setObjectName("label_5")
-
-        self.gridLayout.addWidget(self.label_5, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
 
         self.comboBox = SelectAllTestComboBox(self.groupBox_3)
         self.comboBox.setObjectName("comboBox")
 
         self.gridLayout.addWidget(self.comboBox, 2, 1, 1, 1)
 
+        self.dateEdit = QDateEdit(self.groupBox_3)
+        self.dateEdit.setObjectName("dateEdit")
+
+        self.gridLayout.addWidget(self.dateEdit, 14, 0, 1, 1)
+
+        self.doubleSpinBox = QDoubleSpinBox(self.groupBox_3)
+        self.doubleSpinBox.setObjectName("doubleSpinBox")
+
+        self.gridLayout.addWidget(self.doubleSpinBox, 9, 1, 1, 1)
+
+        self.dateTimeEdit = QDateTimeEdit(self.groupBox_3)
+        self.dateTimeEdit.setObjectName("dateTimeEdit")
+
+        self.gridLayout.addWidget(self.dateTimeEdit, 14, 1, 1, 1)
+
         self.gridLayout_2.addWidget(self.groupBox_3, 4, 1, 1, 1)
-
-        self.groupBox_2 = QGroupBox(test_widget)
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.verticalLayout_3 = QVBoxLayout(self.groupBox_2)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.pushButton = QPushButton(self.groupBox_2)
-        self.pushButton.setObjectName("pushButton")
-
-        self.verticalLayout_3.addWidget(self.pushButton)
-
-        self.pushButton_2 = QPushButton(self.groupBox_2)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.setCheckable(True)
-
-        self.verticalLayout_3.addWidget(self.pushButton_2)
-
-        self.horizontalLayout_3 = QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.pushButton_3 = IconButton(self.groupBox_2)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.setFlat(False)
-
-        self.horizontalLayout_3.addWidget(self.pushButton_3)
-
-        self.horizontalSpacer_2 = QSpacerItem(
-            40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
-        )
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
-
-        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
-
-        self.pushButton_4 = IconButton(self.groupBox_2)
-        self.pushButton_4.setObjectName("pushButton_4")
-
-        self.verticalLayout_3.addWidget(self.pushButton_4)
-
-        self.gridLayout_2.addWidget(self.groupBox_2, 2, 1, 1, 1)
-
-        self.groupBox = QGroupBox(test_widget)
-        self.groupBox.setObjectName("groupBox")
-        self.verticalLayout_4 = QVBoxLayout(self.groupBox)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.verticalLayout_5 = QVBoxLayout()
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.radioButton = QRadioButton(self.groupBox)
-        self.radioButton.setObjectName("radioButton")
-        self.radioButton.setToolTipDuration(-10)
-        self.radioButton.setChecked(True)
-
-        self.verticalLayout_5.addWidget(self.radioButton)
-
-        self.radioButton_2 = QRadioButton(self.groupBox)
-        self.radioButton_2.setObjectName("radioButton_2")
-
-        self.verticalLayout_5.addWidget(self.radioButton_2)
-
-        self.radioButton_3 = QRadioButton(self.groupBox)
-        self.radioButton_3.setObjectName("radioButton_3")
-
-        self.verticalLayout_5.addWidget(self.radioButton_3)
-
-        self.checkBox_5 = QCheckBox(self.groupBox)
-        self.checkBox_5.setObjectName("checkBox_5")
-        self.checkBox_5.setTristate(True)
-
-        self.verticalLayout_5.addWidget(self.checkBox_5)
-
-        self.custom_icon_engine_checkbox = QCheckBox(self.groupBox)
-        self.custom_icon_engine_checkbox.setObjectName(
-            "custom_icon_engine_checkbox"
-        )
-
-        self.verticalLayout_5.addWidget(self.custom_icon_engine_checkbox)
-
-        self.icon_checkbox = QCheckBox(self.groupBox)
-        self.icon_checkbox.setObjectName("icon_checkbox")
-
-        self.verticalLayout_5.addWidget(self.icon_checkbox)
-
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.checkBox_3 = Toggle(self.groupBox)
-        self.checkBox_3.setObjectName("checkBox_3")
-
-        self.horizontalLayout_5.addWidget(self.checkBox_3)
-
-        self.horizontalSpacer_3 = QSpacerItem(
-            40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
-        )
-
-        self.horizontalLayout_5.addItem(self.horizontalSpacer_3)
-
-        self.checkBox_4 = Toggle(self.groupBox)
-        self.checkBox_4.setObjectName("checkBox_4")
-        self.checkBox_4.setLayoutDirection(Qt.RightToLeft)
-
-        self.horizontalLayout_5.addWidget(self.checkBox_4)
-
-        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.checkBox = Toggle(self.groupBox)
-        self.checkBox.setObjectName("checkBox")
-        self.checkBox.setCheckable(True)
-        self.checkBox.setChecked(False)
-        self.checkBox.setAutoExclusive(False)
-
-        self.horizontalLayout_4.addWidget(self.checkBox)
-
-        self.horizontalSpacer_4 = QSpacerItem(
-            40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
-        )
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
-
-        self.checkBox_2 = Toggle(self.groupBox)
-        self.checkBox_2.setObjectName("checkBox_2")
-        self.checkBox_2.setLayoutDirection(Qt.RightToLeft)
-
-        self.horizontalLayout_4.addWidget(self.checkBox_2)
-
-        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
-
-        self.verticalLayout_4.addLayout(self.verticalLayout_5)
-
-        self.gridLayout_2.addWidget(self.groupBox, 2, 0, 1, 1)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -322,7 +206,7 @@ class Ui_test_widget(object):
         self.horizontalLayout.addWidget(self.disable_widgets)
 
         self.horizontalSpacer = QSpacerItem(
-            40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
         )
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -411,12 +295,12 @@ class Ui_test_widget(object):
         self.tabWidget.addTab(self.tab_2, "")
         self.tab_3 = QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.tab_3.setCursor(QCursor(Qt.ArrowCursor))
+        self.tab_3.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
         self.horizontalLayout_2 = QHBoxLayout(self.tab_3)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.splitter = QSplitter(self.tab_3)
         self.splitter.setObjectName("splitter")
-        self.splitter.setOrientation(Qt.Horizontal)
+        self.splitter.setOrientation(Qt.Orientation.Horizontal)
         self.splitter_label = QLabel(self.splitter)
         self.splitter_label.setObjectName("splitter_label")
         self.splitter.addWidget(self.splitter_label)
@@ -435,7 +319,9 @@ class Ui_test_widget(object):
         self.drop_widget.setObjectName("drop_widget")
         self.drop_widget.setAcceptDrops(True)
         self.drop_widget.setDragEnabled(True)
-        self.drop_widget.setDragDropMode(QAbstractItemView.DragDrop)
+        self.drop_widget.setDragDropMode(
+            QAbstractItemView.DragDropMode.DragDrop
+        )
 
         self.verticalLayout_6.addWidget(self.drop_widget)
 
@@ -463,13 +349,166 @@ class Ui_test_widget(object):
         self.horizontalLayout_7.addLayout(self.verticalLayout_7)
 
         self.tabWidget.addTab(self.tab_6, "")
+        self.tab_5 = QWidget()
+        self.tab_5.setObjectName("tab_5")
+        self.verticalLayout_9 = QVBoxLayout(self.tab_5)
+        self.verticalLayout_9.setObjectName("verticalLayout_9")
+        self.verticalLayout_8 = QVBoxLayout()
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.dialog_btn = QPushButton(self.tab_5)
+        self.dialog_btn.setObjectName("dialog_btn")
+
+        self.verticalLayout_8.addWidget(self.dialog_btn)
+
+        self.input_dialog_btn = QPushButton(self.tab_5)
+        self.input_dialog_btn.setObjectName("input_dialog_btn")
+
+        self.verticalLayout_8.addWidget(self.input_dialog_btn)
+
+        self.verticalSpacer = QSpacerItem(
+            20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding
+        )
+
+        self.verticalLayout_8.addItem(self.verticalSpacer)
+
+        self.verticalLayout_9.addLayout(self.verticalLayout_8)
+
+        self.tabWidget.addTab(self.tab_5, "")
 
         self.gridLayout_2.addWidget(self.tabWidget, 4, 0, 1, 1)
 
+        self.groupBox = QGroupBox(test_widget)
+        self.groupBox.setObjectName("groupBox")
+        self.verticalLayout_4 = QVBoxLayout(self.groupBox)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.verticalLayout_5 = QVBoxLayout()
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.radioButton = QRadioButton(self.groupBox)
+        self.radioButton.setObjectName("radioButton")
+        self.radioButton.setToolTipDuration(-10)
+        self.radioButton.setChecked(True)
+
+        self.verticalLayout_5.addWidget(self.radioButton)
+
+        self.radioButton_2 = QRadioButton(self.groupBox)
+        self.radioButton_2.setObjectName("radioButton_2")
+
+        self.verticalLayout_5.addWidget(self.radioButton_2)
+
+        self.radioButton_3 = QRadioButton(self.groupBox)
+        self.radioButton_3.setObjectName("radioButton_3")
+
+        self.verticalLayout_5.addWidget(self.radioButton_3)
+
+        self.checkBox_5 = QCheckBox(self.groupBox)
+        self.checkBox_5.setObjectName("checkBox_5")
+        self.checkBox_5.setTristate(True)
+
+        self.verticalLayout_5.addWidget(self.checkBox_5)
+
+        self.custom_icon_engine_checkbox = QCheckBox(self.groupBox)
+        self.custom_icon_engine_checkbox.setObjectName(
+            "custom_icon_engine_checkbox"
+        )
+
+        self.verticalLayout_5.addWidget(self.custom_icon_engine_checkbox)
+
+        self.icon_checkbox = QCheckBox(self.groupBox)
+        self.icon_checkbox.setObjectName("icon_checkbox")
+
+        self.verticalLayout_5.addWidget(self.icon_checkbox)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.checkBox_3 = Toggle(self.groupBox)
+        self.checkBox_3.setObjectName("checkBox_3")
+
+        self.horizontalLayout_5.addWidget(self.checkBox_3)
+
+        self.horizontalSpacer_3 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_3)
+
+        self.checkBox_4 = Toggle(self.groupBox)
+        self.checkBox_4.setObjectName("checkBox_4")
+        self.checkBox_4.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+
+        self.horizontalLayout_5.addWidget(self.checkBox_4)
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.checkBox = Toggle(self.groupBox)
+        self.checkBox.setObjectName("checkBox")
+        self.checkBox.setCheckable(True)
+        self.checkBox.setChecked(False)
+        self.checkBox.setAutoExclusive(False)
+
+        self.horizontalLayout_4.addWidget(self.checkBox)
+
+        self.horizontalSpacer_4 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
+
+        self.checkBox_2 = Toggle(self.groupBox)
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.checkBox_2.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+
+        self.horizontalLayout_4.addWidget(self.checkBox_2)
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
+
+        self.verticalLayout_4.addLayout(self.verticalLayout_5)
+
+        self.gridLayout_2.addWidget(self.groupBox, 2, 0, 1, 1)
+
+        self.groupBox_2 = QGroupBox(test_widget)
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.verticalLayout_3 = QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.pushButton = QPushButton(self.groupBox_2)
+        self.pushButton.setObjectName("pushButton")
+
+        self.verticalLayout_3.addWidget(self.pushButton)
+
+        self.pushButton_2 = QPushButton(self.groupBox_2)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setCheckable(True)
+
+        self.verticalLayout_3.addWidget(self.pushButton_2)
+
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.pushButton_3 = IconButton(self.groupBox_2)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.setFlat(False)
+
+        self.horizontalLayout_3.addWidget(self.pushButton_3)
+
+        self.horizontalSpacer_2 = QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
+        )
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
+
+        self.pushButton_4 = IconButton(self.groupBox_2)
+        self.pushButton_4.setObjectName("pushButton_4")
+
+        self.verticalLayout_3.addWidget(self.pushButton_4)
+
+        self.gridLayout_2.addWidget(self.groupBox_2, 2, 1, 1, 1)
+
         self.retranslateUi(test_widget)
 
+        self.tabWidget.setCurrentIndex(0)
         self.pushButton_4.setDefault(False)
-        self.tabWidget.setCurrentIndex(4)
 
     # setupUi
 
@@ -483,6 +522,39 @@ class Ui_test_widget(object):
         self.lineEdit.setText(
             QCoreApplication.translate("test_widget", "test", None)
         )
+        self.styled_combobox.setItemText(
+            0, QCoreApplication.translate("test_widget", "New Item", None)
+        )
+        self.styled_combobox.setItemText(
+            1, QCoreApplication.translate("test_widget", "New Item 2", None)
+        )
+        self.styled_combobox.setItemText(
+            2, QCoreApplication.translate("test_widget", "New Item 3", None)
+        )
+
+        self.label_4.setText(
+            QCoreApplication.translate(
+                "test_widget", "Checkable ComboBox", None
+            )
+        )
+        self.label_5.setText(
+            QCoreApplication.translate(
+                "test_widget", "SelectAll ComboBox", None
+            )
+        )
+        self.label.setText(
+            QCoreApplication.translate("test_widget", "Styled ComboBox", None)
+        )
+        self.transparent_combobox.setItemText(
+            0, QCoreApplication.translate("test_widget", "New Item", None)
+        )
+        self.transparent_combobox.setItemText(
+            1, QCoreApplication.translate("test_widget", "New Item 2", None)
+        )
+        self.transparent_combobox.setItemText(
+            2, QCoreApplication.translate("test_widget", "New Item 3", None)
+        )
+
         self.label_3.setText(
             QCoreApplication.translate(
                 "test_widget", "Test QProgressBar:", None
@@ -493,89 +565,6 @@ class Ui_test_widget(object):
                 "test_widget", "Transparent ComboBox", None
             )
         )
-        self.styled_combobox.setItemText(
-            0, QCoreApplication.translate("test_widget", "New Item", None)
-        )
-        self.styled_combobox.setItemText(
-            1, QCoreApplication.translate("test_widget", "New Item 2", None)
-        )
-        self.styled_combobox.setItemText(
-            2, QCoreApplication.translate("test_widget", "New Item 3", None)
-        )
-
-        self.transparent_combobox.setItemText(
-            0, QCoreApplication.translate("test_widget", "New Item", None)
-        )
-        self.transparent_combobox.setItemText(
-            1, QCoreApplication.translate("test_widget", "New Item 2", None)
-        )
-        self.transparent_combobox.setItemText(
-            2, QCoreApplication.translate("test_widget", "New Item 3", None)
-        )
-
-        self.label_4.setText(
-            QCoreApplication.translate(
-                "test_widget", "Checkable ComboBox", None
-            )
-        )
-        self.label.setText(
-            QCoreApplication.translate("test_widget", "Styled ComboBox", None)
-        )
-        self.label_5.setText(
-            QCoreApplication.translate(
-                "test_widget", "SelectAll ComboBox", None
-            )
-        )
-        self.groupBox_2.setTitle(
-            QCoreApplication.translate("test_widget", "GroupBox", None)
-        )
-        self.pushButton.setText(
-            QCoreApplication.translate("test_widget", "PushButton", None)
-        )
-        self.pushButton_2.setText(
-            QCoreApplication.translate("test_widget", "PushButton", None)
-        )
-        self.pushButton_3.setText(
-            QCoreApplication.translate("test_widget", "Test-Text", None)
-        )
-        self.pushButton_4.setText("")
-        self.groupBox.setTitle(
-            QCoreApplication.translate("test_widget", "GroupBox", None)
-        )
-        self.radioButton.setText(
-            QCoreApplication.translate("test_widget", "RadioButton", None)
-        )
-        self.radioButton_2.setText(
-            QCoreApplication.translate("test_widget", "RadioButton", None)
-        )
-        self.radioButton_3.setText(
-            QCoreApplication.translate("test_widget", "RadioButton", None)
-        )
-        self.checkBox_5.setText(
-            QCoreApplication.translate("test_widget", "CheckBox", None)
-        )
-        self.custom_icon_engine_checkbox.setText(
-            QCoreApplication.translate(
-                "test_widget", "Checkbox with CustomIconEngine", None
-            )
-        )
-        self.icon_checkbox.setText(
-            QCoreApplication.translate(
-                "test_widget", "CheckBox with QIcon", None
-            )
-        )
-        self.checkBox_3.setText(
-            QCoreApplication.translate(
-                "test_widget",
-                "This is a very long test text so that we can crop",
-                None,
-            )
-        )
-        self.checkBox_4.setText(
-            QCoreApplication.translate("test_widget", "CheckBox", None)
-        )
-        self.checkBox.setText("")
-        self.checkBox_2.setText("")
         self.disable_widgets.setText(
             QCoreApplication.translate("test_widget", "Disable Widgets", None)
         )
@@ -583,11 +572,14 @@ class Ui_test_widget(object):
             QCoreApplication.translate(
                 "test_widget",
                 '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
-                '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+                '<html><head><meta name="qrichtext" content="1" /><meta charset="utf-8" /><style type="text/css">\n'
                 "p, li { white-space: pre-wrap; }\n"
-                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />'
-                "test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>",
+                "hr { height: 1px; border-width: 0; }\n"
+                'li.unchecked::marker { content: "\\2610"; }\n'
+                'li.checked::marker { content: "\\2612"; }\n'
+                "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+                '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:\'.SF NS Text\'; font-size:13pt;">test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test'
+                "<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br />test<br /></span></p></body></html>",
                 None,
             )
         )
@@ -746,5 +738,67 @@ class Ui_test_widget(object):
             self.tabWidget.indexOf(self.tab_6),
             QCoreApplication.translate("test_widget", "TreeView", None),
         )
+        self.dialog_btn.setText(
+            QCoreApplication.translate("test_widget", "QDialog", None)
+        )
+        self.input_dialog_btn.setText(
+            QCoreApplication.translate(
+                "test_widget", "QInputDialog (Int)", None
+            )
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_5),
+            QCoreApplication.translate("test_widget", "Dialogs", None),
+        )
+        self.groupBox.setTitle(
+            QCoreApplication.translate("test_widget", "GroupBox", None)
+        )
+        self.radioButton.setText(
+            QCoreApplication.translate("test_widget", "RadioButton", None)
+        )
+        self.radioButton_2.setText(
+            QCoreApplication.translate("test_widget", "RadioButton", None)
+        )
+        self.radioButton_3.setText(
+            QCoreApplication.translate("test_widget", "RadioButton", None)
+        )
+        self.checkBox_5.setText(
+            QCoreApplication.translate("test_widget", "CheckBox", None)
+        )
+        self.custom_icon_engine_checkbox.setText(
+            QCoreApplication.translate(
+                "test_widget", "Checkbox with CustomIconEngine", None
+            )
+        )
+        self.icon_checkbox.setText(
+            QCoreApplication.translate(
+                "test_widget", "CheckBox with QIcon", None
+            )
+        )
+        self.checkBox_3.setText(
+            QCoreApplication.translate(
+                "test_widget",
+                "This is a very long test text so that we can crop",
+                None,
+            )
+        )
+        self.checkBox_4.setText(
+            QCoreApplication.translate("test_widget", "CheckBox", None)
+        )
+        self.checkBox.setText("")
+        self.checkBox_2.setText("")
+        self.groupBox_2.setTitle(
+            QCoreApplication.translate("test_widget", "GroupBox", None)
+        )
+        self.pushButton.setText(
+            QCoreApplication.translate("test_widget", "PushButton", None)
+        )
+        self.pushButton_2.setText(
+            QCoreApplication.translate("test_widget", "PushButton", None)
+        )
+        self.pushButton_3.setText(
+            QCoreApplication.translate("test_widget", "Test-Text", None)
+        )
+        self.pushButton_4.setText("")
 
     # retranslateUi

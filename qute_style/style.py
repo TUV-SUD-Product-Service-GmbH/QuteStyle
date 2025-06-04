@@ -279,6 +279,20 @@ QComboBox QAbstractItemView {{
     background-color: {bg_elements};
     padding: 10px;
     selection-background-color: {context_color};
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border: 1px solid {context_hover};
+    border-top: 0px transparent
+}}
+QComboBox QAbstractItemView::item:selected,
+QComboBox QAbstractItemView::item:hover {{
+    color: {active};
+    background-color: {context_color};
+    border-radius: 3px;
+}}
+QComboBox:on {{
+     border-bottom-left-radius: 0px;
+     border-bottom-right-radius: 0px;
 }}
 QComboBox:disabled {{
     color: {fg_disabled};
@@ -295,6 +309,49 @@ QComboBox:disabled[cssClass="transparent"] {{
     color: {fg_disabled};
     background-color: transparent;
     border: {bg_disabled};
+}}
+
+/* QDateEdit */
+QDateEdit,QDateTimeEdit {{
+    color: {foreground};
+    background-color: {bg_elements};
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding-left: 5px;
+    padding-right: 22px;
+    selection-color: {active};
+    selection-background-color: {context_color};
+    height: 30px;
+}}
+
+QDateEdit:disabled,QDateTimeEdit:disabled {{
+    color: {fg_disabled};
+    background-color: {bg_disabled};
+}}
+
+QDateEdit::up-button,QDateTimeEdit::up-button
+{{
+    width:25px;
+    height: 16px;
+    right: -1px;
+    top: 0px;
+}}
+
+QDateEdit::down-button,QDateTimeEdit::down-button
+{{
+    width:25px;
+    height: 16px;
+    right: -1px;
+    bottom: 0px;
+}}
+
+/* QDialog */
+QDialog, QInputDialog{{
+    background-color: {dark_two};
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    font: 9pt "Segoe UI";
+    color: {foreground};
 }}
 
 /* QHeaderView */
@@ -338,6 +395,7 @@ QTableCornerButton::section {{
 
 /* QLineEdit */
 QLineEdit,
+QTextEdit,
 QPlainTextEdit {{
     background-color: {bg_elements};
     border-radius: 8px;
@@ -349,11 +407,21 @@ QPlainTextEdit {{
     color: {foreground};
     height: 30px;
 }}
-QLineEdit:read-only, QPlainTextEdit:read-only{{
+
+QLineEdit:disabled,
+QTextEdit:disabled,
+QPlainTextEdit:disabled {{
+    color: {fg_disabled};
+    background-color: {bg_disabled};
+}}
+
+
+QLineEdit:read-only, QTextEdit:read-only, QPlainTextEdit:read-only{{
     background-color: {bg_disabled};
     color: {fg_disabled};
 }}
 QLineEdit:read-only:focus,
+QTextEdit:read-only:focus,
 QPlainTextEdit:read-only:focus {{
     border: 1px solid {bg_disabled};
     background-color: {bg_disabled};
@@ -370,6 +438,7 @@ QLineEdit#column_line_edit {{
     color: {foreground};
 }}
 QLineEdit:focus,
+QTextEdit:focus,
 QPlainTextEdit:focus {{
     border: 1px solid {context_color};
     background-color: {bg_one};
@@ -383,6 +452,8 @@ QLineEdit#column_line_edit:focus {{
 QMenu{{
     background-color: {bg_one};
     color: {foreground};
+    border: 1px solid {bg_three};
+    border-radius: 5px;
 }}
 QMenu::item:disabled {{
     color: {fg_disabled};
@@ -424,7 +495,7 @@ QWidget#style_selection_widget
 /* QProgressBar */
 QProgressBar {{
     background-color: {bg_elements};
-    color: {foreground};
+    color: {active};
     border-style: none;
     border-radius: 10px;
     text-align: center;
@@ -593,6 +664,42 @@ QSlider::handle:vertical:pressed {{
     background-color: {context_pressed};
 }}
 
+/* QSpinBox */
+
+QSpinBox,QDoubleSpinBox {{
+    color: {foreground};
+    background-color: {bg_elements};
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding-left: 5px;
+    padding-right: 22px;
+    selection-color: {active};
+    selection-background-color: {context_color};
+    height: 30px;
+}}
+
+QSpinBox:disabled,QDoubleSpinBox:disabled {{
+    color: {fg_disabled};
+    background-color: {bg_disabled};
+}}
+
+QSpinBox::up-button,QDoubleSpinBox::up-button
+{{
+    width:25px;
+    height: 16px;
+    right: -1px;
+    top: 0px;
+}}
+
+QSpinBox::down-button,QDoubleSpinBox::down-button
+{{
+    width:25;
+    height: 16px;
+    right: -1px;
+    bottom: 0px;
+}}
+
+
 /* QSplitter */
 
 /* This activates the hover which isn't active by default */
@@ -716,6 +823,23 @@ QTableView:disabled,
 QTableWidget:disabled,
 QTreeWidget:disabled {{
     color: {fg_disabled};
+}}
+
+QTreeView::item:selected,
+QListView::item:selected,
+QTableView::item:selected,
+QTableWidget::item:selected,
+QTreeWidget::item:selected {{
+        color: {active};
+        background-color: {context_pressed};
+}}
+QTreeView::item:hover,
+QListView::item:hover,
+QTableView::item:hover,
+QTableWidget::item:hover,
+QTreeWidget::item:hover {{
+        color: {active};
+        background-color: {context_color};
 }}
 
 QTableView::item QComboBox{{

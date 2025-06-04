@@ -7,7 +7,7 @@ import operator
 from copy import copy
 
 from PySide6 import QtCore
-from PySide6.QtCore import QRectF, QSize, Qt, Slot
+from PySide6.QtCore import QRectF, QSize, Qt
 from PySide6.QtGui import (
     QCloseEvent,
     QColor,
@@ -174,7 +174,6 @@ class QuteStyleApplication(  # pylint: disable=too-many-instance-attributes
             thread.start()
             log.debug("Thread starting: %s", thread)
 
-    @Slot(StartupThread, name="on_finished_thread")
     def on_finished_thread(self, thread: StartupThread) -> None:
         """Handle a finished StartupThread."""
         log.debug("Thread finished: %s", thread)

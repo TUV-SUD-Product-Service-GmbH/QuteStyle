@@ -5,7 +5,6 @@ from __future__ import annotations
 import contextlib
 import logging
 from collections.abc import Generator
-from typing import cast
 
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPen
@@ -269,10 +268,7 @@ class QuteStyle(QProxyStyle):
             if option.direction == Qt.LayoutDirection.LeftToRight:
                 return 0
             # cast Qt.RightToLeft
-            return (
-                cast(int, option.rect.width())
-                - QuteStyle.ToggleOptions.BOX_WIDTH
-            )
+            return option.rect.width() - QuteStyle.ToggleOptions.BOX_WIDTH
 
         @staticmethod
         def label_x(option: QStyleOption) -> int:
@@ -517,8 +513,8 @@ class QuteStyle(QProxyStyle):
         # Draw check mark if checkbox is checked. Note that State_NoChange
         # indeed is the QStyle.State for Qt.PartiallyChecked.
         if (
-            option.state & QStyle.StateFlag.State_On  # type: ignore
-            or option.state & QStyle.StateFlag.State_NoChange  # type: ignore
+            option.state & QStyle.StateFlag.State_On
+            or option.state & QStyle.StateFlag.State_NoChange
         ):
             QuteStyle._draw_checkbox_check(option, painter)
 
@@ -532,7 +528,7 @@ class QuteStyle(QProxyStyle):
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
             painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QBrush(QuteStyle._cb_background_color(option)))
-            painter.drawRoundedRect(option.rect, 2, 2)  # type: ignore
+            painter.drawRoundedRect(option.rect, 2, 2)
 
     @staticmethod
     def _draw_checkbox_frame(
@@ -544,9 +540,7 @@ class QuteStyle(QProxyStyle):
             painter.setRenderHint(QPainter.RenderHint.Antialiasing)
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.setPen(QPen(QuteStyle._cb_frame_color(option)))
-            painter.drawRoundedRect(
-                option.rect.adjusted(1, 1, -1, -1), 1, 1  # type: ignore
-            )
+            painter.drawRoundedRect(option.rect.adjusted(1, 1, -1, -1), 1, 1)
 
     @staticmethod
     def _draw_checkbox_check(
@@ -556,12 +550,12 @@ class QuteStyle(QProxyStyle):
         """Draw the check of the checkbox."""
         state = (
             Qt.CheckState.Checked
-            if option.state & QStyle.StateFlag.State_On  # type: ignore
+            if option.state & QStyle.StateFlag.State_On
             else Qt.CheckState.PartiallyChecked
         )
         QuteStyle.draw_pixmap(
             painter,
-            option.rect.adjusted(1, 1, -1, -1),  # type: ignore
+            option.rect.adjusted(1, 1, -1, -1),
             QuteStyle.QCheckBoxOptions.ICON_PATH[state],
             QuteStyle.button_foreground(option).name(),
         )
@@ -571,17 +565,16 @@ class QuteStyle(QProxyStyle):
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the frame color of a checkbox."""
-        if not option.state & QStyle.StateFlag.State_Enabled:  # type: ignore
+        if not option.state & QStyle.StateFlag.State_Enabled:
             role = QPalette.ColorRole.Window
-        elif option.state & QStyle.StateFlag.State_MouseOver:  # type: ignore
+        elif option.state & QStyle.StateFlag.State_MouseOver:
             role = QPalette.ColorRole.Highlight
         else:
             role = QPalette.ColorRole.WindowText
-        return cast(
-            QColor,
+        return (
             option.palette.color(  # type: ignore
                 QPalette.ColorGroup.Normal, role
-            ),
+            )
         )
 
     @staticmethod
@@ -589,15 +582,14 @@ class QuteStyle(QProxyStyle):
         option: QStyleOptionButton | QStyleOptionViewItem,
     ) -> QColor:
         """Get the background color of a checkbox."""
-        if option.state & QStyle.StateFlag.State_Enabled:  # type: ignore
+        if option.state & QStyle.StateFlag.State_Enabled:
             group = QPalette.ColorGroup.Normal
         else:
             group = QPalette.ColorGroup.Disabled
-        return cast(
-            QColor,
+        return (
             option.palette.color(  # type: ignore
                 group, QPalette.ColorRole.AlternateBase
-            ),
+            )
         )
 
     def _panel_draw_item_view_item(
@@ -615,10 +607,7 @@ class QuteStyle(QProxyStyle):
         ):
             painter.fillRect(option.rect, brush)
         else:
-            if (
-                cast(QBrush, option.backgroundBrush).style()
-                != Qt.BrushStyle.NoBrush
-            ):
+            if option.backgroundBrush.style() != Qt.BrushStyle.NoBrush:
                 old_brush_origin = painter.brushOrigin()
                 painter.setBrushOrigin(option.rect.topLeft())
                 painter.fillRect(option.rect, option.backgroundBrush)
@@ -649,10 +638,7 @@ class QuteStyle(QProxyStyle):
                 color_group = QPalette.ColorGroup.Inactive
         else:
             color_group = QPalette.ColorGroup.Disabled
-        return cast(
-            QBrush,
-            option.palette.brush(color_group, QPalette.ColorRole.Highlight),
-        )
+        return option.palette.brush(color_group, QPalette.ColorRole.Highlight)
 
     @staticmethod
     def draw_pixmap(
@@ -677,50 +663,35 @@ class QuteStyle(QProxyStyle):
             option.state & QStyle.StateFlag.State_Selected
             or option.state & QStyle.StateFlag.State_MouseOver
         ):
-            return cast(
-                QColor,
-                option.palette.color(
-                    QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
-                ),
+            return option.palette.color(
+                QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
             )
+
         if option.state & QStyle.StateFlag.State_Enabled:
-            return cast(
-                QColor,
-                option.palette.color(
-                    QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
-                ),
+            return option.palette.color(
+                QPalette.ColorGroup.Normal, QPalette.ColorRole.ButtonText
             )
-        return cast(
-            QColor,
-            option.palette.color(
-                QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText
-            ),
+
+        return option.palette.color(
+            QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText
         )
 
     @staticmethod
     def button_background(option: QStyleOptionButton) -> QColor:
         """Return a button's background color depending on option."""
         if option.state & QStyle.StateFlag.State_On:
-            return cast(
-                QColor,
-                option.palette.color(
-                    QPalette.ColorGroup.Normal, QPalette.ColorRole.Highlight
-                ),
+            return option.palette.color(
+                QPalette.ColorGroup.Normal, QPalette.ColorRole.Highlight
             )
+
         return (
-            cast(
-                QColor,
-                option.palette.color(
-                    QPalette.ColorGroup.Normal,
-                    QPalette.ColorRole.AlternateBase,
-                ),
+            option.palette.color(
+                QPalette.ColorGroup.Normal,
+                QPalette.ColorRole.AlternateBase,
             )
             if option.state & QStyle.StateFlag.State_Enabled
-            else cast(
-                QColor,
-                option.palette.color(
-                    QPalette.ColorGroup.Disabled,
-                    QPalette.ColorRole.AlternateBase,
-                ),
+            else option.palette.color(
+                QPalette.ColorGroup.Disabled,
+                QPalette.ColorRole.AlternateBase,
             )
         )

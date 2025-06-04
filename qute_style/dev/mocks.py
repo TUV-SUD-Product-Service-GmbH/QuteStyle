@@ -52,8 +52,8 @@ def _mp_message_dialog(
     return _mp_call(monkeypatch, mock_class, method, return_value, False)  # type: ignore
 
 
-@overload  # type: ignore
-@contextlib.contextmanager
+@overload
+@contextlib.contextmanager  # type: ignore[arg-type]
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: type[Any] | ModuleType,
@@ -63,8 +63,8 @@ def _mp_call(
 ) -> CallList: ...
 
 
-@overload  # type: ignore
-@contextlib.contextmanager
+@overload
+@contextlib.contextmanager  # type: ignore[arg-type]
 def _mp_call(
     monkeypatch: MonkeyPatch,
     mock_class: str,
