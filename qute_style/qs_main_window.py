@@ -708,6 +708,10 @@ class QuteStyleMainWindow(
     def _save_settings(self) -> None:
         """Save the paint data and state/geometry settings."""
         log.debug("Saving settings to registry.")
+        # to prevent problems after starting app maximized it is not
+        # offered anymore, see: https://bugreports.qt.io/browse/QTBUG-118598
+        if self.isMaximized():
+            self.showNormal()
         settings = QSettings()
         settings.setValue("state", self.saveState())
         settings.setValue("geometry", self.saveGeometry())

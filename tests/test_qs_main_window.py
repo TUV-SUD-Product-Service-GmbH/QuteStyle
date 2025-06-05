@@ -321,12 +321,6 @@ def test_maximize_mode_setting_after_restart(qtbot: QtBot) -> None:
     window.close()
 
     window = create_new_main_window(qtbot, StyledMainWindow)
-    assert window.isMaximized()
-
-    window.showNormal()
-    window.close()
-
-    window = create_new_main_window(qtbot, StyledMainWindow)
     assert not window.isMaximized()
 
 
@@ -342,8 +336,8 @@ def test_maximize_mode(qtbot: QtBot) -> None:
 
     assert window.isMaximized()
     assert window._title_bar.maximize_button.tooltip_text == "Verkleinern"
-    assert window.width() == rect.width()
-    assert window.height() == rect.height()
+    assert window.windowHandle().width() == rect.width()
+    assert window.windowHandle().height() == rect.height()
     for grip in window._grips:
         assert not grip.isEnabled()
 
