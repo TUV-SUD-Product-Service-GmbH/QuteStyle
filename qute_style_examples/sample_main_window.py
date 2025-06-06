@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import QSize, Signal, Slot
+from PySide6.QtCore import QSize, Signal
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -112,7 +112,6 @@ class StyledMainWindow(QuteStyleMainWindow):
         except KeyError:
             self._current_idx = 0
 
-    @Slot(name="on_switch_style")
     def on_switch_style(self) -> None:
         """Set the next available style."""
         self._current_idx += 1

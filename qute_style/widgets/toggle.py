@@ -11,7 +11,6 @@ from PySide6.QtCore import (
     QPropertyAnimation,
     QSize,
     Qt,
-    Slot,
 )
 from PySide6.QtGui import QFont, QFontMetrics, QPainter, QPaintEvent
 from PySide6.QtWidgets import (
@@ -89,7 +88,6 @@ class Toggle(QCheckBox):
         self._position = pos
         self.update()
 
-    @Slot(int, name="setup_animation")
     def setup_animation(self, value: Qt.CheckState) -> None:
         """Initiate _animation of inner circle."""
         self._animation.stop()

@@ -157,7 +157,7 @@ class WaitingSpinner(QWidget):
         return self._color
 
     @color.setter
-    def color(self, color: Qt.GlobalColor = Qt.GlobalColor.black) -> None:
+    def color(self, color: QColor = QColor(Qt.GlobalColor.black)) -> None:
         """Set color of WaitingSpinner."""
         self._color = QColor(color)
 
@@ -301,7 +301,7 @@ class WaitingSpinner(QWidget):
         if count_distance == 0:
             return color
         min_alpha_f = min_opacity / 100.0
-        distance_threshold = int(
+        distance_threshold = int(  # noqa: RUF046
             math.ceil((total_nr_of_lines - 1) * trail_fade_perc / 100.0)
         )
         if count_distance > distance_threshold:

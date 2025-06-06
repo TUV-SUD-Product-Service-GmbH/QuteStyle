@@ -105,7 +105,7 @@ def fixture_text(request: SubRequest) -> str | None:
 @pytest.fixture(name="style_option_button", scope="class")
 def fixture_style_option_button(
     direction: Qt.LayoutDirection,
-    state: QtWidgets.QStyle,
+    state: QtWidgets.QStyle.StateFlag,
     text: str | None,
 ) -> QStyleOptionButton:
     """Create an QStyleOptionButton for testing."""
@@ -113,7 +113,7 @@ def fixture_style_option_button(
     option.direction = direction
     option.state = state
     option.palette = QuteStyle().standardPalette()
-    option.text = text
+    option.text = text or ""
     return option
 
 

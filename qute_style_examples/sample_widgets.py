@@ -13,14 +13,15 @@ from PySide6.QtCore import (
     QSize,
     QStringListModel,
     Qt,
-    Slot,
 )
 from PySide6.QtGui import QDragEnterEvent, QDropEvent, QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
+    QDialog,
     QDialogButtonBox,
     QFileIconProvider,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QListView,
     QMenu,
@@ -82,6 +83,8 @@ class TestWidget(MainWidget):
         self._ui.horizontalSlider.valueChanged.connect(
             self._ui.progressBar.setValue
         )
+        self._ui.dialog_btn.clicked.connect(self.on_dialog)
+        self._ui.input_dialog_btn.clicked.connect(self.on_input_dialog)
 
         text = self.tr("Drop some files.")
         self._drop_label = DropLabel(text, self._ui.drop_widget)
@@ -138,7 +141,6 @@ class TestWidget(MainWidget):
         self._ui.drop_widget.clear()
         self._drop_label.show()
 
-    @Slot(name="on_change_orientation")
     def on_change_orientation(self) -> None:
         """Change the orientation of the QSplitter."""
         if self._ui.splitter.orientation() == Qt.Orientation.Horizontal:
@@ -146,7 +148,6 @@ class TestWidget(MainWidget):
         else:
             self._ui.splitter.setOrientation(Qt.Orientation.Horizontal)
 
-    @Slot(name="on_widgets_disabled")
     def on_widgets_disabled(self) -> None:
         """Disable all widgets."""
         if self._ui.disable_widgets.isChecked():
@@ -156,6 +157,19 @@ class TestWidget(MainWidget):
         else:
             for child in self.children():
                 cast(QWidget, child).setEnabled(True)
+
+    @staticmethod
+    def on_dialog() -> None:
+        """Show generic dialog."""
+        dialog = QDialog()
+        dialog.exec()
+
+    def on_input_dialog(self) -> None:
+        """Show input dialog."""
+        input_dialog = QInputDialog()
+        _ = input_dialog.getInt(
+            self, self.tr("How old are you?"), "Enter your age:"
+        )
 
 
 class Model(QStringListModel):

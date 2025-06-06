@@ -16,7 +16,6 @@ from PySide6.QtCore import (
     QSize,
     Qt,
     Signal,
-    Slot,
 )
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtSvgWidgets import QSvgWidget
@@ -82,7 +81,6 @@ class StackedWidget(QStackedWidget):
             self._animation.start()
             self._animation_running = True
 
-    @Slot(name="on_animation_finished")
     def on_animation_finished(self) -> None:
         """Animation finished."""
         self._animation_running = False
@@ -200,7 +198,6 @@ class HomePage(MainWidget):
         layout.addWidget(stylesheet_btn, 1, 2)
         return layout
 
-    @Slot(int, name="on_index_changed")
     def on_index_changed(self, index: int) -> None:
         """
         On index changed.

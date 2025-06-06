@@ -18,7 +18,6 @@ from PySide6.QtCore import (
     QSize,
     Qt,
     Signal,
-    Slot,
 )
 from PySide6.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
 from PySide6.QtWidgets import (
@@ -235,7 +234,6 @@ class QuteStyleMainWindow(
         """Get main widget from content."""
         return self._content.findChild(widget)
 
-    @Slot(QRect, name="window_geometry_changed")
     def window_geometry_changed(self, geometry: QRect) -> None:
         """Handle change of window geometry by using the grips."""
         self.setGeometry(geometry)
@@ -418,7 +416,6 @@ class QuteStyleMainWindow(
         """Set the main stylesheet of the app."""
         self.setStyleSheet(get_style())
 
-    @Slot(QPoint, name="move_window")
     def move_window(self, pos: QPoint) -> None:
         """
         Move the window.
@@ -445,7 +442,6 @@ class QuteStyleMainWindow(
             self.move(self.pos() + diff)
         self.last_move_pos = pos
 
-    @Slot(name="maximize")
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
         if self.isMaximized():
@@ -591,7 +587,6 @@ class QuteStyleMainWindow(
         self.last_move_pos = event.globalPosition().toPoint()
         log.debug("Storing last click at %s", self.last_move_pos)
 
-    @Slot(type, name="on_main_widget")
     def on_main_widget(self, widget_class: type[MainWidget]) -> None:
         """Handle display of the main widget that is of the given type."""
         current_widget = cast(
@@ -615,7 +610,6 @@ class QuteStyleMainWindow(
                 return
         raise ValueError(f"Could not find widget {widget_class}")
 
-    @Slot(type, name="on_right_column")
     def on_right_column(self, widget_class: type[BaseWidget]) -> None:
         """Handle a click on the button for the right column."""
         right_widget_type = self.right_widget_type()
@@ -662,7 +656,6 @@ class QuteStyleMainWindow(
         # Return None explicitly instead of <class NoneType>
         return None
 
-    @Slot(type, name="on_left_column")
     def on_left_column(self, widget_class: type[BaseWidget]) -> None:
         """Handle a click on the button for the left column."""
         right_widget_type = self.right_widget_type()
@@ -703,7 +696,6 @@ class QuteStyleMainWindow(
             cast(MainWidget, self._content.currentWidget()).ICON,
         )
 
-    @Slot(name="on_close_left_column")
     def on_close_left_column(self) -> None:
         """Handle a click on the button for the left column."""
         # if the column was opened before, a widget must be set.
@@ -716,6 +708,10 @@ class QuteStyleMainWindow(
     def _save_settings(self) -> None:
         """Save the paint data and state/geometry settings."""
         log.debug("Saving settings to registry.")
+        # to prevent problems after starting app maximized it is not
+        # offered anymore, see: https://bugreports.qt.io/browse/QTBUG-118598
+        if self.isMaximized():
+            self.showNormal()
         settings = QSettings()
         settings.setValue("state", self.saveState())
         settings.setValue("geometry", self.saveGeometry())
@@ -726,7 +722,6 @@ class QuteStyleMainWindow(
         settings.setValue("last_used_widget", current_widget)
         log.debug("Finished writing settings to registry")
 
-    @Slot(QCloseEvent, name="closeEvent")
     def closeEvent(self, close_event: QCloseEvent) -> None:  # noqa: N802
         """Handle a close event."""
         widgets = [
@@ -767,7 +762,6 @@ class QuteStyleMainWindow(
                 ],
             )
 
-    @Slot(str, name="on_change_theme")
     def on_change_theme(self, theme: str) -> None:
         """Change the theme to the theme with the given name."""
         set_current_style(theme)
