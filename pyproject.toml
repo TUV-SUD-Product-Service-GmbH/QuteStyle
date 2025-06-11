@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qute_style"
-version = "1.0.9"
+version = "1.0.9-dev1"
 description = "QuteStyle is an expandable application framework for PySide6"
 authors = ["Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke <PS-TF-Entwicklung@tuev-sued.de>"]
 readme = "README.md"
@@ -12,8 +12,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
-PySide6 = "6.9.1"
+python = ">=3.9,<3.12"
+PySide6 = "6.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "8.4.0"
@@ -28,7 +28,6 @@ pytest-cov = "^6.0.0"
 pytest-github-actions-annotate-failures = "^0.2.0"
 ruff = "^0.11.12"
 types-requests = "2.32.0.20250602"
-PySide6-stubs = { git = "https://github.com/python-qt-tools/PySide6-stubs.git", rev = "70dd77b" }
 
 
 [tool.poetry.scripts]
