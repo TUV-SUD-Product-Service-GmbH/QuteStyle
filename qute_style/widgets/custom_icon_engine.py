@@ -55,8 +55,6 @@ class CustomIconEngine(QIconEngine):  # pylint: disable=too-few-public-methods
         store = PixmapStore.inst()
         radius = min(rect.width(), rect.height())
         rect.setSize(QSize(radius, radius))
-        # Scale Icon (not rect) according to DevicePixelRatio
-        radius = int(radius * painter.device().devicePixelRatio())
         pixmap = store.get_pixmap(
             self._path, radius, radius, get_color(self._color_name)
         )

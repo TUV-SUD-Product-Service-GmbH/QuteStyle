@@ -25,6 +25,7 @@ class TitleBar(QFrame):
     minimize = Signal(name="minimize")
     maximize = Signal(name="maximize")
     move_window = Signal(QPoint, name="move")
+    start_move = Signal(QPoint, name="start_move")
 
     def __init__(  # noqa: PLR0913
         self,
@@ -47,7 +48,7 @@ class TitleBar(QFrame):
         bg_layout.setSpacing(0)
 
         # Icon with ToolBox logo
-        self._icon = Icon(int(self.height() * 0.5), None)
+        self._icon = Icon(int(self.height() * 0.5), None, fit_to_widget=True)
         self._icon.set_icon(logo)
         self._icon.setSizePolicy(
             QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
@@ -145,11 +146,18 @@ class TitleBar(QFrame):
             self._double_click_in_progress = True
             self.maximize.emit()
             return True
+        if event.type() == QEvent.Type.MouseButtonPress:
+            mouse_event = cast(QMouseEvent, event)
+            if mouse_event.button() == Qt.MouseButton.LeftButton:
+                # Initialize drag start position so movement sticks to cursor
+                self.start_move.emit(mouse_event.globalPosition().toPoint())
+            return True
         if event.type() == QEvent.Type.MouseMove:
             if not self._double_click_in_progress:
-                self.move_window.emit(
-                    cast(QMouseEvent, event).globalPosition().toPoint()
-                )
+                mouse_event = cast(QMouseEvent, event)
+                # Only process if left button is pressed (dragging)
+                if mouse_event.buttons() & Qt.MouseButton.LeftButton:
+                    self.move_window.emit(mouse_event.globalPosition().toPoint())
             return True
         return False
 

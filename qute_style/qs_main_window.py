@@ -17,6 +17,7 @@ from PySide6.QtCore import (
     QSettings,
     QSize,
     Qt,
+    QTimer,
     Signal,
 )
 from PySide6.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
@@ -128,6 +129,8 @@ class QuteStyleMainWindow(
 
         # Stores the position of the last clicked (needed for moving)
         self.last_move_pos = QPoint()
+        # Offset between cursor global pos and window top-left during drag
+        self._drag_offset = QPoint()
 
         # This is the animation group for hiding/showing the columns
         # (left/right). It needs to be globally defined to avoid being garbage
@@ -229,6 +232,12 @@ class QuteStyleMainWindow(
             log.warning(
                 "Could not restore state from: %s", settings.value("state")
             )
+
+        # Restore maximized state if it was previously maximized
+        was_maximized = settings.value("maximized", False, type=bool)
+        if was_maximized:
+            # Use QTimer.singleShot to ensure the window is shown first
+            QTimer.singleShot(0, self.showMaximized)
 
     def get_main_widget(self, widget: type[MainWidgetT]) -> MainWidgetT | None:
         """Get main widget from content."""
@@ -346,6 +355,8 @@ class QuteStyleMainWindow(
         title_bar.close_app.connect(self.close)
         title_bar.minimize.connect(self.showMinimized)
         title_bar.maximize.connect(self.maximize)
+        # Ensure drag starts aligned with cursor by initializing on press
+        title_bar.start_move.connect(self._on_title_bar_press)
         title_bar.move_window.connect(self.move_window)
         right_app_layout.addWidget(title_bar)
         title_bar.right_button_clicked.connect(self.on_right_column)
@@ -420,27 +431,40 @@ class QuteStyleMainWindow(
         """
         Move the window.
 
-        pos is the position at which the QMouseEvent triggering the move
-        occurred.
+        pos is the global mouse position at which the QMouseEvent triggering
+        the move occurred.
         """
         if self.isMaximized():
+            # Store ratio where mouse is on title bar before restoring
+            title_bar_click_ratio = (pos.x() - self.x()) / self.width()
+
             # Show the window normal
             self.showNormal()
 
-            # Move the window so that the cursor is centered on the title bar.
-            new_pos = pos - QPoint(
-                int(self.width() / 2), int(self._title_bar.height() / 2)
-            )
-            self.move(new_pos)
-        else:
-            # Calculate the difference between the last click's position and
-            # the new click position
-            diff = pos - self.last_move_pos
+            # Force the geometry update to be applied immediately
+            self.centralWidget().update()
+            QApplication.processEvents()
 
-            # Add the difference to the current position and move to
-            # that position.
-            self.move(self.pos() + diff)
-        self.last_move_pos = pos
+            # Calculate where mouse should be on title bar of restored window
+            new_click_x = int(self.width() * title_bar_click_ratio)
+
+            # Use the actual vertical offset captured at press time if
+            # available; fallback to half title bar as a safe default.
+            click_y = self._drag_offset.y() if not self._drag_offset.isNull() else int(self._title_bar.height() / 2)
+
+            # Move window so cursor stays at same relative position
+            new_pos = pos - QPoint(new_click_x, click_y)
+            self.move(new_pos)
+
+            # Update offsets to continue dragging seamlessly
+            self.last_move_pos = pos
+            self._drag_offset = pos - self.pos()
+        else:
+            # Absolute positioning to keep window exactly under the cursor
+            self.move(pos - self._drag_offset)
+
+            # Update last_move_pos to current position for potential legacy use
+            self.last_move_pos = pos
 
     def maximize(self) -> None:
         """Handle a maximize request from the TitleBar."""
@@ -449,8 +473,9 @@ class QuteStyleMainWindow(
         else:
             self.showMaximized()
 
-    def showEvent(self, _: QShowEvent) -> None:  # noqa: N802
+    def showEvent(self, event: QShowEvent) -> None:  # noqa: N802
         """Listen to QShowEvents to get initial window state."""
+        super().showEvent(event)
         if self.isMaximized() or self.isFullScreen():
             log.debug("Window started in maximized/fullscreen mode")
             self._show_maximized_layout()
@@ -587,6 +612,13 @@ class QuteStyleMainWindow(
         self.last_move_pos = event.globalPosition().toPoint()
         log.debug("Storing last click at %s", self.last_move_pos)
 
+    def _on_title_bar_press(self, pos: QPoint) -> None:
+        """Initialize drag anchors when pressing on the title bar."""
+        self.last_move_pos = pos
+        # Store the absolute offset between cursor global pos and window top-left
+        self._drag_offset = pos - self.pos()
+        log.debug("Title bar press at %s, drag offset %s", self.last_move_pos, self._drag_offset)
+
     def on_main_widget(self, widget_class: type[MainWidget]) -> None:
         """Handle display of the main widget that is of the given type."""
         current_widget = cast(
@@ -710,11 +742,13 @@ class QuteStyleMainWindow(
         log.debug("Saving settings to registry.")
         # to prevent problems after starting app maximized it is not
         # offered anymore, see: https://bugreports.qt.io/browse/QTBUG-118598
-        if self.isMaximized():
+        was_maximized = self.isMaximized()
+        if was_maximized:
             self.showNormal()
         settings = QSettings()
         settings.setValue("state", self.saveState())
         settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("maximized", was_maximized)
         current_widget = cast(
             type[MainWidget],
             type(self._content.currentWidget()),

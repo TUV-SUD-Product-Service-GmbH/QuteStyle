@@ -16,7 +16,10 @@ class Icon(QWidget):
     DEFAULT_ICON_PATH = ":/svg_icons/no_icon.svg"
 
     def __init__(
-        self, radius: int = 20, color_name: str | None = "foreground"
+        self,
+        radius: int = 20,
+        color_name: str | None = "foreground",
+        fit_to_widget: bool = True,
     ) -> None:
         """Create a new Icon."""
         super().__init__()
@@ -26,6 +29,7 @@ class Icon(QWidget):
         self.setFixedSize(int(1.5 * radius), int(1.5 * radius))
         self._icon_path = self.DEFAULT_ICON_PATH
         self._color_name = color_name
+        self._fit_to_widget = fit_to_widget
 
     def set_icon(self, icon_path: str) -> None:
         """Set the given icon path."""
@@ -39,12 +43,24 @@ class Icon(QWidget):
         return cast(QApplication, QApplication.instance()).devicePixelRatio()
 
     def paintEvent(self, _: QtGui.QPaintEvent) -> None:  # noqa: N802
-        """Override QWidget.paintEvent to draw pixmap."""
-        pixmap = self._get_pixmap()
-        xy_pos = (self.height() - pixmap.height()) // 2
+        """Override QWidget.paintEvent to draw pixmap.
 
+        When fit_to_widget is True (default), the pixmap is centered and scaled
+        to its logical size accounting for device pixel ratio. If False, legacy
+        behavior draws the pixmap using its pixel size at a centered position.
+        """
+        pixmap = self._get_pixmap()
         painter = QPainter(self)
-        painter.drawPixmap(xy_pos, xy_pos, pixmap)
+        if self._fit_to_widget:
+            scale = self.scale
+            disp_w = int(pixmap.width() / scale)
+            disp_h = int(pixmap.height() / scale)
+            x = int((self.width() - disp_w) / 2)
+            y = int((self.height() - disp_h) / 2)
+            painter.drawPixmap(x, y, disp_w, disp_h, pixmap)
+        else:
+            xy_pos = (self.height() - pixmap.height()) // 2
+            painter.drawPixmap(xy_pos, xy_pos, pixmap)
         painter.end()
 
     def _get_pixmap(self) -> QPixmap:
