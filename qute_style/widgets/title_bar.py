@@ -137,7 +137,7 @@ class TitleBar(QFrame):
         variable blocks this situation which could lead to e.g. a maximize
         operation followed directly by a minimize operation.
         """
-        if obj is not self._title_label and not self._icon:
+        if obj is not self._title_label and obj is not self._icon:
             return False
         if event.type() == QEvent.Type.MouseButtonRelease:
             self._double_click_in_progress = False
