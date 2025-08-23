@@ -12,6 +12,9 @@ from pytestqt.qtbot import QtBot
 from qute_style.dev.mocks import CallList, check_call
 from qute_style.widgets.icon import Icon
 
+# Type alias for expected positions (x, y, width, height)
+PositionTuple = tuple[int, int, int, int]
+
 
 @pytest.fixture(name="radius", scope="session")
 def fixture_radius() -> int:
@@ -91,10 +94,17 @@ class TestDraw:
     """Test drawing an Icon."""
 
     @staticmethod
-    @pytest.fixture(name="xy_pos", scope="class")
-    def fixture_xy_pos(icon: Icon, pixmap: QPixmap) -> float:
-        """Return the x/y position of the pixmap to paint."""
-        return (icon.height() - pixmap.height()) // 2
+    @pytest.fixture(name="expected_positions", scope="class")
+    def fixture_expected_positions(
+        icon: Icon, pixmap: QPixmap, scale: float
+    ) -> PositionTuple:
+        """Return the expected x, y, width, height for the pixmap to paint."""
+        # With fit_to_widget=True (default), calculate display size and pos
+        disp_w = int(pixmap.width() / scale)
+        disp_h = int(pixmap.height() / scale)
+        x = int((icon.width() - disp_w) / 2)
+        y = int((icon.height() - disp_h) / 2)
+        return x, y, disp_w, disp_h
 
     @staticmethod
     @pytest.fixture(name="draw_pixmap_call", scope="class")
@@ -110,18 +120,42 @@ class TestDraw:
         yield calls
 
     @staticmethod
-    def test_x_pos(draw_pixmap_call: CallList, xy_pos: float) -> None:
+    def test_x_pos(
+        draw_pixmap_call: CallList, expected_positions: PositionTuple
+    ) -> None:
         """Test that the QPixmap is drawn at the correct x position."""
-        assert draw_pixmap_call[0][0][1] == xy_pos
+        expected_x = expected_positions[0]
+        assert draw_pixmap_call[0][0][1] == expected_x
 
     @staticmethod
-    def test_y_pos(draw_pixmap_call: CallList, xy_pos: float) -> None:
+    def test_y_pos(
+        draw_pixmap_call: CallList, expected_positions: PositionTuple
+    ) -> None:
         """Test that the QPixmap is drawn at the correct y position."""
-        assert draw_pixmap_call[0][0][2] == xy_pos
+        expected_y = expected_positions[1]
+        assert draw_pixmap_call[0][0][2] == expected_y
+
+    @staticmethod
+    def test_display_width(
+        draw_pixmap_call: CallList, expected_positions: PositionTuple
+    ) -> None:
+        """Test that the QPixmap is drawn with the correct display width."""
+        expected_width = expected_positions[2]
+        assert draw_pixmap_call[0][0][3] == expected_width
+
+    @staticmethod
+    def test_display_height(
+        draw_pixmap_call: CallList, expected_positions: PositionTuple
+    ) -> None:
+        """Test that the QPixmap is drawn with the correct display height."""
+        expected_height = expected_positions[3]
+        assert draw_pixmap_call[0][0][4] == expected_height
 
     @staticmethod
     def test_image(draw_pixmap_call: CallList, pixmap: QPixmap) -> None:
         """Test that the pixmaps are identical."""
-        assert draw_pixmap_call[0][0][3].width() == pixmap.width()
-        assert draw_pixmap_call[0][0][3].height() == pixmap.height()
-        assert draw_pixmap_call[0][0][3].toImage() == pixmap.toImage()
+        # The pixmap is the 5th parameter (index 5) in fit_to_widget=True call
+        drawn_pixmap = draw_pixmap_call[0][0][5]
+        assert drawn_pixmap.width() == pixmap.width()
+        assert drawn_pixmap.height() == pixmap.height()
+        assert drawn_pixmap.toImage() == pixmap.toImage()

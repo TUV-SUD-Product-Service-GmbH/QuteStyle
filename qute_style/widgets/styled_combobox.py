@@ -240,12 +240,19 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         """Update the texts."""
         text = self._get_text()
 
-        # Compute elided text (with "...")
-        metrics = QFontMetrics(self.lineEdit().font())
-        elided_text = metrics.elidedText(
-            text, Qt.TextElideMode.ElideRight, self.lineEdit().width()
-        )
-        self.lineEdit().setText(elided_text)
+        # Only elide text if the widget has been properly sized
+        # (avoid eliding when width is too small, e.g., during initialization)
+        line_edit_width = self.lineEdit().width()
+        if line_edit_width > 50:  # Reasonable minimum width for text display
+            # Compute elided text (with "...")
+            metrics = QFontMetrics(self.lineEdit().font())
+            elided_text = metrics.elidedText(
+                text, Qt.TextElideMode.ElideRight, line_edit_width
+            )
+            self.lineEdit().setText(elided_text)
+        else:
+            # Widget not properly sized yet, just set the text directly
+            self.lineEdit().setText(text)
 
     def send_current_state(self) -> None:
         """Emit the current state via dataChanged."""
@@ -324,6 +331,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
                 if data in item_ids
                 else Qt.CheckState.Unchecked
             )
+        self.update_text()
 
 
 class SelectAllComboBox(CheckableComboBox[str | int], Generic[ItemData]):
