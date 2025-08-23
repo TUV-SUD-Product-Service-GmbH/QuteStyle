@@ -37,7 +37,7 @@ def fixture_visible_widgets() -> list[type[MainWidget]]:
 
 
 @pytest.fixture(name="mock_qsettings")
-def fixture_mock_qsettings() -> Mock:
+def fixture_mock_qsettings() -> Mock:  # type: ignore
     """Mock QSettings to control theme selection behavior."""
     with patch("qute_style.widgets.home_page.QSettings") as mock_settings:
         mock_instance = Mock()
@@ -70,9 +70,9 @@ class TestWidgetType:
     @staticmethod
     def test_enum_values() -> None:
         """Test that WidgetType has correct values."""
-        assert WidgetType.HOMEPAGE == 0
-        assert WidgetType.VERSION_HISTORY == 1
-        assert WidgetType.STYLE_WIDGET == 2
+        assert WidgetType.HOMEPAGE == 0  # type: ignore
+        assert WidgetType.VERSION_HISTORY == 1  # type: ignore
+        assert WidgetType.STYLE_WIDGET == 2  # type: ignore
 
     @staticmethod
     def test_enum_count() -> None:
@@ -286,7 +286,9 @@ class TestHomePage:
 
         # Test version history button
         with qtbot.waitSignal(home_page._widget_stack.widget_selected):
-            home_page._select_buttons[WidgetType.VERSION_HISTORY].clicked.emit()
+            home_page._select_buttons[
+                WidgetType.VERSION_HISTORY
+            ].clicked.emit()
 
         # Test style widget button
         with qtbot.waitSignal(home_page._widget_stack.widget_selected):
@@ -296,7 +298,9 @@ class TestHomePage:
     def test_widget_stack_signal_connection(home_page: HomePage) -> None:
         """Test that widget stack signal is connected."""
         # Simulate widget selection
-        home_page._widget_stack.widget_selected.emit(WidgetType.VERSION_HISTORY)
+        home_page._widget_stack.widget_selected.emit(
+            WidgetType.VERSION_HISTORY
+        )
 
         # Check that corresponding button is checked
         assert home_page._select_buttons[
@@ -494,11 +498,13 @@ class TestHomePageStyleSelection:
 
         # Find theme buttons - they should be QPushButton instances
         from PySide6.QtWidgets import QPushButton
+
         buttons = style_widget.findChildren(QPushButton)
 
         # Filter for theme buttons (not the navigation buttons)
         theme_buttons = [
-            btn for btn in buttons
+            btn
+            for btn in buttons
             if btn.parent() != home_page and btn.iconSize().width() > 0
         ]
 
@@ -576,10 +582,7 @@ class TestHomePageEdgeCases:
         assert home_page._app_lang == "de"
 
     @staticmethod
-    def test_multiple_theme_changes(
-        qtbot: QtBot,
-        home_page: HomePage
-    ) -> None:
+    def test_multiple_theme_changes(qtbot: QtBot, home_page: HomePage) -> None:
         """Test multiple rapid theme changes."""
         # Simulate multiple theme change signals
         themes = ["Dark", "Light", "Blue"]
@@ -597,4 +600,3 @@ class TestHomePageEdgeCases:
                     widget_type, animate=False
                 )
                 assert home_page._widget_stack.currentIndex() == widget_type
-
