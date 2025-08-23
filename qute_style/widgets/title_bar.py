@@ -157,7 +157,9 @@ class TitleBar(QFrame):
                 mouse_event = cast(QMouseEvent, event)
                 # Only process if left button is pressed (dragging)
                 if mouse_event.buttons() & Qt.MouseButton.LeftButton:
-                    self.move_window.emit(mouse_event.globalPosition().toPoint())
+                    self.move_window.emit(
+                        mouse_event.globalPosition().toPoint()
+                    )
             return True
         return False
 

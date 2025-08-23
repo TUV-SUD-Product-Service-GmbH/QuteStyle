@@ -450,7 +450,11 @@ class QuteStyleMainWindow(
 
             # Use the actual vertical offset captured at press time if
             # available; fallback to half title bar as a safe default.
-            click_y = self._drag_offset.y() if not self._drag_offset.isNull() else int(self._title_bar.height() / 2)
+            click_y = (
+                self._drag_offset.y()
+                if not self._drag_offset.isNull()
+                else int(self._title_bar.height() / 2)
+            )
 
             # Move window so cursor stays at same relative position
             new_pos = pos - QPoint(new_click_x, click_y)
@@ -615,9 +619,12 @@ class QuteStyleMainWindow(
     def _on_title_bar_press(self, pos: QPoint) -> None:
         """Initialize drag anchors when pressing on the title bar."""
         self.last_move_pos = pos
-        # Store the absolute offset between cursor global pos and window top-left
         self._drag_offset = pos - self.pos()
-        log.debug("Title bar press at %s, drag offset %s", self.last_move_pos, self._drag_offset)
+        log.debug(
+            "Title bar press at %s, drag offset %s",
+            self.last_move_pos,
+            self._drag_offset,
+        )
 
     def on_main_widget(self, widget_class: type[MainWidget]) -> None:
         """Handle display of the main widget that is of the given type."""
