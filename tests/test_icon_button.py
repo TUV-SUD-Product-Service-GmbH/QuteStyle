@@ -32,8 +32,8 @@ def test_icon_button_paint(  # pylint: disable=unused-argument
         """Mock draw Pixmap method."""
         assert pos_x == 7
         assert pos_y == 7
-        assert width == 21
-        assert height == 21
+        assert width == 22
+        assert height == 22
         store = PixmapStore.inst()
         new_pixmap = store.get_pixmap(
             "tests/test_images/test_icon.svg", 43, 43, get_color("foreground")
