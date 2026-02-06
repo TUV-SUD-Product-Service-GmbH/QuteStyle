@@ -83,22 +83,24 @@ class StyledComboBox(QComboBox):
 
         # Define size of arrow depending on ComboBox SubControl
         opt = QStyleOptionComboBox()
+        self.initStyleOption(opt)
         rect = self.style().subControlRect(
             QStyle.ComplexControl.CC_ComboBox,
             opt,
             QStyle.SubControl.SC_ComboBoxArrow,
-            None,
+            self,
         )
         radius = int(rect.width() * 0.5)
 
         # Get correct scale and pixmap
-        scale = int(painter.device().devicePixelRatio())
+        scale = painter.device().devicePixelRatio()
         pixmap = PixmapStore.inst().get_pixmap(
             ":/svg_icons/expand_more.svg",
-            radius * scale,
-            radius * scale,
+            round(radius * scale),
+            round(radius * scale),
             color,
         )
+        pixmap.setDevicePixelRatio(scale)
         # Draw arrow above existing ComboBox
         painter.setCompositionMode(
             QPainter.CompositionMode.CompositionMode_SourceOver
@@ -107,10 +109,8 @@ class StyledComboBox(QComboBox):
         # x-axis: in the middle of arrow rect with spacing 2
         # y-axis: in the middle of arrow rect
         painter.drawPixmap(
-            int(self.width() - 0.5 * (4 + rect.width() + radius)),
-            int(0.5 * (self.height() - radius)),
-            radius,
-            radius,
+            round(self.width() - 0.5 * (4 + rect.width() + radius)),
+            round(0.5 * (self.height() - radius)),
             pixmap,
         )
         painter.end()
@@ -133,7 +133,9 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
 
         # Make the combo editable to set a custom text, but readonly
         self.setEditable(True)
-        self.lineEdit().setReadOnly(True)
+        line_edit = self.lineEdit()
+        assert line_edit is not None
+        line_edit.setReadOnly(True)
 
         # Update the text when an item is toggled
         self.model().dataChanged.connect(self.handle_data_change)
@@ -142,7 +144,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         self.view().viewport().installEventFilter(self)
 
         # Hide and show popup when clicking the line edit
-        self.lineEdit().installEventFilter(self)
+        line_edit.installEventFilter(self)
         self.popup_open = False
 
         # add some spacing between the items
@@ -206,7 +208,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     @Slot(
         QModelIndex,
         QModelIndex,
-        "QVector<int>",  # type: ignore
+        "QVector<int>",
         name="handle_data_change",
     )
     def handle_data_change(
@@ -241,11 +243,13 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
         text = self._get_text()
 
         # Compute elided text (with "...")
-        metrics = QFontMetrics(self.lineEdit().font())
+        line_edit = self.lineEdit()
+        assert line_edit is not None
+        metrics = QFontMetrics(line_edit.font())
         elided_text = metrics.elidedText(
-            text, Qt.TextElideMode.ElideRight, self.lineEdit().width()
+            text, Qt.TextElideMode.ElideRight, line_edit.width()
         )
-        self.lineEdit().setText(elided_text)
+        line_edit.setText(elided_text)
 
     def send_current_state(self) -> None:
         """Emit the current state via dataChanged."""
@@ -347,7 +351,7 @@ class SelectAllComboBox(CheckableComboBox[str | int], Generic[ItemData]):
     @Slot(
         QModelIndex,
         QModelIndex,
-        "QVector<int>",  # type: ignore
+        "QVector<int>",
         name="handle_data_change",
     )
     def handle_data_change(

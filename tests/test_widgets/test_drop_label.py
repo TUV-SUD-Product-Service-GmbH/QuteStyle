@@ -15,8 +15,9 @@ def test_drop_label(qtbot: QtBot) -> None:
     drop_label = DropLabel("test text", widget)
     drop_label.show()
     qtbot.addWidget(drop_label)
-    assert drop_label.layout().count() == 4
-    assert (
-        cast(QLabel, drop_label.layout().itemAt(2).widget()).text()
-        == "test text"
-    )
+    layout = drop_label.layout()
+    assert layout is not None
+    assert layout.count() == 4
+    item = layout.itemAt(2)
+    assert item is not None
+    assert cast(QLabel, item.widget()).text() == "test text"

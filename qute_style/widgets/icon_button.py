@@ -169,7 +169,7 @@ class IconButton(QPushButton):
         """
         # Define size of pixmap dependent on FIXED_HEIGHT and devicePixelRatio
         scale_factor = root_painter.device().devicePixelRatio()
-        length = int(self.FIXED_HEIGHT * self._margin * scale_factor)
+        length = round(self.FIXED_HEIGHT * self._margin * scale_factor)
 
         # Get scaled pixmap from store
         pixmap = PixmapStore.inst().get_pixmap(
@@ -179,16 +179,15 @@ class IconButton(QPushButton):
         # x = (FIXED_HEIGHT - pixmap width)/2
         # y = (FIXED_HEIGHT - pixmap height)/2
         # Define width/height of target rect dependent on scale_factor
+        target_w = round(pixmap.width() / scale_factor)
+        target_h = round(pixmap.height() / scale_factor)
         root_painter.drawPixmap(
-            int((self.FIXED_HEIGHT - pixmap.width() / scale_factor) / 2),
-            int((self.FIXED_HEIGHT - pixmap.height() / scale_factor) / 2),
-            int(pixmap.width() / scale_factor),
-            int(pixmap.height() / scale_factor),
+            round((self.FIXED_HEIGHT - target_w) / 2),
+            round((self.FIXED_HEIGHT - target_h) / 2),
+            target_w,
+            target_h,
             pixmap,
         )
-        # For example rect = 50x50, scale_factor = 2, svg = 1x10
-        # --> width, height = 40, pixmap = 4x40, x = 23, y = 5,
-        # target rect = 2x20
 
     def _text_paint(self, root_painter: QPainter, text_color: QColor) -> None:
         """Paint the text in the given color."""

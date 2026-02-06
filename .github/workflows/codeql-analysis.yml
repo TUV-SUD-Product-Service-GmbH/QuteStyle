@@ -21,10 +21,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python 3.11
+    - name: Setup Python 3.14
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.14"
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

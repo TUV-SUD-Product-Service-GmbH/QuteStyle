@@ -27,7 +27,7 @@ log = logging.getLogger(
 
 
 @contextlib.contextmanager
-def painter_save(painter: QPainter) -> Generator[QPainter, None, None]:
+def painter_save(painter: QPainter) -> Generator[QPainter]:
     """
     Context manager that saves and restores the state of a QPainter.
 
@@ -212,27 +212,12 @@ class QuteStyle(QProxyStyle):
         """QCheckBox configuration."""
 
         # Space between the checkbox and the text.
-        SPACER = 3
+        SPACER = 6
 
         ICON_PATH = {
             Qt.CheckState.PartiallyChecked: ":/svg_icons/partial_checked.svg",
             Qt.CheckState.Checked: ":/svg_icons/checked.svg",
         }
-
-        @staticmethod
-        def text_option(option: QStyleOptionButton) -> QStyleOptionButton:
-            """Return the option to draw the text for a QCheckBox."""
-            text_option = QStyleOptionButton(option)
-            offset = (
-                option.iconSize.width() + QuteStyle.QCheckBoxOptions.SPACER
-            )
-            text_option.rect = QRect(
-                offset,
-                0,
-                option.rect.width() - offset,
-                option.rect.height(),
-            )
-            return text_option
 
     class ToggleOptions:  # pylint: disable=too-few-public-methods
         """Toggle configuration."""
@@ -353,7 +338,17 @@ class QuteStyle(QProxyStyle):
     ) -> None:
         """Draw a QCheckBox."""
         self._draw_indicator_checkbox(option, painter, widget)
-        text_option = QuteStyle.QCheckBoxOptions.text_option(option)
+        indicator_rect = self.subElementRect(
+            self.SubElement.SE_CheckBoxIndicator, option, widget
+        )
+        text_option = QStyleOptionButton(option)
+        offset = indicator_rect.right() + 1 + self.QCheckBoxOptions.SPACER
+        text_option.rect = QRect(
+            offset,
+            0,
+            option.rect.width() - offset,
+            option.rect.height(),
+        )
         self.drawControl(
             QStyle.ControlElement.CE_CheckBoxLabel,
             text_option,

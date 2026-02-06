@@ -41,10 +41,12 @@ class Icon(QWidget):
     def paintEvent(self, _: QtGui.QPaintEvent) -> None:  # noqa: N802
         """Override QWidget.paintEvent to draw pixmap."""
         pixmap = self._get_pixmap()
-        xy_pos = (self.height() - pixmap.height()) // 2
+        dpr = pixmap.devicePixelRatio()
+        x_pos = round((self.width() - pixmap.width() / dpr) / 2)
+        y_pos = round((self.height() - pixmap.height() / dpr) / 2)
 
         painter = QPainter(self)
-        painter.drawPixmap(xy_pos, xy_pos, pixmap)
+        painter.drawPixmap(x_pos, y_pos, pixmap)
         painter.end()
 
     def _get_pixmap(self) -> QPixmap:

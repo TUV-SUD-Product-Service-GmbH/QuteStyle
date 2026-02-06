@@ -247,15 +247,13 @@ class ModelViewWidget(MainWidget):
         """Return ModelViewWidget specific settings."""
         if not self._settings_widget:
             self._settings_widget = QWidget()
-            QVBoxLayout(self._settings_widget)
-            self._settings_widget.layout().addWidget(
-                QLabel(f"Settings {self.NAME}", self)
-            )
-            self._settings_widget.layout().addWidget(QCheckBox("Activate 1"))
-            self._settings_widget.layout().addWidget(QCheckBox("Activate 2"))
-            self._settings_widget.layout().addWidget(QCheckBox("Activate 2"))
-            self._settings_widget.layout().addWidget(QLabel("...", self))
-            self._settings_widget.layout().addItem(
+            settings_layout = QVBoxLayout(self._settings_widget)
+            settings_layout.addWidget(QLabel(f"Settings {self.NAME}", self))
+            settings_layout.addWidget(QCheckBox("Activate 1"))
+            settings_layout.addWidget(QCheckBox("Activate 2"))
+            settings_layout.addWidget(QCheckBox("Activate 2"))
+            settings_layout.addWidget(QLabel("...", self))
+            settings_layout.addItem(
                 QSpacerItem(
                     0,
                     0,

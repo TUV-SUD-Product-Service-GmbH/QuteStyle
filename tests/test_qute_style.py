@@ -261,7 +261,7 @@ def qtbot(request: SubRequest) -> QtBot:
 
 
 @pytest.fixture(name="painter", scope="class")
-def fixture_painter() -> Generator[QPainter, None, None]:
+def fixture_painter() -> Generator[QPainter]:
     """
     Create a QPainter with a 100x100 QImage to paint on.
 
@@ -428,7 +428,7 @@ def test_draw_primitive_indicator_checkbox(
 
 
 @contextlib.contextmanager
-def painter_save_mock(_: QPainter) -> Generator[None, None, None]:
+def painter_save_mock(_: QPainter) -> Generator[None]:
     """
     Mock to disable the context manager to disable save of QPainter.
 

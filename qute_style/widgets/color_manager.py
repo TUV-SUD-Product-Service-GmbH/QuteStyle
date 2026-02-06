@@ -155,7 +155,9 @@ class ColorManager(BaseWidget):
         theme = self._create_theme()
         app = cast(QApplication, QApplication.instance())
         assert app is not None
-        app.activeWindow().setStyleSheet(MAIN_STYLE.format(**theme))
+        window = app.activeWindow()
+        assert window is not None
+        window.setStyleSheet(MAIN_STYLE.format(**theme))
         self.set_code()
 
     def set_code(self) -> None:

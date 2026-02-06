@@ -57,7 +57,6 @@ class CornerGrip(QSizeGrip):
         The mouseMoveEvent method is only called after a mousePressEvent call.
         """
         self._resize_x_y(event.pos().x(), event.pos().y())
-        super().mouseMoveEvent(event)
 
     def _resize_x_y(self, delta_x: int, delta_y: int) -> None:
         """
@@ -145,6 +144,9 @@ class EdgeGrip(QWidget):
             self.setGeometry(5, 10, 10, height)
         elif self._position == Qt.Edge.RightEdge:
             self.setGeometry(width - 15, 10, 10, height)
+
+    def mousePressEvent(self, _: QMouseEvent) -> None:  # noqa: N802
+        """Accept mouse press to enable mouse move tracking for resize."""
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:  # noqa: N802
         """
