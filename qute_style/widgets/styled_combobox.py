@@ -105,12 +105,10 @@ class StyledComboBox(QComboBox):
         painter.setCompositionMode(
             QPainter.CompositionMode.CompositionMode_SourceOver
         )
-        # Draw arrow in rect 25x25 at the end, with size: radius x radius
-        # x-axis: in the middle of arrow rect with spacing 2
-        # y-axis: in the middle of arrow rect
+        # Center arrow icon within the arrow sub-control rect
         painter.drawPixmap(
-            round(self.width() - 0.5 * (4 + rect.width() + radius)),
-            round(0.5 * (self.height() - radius)),
+            round(rect.x() + (rect.width() - radius) / 2),
+            round((self.height() - radius) / 2),
             pixmap,
         )
         painter.end()
