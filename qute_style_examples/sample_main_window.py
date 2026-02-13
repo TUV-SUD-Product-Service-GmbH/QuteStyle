@@ -36,9 +36,8 @@ class SettingsWidget(SettingsBaseWidget):
         """Create a new SettingsWidget."""
         super().__init__(parent)
         layout = QVBoxLayout(self)
-        self.setLayout(layout)
-        self.layout().addWidget(QLabel("Global settings"))
-        self.layout().addItem(
+        layout.addWidget(QLabel("Global settings"))
+        layout.addItem(
             QSpacerItem(
                 0,
                 0,

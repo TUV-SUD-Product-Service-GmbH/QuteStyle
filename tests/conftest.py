@@ -65,7 +65,7 @@ class QuteStyleTestApplication(QuteStyleApplication):
 
 
 @pytest.fixture(scope="session")
-def qapp() -> Generator[QuteStyleTestApplication, None, None]:
+def qapp() -> Generator[QuteStyleTestApplication]:
     """
     Overwrite pytest's qapp fixture.
 

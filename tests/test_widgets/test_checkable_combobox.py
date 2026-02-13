@@ -63,14 +63,12 @@ def test_popup_event_filter(qtbot: QtBot) -> None:
         # the event propagation in QtBot does not work correct so we cannot
         # test if the popup is really shown. therefore we check that at least
         # the internal state and eventFilter work.
-        pos = combobox.lineEdit().rect().center()
-        qtbot.mouseRelease(
-            combobox.lineEdit(), Qt.MouseButton.LeftButton, pos=pos
-        )
+        line_edit = combobox.lineEdit()
+        assert line_edit is not None
+        pos = line_edit.rect().center()
+        qtbot.mouseRelease(line_edit, Qt.MouseButton.LeftButton, pos=pos)
         assert combobox.popup_open is True
-        qtbot.mouseRelease(
-            combobox.lineEdit(), Qt.MouseButton.LeftButton, pos=pos
-        )
+        qtbot.mouseRelease(line_edit, Qt.MouseButton.LeftButton, pos=pos)
         assert combobox.popup_open is False
 
     assert not exceptions

@@ -92,9 +92,10 @@ class TestDraw:
 
     @staticmethod
     @pytest.fixture(name="xy_pos", scope="class")
-    def fixture_xy_pos(icon: Icon, pixmap: QPixmap) -> float:
+    def fixture_xy_pos(icon: Icon, pixmap: QPixmap) -> int:
         """Return the x/y position of the pixmap to paint."""
-        return (icon.height() - pixmap.height()) // 2
+        dpr = pixmap.devicePixelRatio()
+        return round((icon.height() - pixmap.height() / dpr) / 2)
 
     @staticmethod
     @pytest.fixture(name="draw_pixmap_call", scope="class")

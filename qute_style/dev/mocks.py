@@ -121,7 +121,7 @@ def mock_q_message_dialog(
     parent: QWidget,
     method: str = "warning",
     return_value: QMessageBox.StandardButton | None = None,
-) -> Generator[None, None, None]:
+) -> Generator[None]:
     """
     Mock the QMessageDialog call of a method in a context.
 
@@ -152,7 +152,7 @@ def mock_qute_message_dialog(
     parent: QWidget,
     method: str = "warning",
     return_value: QMessageBox.StandardButton | None = None,
-) -> Generator[None, None, None]:
+) -> Generator[None]:
     """
     Mock the QuteMessageBox call of a method in a context.
 
@@ -182,7 +182,7 @@ def check_call(  # noqa: PLR0913
     call_kwargs_list: list[dict[str, Any]] | None = None,
     call_count: int = 1,
     as_property: bool = False,
-) -> Generator[CallList, None, None]:
+) -> Generator[CallList]:
     """
     Context manager for mocking and checking a call to a method.
 
@@ -224,7 +224,7 @@ def check_call_str(  # noqa: PLR0913
     call_kwargs_list: list[dict[str, Any]] | None = None,
     call_count: int = 1,
     as_property: bool = False,
-) -> Generator[CallList, None, None]:
+) -> Generator[CallList]:
     """
     Context manager for mocking and checking a call to a method.
 

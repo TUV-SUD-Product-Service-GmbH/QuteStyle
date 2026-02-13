@@ -132,8 +132,9 @@ class WaitingSpinner(QWidget):
         self.show()
 
         if self._disable_parent_when_spinning:
-            assert self.parentWidget()
-            self.parentWidget().setEnabled(False)
+            parent = self.parentWidget()
+            assert parent is not None
+            parent.setEnabled(False)
 
         if not self._timer.isActive():
             self._timer.start()
@@ -144,8 +145,9 @@ class WaitingSpinner(QWidget):
         self._is_spinning = False
         self.hide()
 
-        if self.parentWidget() and self._disable_parent_when_spinning:
-            self.parentWidget().setEnabled(True)
+        parent = self.parentWidget()
+        if parent and self._disable_parent_when_spinning:
+            parent.setEnabled(True)
 
         if self._timer.isActive():
             self._timer.stop()
@@ -272,10 +274,11 @@ class WaitingSpinner(QWidget):
 
     def _update_position(self) -> None:
         """Center WaitingSpinner on parent widget."""
-        if self.parentWidget() and self._center_on_parent:
+        parent = self.parentWidget()
+        if parent and self._center_on_parent:
             self.move(
-                (self.parentWidget().width() - self.width()) // 2,
-                (self.parentWidget().height() - self.height()) // 2,
+                (parent.width() - self.width()) // 2,
+                (parent.height() - self.height()) // 2,
             )
 
     @staticmethod

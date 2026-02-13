@@ -18,6 +18,7 @@ from PySide6.QtCore import (
     QSize,
     Qt,
     Signal,
+    Slot,
 )
 from PySide6.QtGui import QCloseEvent, QMouseEvent, QResizeEvent, QShowEvent
 from PySide6.QtWidgets import (
@@ -139,11 +140,14 @@ class QuteStyleMainWindow(
 
         # Add a central QWidget with a layout
         self.setCentralWidget(QWidget())
-        central_widget_layout = QVBoxLayout(self.centralWidget())
+        self._central_layout = QVBoxLayout(self.centralWidget())
 
         # Add the main QFrame that contains the background style.
         self._background = BackgroundFrame(self)
-        central_widget_layout.addWidget(self._background)
+        self._central_layout.addWidget(self._background)
+
+        bg_layout = self._background.layout()
+        assert bg_layout is not None
 
         # Get widgets to set visible
         self._visible_widgets = self._get_widgets_to_display(
@@ -151,11 +155,11 @@ class QuteStyleMainWindow(
         )
 
         # Add the left menu.
-        self._left_menu = self._add_left_menu(self._background.layout())
+        self._left_menu = self._add_left_menu(bg_layout)
 
         # Add the left column.
         self._left_column_frame, self._left_column = self._add_left_column(
-            self._background.layout()
+            bg_layout
         )
 
         # Add the main frame that contains title and credit bar as well as
@@ -164,7 +168,7 @@ class QuteStyleMainWindow(
         right_app_layout = QVBoxLayout(right_app_frame)
         right_app_layout.setContentsMargins(3, 5, 5, 5)
         right_app_layout.setSpacing(6)
-        self._background.layout().addWidget(right_app_frame)
+        bg_layout.addWidget(right_app_frame)
 
         # Add the title bar to the main frame
         self._title_bar = self._add_title_bar(right_app_layout)
@@ -416,6 +420,8 @@ class QuteStyleMainWindow(
         """Set the main stylesheet of the app."""
         self.setStyleSheet(get_style())
 
+    Slot(QPoint)
+
     def move_window(self, pos: QPoint) -> None:
         """
         Move the window.
@@ -484,7 +490,7 @@ class QuteStyleMainWindow(
         This also adds the round borders on the main QFrame.
         """
         log.debug("window is in normal mode")
-        self.centralWidget().layout().setContentsMargins(10, 10, 10, 10)
+        self._central_layout.setContentsMargins(10, 10, 10, 10)
         self._background.set_stylesheet(border_radius=10, border_size=2)
         self._title_bar.set_maximized(False)
 
@@ -501,7 +507,7 @@ class QuteStyleMainWindow(
         borders from the main QFrame.
         """
         log.debug("window is in maximized/fullscreen mode")
-        self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
+        self._central_layout.setContentsMargins(0, 0, 0, 0)
         self._background.set_stylesheet(border_radius=0, border_size=0)
         self._title_bar.set_maximized(True)
 
@@ -629,10 +635,9 @@ class QuteStyleMainWindow(
         if widget_class != right_widget_type:
             # Set the current widget for the right column to make it visible.
             for idx in range(self._right_content.count()):
-                if isinstance(self._right_content.widget(idx), widget_class):
-                    self._right_content.setCurrentWidget(
-                        self._right_content.widget(idx)
-                    )
+                widget = self._right_content.widget(idx)
+                if isinstance(widget, widget_class):
+                    self._right_content.setCurrentWidget(widget)
 
             # If the right column isn't visible, we start the animation.
             if not visible:

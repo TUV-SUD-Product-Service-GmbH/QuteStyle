@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qute_style"
-version = "1.0.9"
+version = "1.0.10"
 description = "QuteStyle is an expandable application framework for PySide6"
 authors = ["Marina Baumgartner, Dairen Gonschior, Tilman Krummeck, Dennis Spitzhorn, Gerhard Trapp, Patrick Zwerschke <PS-TF-Entwicklung@tuev-sued.de>"]
 readme = "README.md"
@@ -12,23 +12,22 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
-PySide6 = "6.9.1"
+python = ">=3.10,<3.15"
+PySide6 = "6.10.2"
 
 [tool.poetry.dev-dependencies]
-pytest = "8.4.0"
-pytest-qt = "4.4.0"
-requests = "2.32.3"
-black = "25.1.0"
-coverage = "7.8.2"
-isort = "6.0.1"
-mypy = "1.16.0"
-pre-commit = "4.2.0"
-pytest-cov = "^6.0.0"
-pytest-github-actions-annotate-failures = "^0.2.0"
-ruff = "^0.11.12"
-types-requests = "2.32.0.20250602"
-PySide6-stubs = { git = "https://github.com/python-qt-tools/PySide6-stubs.git", rev = "70dd77b" }
+pytest = "9.0.2"
+pytest-qt = "4.5.0"
+requests = "2.32.5"
+black = "26.1.0"
+coverage = "7.13.3"
+isort = "7.0.0"
+mypy = "1.19.1"
+pre-commit = "4.5.1"
+pytest-cov = "^7.0.0"
+pytest-github-actions-annotate-failures = "^0.3.0"
+ruff = "^0.15.0"
+types-requests = "2.32.4.20260107"
 
 
 [tool.poetry.scripts]
@@ -41,7 +40,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 # Decrease the maximum line length to 79 characters.
 line-length = 79
-target-version = "py311"
+target-version = "py314"
 src = ["qute_style", "qute_style_examples", "tests", "dev_scripts"]
 extend-exclude = ["gen", "ui", "resources", "resources_rc.py"]
 

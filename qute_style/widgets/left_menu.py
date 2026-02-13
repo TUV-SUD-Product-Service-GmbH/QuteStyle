@@ -187,9 +187,11 @@ class LeftMenu(QWidget):
 
         Animation is working with the minimum width of the parent widget.
         """
+        parent_layout = self.parent().layout()
+        assert parent_layout is not None
         parent_margin = (
-            self.parent().layout().contentsMargins().left()
-            + self.parent().layout().contentsMargins().right()
+            parent_layout.contentsMargins().left()
+            + parent_layout.contentsMargins().right()
         )
         parent_width = self.parent().width()
         self._animation.stop()
