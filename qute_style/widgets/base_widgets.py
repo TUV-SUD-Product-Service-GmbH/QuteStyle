@@ -52,7 +52,7 @@ class MainWidget(BaseWidget):
     @property
     def settings_widget(
         self,
-    ) -> None | QWidget:
+    ) -> QWidget | None:
         """Get the settings widget. Implemented by custom classes."""
         return None
 

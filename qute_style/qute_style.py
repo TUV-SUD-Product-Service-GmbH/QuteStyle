@@ -9,9 +9,12 @@ from collections.abc import Generator
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtGui import QBrush, QColor, QPainter, QPalette, QPen
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QCheckBox,
+    QComboBox,
     QProxyStyle,
     QStyle,
+    QStyleHintReturn,
     QStyleOption,
     QStyleOptionButton,
     QStyleOptionViewItem,
@@ -442,6 +445,18 @@ class QuteStyle(QProxyStyle):
                 QuteStyle.ToggleOptions.BACKGROUND_RECT_RADIUS,
             )
 
+    def styleHint(  # noqa: N802
+        self,
+        hint: QStyle.StyleHint,
+        option: QStyleOption | None = None,
+        widget: QWidget | None = None,
+        return_data: QStyleHintReturn | None = None,
+    ) -> int:
+        """Return the style hint for the given element."""
+        if hint == QStyle.StyleHint.SH_ComboBox_Popup:
+            return 0
+        return super().styleHint(hint, option, widget, return_data)
+
     def drawPrimitive(  # noqa: N802
         self,
         element: QStyle.PrimitiveElement,
@@ -454,6 +469,11 @@ class QuteStyle(QProxyStyle):
             # Disable the drawing of a rectangle with a dashed line around a
             # focussed item. This was disabled when implementing the QStyle
             # to replace StyledCheckboxDelegate.
+            return
+        if element == self.PrimitiveElement.PE_IndicatorToolBarSeparator and (
+            isinstance(widget, QComboBox | QAbstractItemView)
+        ):
+            self._draw_item_view_separator(option, painter)
             return
         if element == self.PrimitiveElement.PE_PanelItemViewItem:
             if isinstance(option, QStyleOptionViewItem):
@@ -607,6 +627,17 @@ class QuteStyle(QProxyStyle):
                 )
                 painter.fillRect(text_rect, brush)
         painter.restore()
+
+    @staticmethod
+    def _draw_item_view_separator(
+        option: QStyleOption, painter: QPainter
+    ) -> None:
+        """Draw the separator of a combobox popup as a thin themed line."""
+        rect = option.rect
+        painter.fillRect(
+            QRect(rect.x() + 6, rect.center().y(), rect.width() - 12, 1),
+            QColor(get_color("bg_three")),
+        )
 
     @staticmethod
     def _item_view_item_background_brush(

@@ -32,11 +32,9 @@ class BackgroundFrame(QFrame):
 
     def set_stylesheet(self, border_radius: int, border_size: int) -> None:
         """Set the stylesheet with custom border radius and size."""
-        self.setStyleSheet(
-            f"""
+        self.setStyleSheet(f"""
             #app_background {{
                 border-radius: {border_radius};
                 border: {border_size}px;
                 }}
-            """
-        )
+            """)

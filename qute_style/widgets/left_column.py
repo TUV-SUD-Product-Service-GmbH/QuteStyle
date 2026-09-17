@@ -144,7 +144,7 @@ class LeftColumn(QWidget):
         return icon, title_label
 
     def handle_settings_display(
-        self, settings_widget: None | QWidget, icon: str
+        self, settings_widget: QWidget | None, icon: str
     ) -> None:
         """Handle the display of the settings widget."""
         current_type = self.current_widget_type()

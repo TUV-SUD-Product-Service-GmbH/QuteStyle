@@ -225,7 +225,7 @@ class ModelViewWidget(MainWidget):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         self._view = QListView()
-        self._settings_widget: None | QWidget = None
+        self._settings_widget: QWidget | None = None
         layout.addWidget(self._view)
         model = Model(["Item1", "Item2", "Item3\nwith line break"])
 
@@ -275,7 +275,7 @@ class SpinnerWidget(MainWidget):
         super().__init__(parent)
         layout = QHBoxLayout(self)
         self._view = QListView()
-        self._settings_widget: None | QWidget = None
+        self._settings_widget: QWidget | None = None
         layout.addWidget(self._view)
         self._spinner = create_waiting_spinner(self)
         self._spinner.start()
