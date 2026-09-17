@@ -277,22 +277,29 @@ QComboBox::drop-down {{
 QComboBox QAbstractItemView {{
     color: {foreground};
     background-color: {bg_elements};
-    padding: 10px;
+    selection-color: {active};
     selection-background-color: {context_color};
-    border-top-right-radius: 0px;
-    border-top-left-radius: 0px;
-    border: 1px solid {context_hover};
-    border-top: 0px transparent
+    border: 1px solid {bg_three};
+    border-radius: 8px;
+    padding: 4px;
+    outline: 0;
+}}
+QComboBox QAbstractItemView::item {{
+    color: {foreground};
+    background-color: transparent;
+    border: 0px;
+    border-radius: 4px;
+    padding: 4px 6px;
+    min-height: 20px;
 }}
 QComboBox QAbstractItemView::item:selected,
 QComboBox QAbstractItemView::item:hover {{
     color: {active};
     background-color: {context_color};
-    border-radius: 3px;
 }}
-QComboBox:on {{
-     border-bottom-left-radius: 0px;
-     border-bottom-right-radius: 0px;
+QComboBox QAbstractItemView::item:disabled {{
+    color: {fg_disabled};
+    background-color: transparent;
 }}
 QComboBox:disabled {{
     color: {fg_disabled};

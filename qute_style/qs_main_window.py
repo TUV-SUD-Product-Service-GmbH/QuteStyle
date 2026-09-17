@@ -139,8 +139,9 @@ class QuteStyleMainWindow(
         self._configure_main_window()
 
         # Add a central QWidget with a layout
-        self.setCentralWidget(QWidget())
-        self._central_layout = QVBoxLayout(self.centralWidget())
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        self._central_layout = QVBoxLayout(central_widget)
 
         # Add the main QFrame that contains the background style.
         self._background = BackgroundFrame(self)
@@ -325,6 +326,13 @@ class QuteStyleMainWindow(
         layout.addWidget(right_column_frame)
         return right_column_frame, right_content
 
+    @property
+    def _central_widget(self) -> QWidget:
+        """Return the central widget that was set in __init__."""
+        central_widget = self.centralWidget()
+        assert central_widget is not None
+        return central_widget
+
     def _configure_main_window(self) -> None:
         """Configure the QuteStyleMainWindow."""
         # Set the name of the app.
@@ -341,7 +349,7 @@ class QuteStyleMainWindow(
         """Add a TitleBar to the given QLayout."""
         title_bar = TitleBar(
             self,
-            self.centralWidget(),
+            self._central_widget,
             self._get_widgets_to_display(self.RIGHT_WIDGET_CLASSES),
             self._app_data.app_name,
             self._app_data.app_icon,
@@ -371,7 +379,7 @@ class QuteStyleMainWindow(
         left_column_layout.setContentsMargins(0, 0, 0, 0)
 
         left_column = LeftColumn(
-            app_parent=self.centralWidget(),
+            app_parent=self._central_widget,
             widget_types=self._get_widgets_to_display(
                 self.LEFT_WIDGET_CLASSES
             ),
@@ -399,7 +407,7 @@ class QuteStyleMainWindow(
         # add custom left menu
         left_menu = LeftMenu(
             parent=left_menu_frame,
-            app_parent=self.centralWidget(),
+            app_parent=self._central_widget,
             main_widgets=self._visible_widgets,
             left_column_widgets=self._get_widgets_to_display(
                 self.LEFT_WIDGET_CLASSES

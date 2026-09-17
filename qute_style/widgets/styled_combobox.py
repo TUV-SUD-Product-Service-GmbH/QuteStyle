@@ -27,6 +27,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QComboBox,
+    QFrame,
     QListView,
     QStyle,
     QStyleOptionComboBox,
@@ -53,14 +54,14 @@ class StyledComboBox(QComboBox):
     def __init__(self, parent: QWidget | None = None) -> None:
         """Create a new StyledComboBox."""
         super().__init__(parent)
+        container = self.view().window()
         # options below are needed, otherwise the rounded
         # corners of dropdowns cannot be drawn correctly
-        self.view().window().setWindowFlags(
+        container.setWindowFlags(
             Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
         )
-        self.view().window().setAttribute(
-            Qt.WidgetAttribute.WA_TranslucentBackground
-        )
+        container.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.view().setFrameShape(QFrame.Shape.NoFrame)
         # stop combobox contents from limiting width of whole application
         self.setSizeAdjustPolicy(
             QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
@@ -206,7 +207,7 @@ class CheckableComboBox(StyledComboBox, Generic[ItemData]):
     @Slot(
         QModelIndex,
         QModelIndex,
-        "QVector<int>",
+        "QList<int>",
         name="handle_data_change",
     )
     def handle_data_change(
@@ -349,7 +350,7 @@ class SelectAllComboBox(CheckableComboBox[str | int], Generic[ItemData]):
     @Slot(
         QModelIndex,
         QModelIndex,
-        "QVector<int>",
+        "QList<int>",
         name="handle_data_change",
     )
     def handle_data_change(

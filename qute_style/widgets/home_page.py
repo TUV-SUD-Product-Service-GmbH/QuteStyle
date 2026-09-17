@@ -70,13 +70,11 @@ class StackedWidget(QStackedWidget):
         super().setCurrentIndex(index)
         self.widget_selected.emit(index)
         if animate:
-            self._animation.setStartValue(
-                QSize(self.currentWidget().width(), 0)
-            )
+            current_widget = self.currentWidget()
+            assert current_widget is not None
+            self._animation.setStartValue(QSize(current_widget.width(), 0))
             self._animation.setEndValue(
-                QSize(
-                    self.currentWidget().width(), self.currentWidget().height()
-                )
+                QSize(current_widget.width(), current_widget.height())
             )
             self._animation.start()
             self._animation_running = True
