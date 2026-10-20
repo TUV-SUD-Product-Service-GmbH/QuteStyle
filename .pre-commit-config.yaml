@@ -4,14 +4,14 @@ ci:
 
 repos:
   - repo: https://github.com/pycqa/isort
-    rev: 9.0.1
+    rev: 10.0.0b1
     hooks:
       - id: isort
         name: isort (python)
         args: [ "--profile", "black", "-l 79" ]
 
-  - repo: https://github.com/psf/black
-    rev: 26.5.1
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.10.1
     hooks:
       - id: black
         exclude: ".*venv/.*|.*qute_style/gen/.*|resources_rc.py"
@@ -37,7 +37,7 @@ repos:
       - id: requirements-txt-fixer
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
+    rev: v0.17.1
     hooks:
       - id: ruff
         name: ruff
